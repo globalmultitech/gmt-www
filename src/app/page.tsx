@@ -293,7 +293,57 @@ export default function Home() {
             </p>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20">
+          <div className="relative w-full max-w-5xl mx-auto mb-20">
+            <svg viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
+              <path d="M88.72,254.34l-3.32-4.21l-10.43-1.92l-12.8-12.8l-3-14.72l-10.28-2.19l1,8.73l9.24,5.82l5.39,1.5l11.32,14.96l6.24,2.8l1.62,5.39l10.95,10.53l2.16,3.92l9.45,1.5l12-1.5l11.87,2.33l9,1.8l10.1,13.48l1.8,6.12l-0.15,8.39l-5.84,7l-2.85,6.89l0.3,9l-1.65,14.08l3.9,15.13l7.94,11.24l-1.2,11.54l-4.65,7.64l-1.35,9l-3.6,15.58l2.55,14.38l3.3,22.33l7.2,4.2l10.8-3.45l13.8,2.1l2.7,12.29l-2.4,6.59l-4.2,7.94l-15-1.8l-12.9,4.8l-9.6,1.8l-1.65-1.95l-10.04-4.8l-13.94,1.95l-10.64,8.69l-3.6,9.29l-1.35,10.19l-3.45,5.54l-3.75,10.34l0.6,8.69l5.85,11.54l3.6,8.24l-2.1,7.79l-7.94,13.63l4.95,12.89l-1.5,14.53l-15.3-3.45l-10.8-1.2l-9.74,1.95l-5.7-1.8l3.9-4.34l4.95-2.85l-2.1-6.44l4.5-1.65l9.89,3.3l15,7l10.94,1.95l10.34,8.39l-1.95,16.93l2.4,6l-4.5,7.19l-15-4.5l-8.69,1.8l-5.4-8.84l14.38-10.04l-2.1-12l6.59-11.39l11.69-3.6l11.69-12.44l14.08-6.29l2.1-4.94l-4.2-1.2l-3.15-6l-4.5-1.2l-6.14,5.7l-4.5,5.54l2.4,3.6l-3.6,3.3l-4.95,7.49l-3.3,11.24l-15.44-6.89l-23.68-0.3l-8.09-1.95l8.09-4.34l-14.68-4.2l-12.14-8.39l-0.3-10.64l-10.5-1.65l-9.74-2.25l-12.59-5.84l-11.39,1.35l-9.89-3.75l-12.74,1.8l-12.74,5.84l-4.2,10.04l-1.65,12.29l2.25,9l8.69,8.09l-3.75,8.69l1.95,13.18l-2.1,14.23l-10.8-8.69l-8.39,12l-1.5,6l2.7,14.08l-1.2,10.94l-7.5-17.53l-1.2,12l3.15,10l-3.15,10.79l1.95,7.64l6.74-2.25l10.34,4.2l7.34,4.2l0.3,5.7l-3.6,11.24l-7.5,9l-1.95,16.48l7.19,12.44l10,3.75l-4.5,13.18l-0.45,10.64l-4.2,11.09l-11.39-1.5l-12-6.74l-5.7,9.14l-4.5,10.49l-11.39-6.74l-15.28,4.2l-14.38,6.44l-12-1.8l-9.89-11.39l-2.1-11.39l6-9.29l9.29-6.74l10.19-3.3l4.5-12l-4.2-12.59l-1.5-8.69l-7.2-11.24l1.5-10.79l6.89-4.2l9-7.79l3-9.89l-4.5-12l-1.5-9.29l-6.74-10.34l-2.7-12.59l-1.2-10.04l6.3-8.09l11.09-6.44l-5.1-9.74l-10.19-12.59l-12.59-2.1l-10.19-1.5l-11.09,4.8l-11.69,6.59l-6,10.94l3.9,12l0.45,4.8l-3.45,6.14l-4.2,1.95l-2.25-4.2l-7.79-8.84l-10.5-12.14l-10.2-11.69l-10.94-10.8l-17.68-8.09l-11.09-6.14l-12-12.14l-13.78-18.13l-10.2-10.2l-12.44-14.23l-15.28-13.48l-9-10.94l-10-14.23l-10.79-11.09l-14.08-9l-8.09-7.2l-9.89-8.39l-12.59-6.29l-6-4.5l-7.19-6.74l-9.29-5.1l-6.29-3.6l-7.79-3.9l-4.5-2.7l-5.4-3.6l-6.59-2.7z M9.15,235.3c-0.2,5.85-1.94,9.16-2.4,11.39s-3,6.89-3,6.89l1.65-7s2.7-5.25,2.7-8.24s-2.4-4.94-2.4-4.94l3.44,1.95z" fill="hsl(var(--muted))" stroke="hsl(var(--border))" strokeWidth="0.5" />
+              <g>
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <circle cx="280" cy="360" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>DKI Jakarta</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <circle cx="420" cy="370" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Surabaya</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                           <circle cx="100" cy="250" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Medan</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                           <circle cx="550" cy="340" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Makassar</p>
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                           <circle cx="880" cy="320" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                            <p>Jayapura</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
+              </g>
+            </svg>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center flex flex-col items-center">
                 <div className="mb-4 inline-flex h-20 w-20 items-center justify-center rounded-full border-2 border-primary/50 bg-primary/10">
@@ -303,56 +353,6 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground tracking-widest mt-1 uppercase">{stat.label}</p>
               </div>
             ))}
-          </div>
-
-          <div className="relative w-full max-w-5xl mx-auto">
-            <svg viewBox="0 0 1024 439" xmlns="http://www.w3.org/2000/svg" className="w-full h-auto">
-              <path d="M83.737 271.396l-3.328-4.223-10.45-1.92-12.835-12.834-3.012-14.755-10.3-2.191 1.044-8.752 9.256-5.83 5.407-1.498 11.345-14.99 6.257-2.81 1.622-5.407 10.973-10.552 2.164-3.924 9.473-1.498 12.042 1.498 11.892-2.34 9.044 1.801 10.124 13.513 1.802 6.13-.15 8.408-5.857 7.058-2.853 6.907.301 9.013-1.652 14.117 3.905 15.169 7.96 11.264-1.202 11.564-4.656 7.659-1.352 9.012-3.604 15.619 2.553 14.417 3.304 22.38 7.208 4.205 10.814-3.454 13.817 2.103 2.703 12.316-2.403 6.607-4.205 7.959-15.019 1.802-12.916 4.806-9.612 1.802-1.652-1.952-10.063-4.806-13.968 1.952-10.663 8.71-3.604 9.311-1.352 10.212-3.454 5.556-3.755 10.363.601 8.71 5.857 11.564 3.604 8.259-2.102 7.808-7.959 13.666 4.956 12.916-1.501 14.568-15.319-3.454-10.814-1.202-9.762 1.952-5.707-1.802 3.904-4.355 4.956-2.853-2.103-6.457 4.505-1.652 9.912 3.304 15.018 7.058 10.963 1.952 10.363 8.41-1.952 16.971-4.205 6.007 2.402 7.208-4.505 4.505-15.018 1.802-8.71 8.86-5.407 14.417-10.063-2.103-12.015 6.607-11.414 11.714-3.604 11.714-12.465 14.117-6.307 2.102-4.955-4.205-1.202-3.153-6.007-4.505-1.202-6.157 5.707-4.505 5.556 2.403 3.604-3.604 3.304-4.956 7.508-3.304 11.264-15.469-6.907-23.731-.301-8.109-1.952-8.109 4.355-14.718-4.205-12.165-8.41-.3-10.663-10.513 1.652-9.762-2.253-12.616-5.857-11.414 1.351-9.912-3.754-12.766 1.802-12.766 5.857-4.205 10.063-1.652 12.316 2.253l9.012 8.71 8.109-3.755 8.71 1.952 13.216-2.103 14.267-10.814 8.71-8.41 12.015-1.502 6.007 2.703 14.117-1.202 10.963-7.508 17.571-1.202 12.015 3.153 10.063-3.153 10.814 1.952 7.659 6.758-2.253 10.363 4.205 7.358 4.205.3 5.707-3.604 11.264-7.508 9.012-1.952 16.52.15 12.465 7.208 3.755 10.063-4.505 13.216-.45 10.663-4.205 11.114-11.414 1.502-12.015 6.758-5.707 9.16-4.505 10.513-11.414 6.758-15.318 4.205-14.417 6.457-12.015-1.802-9.912-11.414-2.102-11.414 6.007-9.311 9.311-6.758 10.212-3.304 4.505-12.015-4.205-12.616-1.502-8.71-7.208-11.264 1.502-10.814 6.908-4.205 9.012-7.809 3.004-9.912-4.505-12.015-1.502-9.311-6.758-10.363-2.703-12.616-1.201-10.063 6.307-8.109 11.114-6.457-5.106-9.762-10.212-12.616-12.616-2.102-10.212-1.502-11.114 4.806-11.714 6.607-6.007 10.963.15 12.015 3.904 4.806.45 6.157-3.454 1.952-4.205-4.205-2.253-8.86-7.809-12.165-10.513-11.714-10.212-10.814-10.963-8.109-17.721-6.157-11.114-12.165-12.015-18.172-13.817-10.212-10.212-14.267-12.465-13.516-15.318-10.963-9.012-14.267-11.714-11.264-15.018-9.012-10.063-12.766-10.814-11.114-14.117-9.012-8.71-10.513-10.963-8.41-14.117-7.208-8.109-8.41-9.912-6.307-12.616-4.505-6.007-6.758-7.208-5.106-9.311-3.604-5.106-4.956-6.307-3.904-7.809-2.703-4.505-3.604-5.407-2.703-6.607zm-78.18-19.467c-.206 5.86-1.95 9.176-2.402 11.414s-3.003 6.908-3.003 6.908l1.651-7.058s2.703-5.257 2.703-8.259-2.402-4.956-2.402-4.956l3.453 1.951z" fill="hsl(var(--muted))" stroke="hsl(var(--border))" strokeWidth="0.5" />
-              <g>
-                <TooltipProvider>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <circle cx="260" cy="350" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>DKI Jakarta</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <circle cx="380" cy="360" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Surabaya</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                           <circle cx="80" cy="240" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Medan</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                           <circle cx="510" cy="330" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Makassar</p>
-                        </TooltipContent>
-                    </Tooltip>
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                           <circle cx="880" cy="290" r="8" className="fill-primary cursor-pointer transition-all hover:r-12 hover:fill-accent" />
-                        </TooltipTrigger>
-                        <TooltipContent>
-                            <p>Jayapura</p>
-                        </TooltipContent>
-                    </Tooltip>
-                </TooltipProvider>
-              </g>
-            </svg>
           </div>
 
           <div className="text-center mt-20">
