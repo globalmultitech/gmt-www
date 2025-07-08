@@ -42,7 +42,7 @@ export function Header() {
       <div className="container">
         <div className={cn(
             "flex h-16 items-center justify-between px-4 sm:px-6 transition-all duration-300",
-            !isScrolled && 'bg-card text-card-foreground rounded-full shadow-2xl',
+            !isScrolled && 'bg-card dark:bg-secondary text-card-foreground rounded-full shadow-2xl',
             isScrolled && 'bg-transparent rounded-none shadow-none'
         )}>
           <Logo />
