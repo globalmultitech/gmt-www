@@ -8,6 +8,7 @@ import { Menu, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState } from 'react';
+import { ThemeToggle } from '../theme-toggle';
 
 const navItems = [
   { href: '/produk', label: 'Produk' },
@@ -42,6 +43,7 @@ export function Header() {
         </nav>
 
         <div className="hidden md:flex items-center space-x-4">
+          <ThemeToggle />
           <Button asChild variant="outline">
             <Link href="/admin">Admin Login</Link>
           </Button>
@@ -63,8 +65,9 @@ export function Header() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <div className="flex flex-col h-full">
-                <div className="p-4">
+                <div className="p-4 flex justify-between items-center">
                   <Logo />
+                  <ThemeToggle />
                 </div>
                 <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
                   {navItems.map((item) => (
