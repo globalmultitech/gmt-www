@@ -1,7 +1,10 @@
 {
   "name": "gmt",
   "compatibility_date": "2025-07-09",
-  "assets": {
-    "directory": "./dist"
+  "site": {
+    "bucket": "./out"
+  },
+  "build": {
+    "command": "npm run build"
   }
 }
