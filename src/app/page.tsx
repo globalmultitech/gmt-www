@@ -1,7 +1,8 @@
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Briefcase, Cpu, Code, ShieldCheck, Rocket, Users } from 'lucide-react';
+import { ArrowRight, Briefcase, Cpu, Code, ShieldCheck, Rocket, Users, Sparkles, LifeBuoy, WandSparkles } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import React from 'react';
+import { Button } from '@/components/ui/button';
 
 const SectionTitle = ({ children, className }: { children: React.ReactNode, className?: string }) => (
   <h2 className={cn("text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-center", className)}>
@@ -20,6 +21,23 @@ const FeatureCard = ({ icon, title, description }: { icon: React.ReactNode, titl
         <p className="text-muted-foreground text-sm flex-grow">{description}</p>
         </div>
     </div>
+);
+
+const AmazingFeatureCard = ({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) => (
+  <div className="relative group p-8 rounded-2xl bg-secondary border border-white/10 overflow-hidden transition-all duration-300 hover:-translate-y-1 h-full">
+    <div className="absolute inset-0 bg-gradient-to-br from-primary via-accent to-orange-400 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"></div>
+    <div className="relative z-10 flex flex-col h-full">
+      <div className="p-4 rounded-full bg-background/30 inline-block mb-6 backdrop-blur-sm border border-white/10 text-primary group-hover:bg-white/20 group-hover:border-white/30 group-hover:text-white transition-colors">
+        {icon}
+      </div>
+      <h3 className="text-2xl font-bold mb-3 group-hover:text-white transition-colors">{title}</h3>
+      <p className="text-muted-foreground mb-6 group-hover:text-primary-foreground/80 transition-colors flex-grow">{description}</p>
+      <Link href="#" className="font-semibold text-primary hover:text-accent flex items-center group-hover:text-white group-hover:hover:text-white/80 transition-colors">
+        Baca Selengkapnya
+        <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+      </Link>
+    </div>
+  </div>
 );
 
 const partners = [
@@ -62,7 +80,31 @@ const features = [
     title: 'Layanan Purna Jual',
     description: 'Dukungan teknis responsif dan andal untuk memastikan investasi teknologi Anda berjalan optimal.',
   },
-]
+];
+
+const amazingFeatures = [
+  {
+    icon: <Sparkles className="h-10 w-10" />,
+    title: 'Teknologi Terdepan',
+    description: 'Kami mengadopsi AI dan otomasi canggih untuk memberikan solusi yang selangkah lebih maju, memastikan Anda selalu kompetitif.',
+  },
+  {
+    icon: <LifeBuoy className="h-10 w-10" />,
+    title: 'Dukungan Prioritas 24/7',
+    description: 'Tim ahli kami siap sedia membantu Anda mengatasi kendala teknis kapan saja, memastikan operasional bisnis Anda berjalan lancar.',
+  },
+  {
+    icon: <WandSparkles className="h-10 w-10" />,
+    title: 'Kustomisasi Tanpa Batas',
+    description: 'Setiap bisnis itu unik. Kami merancang solusi yang dapat disesuaikan sepenuhnya untuk menjawab tantangan spesifik perusahaan Anda.',
+  },
+  {
+    icon: <ShieldCheck className="h-10 w-10" />,
+    title: 'Keamanan Tingkat Perbankan',
+    description: 'Dengan enkripsi end-to-end dan standar keamanan internasional, data dan transaksi Anda selalu aman bersama kami.',
+  },
+];
+
 
 const steps = [
   {
@@ -145,6 +187,31 @@ export default function Home() {
             {features.map((feature, index) => (
               <div key={feature.title} className="group fade-in-up" style={{ animationDelay: `${0.2 + index * 0.1}s` }}>
                 <FeatureCard 
+                  icon={feature.icon}
+                  title={feature.title}
+                  description={feature.description}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Amazing Features Section */}
+      <section className="py-16 md:py-24 bg-background">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4 mb-12">
+            <SectionTitle>
+              Keunggulan <span className="bg-gradient-to-br from-primary to-accent bg-clip-text text-transparent">Utama</span> Kami
+            </SectionTitle>
+            <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
+              Inilah yang membuat kami berbeda dan menjadi pilihan utama untuk partner teknologi finansial Anda.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {amazingFeatures.map((feature, index) => (
+              <div key={feature.title} className="group fade-in-up" style={{ animationDelay: `${0.2 + index * 0.1}s` }}>
+                <AmazingFeatureCard 
                   icon={feature.icon}
                   title={feature.title}
                   description={feature.description}
