@@ -41,15 +41,20 @@ const defaultSettings: WebSettings = {
 
 
 export async function getSettings(): Promise<WebSettings> {
-    const settings = await prisma.webSettings.findUnique({
-        where: { id: 1 },
-    });
+    try {
+        const settings = await prisma.webSettings.findUnique({
+            where: { id: 1 },
+        });
 
-    if (!settings) {
-        console.warn("Web settings not found in database, returning default settings.");
+        if (!settings) {
+            console.warn("Web settings not found in database, returning default settings.");
+            return defaultSettings;
+        }
+        
+        // Type assertion is safe here as we control the data structure via our admin panel.
+        return settings as WebSettings;
+    } catch (error) {
+        console.error("FATAL: Failed to fetch web settings, returning default settings. This might indicate a database connection issue.", error);
         return defaultSettings;
     }
-    
-    // Type assertion is safe here as we control the data structure via our admin panel.
-    return settings as WebSettings;
 }
