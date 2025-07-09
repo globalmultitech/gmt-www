@@ -1,10 +1,10 @@
+
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Home, ChevronRight, CheckCircle, Smartphone, Image as ImageIcon } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getSettings } from '@/lib/settings';
-import { headers } from 'next/headers';
+import WhatsAppButton from './whatsapp-button';
 
 type Props = {
   params: { slug: string };
@@ -72,11 +72,6 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  const headersList = headers();
-  const host = headersList.get('host');
-  const protocol = host?.includes('localhost') ? 'http' : 'https';
-  const productUrl = `${protocol}://${host}/produk/${product.slug}`;
-
   const specifications = (product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)) 
     ? Object.entries(product.specifications) 
     : [];
@@ -84,20 +79,6 @@ export default async function ProductDetailPage({ params }: Props) {
   const featuresList = (product.features && Array.isArray(product.features))
     ? product.features
     : [];
-
-  const whatsappNumber = settings.whatsappSales.replace(/[^0-9]/g, '');
-
-  let messageBody = `Yth. Tim Sales ${settings.companyName},\n\nSaya tertarik dengan produk berikut:\n- Nama Produk: ${product.title}\n- Tautan Produk: ${productUrl}`;
-  
-  if (product.image) {
-      messageBody += `\n- Gambar: ${product.image}`;
-  }
-
-  messageBody += `\n\nSaya ingin meminta informasi lebih lanjut mengenai penawaran dan ketersediaan.\n\nTerima kasih.`;
-
-  const encodedMessage = encodeURIComponent(messageBody);
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
-
 
   return (
     <div className="bg-secondary">
@@ -127,17 +108,15 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
 
             {/* Details Section */}
-            <div className="flex flex-col space-y-6">
-              <div>
-                <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                <p className="mt-2 text-lg text-muted-foreground">{product.description}</p>
+            <div className="flex flex-col">
+               <div className="mb-4">
+                 <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
+                 <p className="mt-2 text-lg text-muted-foreground">{product.description}</p>
               </div>
-              <Button asChild size="lg">
-                <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
-                  <Smartphone className="mr-2 h-5 w-5" />
-                  Minta Penawaran
-                </Link>
-              </Button>
+              
+              <div className="mt-4">
+                <WhatsAppButton product={product} settings={settings} />
+              </div>
             </div>
           </div>
         </div>
