@@ -73,6 +73,8 @@ export default async function ProductDetailPage({ params }: Props) {
   const specifications = product.specifications && typeof product.specifications === 'object' 
     ? Object.entries(product.specifications as {[key: string]: string}) 
     : [];
+    
+  const featuresList = Array.isArray(product.features) ? product.features as string[] : [];
 
   return (
     <div className="bg-secondary">
@@ -124,7 +126,7 @@ export default async function ProductDetailPage({ params }: Props) {
           </TabsContent>
           <TabsContent value="features" className="py-6 px-4 bg-background rounded-b-md border border-t-0">
              <ul className="space-y-4">
-                {product.features.map((feature, index) => (
+                {featuresList.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <CheckCircle className="h-4 w-4" />

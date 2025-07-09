@@ -68,7 +68,7 @@ export default async function ProdukPage() {
                   <div className="flex-grow">
                     <h4 className="font-semibold text-primary mb-3">Fitur Utama:</h4>
                     <ul className="space-y-2">
-                        {product.features.slice(0, 3).map((feature, index) => (
+                        {Array.isArray(product.features) && (product.features as string[]).slice(0, 3).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
                             <CheckCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
                             <span className="text-sm text-muted-foreground">{feature}</span>

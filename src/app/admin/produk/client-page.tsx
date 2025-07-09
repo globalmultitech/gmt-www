@@ -265,7 +265,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
 
                <div className="space-y-1">
                 <Label htmlFor="features">Fitur Utama (Satu per baris)</Label>
-                <Textarea id="features" name="features" required rows={5} placeholder="Fitur A&#10;Fitur B&#10;Fitur C" defaultValue={editingProduct?.features.join('\n')}/>
+                <Textarea id="features" name="features" required rows={5} placeholder="Fitur A&#10;Fitur B&#10;Fitur C" defaultValue={Array.isArray(editingProduct?.features) ? (editingProduct.features as string[]).join('\n') : ''}/>
               </div>
                <div className="space-y-1">
                 <Label htmlFor="specifications">Spesifikasi (Format JSON)</Label>

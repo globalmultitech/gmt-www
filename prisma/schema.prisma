@@ -1,14 +1,11 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
 
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "debian-openssl-1.1.x"]
-}
-
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
 }
 
 model User {
@@ -24,51 +21,56 @@ model User {
 
 model WebSettings {
   id            Int      @id @default(1)
-  logoUrl       String?  @map("logo_url")
-  companyName   String   @map("company_name")
-  whatsappSales String   @map("whatsapp_sales")
-  footerText    String   @map("footer_text")
-  socialMedia   Json     @map("social_media")
-  menuItems     Json     @map("menu_items")
+  logoUrl       String?
+  companyName   String
+  whatsappSales String
+  footerText    String
+  socialMedia   Json
+  menuItems     Json
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@map("web_settings")
 }
 
+model Product {
+  id              Int      @id @default(autoincrement())
+  title           String   @unique
+  slug            String   @unique
+  description     String
+  longDescription String?
+  image           String
+  features        Json     @default("[]")
+  specifications  Json?
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subCategoryId Int
+  subCategory   ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+
+  @@map("products")
+}
+
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
   name          String               @unique
   subCategories ProductSubCategory[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 
   @@map("product_categories")
 }
 
 model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId Int
   products   Product[]
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@map("product_sub_categories")
-}
-
-model Product {
-  id               Int                 @id @default(autoincrement())
-  title            String              @unique
-  slug             String              @unique
-  description      String
-  longDescription  String?
-  image            String
-  features         String[]
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?
-  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
-  subCategoryId    Int?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-
-  @@map("products")
 }
