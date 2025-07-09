@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/table';
 import type { JsonValue } from '@prisma/client/runtime/library';
 import { getSettings } from '@/lib/settings';
+import { headers } from 'next/headers';
 
 type Props = {
   params: { slug: string };
@@ -75,6 +76,11 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
+  const headersList = headers();
+  const host = headersList.get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const productUrl = `${protocol}://${host}/produk/${product.slug}`;
+
   const specifications = (product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)) 
     ? Object.entries(product.specifications) 
     : [];
@@ -84,7 +90,15 @@ export default async function ProductDetailPage({ params }: Props) {
     : [];
 
   const whatsappNumber = settings.whatsappSales.replace(/[^0-9]/g, '');
-  const message = `Yth. tim ${settings.companyName},\n\nSaya tertarik dengan produk "${product.title}" dan ingin meminta informasi lebih lanjut.\n\nTerima kasih.`;
+
+  let message = `Yth. tim ${settings.companyName},\n\nSaya tertarik dengan produk berikut:\n- Nama Produk: ${product.title}\n- Halaman Produk: ${productUrl}`;
+
+  if (product.image) {
+    message += `\n- Gambar Produk: ${product.image}`;
+  }
+
+  message += `\n\nSaya ingin meminta informasi lebih lanjut mengenai penawaran dan ketersediaan.\n\nTerima kasih.`;
+
   const encodedMessage = encodeURIComponent(message);
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
