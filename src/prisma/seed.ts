@@ -170,11 +170,23 @@ async function main() {
   ];
 
   for (const productData of productsToSeed) {
-    await prisma.product.upsert({
-      where: { title: productData.title },
-      update: productData,
-      create: productData,
-    });
+    const p = await prisma.product.findUnique({ where: { title: productData.title } });
+    const data = {
+      ...productData,
+      features: productData.features,
+      specifications: productData.specifications,
+    };
+    if (p) {
+      await prisma.product.update({
+        where: { title: productData.title },
+        data,
+      });
+    } else {
+      await prisma.product.create({
+        data,
+      });
+    }
+
     console.log(`Product "${productData.title}" seeded.`);
   }
 
