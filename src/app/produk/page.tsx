@@ -1,9 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
+import { Button } from '@/components/ui/button';
 
 async function getProducts() {
     return prisma.product.findMany({
@@ -46,28 +48,39 @@ export default async function ProdukPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => (
               <Card key={product.id} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
-                <div className="relative h-56 w-full">
-                  <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
+                 <Link href={`/produk/${product.slug}`} className="block">
+                    <div className="relative h-56 w-full">
+                        <Image
+                            src={product.image}
+                            alt={product.title}
+                            fill
+                            className="object-cover"
+                        />
+                    </div>
+                </Link>
                 <CardHeader>
-                  <CardTitle className="font-headline text-2xl">{product.title}</CardTitle>
+                   <Link href={`/produk/${product.slug}`} className="block">
+                     <CardTitle className="font-headline text-2xl hover:text-primary">{product.title}</CardTitle>
+                   </Link>
                   <CardDescription>{product.description}</CardDescription>
                 </CardHeader>
-                <CardContent className="flex-grow">
-                  <h4 className="font-semibold text-primary mb-3">Fitur Utama:</h4>
-                  <ul className="space-y-2">
-                    {product.features.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-2">
-                        <CheckCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <CardContent className="flex-grow flex flex-col">
+                  <div className="flex-grow">
+                    <h4 className="font-semibold text-primary mb-3">Fitur Utama:</h4>
+                    <ul className="space-y-2">
+                        {product.features.slice(0, 3).map((feature, index) => (
+                        <li key={index} className="flex items-start gap-2">
+                            <CheckCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{feature}</span>
+                        </li>
+                        ))}
+                    </ul>
+                  </div>
+                   <Button asChild className="mt-6 w-full">
+                        <Link href={`/produk/${product.slug}`}>
+                            Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
+                        </Link>
+                    </Button>
                 </CardContent>
               </Card>
             ))}

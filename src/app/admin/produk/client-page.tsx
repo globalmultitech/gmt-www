@@ -34,7 +34,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Trash2, Loader2, Pencil, Upload } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
 import type { Product } from '@prisma/client';
 import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
@@ -100,7 +100,20 @@ export default function ProductManagementClientPage({ products }: { products: Pr
   
   const [isUploading, setIsUploading] = useState(false);
   const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+  const [slug, setSlug] = useState('');
 
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '') // remove special chars
+      .replace(/\s+/g, '-')           // replace spaces with -
+      .replace(/-+/g, '-');          // replace multiple - with single -
+  }
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newTitle = e.target.value;
+    setSlug(generateSlug(newTitle));
+  }
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -124,9 +137,7 @@ export default function ProductManagementClientPage({ products }: { products: Pr
       await fetch(signedUrl, {
         method: 'PUT',
         body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
+        headers: { 'Content-Type': file.type },
       });
 
       setUploadedImageUrl(publicUrl);
@@ -145,6 +156,7 @@ export default function ProductManagementClientPage({ products }: { products: Pr
   const handleOpenDialog = (product: Product | null) => {
     setEditingProduct(product);
     setUploadedImageUrl(product?.image ?? '');
+    setSlug(product?.slug ?? '');
     setDialogOpen(true);
   }
 
@@ -188,11 +200,20 @@ export default function ProductManagementClientPage({ products }: { products: Pr
 
               <div className="space-y-1">
                 <Label htmlFor="title">Judul Produk</Label>
-                <Input id="title" name="title" required defaultValue={editingProduct?.title} />
+                <Input id="title" name="title" required defaultValue={editingProduct?.title} onChange={handleTitleChange} />
+              </div>
+               <div className="space-y-1">
+                <Label htmlFor="slug">Slug URL</Label>
+                <Input id="slug" name="slug" required value={slug} onChange={(e) => setSlug(e.target.value)} />
+                <p className="text-xs text-muted-foreground">Bagian dari URL, contoh: /produk/{slug || 'nama-produk-anda'}</p>
               </div>
               <div className="space-y-1">
-                <Label htmlFor="description">Deskripsi</Label>
+                <Label htmlFor="description">Deskripsi Singkat</Label>
                 <Textarea id="description" name="description" required defaultValue={editingProduct?.description} />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="longDescription">Deskripsi Lengkap</Label>
+                <Textarea id="longDescription" name="longDescription" rows={5} defaultValue={editingProduct?.longDescription ?? ''} />
               </div>
               
               <div className="space-y-2">
@@ -207,9 +228,12 @@ export default function ProductManagementClientPage({ products }: { products: Pr
               </div>
 
                <div className="space-y-1">
-                <Label htmlFor="features">Fitur Utama</Label>
-                <Textarea id="features" name="features" required rows={5} placeholder="Satu fitur per baris" defaultValue={editingProduct?.features.join('\n')}/>
-                 <p className="text-xs text-muted-foreground">Tulis setiap fitur pada baris baru.</p>
+                <Label htmlFor="features">Fitur Utama (Satu per baris)</Label>
+                <Textarea id="features" name="features" required rows={5} placeholder="Fitur A&#10;Fitur B&#10;Fitur C" defaultValue={editingProduct?.features.join('\n')}/>
+              </div>
+               <div className="space-y-1">
+                <Label htmlFor="specifications">Spesifikasi (Format JSON)</Label>
+                <Textarea id="specifications" name="specifications" rows={8} placeholder='{&#10;  "Ukuran": "21 inci",&#10;  "Resolusi": "1920x1080"&#10;}' defaultValue={editingProduct?.specifications ? JSON.stringify(editingProduct.specifications, null, 2) : ''}/>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="metaTitle">Meta Title (SEO)</Label>
