@@ -1,3 +1,4 @@
+
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 import 'dotenv/config';
@@ -83,7 +84,6 @@ async function main() {
 
 
   console.log('Seeding products...');
-  
   const productsToSeed = [
     {
       title: 'Digital Kiosk GMT-K1',

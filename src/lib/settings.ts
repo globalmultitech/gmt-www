@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import type { WebSettings as PrismaWebSettings, Prisma } from '@prisma/client';
+import type { WebSettings as PrismaWebSettings } from '@prisma/client';
 
 export type MenuItem = {
   label: string;
@@ -10,7 +10,6 @@ export type SocialMediaLinks = {
   [key: string]: string;
 };
 
-// This type combines Prisma's type with our stricter JSON types
 export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
@@ -41,6 +40,15 @@ const defaultSettings: WebSettings = {
   updatedAt: new Date(),
 };
 
+function parseJsonSafe(jsonString: string | null, defaultValue: any) {
+    if (!jsonString) return defaultValue;
+    try {
+        return JSON.parse(jsonString);
+    } catch (e) {
+        console.error("Failed to parse JSON string:", e);
+        return defaultValue;
+    }
+}
 
 export async function getSettings(): Promise<WebSettings> {
     try {
@@ -52,15 +60,9 @@ export async function getSettings(): Promise<WebSettings> {
             console.warn("Web settings not found in database, returning default settings.");
             return defaultSettings;
         }
-        
-        // Safely parse JSON fields
-        const socialMedia = settingsFromDb.socialMedia && typeof settingsFromDb.socialMedia === 'object' 
-            ? settingsFromDb.socialMedia as SocialMediaLinks
-            : defaultSettings.socialMedia;
 
-        const menuItems = settingsFromDb.menuItems && Array.isArray(settingsFromDb.menuItems)
-            ? settingsFromDb.menuItems as MenuItem[]
-            : defaultSettings.menuItems;
+        const socialMedia = parseJsonSafe(settingsFromDb.socialMedia, defaultSettings.socialMedia) as SocialMediaLinks;
+        const menuItems = parseJsonSafe(settingsFromDb.menuItems, defaultSettings.menuItems) as MenuItem[];
 
         return {
             ...settingsFromDb,

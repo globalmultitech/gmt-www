@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2 } from 'lucide-react';
-import type { WebSettings } from '@prisma/client';
+import type { WebSettings } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -80,7 +80,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     }
   }, [state, toast]);
 
-  // Prisma stores JSON as a specific type, need to stringify for Textarea
   const socialMediaJSON = JSON.stringify(settings.socialMedia, null, 2);
   const menuItemsJSON = JSON.stringify(settings.menuItems, null, 2);
 

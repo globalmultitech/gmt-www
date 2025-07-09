@@ -14,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import type { JsonValue } from '@prisma/client/runtime/library';
 
 type Props = {
   params: { slug: string };
@@ -73,13 +72,25 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  const specifications = product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)
-    ? Object.entries(product.specifications as {[key: string]: JsonValue}) 
-    : [];
-    
-  const featuresList = product.features && Array.isArray(product.features)
-    ? product.features as string[]
-    : [];
+  let specifications = [];
+  try {
+      const specsData = product.specifications ? JSON.parse(product.specifications) : {};
+      if (specsData && typeof specsData === 'object' && !Array.isArray(specsData)) {
+        specifications = Object.entries(specsData);
+      }
+  } catch (e) {
+      console.error("Failed to parse specifications JSON:", e);
+  }
+
+  let featuresList = [];
+  try {
+      const featuresData = product.features ? JSON.parse(product.features) : [];
+      if (Array.isArray(featuresData)) {
+          featuresList = featuresData;
+      }
+  } catch (e) {
+      console.error("Failed to parse features JSON:", e);
+  }
 
   return (
     <div className="bg-secondary">
@@ -142,7 +153,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <CheckCircle className="h-4 w-4" />
                     </div>
-                    <span className="text-muted-foreground">{feature}</span>
+                    <span className="text-muted-foreground">{String(feature)}</span>
                     </li>
                 ))}
             </ul>
@@ -154,7 +165,7 @@ export default async function ProductDetailPage({ params }: Props) {
                         <TableBody>
                         {specifications.map(([key, value]) => (
                             <TableRow key={key}>
-                                <TableCell className="font-semibold text-foreground w-1/3">{key}</TableCell>
+                                <TableCell className="font-semibold text-foreground w-1/3">{String(key)}</TableCell>
                                 <TableCell className="text-muted-foreground">{String(value)}</TableCell>
                             </TableRow>
                         ))}

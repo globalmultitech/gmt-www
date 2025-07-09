@@ -189,8 +189,18 @@ export default function ProductManagementClientPage({ products, categories }: { 
     }
   }, [createState, updateState, editingProduct, toast]);
   
-  const featuresDefaultValue = editingProduct?.features ? JSON.stringify(editingProduct.features, null, 2) : '[\n  "Fitur A",\n  "Fitur B",\n  "Fitur C"\n]';
-  const specificationsDefaultValue = editingProduct?.specifications ? JSON.stringify(editingProduct.specifications, null, 2) : '';
+  const getJsonString = (data: string | null | undefined, defaultData: any) => {
+    if (!data) return JSON.stringify(defaultData, null, 2);
+    try {
+      const parsed = JSON.parse(data);
+      return JSON.stringify(parsed, null, 2);
+    } catch {
+      return JSON.stringify(defaultData, null, 2);
+    }
+  };
+
+  const featuresDefaultValue = getJsonString(editingProduct?.features, ['Fitur A', 'Fitur B', 'Fitur C']);
+  const specificationsDefaultValue = getJsonString(editingProduct?.specifications, {});
 
   return (
     <div>

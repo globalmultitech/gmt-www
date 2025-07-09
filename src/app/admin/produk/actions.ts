@@ -57,7 +57,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
     return { message };
   }
   
-  const { features, specifications, ...rest } = validatedFields.data;
+  const { ...rest } = validatedFields.data;
 
   try {
     const existingSlug = await prisma.product.findUnique({ where: { slug: rest.slug } });
@@ -68,8 +68,6 @@ export async function createProduct(prevState: { message: string } | undefined, 
     await prisma.product.create({
       data: {
         ...rest,
-        features: JSON.parse(features),
-        specifications: specifications ? JSON.parse(specifications) : null,
       },
     });
 
@@ -104,7 +102,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         return { message };
     }
 
-    const { id, features, specifications, ...rest } = validatedFields.data;
+    const { id, ...rest } = validatedFields.data;
 
     try {
         const existingSlug = await prisma.product.findFirst({ where: { slug: rest.slug, id: { not: id } } });
@@ -116,8 +114,6 @@ export async function updateProduct(prevState: { message: string } | undefined, 
             where: { id },
             data: {
                 ...rest,
-                features: JSON.parse(features),
-                specifications: specifications ? JSON.parse(specifications) : null,
             },
         });
 

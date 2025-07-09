@@ -1,9 +1,12 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "debian-openssl-1.1.x"]
+  provider = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -26,30 +29,10 @@ model WebSettings {
   companyName   String
   whatsappSales String
   footerText    String
-  socialMedia   Json
-  menuItems     Json
+  socialMedia   String // JSON stored as string
+  menuItems     String // JSON stored as string
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-}
-
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-model ProductSubCategory {
-  id         Int       @id @default(autoincrement())
-  name       String
-  categoryId Int
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  products   Product[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@unique([name, categoryId])
 }
 
 model Product {
@@ -59,13 +42,37 @@ model Product {
   description     String   @db.Text
   longDescription String?  @db.Text
   image           String?
-  features        Json
-  specifications  Json?
+  features        String?  // JSON stored as string
+  specifications  String?  // JSON stored as string
   metaTitle       String?
   metaDescription String?  @db.Text
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
 
   subCategoryId Int
   subCategory   ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductCategory {
+  id            Int      @id @default(autoincrement())
+  name          String   @unique
+  subCategories ProductSubCategory[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model ProductSubCategory {
+  id         Int      @id @default(autoincrement())
+  name       String
+  
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  products   Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([name, categoryId])
 }

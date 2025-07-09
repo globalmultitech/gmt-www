@@ -47,7 +47,18 @@ export default async function ProdukPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => {
-              const featuresList = product.features && Array.isArray(product.features) ? product.features as string[] : [];
+              let featuresList = [];
+              try {
+                if (product.features) {
+                  const parsedFeatures = JSON.parse(product.features);
+                  if(Array.isArray(parsedFeatures)) {
+                    featuresList = parsedFeatures;
+                  }
+                }
+              } catch (e) {
+                 console.error("Failed to parse features JSON for product:", product.title, e);
+              }
+              
               return (
               <Card key={product.id} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
                  <Link href={`/produk/${product.slug}`} className="block">
@@ -79,7 +90,7 @@ export default async function ProdukPage() {
                         {featuresList.slice(0, 3).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
                             <CheckCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">{feature}</span>
+                            <span className="text-sm text-muted-foreground">{String(feature)}</span>
                         </li>
                         ))}
                     </ul>
