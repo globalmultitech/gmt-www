@@ -47,17 +47,7 @@ export default async function ProdukPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => {
-              let featuresList = [];
-              try {
-                if (product.features) {
-                  const parsedFeatures = JSON.parse(product.features);
-                  if(Array.isArray(parsedFeatures)) {
-                    featuresList = parsedFeatures;
-                  }
-                }
-              } catch (e) {
-                 console.error("Failed to parse features JSON for product:", product.title, e);
-              }
+              const featuresList = (product.features && Array.isArray(product.features)) ? product.features : [];
               
               return (
               <Card key={product.id} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">

@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import type { JsonValue } from '@prisma/client/runtime/library';
 
 type Props = {
   params: { slug: string };
@@ -72,25 +73,14 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  let specifications = [];
-  try {
-      const specsData = product.specifications ? JSON.parse(product.specifications) : {};
-      if (specsData && typeof specsData === 'object' && !Array.isArray(specsData)) {
-        specifications = Object.entries(specsData);
-      }
-  } catch (e) {
-      console.error("Failed to parse specifications JSON:", e);
-  }
+  const specifications = (product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)) 
+    ? Object.entries(product.specifications) 
+    : [];
 
-  let featuresList = [];
-  try {
-      const featuresData = product.features ? JSON.parse(product.features) : [];
-      if (Array.isArray(featuresData)) {
-          featuresList = featuresData;
-      }
-  } catch (e) {
-      console.error("Failed to parse features JSON:", e);
-  }
+  const featuresList = (product.features && Array.isArray(product.features))
+    ? product.features
+    : [];
+
 
   return (
     <div className="bg-secondary">

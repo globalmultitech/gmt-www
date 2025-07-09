@@ -1,5 +1,6 @@
 import prisma from '@/lib/db';
 import type { WebSettings as PrismaWebSettings } from '@prisma/client';
+import type { JsonValue } from '@prisma/client/runtime/library';
 
 export type MenuItem = {
   label: string;
@@ -40,15 +41,6 @@ const defaultSettings: WebSettings = {
   updatedAt: new Date(),
 };
 
-function parseJsonSafe(jsonString: string | null, defaultValue: any) {
-    if (!jsonString) return defaultValue;
-    try {
-        return JSON.parse(jsonString);
-    } catch (e) {
-        console.error("Failed to parse JSON string:", e);
-        return defaultValue;
-    }
-}
 
 export async function getSettings(): Promise<WebSettings> {
     try {
@@ -61,8 +53,9 @@ export async function getSettings(): Promise<WebSettings> {
             return defaultSettings;
         }
 
-        const socialMedia = parseJsonSafe(settingsFromDb.socialMedia, defaultSettings.socialMedia) as SocialMediaLinks;
-        const menuItems = parseJsonSafe(settingsFromDb.menuItems, defaultSettings.menuItems) as MenuItem[];
+        // Cast the JsonValue to the expected types
+        const socialMedia = (settingsFromDb.socialMedia as JsonValue as SocialMediaLinks) || defaultSettings.socialMedia;
+        const menuItems = (settingsFromDb.menuItems as JsonValue as MenuItem[]) || defaultSettings.menuItems;
 
         return {
             ...settingsFromDb,

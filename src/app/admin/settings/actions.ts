@@ -10,22 +10,22 @@ const SettingsSchema = z.object({
   companyName: z.string().min(1, 'Nama perusahaan tidak boleh kosong'),
   whatsappSales: z.string().min(1, 'Nomor WhatsApp tidak boleh kosong'),
   footerText: z.string().min(1, 'Teks footer tidak boleh kosong'),
-  socialMedia: z.string().refine((val) => {
+  socialMedia: z.string().transform((str, ctx) => {
     try {
-      JSON.parse(val);
-      return true;
-    } catch {
-      return false;
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk link sosial media tidak valid' });
+      return z.NEVER;
     }
-  }, { message: 'Format JSON untuk link sosial media tidak valid' }),
-  menuItems: z.string().refine((val) => {
+  }),
+  menuItems: z.string().transform((str, ctx) => {
     try {
-      JSON.parse(val);
-      return true;
-    } catch {
-      return false;
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk menu tidak valid' });
+      return z.NEVER;
     }
-  }, { message: 'Format JSON untuk menu tidak valid' }),
+  }),
 });
 
 export async function getWebSettings() {

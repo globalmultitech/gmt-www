@@ -11,23 +11,23 @@ const ProductSchema = z.object({
   description: z.string().min(1, 'Deskripsi singkat tidak boleh kosong'),
   longDescription: z.string().optional(),
   image: z.string().optional(),
-  features: z.string().refine((val) => {
+  features: z.string().transform((str, ctx) => {
     try {
-      JSON.parse(val);
-      return true;
-    } catch {
-      return false;
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk fitur tidak valid' });
+      return z.NEVER;
     }
-  }, { message: 'Format JSON untuk fitur tidak valid' }),
-  specifications: z.string().refine((val) => {
-    if (!val || val.trim() === '') return true; // Optional field
+  }),
+  specifications: z.string().transform((str, ctx) => {
+    if (!str || str.trim() === '') return null;
     try {
-      JSON.parse(val);
-      return true;
-    } catch {
-      return false;
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi tidak valid' });
+      return z.NEVER;
     }
-  }, { message: 'Format JSON untuk spesifikasi tidak valid' }).optional(),
+  }).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
 });
