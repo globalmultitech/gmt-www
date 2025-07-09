@@ -2,23 +2,34 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "debian-openssl-1.1.x", "debian-openssl-3.0.x", "linux-musl"]
+  provider     = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
+  name      String
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model WebSettings {
+  id            Int      @id @default(1)
+  companyName   String
+  whatsappSales String
+  footerText    String   @db.Text
+  socialMedia   Json
+  menuItems     Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model Product {
@@ -31,15 +42,4 @@ model Product {
   metaDescription String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-}
-
-model WebSettings {
-  id            Int      @id @default(1)
-  companyName   String
-  whatsappSales String
-  footerText    String   @db.Text
-  socialMedia   Json
-  menuItems     Json
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
 }
