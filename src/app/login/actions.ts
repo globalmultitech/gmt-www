@@ -34,7 +34,7 @@ export async function login(prevState: { message: string } | undefined, formData
       return { message: 'Email atau kata sandi salah.' };
     }
     
-    // Set session cookie
+    // If credentials are valid, set the cookie
     const sessionData = { userId: user.id, name: user.name, email: user.email };
     cookies().set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
@@ -43,12 +43,13 @@ export async function login(prevState: { message: string } | undefined, formData
       path: '/',
     });
 
-    redirect('/admin/dashboard');
-
   } catch (error) {
     console.error('Login error:', error);
     return { message: 'Terjadi kesalahan pada server. Silakan coba lagi nanti.' };
   }
+
+  // Redirect must be called outside of the try...catch block
+  redirect('/admin/dashboard');
 }
 
 export async function logout() {
