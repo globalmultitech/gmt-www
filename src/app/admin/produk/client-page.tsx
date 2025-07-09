@@ -188,6 +188,8 @@ export default function ProductManagementClientPage({ products, categories }: { 
       }
     }
   }, [createState, updateState, editingProduct, toast]);
+  
+  const featuresDefaultValue = editingProduct?.features ? (JSON.parse(editingProduct.features) as string[]).join('\n') : '';
 
   return (
     <div>
@@ -253,7 +255,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="image-upload">Gambar Produk</Label>
+                <Label>Gambar Produk</Label>
                 <div className="flex items-center gap-4">
                     {uploadedImageUrl && (
                         <Image src={uploadedImageUrl} alt="Preview" width={80} height={80} className="rounded-md object-cover" />
@@ -265,11 +267,11 @@ export default function ProductManagementClientPage({ products, categories }: { 
 
                <div className="space-y-1">
                 <Label htmlFor="features">Fitur Utama (Satu per baris)</Label>
-                <Textarea id="features" name="features" required rows={5} placeholder="Fitur A&#10;Fitur B&#10;Fitur C" defaultValue={Array.isArray(editingProduct?.features) ? (editingProduct.features as string[]).join('\n') : ''}/>
+                <Textarea id="features" name="features" required rows={5} placeholder="Fitur A&#10;Fitur B&#10;Fitur C" defaultValue={featuresDefaultValue}/>
               </div>
                <div className="space-y-1">
                 <Label htmlFor="specifications">Spesifikasi (Format JSON)</Label>
-                <Textarea id="specifications" name="specifications" rows={8} placeholder='{&#10;  "Ukuran": "21 inci",&#10;  "Resolusi": "1920x1080"&#10;}' defaultValue={editingProduct?.specifications ? JSON.stringify(editingProduct.specifications, null, 2) : ''}/>
+                <Textarea id="specifications" name="specifications" rows={8} placeholder='{&#10;  "Ukuran": "21 inci",&#10;  "Resolusi": "1920x1080"&#10;}' defaultValue={editingProduct?.specifications ?? ''}/>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="metaTitle">Meta Title (SEO)</Label>

@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import type { WebSettings as PrismaWebSettings, Prisma } from '@prisma/client';
+import type { WebSettings as PrismaWebSettings } from '@prisma/client';
 
 export type MenuItem = {
   label: string;
@@ -44,17 +44,35 @@ const defaultSettings: WebSettings = {
 
 export async function getSettings(): Promise<WebSettings> {
     try {
-        const settings = await prisma.webSettings.findUnique({
+        const settingsFromDb = await prisma.webSettings.findUnique({
             where: { id: 1 },
         });
 
-        if (!settings) {
+        if (!settingsFromDb) {
             console.warn("Web settings not found in database, returning default settings.");
             return defaultSettings;
         }
-        
-        // Type assertion is safe here as we control the data structure via our admin panel.
-        return settings as WebSettings;
+
+        let socialMedia: SocialMediaLinks = defaultSettings.socialMedia;
+        try {
+            if (settingsFromDb.socialMedia) socialMedia = JSON.parse(settingsFromDb.socialMedia);
+        } catch (e) {
+            console.error("Failed to parse socialMedia settings from DB, using defaults.", e);
+        }
+
+        let menuItems: MenuItem[] = defaultSettings.menuItems;
+        try {
+            if (settingsFromDb.menuItems) menuItems = JSON.parse(settingsFromDb.menuItems);
+        } catch (e) {
+            console.error("Failed to parse menuItems settings from DB, using defaults.", e);
+        }
+
+        return {
+            ...settingsFromDb,
+            socialMedia,
+            menuItems,
+        };
+
     } catch (error) {
         console.error("FATAL: Failed to fetch web settings, returning default settings. This might indicate a database connection issue.", error);
         return defaultSettings;

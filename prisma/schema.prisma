@@ -1,15 +1,16 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-generator client {
-  provider = "prisma-client-js"
-  // Using linux-musl for better compatibility with Vercel/serverless environments
-  binaryTargets = ["native", "linux-musl"]
+datasource db {
+  provider     = "sqlite"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-datasource db {
-  provider = "sqlite"
-  url      = "file:./dev.db"
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 model User {
@@ -19,8 +20,6 @@ model User {
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@map("users")
 }
 
 model WebSettings {
@@ -29,48 +28,46 @@ model WebSettings {
   companyName   String
   whatsappSales String
   footerText    String
-  socialMedia   Json
-  menuItems     Json
+  socialMedia   String
+  menuItems     String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
-
-  @@map("web_settings")
 }
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
   name          String               @unique
   subCategories ProductSubCategory[]
-
-  @@map("product_categories")
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 }
 
 model ProductSubCategory {
-  id         Int       @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   name       String
   products   Product[]
-  categoryId Int
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
 
   @@unique([name, categoryId])
-  @@map("product_sub_categories")
 }
 
-model Product {
-  id               Int      @id @default(autoincrement())
-  title            String   @unique
-  slug             String   @unique
-  description      String
-  longDescription  String?
-  image            String
-  features         Json
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  subCategoryId    Int
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
 
-  @@map("products")
+model Product {
+  id              Int      @id @default(autoincrement())
+  title           String   @unique
+  slug            String   @unique
+  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId   Int
+  description     String
+  longDescription String?
+  image           String?
+  features        String?
+  specifications  String?
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }

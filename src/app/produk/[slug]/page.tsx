@@ -72,11 +72,11 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  const specifications = product.specifications && typeof product.specifications === 'object' 
-    ? Object.entries(product.specifications as {[key: string]: string}) 
+  const specifications = product.specifications 
+    ? Object.entries(JSON.parse(product.specifications as string) as {[key: string]: string}) 
     : [];
     
-  const featuresList = Array.isArray(product.features) ? product.features as string[] : [];
+  const featuresList = product.features ? JSON.parse(product.features as string) as string[] : [];
 
   return (
     <div className="bg-secondary">

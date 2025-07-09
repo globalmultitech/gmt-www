@@ -10,10 +10,10 @@ const ProductSchema = z.object({
   subCategoryId: z.coerce.number().min(1, 'Sub Kategori harus dipilih'),
   description: z.string().min(1, 'Deskripsi singkat tidak boleh kosong'),
   longDescription: z.string().optional(),
-  image: z.string().url('URL gambar tidak valid'),
+  image: z.string().optional(),
   features: z.string().min(1, 'Fitur tidak boleh kosong'),
   specifications: z.string().refine((val) => {
-    if (!val) return true; // Optional field
+    if (!val || val.trim() === '') return true; // Optional field, allow empty string
     try {
       JSON.parse(val);
       return true;
@@ -39,7 +39,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
     longDescription: formData.get('longDescription'),
     image: formData.get('image'),
     features: formData.get('features'),
-    specifications: formData.get('specifications') || '{}',
+    specifications: formData.get('specifications'),
     metaTitle: formData.get('metaTitle'),
     metaDescription: formData.get('metaDescription'),
   });
@@ -67,8 +67,8 @@ export async function createProduct(prevState: { message: string } | undefined, 
         description,
         longDescription,
         image,
-        features: featuresArray,
-        specifications: specifications ? JSON.parse(specifications) : {},
+        features: JSON.stringify(featuresArray),
+        specifications: specifications || null,
         metaTitle,
         metaDescription
       },
@@ -94,7 +94,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         longDescription: formData.get('longDescription'),
         image: formData.get('image'),
         features: formData.get('features'),
-        specifications: formData.get('specifications') || '{}',
+        specifications: formData.get('specifications'),
         metaTitle: formData.get('metaTitle'),
         metaDescription: formData.get('metaDescription'),
     });
@@ -123,8 +123,8 @@ export async function updateProduct(prevState: { message: string } | undefined, 
                 description,
                 longDescription,
                 image,
-                features: featuresArray,
-                specifications: specifications ? JSON.parse(specifications) : {},
+                features: JSON.stringify(featuresArray),
+                specifications: specifications || null,
                 metaTitle,
                 metaDescription,
             },

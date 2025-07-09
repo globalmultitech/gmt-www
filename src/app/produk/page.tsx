@@ -46,7 +46,9 @@ export default async function ProdukPage() {
       <section className="py-16 md:py-24 bg-secondary">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {products.map((product) => (
+            {products.map((product) => {
+              const featuresList = product.features ? JSON.parse(product.features) as string[] : [];
+              return (
               <Card key={product.id} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
                  <Link href={`/produk/${product.slug}`} className="block">
                     <div className="relative h-56 w-full bg-muted">
@@ -74,7 +76,7 @@ export default async function ProdukPage() {
                   <div className="flex-grow">
                     <h4 className="font-semibold text-primary mb-3">Fitur Utama:</h4>
                     <ul className="space-y-2">
-                        {Array.isArray(product.features) && (product.features as string[]).slice(0, 3).map((feature, index) => (
+                        {featuresList.slice(0, 3).map((feature, index) => (
                         <li key={index} className="flex items-start gap-2">
                             <CheckCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
                             <span className="text-sm text-muted-foreground">{feature}</span>
@@ -89,7 +91,7 @@ export default async function ProdukPage() {
                     </Button>
                 </CardContent>
               </Card>
-            ))}
+            )})}
           </div>
         </div>
       </section>
