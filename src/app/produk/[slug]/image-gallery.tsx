@@ -26,12 +26,12 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
 
   return (
     <div className="sticky top-24">
-      <div className="relative aspect-square w-full rounded-lg overflow-hidden shadow-lg border bg-muted">
+      <div className="group relative aspect-square w-full rounded-lg overflow-hidden shadow-lg border bg-muted">
         <Image
           src={activeImage}
           alt={`${productTitle} - image ${activeIndex + 1}`}
           fill
-          className="object-contain"
+          className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-105"
           priority={true}
         />
       </div>
