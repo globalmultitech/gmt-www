@@ -1,25 +1,28 @@
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "linux-musl"]
 }
 
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String   @db.Text
   name      String
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
   id            Int      @id @default(1)
-  logoUrl       String?  @db.Text
+  logoUrl       String?  @db.VarChar(2048)
   companyName   String
   whatsappSales String
   footerText    String   @db.Text
@@ -38,13 +41,13 @@ model ProductCategory {
 }
 
 model ProductSubCategory {
-  id         Int      @id @default(autoincrement())
+  id         Int             @id @default(autoincrement())
   name       String
   categoryId Int
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
   @@unique([name, categoryId])
 }
@@ -55,13 +58,13 @@ model Product {
   slug            String             @unique
   description     String             @db.Text
   longDescription String?            @db.Text
-  images          String[]
+  images          Json
   features        Json
   specifications  Json?
   metaTitle       String?
   metaDescription String?            @db.Text
-  subCategoryId   Int
-  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id])
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
+  subCategoryId   Int
+  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
 }
