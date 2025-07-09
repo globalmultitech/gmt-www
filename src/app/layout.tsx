@@ -1,4 +1,3 @@
-'use client';
 
 import type { Metadata } from 'next';
 import './globals.css';
@@ -7,24 +6,21 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { ThemeProvider } from '@/components/theme-provider';
-import { usePathname } from 'next/navigation';
+import { AppShell } from '@/components/layout/app-shell';
+
+export const metadata: Metadata = {
+  title: 'Global Multi Technology',
+  description: 'Solusi dan layanan teknologi terdepan untuk transformasi digital perusahaan Anda.',
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname = usePathname();
-  const isAdminRoute = pathname.startsWith('/admin');
-  const isLoginRoute = pathname === '/login';
-
-  const showHeaderFooter = !isAdminRoute && !isLoginRoute;
-
   return (
     <html lang="id" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        <title>Global Multi Technology</title>
-        <meta name="description" content="Solusi dan layanan teknologi terdepan untuk transformasi digital perusahaan Anda." />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -39,11 +35,9 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <div className="relative flex min-h-dvh flex-col bg-background">
-            {showHeaderFooter && <Header />}
-            <main className="flex-1">{children}</main>
-            {showHeaderFooter && <Footer />}
-          </div>
+          <AppShell header={<Header />} footer={<Footer />}>
+            {children}
+          </AppShell>
           <Toaster />
         </ThemeProvider>
       </body>
