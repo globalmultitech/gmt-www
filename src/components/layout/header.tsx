@@ -37,7 +37,7 @@ export function Header() {
   return (
     <header className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-secondary shadow-md py-2' : 'bg-transparent py-4'
+        isScrolled ? 'bg-secondary/80 backdrop-blur-sm shadow-md py-2' : 'bg-transparent py-4'
       )}>
       <div className="container">
         <div className={cn(
@@ -108,7 +108,7 @@ export function Header() {
                       <Link href="/hubungi-kami" onClick={() => setIsMobileMenuOpen(false)}>Hubungi Kami</Link>
                     </Button>
                      <Button asChild variant="outline" className="w-full">
-                      <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)}>Admin Login</Link>
+                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Admin Login</Link>
                     </Button>
                   </div>
                 </div>

@@ -37,7 +37,7 @@ export default function AdminLayout({
                 </SidebarMenu>
                  <div className="p-2 mt-auto">
                      <Button variant="outline" className="w-full" asChild>
-                        <Link href="/admin">
+                        <Link href="/login">
                             <LogOut className="mr-2 h-4 w-4" />
                             Logout
                         </Link>
