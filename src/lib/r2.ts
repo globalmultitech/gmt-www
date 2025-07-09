@@ -5,6 +5,8 @@ const R2_BUCKET_NAME = process.env.R2_BUCKET_NAME!;
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID!;
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID!;
 const R2_SECRET_ACCESS_KEY = process.env.R2_SECRET_ACCESS_KEY!;
+const R2_PUBLIC_URL = process.env.R2_PUBLIC_URL!;
+
 
 const s3 = new S3Client({
   region: "auto",
@@ -13,7 +15,6 @@ const s3 = new S3Client({
     accessKeyId: R2_ACCESS_KEY_ID,
     secretAccessKey: R2_SECRET_ACCESS_KEY,
   },
-  forcePathStyle: true,
 });
 
 export async function getSignedUrlForS3(key: string, type: string, size: number) {
@@ -28,7 +29,7 @@ export async function getSignedUrlForS3(key: string, type: string, size: number)
         expiresIn: 60, // 1 minute
     });
     
-    const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+    const publicUrl = `${R2_PUBLIC_URL}/${key}`;
 
     return { signedUrl, publicUrl };
 }
