@@ -13,8 +13,6 @@ const GetSignedURLSchema = z.object({
   checksum: z.string(),
 })
 
-const generateFileName = (bytes = 32) => crypto.randomBytes(bytes).toString("hex")
-
 export async function getSignedURL(type: string, size: number, checksum: string) {
     const validatedFields = GetSignedURLSchema.safeParse({
         fileType: type,
@@ -31,8 +29,7 @@ export async function getSignedURL(type: string, size: number, checksum: string)
     const extension = fileType.split("/")[1];
     const key = `${uuidv4()}.${extension}`;
     
-    const signedUrl = await getSignedUrlForS3(key, fileType, fileSize);
-    const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
+    const { signedUrl, publicUrl } = await getSignedUrlForS3(key, fileType, fileSize);
 
     return { signedUrl, publicUrl };
 }
