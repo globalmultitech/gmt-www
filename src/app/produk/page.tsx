@@ -47,7 +47,7 @@ export default async function ProdukPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {products.map((product) => {
-              const featuresList = product.features ? JSON.parse(product.features) as string[] : [];
+              const featuresList = product.features && Array.isArray(product.features) ? product.features as string[] : [];
               return (
               <Card key={product.id} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
                  <Link href={`/produk/${product.slug}`} className="block">

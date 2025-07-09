@@ -58,8 +58,8 @@ export async function updateWebSettings(prevState: { message: string } | undefin
             companyName,
             whatsappSales,
             footerText,
-            socialMedia: socialMedia,
-            menuItems: menuItems
+            socialMedia: JSON.parse(socialMedia),
+            menuItems: JSON.parse(menuItems)
         }
     });
 

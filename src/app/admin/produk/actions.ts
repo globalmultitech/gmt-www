@@ -11,9 +11,16 @@ const ProductSchema = z.object({
   description: z.string().min(1, 'Deskripsi singkat tidak boleh kosong'),
   longDescription: z.string().optional(),
   image: z.string().optional(),
-  features: z.string().min(1, 'Fitur tidak boleh kosong'),
+  features: z.string().refine((val) => {
+    try {
+      JSON.parse(val);
+      return true;
+    } catch {
+      return false;
+    }
+  }, { message: 'Format JSON untuk fitur tidak valid' }),
   specifications: z.string().refine((val) => {
-    if (!val || val.trim() === '') return true; // Optional field, allow empty string
+    if (!val || val.trim() === '') return true; // Optional field
     try {
       JSON.parse(val);
       return true;
@@ -50,33 +57,25 @@ export async function createProduct(prevState: { message: string } | undefined, 
     return { message };
   }
   
-  const { title, slug, subCategoryId, description, longDescription, image, features, specifications, metaTitle, metaDescription } = validatedFields.data;
-  const featuresArray = features.split('\n').filter(f => f.trim() !== '');
+  const { features, specifications, ...rest } = validatedFields.data;
 
   try {
-    const existingSlug = await prisma.product.findUnique({ where: { slug } });
+    const existingSlug = await prisma.product.findUnique({ where: { slug: rest.slug } });
     if(existingSlug) {
       return { message: 'Slug sudah digunakan oleh produk lain.'}
     }
 
     await prisma.product.create({
       data: {
-        title,
-        slug,
-        subCategoryId,
-        description,
-        longDescription,
-        image,
-        features: JSON.stringify(featuresArray),
-        specifications: specifications || null,
-        metaTitle,
-        metaDescription
+        ...rest,
+        features: JSON.parse(features),
+        specifications: specifications ? JSON.parse(specifications) : null,
       },
     });
 
     revalidatePath('/admin/produk');
     revalidatePath('/produk');
-    revalidatePath(`/produk/${slug}`);
+    revalidatePath(`/produk/${rest.slug}`);
     return { message: 'Produk berhasil dibuat.' };
   } catch (error) {
     console.error('Create product error:', error);
@@ -105,11 +104,10 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         return { message };
     }
 
-    const { id, title, slug, subCategoryId, description, longDescription, image, features, specifications, metaTitle, metaDescription } = validatedFields.data;
-    const featuresArray = features.split('\n').filter(f => f.trim() !== '');
+    const { id, features, specifications, ...rest } = validatedFields.data;
 
     try {
-        const existingSlug = await prisma.product.findFirst({ where: { slug, id: { not: id } } });
+        const existingSlug = await prisma.product.findFirst({ where: { slug: rest.slug, id: { not: id } } });
         if(existingSlug) {
             return { message: 'Slug sudah digunakan oleh produk lain.'}
         }
@@ -117,22 +115,15 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         await prisma.product.update({
             where: { id },
             data: {
-                title,
-                slug,
-                subCategoryId,
-                description,
-                longDescription,
-                image,
-                features: JSON.stringify(featuresArray),
-                specifications: specifications || null,
-                metaTitle,
-                metaDescription,
+                ...rest,
+                features: JSON.parse(features),
+                specifications: specifications ? JSON.parse(specifications) : null,
             },
         });
 
         revalidatePath('/admin/produk');
         revalidatePath('/produk');
-        revalidatePath(`/produk/${slug}`);
+        revalidatePath(`/produk/${rest.slug}`);
         return { message: 'Produk berhasil diperbarui.' };
     } catch (error) {
         console.error('Update product error:', error);

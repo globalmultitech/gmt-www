@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import type { JsonValue } from '@prisma/client/runtime/library';
 
 type Props = {
   params: { slug: string };
@@ -72,11 +73,13 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  const specifications = product.specifications 
-    ? Object.entries(JSON.parse(product.specifications as string) as {[key: string]: string}) 
+  const specifications = product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)
+    ? Object.entries(product.specifications as {[key: string]: JsonValue}) 
     : [];
     
-  const featuresList = product.features ? JSON.parse(product.features as string) as string[] : [];
+  const featuresList = product.features && Array.isArray(product.features)
+    ? product.features as string[]
+    : [];
 
   return (
     <div className="bg-secondary">
@@ -152,7 +155,7 @@ export default async function ProductDetailPage({ params }: Props) {
                         {specifications.map(([key, value]) => (
                             <TableRow key={key}>
                                 <TableCell className="font-semibold text-foreground w-1/3">{key}</TableCell>
-                                <TableCell className="text-muted-foreground">{value}</TableCell>
+                                <TableCell className="text-muted-foreground">{String(value)}</TableCell>
                             </TableRow>
                         ))}
                         </TableBody>

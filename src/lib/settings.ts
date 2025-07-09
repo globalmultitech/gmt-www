@@ -1,5 +1,5 @@
 import prisma from '@/lib/db';
-import type { WebSettings as PrismaWebSettings } from '@prisma/client';
+import type { WebSettings as PrismaWebSettings, Prisma } from '@prisma/client';
 
 export type MenuItem = {
   label: string;
@@ -52,20 +52,15 @@ export async function getSettings(): Promise<WebSettings> {
             console.warn("Web settings not found in database, returning default settings.");
             return defaultSettings;
         }
+        
+        // Safely parse JSON fields
+        const socialMedia = settingsFromDb.socialMedia && typeof settingsFromDb.socialMedia === 'object' 
+            ? settingsFromDb.socialMedia as SocialMediaLinks
+            : defaultSettings.socialMedia;
 
-        let socialMedia: SocialMediaLinks = defaultSettings.socialMedia;
-        try {
-            if (settingsFromDb.socialMedia) socialMedia = JSON.parse(settingsFromDb.socialMedia);
-        } catch (e) {
-            console.error("Failed to parse socialMedia settings from DB, using defaults.", e);
-        }
-
-        let menuItems: MenuItem[] = defaultSettings.menuItems;
-        try {
-            if (settingsFromDb.menuItems) menuItems = JSON.parse(settingsFromDb.menuItems);
-        } catch (e) {
-            console.error("Failed to parse menuItems settings from DB, using defaults.", e);
-        }
+        const menuItems = settingsFromDb.menuItems && Array.isArray(settingsFromDb.menuItems)
+            ? settingsFromDb.menuItems as MenuItem[]
+            : defaultSettings.menuItems;
 
         return {
             ...settingsFromDb,

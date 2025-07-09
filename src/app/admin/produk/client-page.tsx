@@ -189,7 +189,8 @@ export default function ProductManagementClientPage({ products, categories }: { 
     }
   }, [createState, updateState, editingProduct, toast]);
   
-  const featuresDefaultValue = editingProduct?.features ? (JSON.parse(editingProduct.features) as string[]).join('\n') : '';
+  const featuresDefaultValue = editingProduct?.features ? JSON.stringify(editingProduct.features, null, 2) : '[\n  "Fitur A",\n  "Fitur B",\n  "Fitur C"\n]';
+  const specificationsDefaultValue = editingProduct?.specifications ? JSON.stringify(editingProduct.specifications, null, 2) : '';
 
   return (
     <div>
@@ -265,13 +266,13 @@ export default function ProductManagementClientPage({ products, categories }: { 
                 </div>
               </div>
 
-               <div className="space-y-1">
-                <Label htmlFor="features">Fitur Utama (Satu per baris)</Label>
-                <Textarea id="features" name="features" required rows={5} placeholder="Fitur A&#10;Fitur B&#10;Fitur C" defaultValue={featuresDefaultValue}/>
+              <div className="space-y-1">
+                <Label htmlFor="features">Fitur Utama (Format JSON)</Label>
+                <Textarea id="features" name="features" required rows={5} placeholder='[\n  "Fitur A",\n  "Fitur B"\n]' defaultValue={featuresDefaultValue}/>
               </div>
-               <div className="space-y-1">
+              <div className="space-y-1">
                 <Label htmlFor="specifications">Spesifikasi (Format JSON)</Label>
-                <Textarea id="specifications" name="specifications" rows={8} placeholder='{&#10;  "Ukuran": "21 inci",&#10;  "Resolusi": "1920x1080"&#10;}' defaultValue={editingProduct?.specifications ?? ''}/>
+                <Textarea id="specifications" name="specifications" rows={8} placeholder='{\n  "Ukuran": "21 inci",\n  "Resolusi": "1920x1080"\n}' defaultValue={specificationsDefaultValue}/>
               </div>
               <div className="space-y-1">
                 <Label htmlFor="metaTitle">Meta Title (SEO)</Label>
