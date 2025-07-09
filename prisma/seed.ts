@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import 'dotenv/config';
 
 const prisma = new PrismaClient();
 
@@ -14,7 +15,9 @@ async function main() {
 
   const admin = await prisma.admin.upsert({
     where: { email: email },
-    update: {},
+    update: {
+      password: hashedPassword,
+    },
     create: {
       email: email,
       password: hashedPassword,
@@ -29,6 +32,7 @@ async function main() {
 
 main()
   .catch((e) => {
+    console.error('Error during database seeding:');
     console.error(e);
     process.exit(1);
   })

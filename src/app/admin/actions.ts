@@ -21,6 +21,13 @@ export async function login(prevState: { message: string } | undefined, formData
       return { message: 'Email atau kata sandi salah.' };
     }
 
+    // It's possible the user exists but the password was not correctly seeded.
+    // A valid bcrypt hash is required for comparison.
+    if (!user.password || user.password.length < 10) {
+      console.error('Invalid password hash in database for user:', email);
+      return { message: 'Konfigurasi akun bermasalah. Hubungi administrator.' };
+    }
+
     const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
