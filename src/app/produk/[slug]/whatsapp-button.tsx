@@ -23,8 +23,9 @@ export default function WhatsAppButton({ product, settings }: WhatsAppButtonProp
 
         let messageBody = `Yth. Tim Sales ${settings.companyName},\n\nSaya tertarik dengan produk berikut:\n- Nama Produk: ${product.title}\n- Tautan Produk: ${productUrl}`;
         
-        if (product.image) {
-            messageBody += `\n- Gambar: ${product.image}`;
+        const mainImage = product.images?.[0];
+        if (mainImage) {
+            messageBody += `\n- Gambar: ${mainImage}`;
         }
 
         messageBody += `\n\nSaya ingin meminta informasi lebih lanjut mengenai penawaran dan ketersediaan.\n\nTerima kasih.`;

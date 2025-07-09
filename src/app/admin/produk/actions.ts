@@ -10,7 +10,18 @@ const ProductSchema = z.object({
   subCategoryId: z.coerce.number().min(1, 'Sub Kategori harus dipilih'),
   description: z.string().min(1, 'Deskripsi singkat tidak boleh kosong'),
   longDescription: z.string().optional(),
-  image: z.string().optional(),
+  images: z.string().transform((str, ctx) => {
+    try {
+      const parsed = JSON.parse(str);
+      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+        return parsed as string[];
+      }
+      throw new Error();
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk gambar tidak valid' });
+      return z.NEVER;
+    }
+  }),
   features: z.string().transform((str, ctx) => {
     try {
       return JSON.parse(str);
@@ -44,7 +55,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
     subCategoryId: formData.get('subCategoryId'),
     description: formData.get('description'),
     longDescription: formData.get('longDescription'),
-    image: formData.get('image'),
+    images: formData.get('images'),
     features: formData.get('features'),
     specifications: formData.get('specifications'),
     metaTitle: formData.get('metaTitle'),
@@ -89,7 +100,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         subCategoryId: formData.get('subCategoryId'),
         description: formData.get('description'),
         longDescription: formData.get('longDescription'),
-        image: formData.get('image'),
+        images: formData.get('images'),
         features: formData.get('features'),
         specifications: formData.get('specifications'),
         metaTitle: formData.get('metaTitle'),

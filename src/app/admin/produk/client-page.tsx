@@ -43,7 +43,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Trash2, Loader2, Pencil, Image as ImageIcon } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Pencil, Image as ImageIcon, X } from 'lucide-react';
 import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
 import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
@@ -112,7 +112,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
   const [updateState, updateFormAction] = useActionState(updateProduct, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [slug, setSlug] = useState('');
 
   const generateSlug = (title: string) => {
@@ -153,7 +153,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
         headers: { 'Content-Type': file.type },
       });
 
-      setUploadedImageUrl(publicUrl);
+      setImageUrls(prev => [...prev, publicUrl]);
     } catch (error) {
       console.error("Upload error:", error);
       toast({
@@ -163,12 +163,17 @@ export default function ProductManagementClientPage({ products, categories }: { 
       });
     } finally {
       setIsUploading(false);
+      event.target.value = ''; // Reset file input
     }
   };
   
+  const handleRemoveImage = (indexToRemove: number) => {
+    setImageUrls(prev => prev.filter((_, index) => index !== indexToRemove));
+  }
+
   const handleOpenDialog = (product: Product | null) => {
     setEditingProduct(product);
-    setUploadedImageUrl(product?.image ?? '');
+    setImageUrls(product?.images ?? []);
     setSlug(product?.slug ?? '');
     setDialogOpen(true);
   }
@@ -207,7 +212,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
         </Button>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) { setEditingProduct(null); setUploadedImageUrl('') }; setDialogOpen(open); }}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) { setEditingProduct(null); setImageUrls([]) }; setDialogOpen(open); }}>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
@@ -217,7 +222,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
             </DialogHeader>
             <form action={editingProduct ? updateFormAction : createFormAction} className="space-y-4">
               {editingProduct && <input type="hidden" name="id" value={editingProduct.id} />}
-              <input type="hidden" name="image" value={uploadedImageUrl} />
+              <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -262,12 +267,25 @@ export default function ProductManagementClientPage({ products, categories }: { 
               
               <div className="space-y-2">
                 <Label>Gambar Produk</Label>
+                 <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                  {imageUrls.map((url, index) => (
+                    <div key={index} className="relative group">
+                      <Image src={url} alt={`Preview ${index + 1}`} width={100} height={100} className="rounded-md object-cover w-full aspect-square" />
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        className="absolute top-1 right-1 h-6 w-6 opacity-50 group-hover:opacity-100 transition-opacity"
+                        onClick={() => handleRemoveImage(index)}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
                 <div className="flex items-center gap-4">
-                    {uploadedImageUrl && (
-                        <Image src={uploadedImageUrl} alt="Preview" width={80} height={80} className="rounded-md object-cover" />
-                    )}
-                     <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                     {isUploading && <Loader2 className="animate-spin" />}
+                  <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                  {isUploading && <Loader2 className="animate-spin" />}
                 </div>
               </div>
 
@@ -316,27 +334,30 @@ export default function ProductManagementClientPage({ products, categories }: { 
                 </TableCell>
               </TableRow>
             ) : (
-               products.map((product) => (
-                <TableRow key={product.id}>
-                  <TableCell>
-                    {product.image ? (
-                        <Image src={product.image} alt={product.title} width={64} height={64} className="rounded-md object-cover bg-muted" />
-                    ) : (
-                        <div className="w-16 h-16 rounded-md bg-secondary flex items-center justify-center">
-                            <ImageIcon className="w-8 h-8 text-muted-foreground" />
-                        </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{product.title}</TableCell>
-                  <TableCell>{new Date(product.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(product)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <DeleteButton productId={product.id} />
-                  </TableCell>
-                </TableRow>
-              ))
+               products.map((product) => {
+                const mainImage = product.images?.[0];
+                return (
+                  <TableRow key={product.id}>
+                    <TableCell>
+                      {mainImage ? (
+                          <Image src={mainImage} alt={product.title} width={64} height={64} className="rounded-md object-cover bg-muted" />
+                      ) : (
+                          <div className="w-16 h-16 rounded-md bg-secondary flex items-center justify-center">
+                              <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                          </div>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium">{product.title}</TableCell>
+                    <TableCell>{new Date(product.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(product)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <DeleteButton productId={product.id} />
+                    </TableCell>
+                  </TableRow>
+                )
+              })
             )}
           </TableBody>
         </Table>

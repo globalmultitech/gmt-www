@@ -2,9 +2,8 @@
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Home, ChevronRight, CheckCircle, Smartphone, Image as ImageIcon } from 'lucide-react';
+import { Home, ChevronRight, CheckCircle } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -13,6 +12,7 @@ import {
 } from '@/components/ui/table';
 import { getSettings } from '@/lib/settings';
 import WhatsAppButton from './whatsapp-button';
+import ProductImageGallery from './image-gallery';
 
 type Props = {
   params: { slug: string };
@@ -41,7 +41,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
   
-  const productImageUrl = product.image ?? undefined;
+  const mainImageUrl = product.images?.[0] ?? undefined;
 
   return {
     title: product.metaTitle || product.title,
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
         title: product.metaTitle || product.title,
         description: product.metaDescription || product.description,
-        images: productImageUrl ? [productImageUrl] : [],
+        images: mainImageUrl ? [mainImageUrl] : [],
     },
   };
 }
@@ -90,28 +90,13 @@ export default async function ProductDetailPage({ params }: Props) {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12">
             {/* Image Section */}
-            <div>
-              <div className="relative aspect-square w-full rounded-lg overflow-hidden shadow-lg border bg-muted">
-                {product.image ? (
-                    <Image
-                    src={product.image}
-                    alt={product.title}
-                    fill
-                    className="object-contain"
-                    />
-                ) : (
-                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
-                        <ImageIcon className="h-20 w-20" />
-                    </div>
-                )}
-              </div>
-            </div>
+            <ProductImageGallery images={product.images} productTitle={product.title} />
 
             {/* Details Section */}
             <div className="flex flex-col">
                <div className="mb-4">
                  <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                 <p className="mt-2 text-lg text-muted-foreground">{product.description}</p>
+                 <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
               </div>
               
               <div className="mt-4">
