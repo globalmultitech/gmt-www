@@ -1,3 +1,4 @@
+
 datasource db {
   provider     = "mysql"
   url          = env("DATABASE_URL")
@@ -22,7 +23,7 @@ model WebSettings {
   id            Int      @id @default(1)
   companyName   String
   whatsappSales String
-  footerText    String   @db.Text
+  footerText    String
   socialMedia   Json
   menuItems     Json
   createdAt     DateTime @default(now())
