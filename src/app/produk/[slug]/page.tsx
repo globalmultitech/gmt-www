@@ -10,8 +10,6 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableHeader,
   TableRow,
 } from '@/components/ui/table';
 import type { JsonValue } from '@prisma/client/runtime/library';
@@ -25,6 +23,13 @@ type Props = {
 async function getProductBySlug(slug: string) {
   const product = await prisma.product.findUnique({
     where: { slug },
+    include: {
+      subCategory: {
+        include: {
+          category: true,
+        },
+      },
+    },
   });
   return product;
 }
@@ -37,15 +42,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: 'Produk Tidak Ditemukan',
     };
   }
-
-  const openGraphImages = product.image ? [
-    {
-      url: product.image,
-      width: 1200,
-      height: 630,
-      alt: product.title,
-    },
-  ] : [];
+  
+  const productImageUrl = product.image ?? undefined;
 
   return {
     title: product.metaTitle || product.title,
@@ -53,7 +51,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
         title: product.metaTitle || product.title,
         description: product.metaDescription || product.description,
-        images: openGraphImages,
+        images: productImageUrl ? [productImageUrl] : [],
     },
   };
 }
@@ -91,15 +89,15 @@ export default async function ProductDetailPage({ params }: Props) {
 
   const whatsappNumber = settings.whatsappSales.replace(/[^0-9]/g, '');
 
-  let message = `Yth. tim ${settings.companyName},\n\nSaya tertarik dengan produk berikut:\n- Nama Produk: ${product.title}\n- Halaman Produk: ${productUrl}`;
-
+  let messageBody = `Yth. Tim Sales ${settings.companyName},\n\nSaya tertarik dengan produk berikut:\n- Nama Produk: ${product.title}\n- Tautan Produk: ${productUrl}`;
+  
   if (product.image) {
-    message += `\n- Gambar Produk: ${product.image}`;
+      messageBody += `\n- Gambar: ${product.image}`;
   }
 
-  message += `\n\nSaya ingin meminta informasi lebih lanjut mengenai penawaran dan ketersediaan.\n\nTerima kasih.`;
+  messageBody += `\n\nSaya ingin meminta informasi lebih lanjut mengenai penawaran dan ketersediaan.\n\nTerima kasih.`;
 
-  const encodedMessage = encodeURIComponent(message);
+  const encodedMessage = encodeURIComponent(messageBody);
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
 
@@ -147,18 +145,18 @@ export default async function ProductDetailPage({ params }: Props) {
 
       <div className="container mx-auto px-4 py-12 md:py-16">
          <Tabs defaultValue="description" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="description">Deskripsi</TabsTrigger>
-            <TabsTrigger value="features">Fitur</TabsTrigger>
-            <TabsTrigger value="specifications">Spesifikasi</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-3 gap-4 border-b">
+            <TabsTrigger value="description" className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none">Deskripsi</TabsTrigger>
+            <TabsTrigger value="features" className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none">Fitur</TabsTrigger>
+            <TabsTrigger value="specifications" className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none">Spesifikasi</TabsTrigger>
           </TabsList>
-          <TabsContent value="description" className="py-6 px-4 bg-background rounded-b-md border border-t-0">
+          <TabsContent value="description" className="py-8">
             <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
               <p>{product.longDescription || product.description}</p>
             </article>
           </TabsContent>
-          <TabsContent value="features" className="py-6 px-4 bg-background rounded-b-md border border-t-0">
-             <ul className="space-y-4">
+          <TabsContent value="features" className="py-8">
+             <ul className="space-y-4 max-w-2xl">
                 {featuresList.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
                     <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
@@ -169,9 +167,9 @@ export default async function ProductDetailPage({ params }: Props) {
                 ))}
             </ul>
           </TabsContent>
-          <TabsContent value="specifications" className="py-6 px-4 bg-background rounded-b-md border border-t-0">
+          <TabsContent value="specifications" className="py-8">
             {specifications.length > 0 ? (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-w-2xl rounded-lg border">
                     <Table>
                         <TableBody>
                         {specifications.map(([key, value]) => (
