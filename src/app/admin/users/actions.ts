@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 const UserSchema = z.object({
   name: z.string().min(1, 'Nama tidak boleh kosong'),

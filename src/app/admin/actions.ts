@@ -2,7 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/db';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 
 export async function login(prevState: { message: string } | undefined, formData: FormData) {
   const email = formData.get('email') as string;
