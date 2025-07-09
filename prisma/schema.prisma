@@ -21,11 +21,11 @@ model User {
 }
 
 model WebSettings {
-  id            Int      @id @default(1)
-  logoUrl       String?  @db.VarChar(2048)
+  id            Int     @id @default(1)
+  logoUrl       String? @db.Text
   companyName   String
   whatsappSales String
-  footerText    String   @db.Text
+  footerText    String  @db.Text
   socialMedia   Json
   menuItems     Json
   createdAt     DateTime @default(now())
@@ -53,18 +53,20 @@ model ProductSubCategory {
 }
 
 model Product {
-  id              Int                @id @default(autoincrement())
-  title           String             @unique
-  slug            String             @unique
-  description     String             @db.Text
-  longDescription String?            @db.Text
-  images          Json
-  features        Json
-  specifications  Json?
-  metaTitle       String?
-  metaDescription String?            @db.Text
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  subCategoryId   Int
-  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  id               Int                 @id @default(autoincrement())
+  title            String              @unique
+  slug             String              @unique
+  description      String              @db.Text
+  longDescription  String?             @db.Text
+  images           Json
+  features         Json
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?
+  tokopediaUrl     String?
+  shopeeUrl        String?
+  subCategoryId    Int?
+  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }

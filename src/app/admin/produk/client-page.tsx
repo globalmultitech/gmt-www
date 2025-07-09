@@ -173,7 +173,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
 
   const handleOpenDialog = (product: Product | null) => {
     setEditingProduct(product);
-    setImageUrls(product?.images ?? []);
+    setImageUrls(product?.images as string[] ?? []);
     setSlug(product?.slug ?? '');
     setDialogOpen(true);
   }
@@ -265,6 +265,17 @@ export default function ProductManagementClientPage({ products, categories }: { 
                 <Textarea id="longDescription" name="longDescription" rows={5} defaultValue={editingProduct?.longDescription ?? ''} />
               </div>
               
+              <div className="grid grid-cols-2 gap-4">
+                 <div className="space-y-1">
+                    <Label htmlFor="tokopediaUrl">Link Tokopedia</Label>
+                    <Input id="tokopediaUrl" name="tokopediaUrl" defaultValue={editingProduct?.tokopediaUrl ?? ''} placeholder="https://tokopedia.com/link-produk" />
+                </div>
+                <div className="space-y-1">
+                    <Label htmlFor="shopeeUrl">Link Shopee</Label>
+                    <Input id="shopeeUrl" name="shopeeUrl" defaultValue={editingProduct?.shopeeUrl ?? ''} placeholder="https://shopee.co.id/link-produk" />
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label>Gambar Produk</Label>
                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -335,7 +346,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
               </TableRow>
             ) : (
                products.map((product) => {
-                const mainImage = product.images?.[0];
+                const mainImage = (product.images as string[])?.[0];
                 return (
                   <TableRow key={product.id}>
                     <TableCell>

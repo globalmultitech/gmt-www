@@ -14,6 +14,9 @@ import { getSettings } from '@/lib/settings';
 import WhatsAppButton from './whatsapp-button';
 import ProductImageGallery from './image-gallery';
 import RelatedProducts from './related-products';
+import { Button } from '@/components/ui/button';
+import { TokopediaIcon } from '@/components/icons/tokopedia-icon';
+import { ShopeeIcon } from '@/components/icons/shopee-icon';
 
 type Props = {
   params: { slug: string };
@@ -57,7 +60,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
   
-  const mainImageUrl = product.images?.[0] ?? undefined;
+  const mainImageUrl = (product.images as string[])?.[0] ?? undefined;
 
   return {
     title: product.metaTitle || product.title,
@@ -118,8 +121,24 @@ export default async function ProductDetailPage({ params }: Props) {
                   <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
                 </div>
                 
-                <div className="mt-4">
+                <div className="mt-6 flex flex-wrap items-center gap-3">
                   <WhatsAppButton product={product} settings={settings} />
+                  {product.tokopediaUrl && (
+                    <Button asChild variant="outline" size="lg" className="border-green-500 hover:bg-green-500/10 hover:text-green-600 text-green-600">
+                      <Link href={product.tokopediaUrl} target="_blank" rel="noopener noreferrer">
+                          <TokopediaIcon className="mr-2 h-5 w-5" />
+                          Tokopedia
+                      </Link>
+                    </Button>
+                  )}
+                   {product.shopeeUrl && (
+                    <Button asChild variant="outline" size="lg" className="border-orange-500 hover:bg-orange-500/10 hover:text-orange-600 text-orange-600">
+                      <Link href={product.shopeeUrl} target="_blank" rel="noopener noreferrer">
+                          <ShopeeIcon className="mr-2 h-5 w-5" />
+                          Shopee
+                      </Link>
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>

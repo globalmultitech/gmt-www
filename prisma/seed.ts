@@ -108,6 +108,8 @@ async function main() {
       },
       metaTitle: 'Jual Digital Kiosk GMT-K1 | Solusi Perbankan Modern',
       metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.',
+      tokopediaUrl: '',
+      shopeeUrl: '',
       subCategoryId: kioskSubCategory.id,
     },
     {
@@ -130,6 +132,8 @@ async function main() {
       },
       metaTitle: 'SmartQ Queue System | Sistem Antrian Cerdas',
       metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.',
+      tokopediaUrl: '',
+      shopeeUrl: '',
       subCategoryId: queueSubCategory.id,
     },
     {
@@ -153,6 +157,8 @@ async function main() {
       },
       metaTitle: 'ForexRate Display F-32 | Papan Kurs Digital',
       metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.',
+      tokopediaUrl: '',
+      shopeeUrl: '',
       subCategoryId: displaySubCategory.id,
     }
   ];

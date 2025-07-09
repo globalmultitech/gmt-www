@@ -41,6 +41,8 @@ const ProductSchema = z.object({
   }).optional(),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
+  tokopediaUrl: z.string().optional(),
+  shopeeUrl: z.string().optional(),
 });
 
 const UpdateProductSchema = ProductSchema.extend({
@@ -60,6 +62,8 @@ export async function createProduct(prevState: { message: string } | undefined, 
     specifications: formData.get('specifications'),
     metaTitle: formData.get('metaTitle'),
     metaDescription: formData.get('metaDescription'),
+    tokopediaUrl: formData.get('tokopediaUrl'),
+    shopeeUrl: formData.get('shopeeUrl'),
   });
 
   if (!validatedFields.success) {
@@ -105,6 +109,8 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         specifications: formData.get('specifications'),
         metaTitle: formData.get('metaTitle'),
         metaDescription: formData.get('metaDescription'),
+        tokopediaUrl: formData.get('tokopediaUrl'),
+        shopeeUrl: formData.get('shopeeUrl'),
     });
 
     if (!validatedFields.success) {
