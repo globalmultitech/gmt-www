@@ -18,8 +18,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
-  DialogClose
 } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -36,11 +34,12 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Pencil, Upload } from 'lucide-react';
 import type { Product } from '@prisma/client';
 import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
+import { getSignedURL } from '../actions';
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
   const { pending } = useFormStatus();
@@ -98,6 +97,56 @@ export default function ProductManagementClientPage({ products }: { products: Pr
 
   const [createState, createFormAction] = useActionState(createProduct, undefined);
   const [updateState, updateFormAction] = useActionState(updateProduct, undefined);
+  
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>('');
+
+
+  const computeSHA256 = async (file: File) => {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hashHex;
+  };
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const checksum = await computeSHA256(file);
+      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
+      
+      await fetch(signedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+
+      setUploadedImageUrl(publicUrl);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: 'Upload Gagal',
+        description: 'Gagal mengunggah gambar. Silakan coba lagi.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+  
+  const handleOpenDialog = (product: Product | null) => {
+    setEditingProduct(product);
+    setUploadedImageUrl(product?.image ?? '');
+    setDialogOpen(true);
+  }
 
   useEffect(() => {
     const state = editingProduct ? updateState : createState;
@@ -114,11 +163,6 @@ export default function ProductManagementClientPage({ products }: { products: Pr
       }
     }
   }, [createState, updateState, editingProduct, toast]);
-  
-  const handleOpenDialog = (product: Product | null) => {
-    setEditingProduct(product);
-    setDialogOpen(true);
-  }
 
   return (
     <div>
@@ -130,7 +174,7 @@ export default function ProductManagementClientPage({ products }: { products: Pr
         </Button>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) setEditingProduct(null); setDialogOpen(open); }}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) { setEditingProduct(null); setUploadedImageUrl('') }; setDialogOpen(open); }}>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
@@ -140,6 +184,8 @@ export default function ProductManagementClientPage({ products }: { products: Pr
             </DialogHeader>
             <form action={editingProduct ? updateFormAction : createFormAction} className="space-y-4">
               {editingProduct && <input type="hidden" name="id" value={editingProduct.id} />}
+              <input type="hidden" name="image" value={uploadedImageUrl} />
+
               <div className="space-y-1">
                 <Label htmlFor="title">Judul Produk</Label>
                 <Input id="title" name="title" required defaultValue={editingProduct?.title} />
@@ -148,10 +194,18 @@ export default function ProductManagementClientPage({ products }: { products: Pr
                 <Label htmlFor="description">Deskripsi</Label>
                 <Textarea id="description" name="description" required defaultValue={editingProduct?.description} />
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="image">URL Gambar</Label>
-                <Input id="image" name="image" type="url" required placeholder="https://placehold.co/600x400.png" defaultValue={editingProduct?.image} />
+              
+              <div className="space-y-2">
+                <Label htmlFor="image-upload">Gambar Produk</Label>
+                <div className="flex items-center gap-4">
+                    {uploadedImageUrl && (
+                        <Image src={uploadedImageUrl} alt="Preview" width={80} height={80} className="rounded-md object-cover" />
+                    )}
+                     <Input id="image-upload" name="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                     {isUploading && <Loader2 className="animate-spin" />}
+                </div>
               </div>
+
                <div className="space-y-1">
                 <Label htmlFor="features">Fitur Utama</Label>
                 <Textarea id="features" name="features" required rows={5} placeholder="Satu fitur per baris" defaultValue={editingProduct?.features.join('\n')}/>
