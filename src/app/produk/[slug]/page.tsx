@@ -3,7 +3,7 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Home, ChevronRight, CheckCircle, Smartphone } from 'lucide-react';
+import { Home, ChevronRight, CheckCircle, Smartphone, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
@@ -35,20 +35,22 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
+  const openGraphImages = product.image ? [
+    {
+      url: product.image,
+      width: 1200,
+      height: 630,
+      alt: product.title,
+    },
+  ] : [];
+
   return {
     title: product.metaTitle || product.title,
     description: product.metaDescription || product.description,
     openGraph: {
         title: product.metaTitle || product.title,
         description: product.metaDescription || product.description,
-        images: [
-            {
-                url: product.image,
-                width: 1200,
-                height: 630,
-                alt: product.title,
-            },
-        ],
+        images: openGraphImages,
     },
   };
 }
@@ -87,13 +89,19 @@ export default async function ProductDetailPage({ params }: Props) {
           <div className="grid md:grid-cols-2 gap-8 md:gap-12">
             {/* Image Section */}
             <div>
-              <div className="relative aspect-square w-full rounded-lg overflow-hidden shadow-lg border">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  fill
-                  className="object-contain"
-                />
+              <div className="relative aspect-square w-full rounded-lg overflow-hidden shadow-lg border bg-muted">
+                {product.image ? (
+                    <Image
+                    src={product.image}
+                    alt={product.title}
+                    fill
+                    className="object-contain"
+                    />
+                ) : (
+                    <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                        <ImageIcon className="h-20 w-20" />
+                    </div>
+                )}
               </div>
             </div>
 

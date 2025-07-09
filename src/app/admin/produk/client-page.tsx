@@ -43,7 +43,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Pencil, Image as ImageIcon } from 'lucide-react';
 import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
 import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
@@ -311,7 +311,13 @@ export default function ProductManagementClientPage({ products, categories }: { 
                products.map((product) => (
                 <TableRow key={product.id}>
                   <TableCell>
-                    <Image src={product.image} alt={product.title} width={64} height={64} className="rounded-md object-cover" />
+                    {product.image ? (
+                        <Image src={product.image} alt={product.title} width={64} height={64} className="rounded-md object-cover bg-muted" />
+                    ) : (
+                        <div className="w-16 h-16 rounded-md bg-secondary flex items-center justify-center">
+                            <ImageIcon className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                    )}
                   </TableCell>
                   <TableCell className="font-medium">{product.title}</TableCell>
                   <TableCell>{new Date(product.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>

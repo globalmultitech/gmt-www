@@ -1,6 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { CheckCircle, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import prisma from '@/lib/db';
@@ -49,13 +49,19 @@ export default async function ProdukPage() {
             {products.map((product) => (
               <Card key={product.id} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
                  <Link href={`/produk/${product.slug}`} className="block">
-                    <div className="relative h-56 w-full">
-                        <Image
-                            src={product.image}
-                            alt={product.title}
-                            fill
-                            className="object-cover"
-                        />
+                    <div className="relative h-56 w-full bg-muted">
+                        {product.image ? (
+                            <Image
+                                src={product.image}
+                                alt={product.title}
+                                fill
+                                className="object-cover"
+                            />
+                        ) : (
+                            <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                                <ImageIcon className="h-10 w-10" />
+                            </div>
+                        )}
                     </div>
                 </Link>
                 <CardHeader>
