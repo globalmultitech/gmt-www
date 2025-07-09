@@ -1,0 +1,192 @@
+'use client';
+
+import { useState, useActionState, useEffect, useTransition } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
+import type { User } from '@prisma/client';
+import { createUser, deleteUser } from './actions';
+import { useFormStatus } from 'react-dom';
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+  return (
+    <Button type="submit" disabled={pending}>
+      {pending ? <Loader2 className="animate-spin" /> : 'Simpan'}
+    </Button>
+  );
+}
+
+function DeleteButton({ userId }: { userId: number }) {
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteUser(userId);
+      toast({
+        title: result.message.includes('berhasil') ? 'Sukses' : 'Gagal',
+        description: result.message,
+        variant: result.message.includes('berhasil') ? 'default' : 'destructive',
+      });
+    });
+  };
+
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="ghost" size="icon" disabled={isPending}>
+          <Trash2 className="h-4 w-4 text-destructive" />
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tindakan ini tidak dapat dibatalkan. Ini akan menghapus user secara permanen.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+            {isPending ? <Loader2 className="animate-spin" /> : 'Hapus'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
+
+export default function UserManagementClientPage({ users }: { users: User[] }) {
+  const { toast } = useToast();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [state, formAction] = useActionState(createUser, undefined);
+
+  useEffect(() => {
+    if (state?.message) {
+      const isSuccess = state.message.includes('berhasil');
+      toast({
+        title: isSuccess ? 'Sukses' : 'Gagal',
+        description: state.message,
+        variant: isSuccess ? 'default' : 'destructive',
+      });
+      if(isSuccess) {
+        setIsDialogOpen(false);
+      }
+    }
+  }, [state, toast]);
+
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Manajemen User</h1>
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <PlusCircle className="mr-2" />
+              Tambah User
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Tambah User Baru</DialogTitle>
+              <DialogDescription>
+                Isi formulir di bawah ini untuk menambahkan akun user baru.
+              </DialogDescription>
+            </DialogHeader>
+            <form action={formAction} className="space-y-4">
+              <div className="space-y-1">
+                <Label htmlFor="name">Nama Lengkap</Label>
+                <Input id="name" name="name" required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" required />
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="password">Kata Sandi</Label>
+                <Input id="password" name="password" type="password" required placeholder="Minimal 6 karakter" />
+              </div>
+              <DialogFooter>
+                <DialogClose asChild>
+                    <Button variant="ghost">Batal</Button>
+                </DialogClose>
+                <SubmitButton />
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="border rounded-lg bg-card">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Nama</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Tanggal Dibuat</TableHead>
+              <TableHead className="text-right w-[100px]">Aksi</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-muted-foreground h-24">
+                  Belum ada data user.
+                </TableCell>
+              </TableRow>
+            ) : (
+               users.map((user) => (
+                <TableRow key={user.id}>
+                  <TableCell className="font-medium">{user.name}</TableCell>
+                  <TableCell>{user.email}</TableCell>
+                  <TableCell>{new Date(user.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>
+                  <TableCell className="text-right">
+                    <Button variant="ghost" size="icon" disabled>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <DeleteButton userId={user.id} />
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  );
+}

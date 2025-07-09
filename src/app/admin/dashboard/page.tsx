@@ -1,33 +1,35 @@
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { LogOut } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Users } from "lucide-react";
 
 export default function AdminDashboardPage() {
     return (
-        <div className="flex min-h-screen flex-col bg-secondary">
-             <header className="bg-background border-b sticky top-0 z-10">
-                <div className="container mx-auto flex h-16 items-center justify-between px-4">
-                    <h1 className="text-xl font-bold text-primary">Admin Dashboard</h1>
-                     <Button variant="outline" asChild>
-                        <Link href="/admin">
-                            <LogOut className="mr-2 h-4 w-4" />
-                            Logout
-                        </Link>
-                    </Button>
-                </div>
-            </header>
-            <main className="flex-grow container mx-auto p-4 md:p-8">
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Selamat Datang, Admin!</CardTitle>
-                        <CardDescription>Anda telah berhasil masuk ke dasbor admin.</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <p>Dari sini, Anda dapat mulai mengelola konten situs web. Fungsi ini sedang dalam pengembangan.</p>
-                    </CardContent>
-                </Card>
-            </main>
+        <div>
+            <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Selamat Datang, Admin!</CardTitle>
+                    <CardDescription>Pilih salah satu modul di bawah untuk mulai mengelola konten.</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <Card>
+                            <CardHeader>
+                                <Users className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Manajemen User</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Tambah, edit, atau hapus akun user yang dapat mengakses dashboard ini.</p>
+                                <Button asChild>
+                                    <Link href="/admin/users">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        {/* Other modules can be added here */}
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 }

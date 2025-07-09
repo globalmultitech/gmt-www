@@ -13,7 +13,7 @@ export async function login(prevState: { message: string } | undefined, formData
   }
 
   try {
-    const user = await prisma.admin.findUnique({
+    const user = await prisma.user.findUnique({
       where: { email },
     });
 

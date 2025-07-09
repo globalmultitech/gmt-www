@@ -7,13 +7,14 @@ const prisma = new PrismaClient();
 async function main() {
   const email = 'admin@gmt.co.id';
   const plainPassword = 'password123';
+  const name = 'Admin User';
 
-  console.log(`Checking for existing admin user with email: ${email}...`);
+  console.log(`Checking for existing user with email: ${email}...`);
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(plainPassword, salt);
 
-  const admin = await prisma.admin.upsert({
+  const user = await prisma.user.upsert({
     where: { email: email },
     update: {
       password: hashedPassword,
@@ -21,10 +22,11 @@ async function main() {
     create: {
       email: email,
       password: hashedPassword,
+      name: name,
     },
   });
 
-  console.log(`Admin user ${admin.email} has been created/confirmed.`);
+  console.log(`User ${user.email} has been created/confirmed.`);
   console.log('You can now log in with:');
   console.log(`Email: ${email}`);
   console.log(`Password: ${plainPassword}`);
