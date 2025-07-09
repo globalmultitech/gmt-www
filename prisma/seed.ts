@@ -55,6 +55,33 @@ async function main() {
   });
   console.log('Web settings seeded.');
 
+  console.log('Seeding categories and sub-categories...');
+  const hardwareCategory = await prisma.productCategory.upsert({
+    where: { name: 'Perangkat Keras' },
+    update: {},
+    create: { name: 'Perangkat Keras' },
+  });
+
+  const kioskSubCategory = await prisma.productSubCategory.upsert({
+    where: { id: 1 }, // Using a fixed ID for simplicity in seeding
+    update: { name: 'Kiosk Digital', categoryId: hardwareCategory.id },
+    create: { name: 'Kiosk Digital', categoryId: hardwareCategory.id },
+  });
+
+  const queueSubCategory = await prisma.productSubCategory.upsert({
+    where: { id: 2 },
+    update: { name: 'Sistem Antrian', categoryId: hardwareCategory.id },
+    create: { name: 'Sistem Antrian', categoryId: hardwareCategory.id },
+  });
+  
+  const displaySubCategory = await prisma.productSubCategory.upsert({
+    where: { id: 3 },
+    update: { name: 'Display Informasi', categoryId: hardwareCategory.id },
+    create: { name: 'Display Informasi', categoryId: hardwareCategory.id },
+  });
+  console.log('Categories seeded.');
+
+
   console.log('Seeding products...');
   const productsToSeed = [
     {
@@ -79,7 +106,8 @@ async function main() {
         "Konektivitas": "Wi-Fi, Ethernet, Bluetooth"
       },
       metaTitle: 'Jual Digital Kiosk GMT-K1 | Solusi Perbankan Modern',
-      metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.'
+      metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.',
+      subCategoryId: kioskSubCategory.id,
     },
     {
       title: 'SmartQ Queue System',
@@ -100,7 +128,8 @@ async function main() {
         "Platform": "Berbasis Web, dapat diakses dari mana saja"
       },
       metaTitle: 'SmartQ Queue System | Sistem Antrian Cerdas',
-      metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.'
+      metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.',
+      subCategoryId: queueSubCategory.id,
     },
     {
       title: 'ForexRate Display F-32',
@@ -122,7 +151,8 @@ async function main() {
         "Input Data": "API, XML, atau input manual"
       },
       metaTitle: 'ForexRate Display F-32 | Papan Kurs Digital',
-      metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.'
+      metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.',
+      subCategoryId: displaySubCategory.id,
     }
   ];
 

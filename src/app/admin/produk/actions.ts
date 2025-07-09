@@ -7,6 +7,7 @@ import { z } from 'zod';
 const ProductSchema = z.object({
   title: z.string().min(1, 'Judul tidak boleh kosong'),
   slug: z.string().min(1, 'Slug tidak boleh kosong').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
+  subCategoryId: z.coerce.number().min(1, 'Sub Kategori harus dipilih'),
   description: z.string().min(1, 'Deskripsi singkat tidak boleh kosong'),
   longDescription: z.string().optional(),
   image: z.string().url('URL gambar tidak valid'),
@@ -33,6 +34,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
   const validatedFields = ProductSchema.safeParse({
     title: formData.get('title'),
     slug: formData.get('slug'),
+    subCategoryId: formData.get('subCategoryId'),
     description: formData.get('description'),
     longDescription: formData.get('longDescription'),
     image: formData.get('image'),
@@ -48,7 +50,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
     return { message };
   }
   
-  const { title, slug, description, longDescription, image, features, specifications, metaTitle, metaDescription } = validatedFields.data;
+  const { title, slug, subCategoryId, description, longDescription, image, features, specifications, metaTitle, metaDescription } = validatedFields.data;
   const featuresArray = features.split('\n').filter(f => f.trim() !== '');
 
   try {
@@ -61,6 +63,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
       data: {
         title,
         slug,
+        subCategoryId,
         description,
         longDescription,
         image,
@@ -86,6 +89,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         id: formData.get('id'),
         title: formData.get('title'),
         slug: formData.get('slug'),
+        subCategoryId: formData.get('subCategoryId'),
         description: formData.get('description'),
         longDescription: formData.get('longDescription'),
         image: formData.get('image'),
@@ -101,7 +105,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
         return { message };
     }
 
-    const { id, title, slug, description, longDescription, image, features, specifications, metaTitle, metaDescription } = validatedFields.data;
+    const { id, title, slug, subCategoryId, description, longDescription, image, features, specifications, metaTitle, metaDescription } = validatedFields.data;
     const featuresArray = features.split('\n').filter(f => f.trim() !== '');
 
     try {
@@ -115,6 +119,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
             data: {
                 title,
                 slug,
+                subCategoryId,
                 description,
                 longDescription,
                 image,

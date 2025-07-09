@@ -3,7 +3,7 @@
 import { useState, useEffect, type ReactNode } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { LayoutDashboard, Users, LogOut, Settings, Package } from 'lucide-react';
+import { LayoutDashboard, Users, LogOut, Settings, Package, Shapes } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logout } from '@/app/login/actions';
 import { cn } from '@/lib/utils';
@@ -38,6 +38,7 @@ export default function AdminLayout({
   const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
     { href: '/admin/produk', label: 'Produk', icon: <Package className="h-5 w-5" /> },
+    { href: '/admin/kategori', label: 'Kategori', icon: <Shapes className="h-5 w-5" /> },
     { href: '/admin/users', label: 'Manajemen User', icon: <Users className="h-5 w-5" /> },
     { href: '/admin/settings', label: 'Pengaturan', icon: <Settings className="h-5 w-5" /> },
   ];

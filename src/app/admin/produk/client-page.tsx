@@ -30,16 +30,29 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
-import type { Product } from '@prisma/client';
+import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
 import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { getSignedURL } from '../actions';
+
+type CategoryWithSubCategories = ProductCategory & {
+  subCategories: ProductSubCategory[];
+};
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
   const { pending } = useFormStatus();
@@ -90,7 +103,7 @@ function DeleteButton({ productId }: { productId: number }) {
   );
 }
 
-export default function ProductManagementClientPage({ products }: { products: Product[] }) {
+export default function ProductManagementClientPage({ products, categories }: { products: Product[], categories: CategoryWithSubCategories[] }) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
@@ -198,15 +211,38 @@ export default function ProductManagementClientPage({ products }: { products: Pr
               {editingProduct && <input type="hidden" name="id" value={editingProduct.id} />}
               <input type="hidden" name="image" value={uploadedImageUrl} />
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <Label htmlFor="title">Judul Produk</Label>
+                  <Input id="title" name="title" required defaultValue={editingProduct?.title} onChange={handleTitleChange} />
+                </div>
+                <div className="space-y-1">
+                  <Label htmlFor="slug">Slug URL</Label>
+                  <Input id="slug" name="slug" required value={slug} onChange={(e) => setSlug(e.target.value)} />
+                </div>
+              </div>
+              
               <div className="space-y-1">
-                <Label htmlFor="title">Judul Produk</Label>
-                <Input id="title" name="title" required defaultValue={editingProduct?.title} onChange={handleTitleChange} />
+                <Label htmlFor="subCategoryId">Kategori Produk</Label>
+                <Select name="subCategoryId" required defaultValue={editingProduct?.subCategoryId?.toString()}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Pilih sub-kategori..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectGroup key={category.id}>
+                        <SelectLabel>{category.name}</SelectLabel>
+                        {category.subCategories.map((subCategory) => (
+                           <SelectItem key={subCategory.id} value={subCategory.id.toString()}>
+                             {subCategory.name}
+                           </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
-               <div className="space-y-1">
-                <Label htmlFor="slug">Slug URL</Label>
-                <Input id="slug" name="slug" required value={slug} onChange={(e) => setSlug(e.target.value)} />
-                <p className="text-xs text-muted-foreground">Bagian dari URL, contoh: /produk/{slug || 'nama-produk-anda'}</p>
-              </div>
+
               <div className="space-y-1">
                 <Label htmlFor="description">Deskripsi Singkat</Label>
                 <Textarea id="description" name="description" required defaultValue={editingProduct?.description} />

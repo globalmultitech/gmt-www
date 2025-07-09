@@ -3,41 +3,25 @@
 
 generator client {
   provider        = "prisma-client-js"
+  // The `binaryTargets` setting is needed for deploying to Vercel.
+  // It ensures the correct Prisma engine is available for the deployment environment.
   binaryTargets   = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
   provider = "sqlite"
   url      = "file:./dev.db"
-  relationMode = "prisma"
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
+  name      String
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("users")
-}
-
-model Product {
-  id              Int      @id @default(autoincrement())
-  title           String   @unique
-  slug            String   @unique
-  description     String
-  longDescription String?
-  image           String
-  features        String[]
-  specifications  Json?
-  metaTitle       String?
-  metaDescription String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-
-  @@map("products")
 }
 
 model WebSettings {
@@ -51,4 +35,49 @@ model WebSettings {
   updatedAt     DateTime @updatedAt
 
   @@map("web_settings")
+}
+
+model Product {
+  id              Int       @id @default(autoincrement())
+  title           String    @unique
+  slug            String    @unique
+  description     String
+  longDescription String?
+  image           String
+  features        Json
+  specifications  Json?
+  metaTitle       String?
+  metaDescription String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  subCategoryId   Int?
+  subCategory     ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
+
+  @@map("products")
+}
+
+model ProductCategory {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  subCategories ProductSubCategory[]
+
+  @@map("product_categories")
+}
+
+model ProductSubCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  
+  products   Product[]
+
+  @@map("product_sub_categories")
 }
