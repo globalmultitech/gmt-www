@@ -37,7 +37,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
 import type { User } from '@prisma/client';
-import { createUser, deleteUser } from './actions';
+import { createUser, deleteUser, updateUser } from './actions';
 import { useFormStatus } from 'react-dom';
 
 function SubmitButton() {
@@ -92,29 +92,49 @@ function DeleteButton({ userId }: { userId: number }) {
 
 export default function UserManagementClientPage({ users }: { users: User[] }) {
   const { toast } = useToast();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [state, formAction] = useActionState(createUser, undefined);
+  // State for Add User Dialog
+  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [createState, createFormAction] = useActionState(createUser, undefined);
 
+  // State for Edit User Dialog
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [updateState, updateFormAction] = useActionState(updateUser, undefined);
+
+  // Effect for Create User
   useEffect(() => {
-    if (state?.message) {
-      const isSuccess = state.message.includes('berhasil');
+    if (createState?.message) {
+      const isSuccess = createState.message.includes('berhasil');
       toast({
         title: isSuccess ? 'Sukses' : 'Gagal',
-        description: state.message,
+        description: createState.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
       if(isSuccess) {
-        setIsDialogOpen(false);
+        setIsAddDialogOpen(false);
       }
     }
-  }, [state, toast]);
+  }, [createState, toast]);
 
+  // Effect for Update User
+  useEffect(() => {
+    if (updateState?.message) {
+        const isSuccess = updateState.message.includes('berhasil');
+        toast({
+            title: isSuccess ? 'Sukses' : 'Gagal',
+            description: updateState.message,
+            variant: isSuccess ? 'default' : 'destructive',
+        });
+        if (isSuccess) {
+            setEditingUser(null); // Close the dialog on success
+        }
+    }
+  }, [updateState, toast]);
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Manajemen User</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
           <DialogTrigger asChild>
             <Button>
               <PlusCircle className="mr-2" />
@@ -128,7 +148,7 @@ export default function UserManagementClientPage({ users }: { users: User[] }) {
                 Isi formulir di bawah ini untuk menambahkan akun user baru.
               </DialogDescription>
             </DialogHeader>
-            <form action={formAction} className="space-y-4">
+            <form action={createFormAction} className="space-y-4">
               <div className="space-y-1">
                 <Label htmlFor="name">Nama Lengkap</Label>
                 <Input id="name" name="name" required />
@@ -151,6 +171,40 @@ export default function UserManagementClientPage({ users }: { users: User[] }) {
           </DialogContent>
         </Dialog>
       </div>
+
+       {/* Edit User Dialog */}
+      <Dialog open={!!editingUser} onOpenChange={(open) => !open && setEditingUser(null)}>
+        {editingUser && (
+            <DialogContent>
+                <DialogHeader>
+                    <DialogTitle>Edit User</DialogTitle>
+                    <DialogDescription>
+                        Ubah detail user. Kosongkan kata sandi jika tidak ingin diubah.
+                    </DialogDescription>
+                </DialogHeader>
+                <form action={updateFormAction} className="space-y-4">
+                    <input type="hidden" name="id" value={editingUser.id} />
+                    <div className="space-y-1">
+                        <Label htmlFor="name-edit">Nama Lengkap</Label>
+                        <Input id="name-edit" name="name" defaultValue={editingUser.name} required />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="email-edit">Email</Label>
+                        <Input id="email-edit" name="email" type="email" defaultValue={editingUser.email} required />
+                    </div>
+                    <div className="space-y-1">
+                        <Label htmlFor="password-edit">Kata Sandi Baru</Label>
+                        <Input id="password-edit" name="password" type="password" placeholder="Minimal 6 karakter" />
+                    </div>
+                    <DialogFooter>
+                        <Button type="button" variant="ghost" onClick={() => setEditingUser(null)}>Batal</Button>
+                        <SubmitButton />
+                    </DialogFooter>
+                </form>
+            </DialogContent>
+        )}
+      </Dialog>
+
 
       <div className="border rounded-lg bg-card">
         <Table>
@@ -176,7 +230,7 @@ export default function UserManagementClientPage({ users }: { users: User[] }) {
                   <TableCell>{user.email}</TableCell>
                   <TableCell>{new Date(user.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" disabled>
+                    <Button variant="ghost" size="icon" onClick={() => setEditingUser(user)}>
                       <Pencil className="h-4 w-4" />
                     </Button>
                     <DeleteButton userId={user.id} />
