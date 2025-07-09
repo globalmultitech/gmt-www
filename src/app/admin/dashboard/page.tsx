@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, Settings } from "lucide-react";
+import { Users, Settings, Package } from "lucide-react";
 
 export default function AdminDashboardPage() {
     return (
@@ -35,6 +35,18 @@ export default function AdminDashboardPage() {
                                 <p className="text-muted-foreground text-sm mb-4">Kelola menu, footer, nama perusahaan, dan informasi kontak website.</p>
                                 <Button asChild>
                                     <Link href="/admin/settings">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <Package className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Manajemen Produk</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Tambah, edit, atau hapus produk yang ditampilkan di halaman publik.</p>
+                                <Button asChild>
+                                    <Link href="/admin/produk">Buka Modul</Link>
                                 </Button>
                             </CardContent>
                         </Card>
