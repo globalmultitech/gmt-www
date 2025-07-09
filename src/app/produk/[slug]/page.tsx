@@ -84,7 +84,7 @@ export default async function ProductDetailPage({ params }: Props) {
     : [];
 
   const whatsappNumber = settings.whatsappSales.replace(/[^0-9]/g, '');
-  const message = `Halo ${settings.companyName}, saya minat produk anda yaitu ${product.title}`;
+  const message = `Yth. tim ${settings.companyName},\n\nSaya tertarik dengan produk "${product.title}" dan ingin meminta informasi lebih lanjut.\n\nTerima kasih.`;
   const encodedMessage = encodeURIComponent(message);
   const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
@@ -123,7 +123,7 @@ export default async function ProductDetailPage({ params }: Props) {
               <Button asChild size="lg">
                 <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
                   <Smartphone className="mr-2 h-5 w-5" />
-                  Hubungi via WhatsApp
+                  Minta Penawaran via WhatsApp
                 </Link>
               </Button>
             </div>
