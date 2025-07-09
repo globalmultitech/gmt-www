@@ -1,18 +1,21 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
+}
 
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-generator client {
-  provider        = "prisma-client-js"
-}
-
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String
   name      String
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -38,31 +41,31 @@ model ProductCategory {
 }
 
 model ProductSubCategory {
-  id         Int        @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   categoryId Int
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
   @@unique([name, categoryId])
 }
 
-
 model Product {
-  id               Int      @id @default(autoincrement())
-  title            String   @unique
-  slug             String   @unique
-  subCategoryId    Int
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Restrict)
-  description      String   @db.Text
-  longDescription  String?  @db.Text
-  image            String?
-  features         Json?
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?  @db.Text
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  title           String   @unique
+  slug            String   @unique
+  description     String   @db.Text
+  longDescription String?  @db.Text
+  image           String?
+  features        Json
+  specifications  Json?
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  subCategoryId Int
+  subCategory   ProductSubCategory @relation(fields: [subCategoryId], references: [id])
 }
