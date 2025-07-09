@@ -127,9 +127,11 @@ export default async function ProductDetailPage({ params }: Props) {
             </div>
 
             {/* Details Section */}
-            <div className="space-y-6">
-              <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-              <p className="text-lg text-muted-foreground">{product.description}</p>
+            <div className="flex flex-col space-y-6">
+              <div>
+                <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
+                <p className="mt-2 text-lg text-muted-foreground">{product.description}</p>
+              </div>
               <Button asChild size="lg">
                 <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
                   <Smartphone className="mr-2 h-5 w-5" />
