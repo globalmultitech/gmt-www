@@ -1,8 +1,10 @@
+
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarTrigger, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton } from "@/components/ui/sidebar";
 import { Users, LayoutDashboard, LogOut } from "lucide-react";
 import { Logo } from "@/components/logo";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { logout } from "@/app/login/actions";
 
 export default function AdminLayout({
   children,
@@ -36,12 +38,12 @@ export default function AdminLayout({
                     </SidebarMenuItem>
                 </SidebarMenu>
                  <div className="p-2 mt-auto">
-                     <Button variant="outline" className="w-full" asChild>
-                        <Link href="/login">
+                    <form action={logout}>
+                         <Button type="submit" variant="outline" className="w-full">
                             <LogOut className="mr-2 h-4 w-4" />
                             Logout
-                        </Link>
-                    </Button>
+                        </Button>
+                    </form>
                 </div>
             </SidebarContent>
         </Sidebar>
