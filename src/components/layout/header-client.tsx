@@ -14,9 +14,10 @@ import type { MenuItem } from '@/lib/settings';
 type HeaderClientProps = {
     navItems: MenuItem[];
     companyName: string;
+    logoUrl?: string | null;
 }
 
-export function HeaderClient({ navItems, companyName }: HeaderClientProps) {
+export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -42,7 +43,7 @@ export function HeaderClient({ navItems, companyName }: HeaderClientProps) {
             !isScrolled && 'bg-card dark:bg-secondary text-card-foreground rounded-full shadow-2xl',
             isScrolled && 'bg-transparent rounded-none shadow-none'
         )}>
-          <Logo companyName={companyName} />
+          <Logo companyName={companyName} logoUrl={logoUrl} />
 
           <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
             {navItems.map((item) => (
@@ -83,7 +84,7 @@ export function HeaderClient({ navItems, companyName }: HeaderClientProps) {
               <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-0">
                 <div className="flex flex-col h-full">
                   <div className="p-4 border-b">
-                    <Logo companyName={companyName} />
+                    <Logo companyName={companyName} logoUrl={logoUrl} />
                   </div>
                   <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
                     {navItems.map((item) => (

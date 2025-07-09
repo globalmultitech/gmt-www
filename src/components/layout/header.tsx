@@ -7,6 +7,7 @@ export async function Header() {
   
   const navItems = (settings.menuItems as MenuItem[]) || [];
   const companyName = settings.companyName;
+  const logoUrl = settings.logoUrl;
 
-  return <HeaderClient navItems={navItems} companyName={companyName} />;
+  return <HeaderClient navItems={navItems} companyName={companyName} logoUrl={logoUrl} />;
 }

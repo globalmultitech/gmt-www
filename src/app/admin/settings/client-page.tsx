@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,8 @@ import type { WebSettings } from '@prisma/client';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { getSignedURL } from '../actions';
+import Image from 'next/image';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -24,6 +26,48 @@ function SubmitButton() {
 export default function SettingsClientPage({ settings }: { settings: WebSettings }) {
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateWebSettings, undefined);
+  
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(settings.logoUrl ?? '');
+
+  const computeSHA256 = async (file: File) => {
+    const buffer = await file.arrayBuffer();
+    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hashHex = hashArray
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+    return hashHex;
+  };
+  
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const checksum = await computeSHA256(file);
+      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
+      
+      await fetch(signedUrl, {
+        method: 'PUT',
+        body: file,
+        headers: { 'Content-Type': file.type },
+      });
+
+      setUploadedImageUrl(publicUrl);
+    } catch (error) {
+      console.error("Upload error:", error);
+      toast({
+        title: 'Upload Gagal',
+        description: 'Gagal mengunggah logo. Silakan periksa pengaturan CORS di R2.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
 
   useEffect(() => {
     if (state?.message) {
@@ -47,11 +91,25 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
             <p className="text-muted-foreground">Kelola informasi umum, menu, dan tautan yang tampil di website Anda.</p>
         </div>
       <form action={formAction}>
+        <input type="hidden" name="logoUrl" value={uploadedImageUrl} />
         <Card>
           <CardHeader>
             <CardTitle>Informasi Umum</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="image-upload">Logo Perusahaan</Label>
+                <div className="flex items-center gap-4">
+                    {uploadedImageUrl ? (
+                        <Image src={uploadedImageUrl} alt="Logo Preview" width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
+                    ) : (
+                        <div className="h-10 w-40 rounded-md bg-muted flex items-center justify-center text-sm text-muted-foreground">Tidak ada logo</div>
+                    )}
+                     <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading}/>
+                     {isUploading && <Loader2 className="animate-spin" />}
+                </div>
+                <p className="text-xs text-muted-foreground">Unggah logo perusahaan Anda. Format yang didukung: PNG, JPG, WEBP, SVG.</p>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="companyName">Nama Perusahaan</Label>
               <Input id="companyName" name="companyName" defaultValue={settings.companyName} required />

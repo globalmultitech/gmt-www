@@ -34,6 +34,7 @@ async function main() {
     update: {}, // Don't update on seed, just ensure it exists
     create: {
       id: 1,
+      logoUrl: '',
       companyName: 'Global Multi Technology',
       whatsappSales: '+6281234567890',
       footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',

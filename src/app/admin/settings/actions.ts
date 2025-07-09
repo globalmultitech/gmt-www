@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
 
 const SettingsSchema = z.object({
+  logoUrl: z.string().optional(),
   companyName: z.string().min(1, 'Nama perusahaan tidak boleh kosong'),
   whatsappSales: z.string().min(1, 'Nomor WhatsApp tidak boleh kosong'),
   footerText: z.string().min(1, 'Teks footer tidak boleh kosong'),
@@ -33,6 +34,7 @@ export async function getWebSettings() {
 
 export async function updateWebSettings(prevState: { message: string } | undefined, formData: FormData) {
   const validatedFields = SettingsSchema.safeParse({
+    logoUrl: formData.get('logoUrl'),
     companyName: formData.get('companyName'),
     whatsappSales: formData.get('whatsappSales'),
     footerText: formData.get('footerText'),
@@ -46,12 +48,13 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message };
   }
   
-  const { companyName, whatsappSales, footerText, socialMedia, menuItems } = validatedFields.data;
+  const { logoUrl, companyName, whatsappSales, footerText, socialMedia, menuItems } = validatedFields.data;
 
   try {
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
+            logoUrl,
             companyName,
             whatsappSales,
             footerText,

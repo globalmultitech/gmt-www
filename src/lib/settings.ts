@@ -12,12 +12,14 @@ export type SocialMediaLinks = {
 
 // This type combines Prisma's type with our stricter JSON types
 export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems'> {
+  logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
 }
 
 const defaultSettings: WebSettings = {
   id: 1,
+  logoUrl: null,
   companyName: 'Global Multi Technology',
   whatsappSales: '+6281234567890',
   footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',

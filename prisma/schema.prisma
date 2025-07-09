@@ -2,10 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  // The `binaryTargets` setting is needed for deploying to Vercel.
-  // It ensures the correct Prisma engine is available for the deployment environment.
-  binaryTargets   = ["native", "debian-openssl-1.1.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-1.1.x"]
 }
 
 datasource db {
@@ -16,7 +14,7 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
+  name      String?
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -26,58 +24,51 @@ model User {
 
 model WebSettings {
   id            Int      @id @default(1)
-  companyName   String
-  whatsappSales String
-  footerText    String
-  socialMedia   Json
-  menuItems     Json
+  logoUrl       String?  @map("logo_url")
+  companyName   String   @map("company_name")
+  whatsappSales String   @map("whatsapp_sales")
+  footerText    String   @map("footer_text")
+  socialMedia   Json     @map("social_media")
+  menuItems     Json     @map("menu_items")
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@map("web_settings")
 }
 
-model Product {
-  id              Int       @id @default(autoincrement())
-  title           String    @unique
-  slug            String    @unique
-  description     String
-  longDescription String?
-  image           String
-  features        Json
-  specifications  Json?
-  metaTitle       String?
-  metaDescription String?
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
-
-  subCategoryId   Int?
-  subCategory     ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
-
-  @@map("products")
-}
-
 model ProductCategory {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-  
+  id            Int                  @id @default(autoincrement())
+  name          String               @unique
   subCategories ProductSubCategory[]
 
   @@map("product_categories")
 }
 
 model ProductSubCategory {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  categoryId Int
+  id         Int             @id @default(autoincrement())
+  name       String
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+  categoryId Int
   products   Product[]
 
   @@map("product_sub_categories")
+}
+
+model Product {
+  id               Int                 @id @default(autoincrement())
+  title            String              @unique
+  slug             String              @unique
+  description      String
+  longDescription  String?
+  image            String
+  features         String[]
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?
+  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
+  subCategoryId    Int?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+
+  @@map("products")
 }

@@ -9,9 +9,10 @@ type FooterClientProps = {
     companyName: string;
     footerText: string;
     socialLinksData: SocialMediaLinks;
+    logoUrl?: string | null;
 }
 
-export function FooterClient({ companyName, footerText, socialLinksData }: FooterClientProps) {
+export function FooterClient({ companyName, footerText, socialLinksData, logoUrl }: FooterClientProps) {
   
   const socialIcons = {
     twitter: <Twitter className="h-5 w-5" />,
@@ -70,7 +71,7 @@ export function FooterClient({ companyName, footerText, socialLinksData }: Foote
       <div className="container mx-auto px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-4 space-y-4">
-            <Logo companyName={companyName} />
+            <Logo companyName={companyName} logoUrl={logoUrl} />
             <p className="text-muted-foreground text-sm max-w-xs">
               {footerText}
             </p>

@@ -8,10 +8,12 @@ export async function Footer() {
     const companyName = settings.companyName;
     const footerText = settings.footerText;
     const socialLinksData = (settings.socialMedia as SocialMediaLinks) || {};
+    const logoUrl = settings.logoUrl;
 
     return <FooterClient 
         companyName={companyName} 
         footerText={footerText} 
         socialLinksData={socialLinksData} 
+        logoUrl={logoUrl}
     />;
 }
