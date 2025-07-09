@@ -84,13 +84,25 @@ async function main() {
 
 
   console.log('Seeding products...');
+  
+  const r2PublicUrl = process.env.R2_PUBLIC_URL;
+  if (!r2PublicUrl) {
+    console.warn("R2_PUBLIC_URL is not set in .env. Seeding products with placeholder images.");
+  }
+  
+  const getImageUrl = (imageName: string) => {
+    // Trim trailing slash from R2_PUBLIC_URL if it exists
+    const baseUrl = r2PublicUrl ? r2PublicUrl.replace(/\/$/, '') : null;
+    return baseUrl ? `${baseUrl}/${imageName}` : `https://placehold.co/600x400.png`;
+  };
+
   const productsToSeed = [
     {
       title: 'Digital Kiosk GMT-K1',
       slug: 'digital-kiosk-gmt-k1',
       description: 'Solusi layanan mandiri interaktif untuk perbankan modern. Meningkatkan efisiensi dan pengalaman nasabah.',
       longDescription: 'Digital Kiosk GMT-K1 merupakan terobosan dalam layanan perbankan mandiri. Dirancang dengan desain yang elegan dan futuristik, kiosk ini memungkinkan nasabah untuk melakukan berbagai transaksi tanpa perlu antri di teller, mulai dari pembukaan rekening, transfer, hingga pembayaran tagihan. Dibangun dengan material berkualitas tinggi dan sistem keamanan berlapis, GMT-K1 adalah investasi cerdas untuk modernisasi cabang bank Anda.',
-      image: 'https://placehold.co/600x400.png',
+      image: getImageUrl('digital-kiosk.png'),
       features: [
         "Layar sentuh 21.5 inci Full HD responsif",
         "Dilengkapi NFC dan QR Code Reader terintegrasi",
@@ -115,7 +127,7 @@ async function main() {
       slug: 'smartq-queue-system',
       description: 'Sistem antrian cerdas yang mengurangi waktu tunggu dan mengoptimalkan alur layanan pelanggan di cabang.',
       longDescription: 'Tinggalkan sistem antrian konvensional dan beralih ke SmartQ. Solusi manajemen antrian kami tidak hanya mengatur alur nasabah, tetapi juga mengumpulkan data berharga untuk analisis performa layanan. Nasabah dapat mengambil nomor antrian dari jarak jauh melalui aplikasi mobile, memantau status antrian secara real-time, dan mendapatkan estimasi waktu tunggu yang akurat. Ini adalah kunci untuk meningkatkan kepuasan dan loyalitas nasabah.',
-      image: 'https://placehold.co/600x400.png',
+      image: getImageUrl('queue-system.png'),
       features: [
         "Manajemen antrian multi-layanan dan multi-teller",
         "Tiket antrian virtual via aplikasi mobile atau QR code",
@@ -137,7 +149,7 @@ async function main() {
       slug: 'forexrate-display-f-32',
       description: 'Tampilan informasi kurs mata uang asing yang akurat, real-time, dan profesional untuk cabang bank Anda.',
       longDescription: 'Sajikan informasi kurs valuta asing dengan cara yang modern dan dapat diandalkan menggunakan ForexRate Display F-32. Dengan layar 32 inci beresolusi tinggi, informasi kurs menjadi jelas terbaca dari berbagai sudut. Sistem kami terhubung langsung ke sumber data terpercaya untuk memastikan kurs selalu up-to-date secara real-time. Konten tambahan seperti video promosi atau berita juga dapat ditampilkan, menjadikannya alat komunikasi yang efektif di dalam cabang.',
-      image: 'https://placehold.co/600x400.png',
+      image: getImageUrl('forex-display.png'),
       features: [
         "Layar 32 inci profesional dengan kecerahan tinggi",
         "Pembaruan kurs otomatis dan real-time dari sumber terpercaya",

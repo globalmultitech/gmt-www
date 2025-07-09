@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import type {NextConfig} from 'next';
 
 const r2Hostname = process.env.R2_PUBLIC_URL
