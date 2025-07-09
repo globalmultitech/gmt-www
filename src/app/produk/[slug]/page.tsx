@@ -5,14 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Home, ChevronRight, CheckCircle, Smartphone, Image as ImageIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   Table,
   TableBody,
   TableCell,
   TableRow,
 } from '@/components/ui/table';
-import type { JsonValue } from '@prisma/client/runtime/library';
 import { getSettings } from '@/lib/settings';
 import { headers } from 'next/headers';
 
@@ -135,7 +133,7 @@ export default async function ProductDetailPage({ params }: Props) {
               <Button asChild size="lg">
                 <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
                   <Smartphone className="mr-2 h-5 w-5" />
-                  Minta Penawaran via WhatsApp
+                  Minta Penawaran
                 </Link>
               </Button>
             </div>
@@ -144,48 +142,58 @@ export default async function ProductDetailPage({ params }: Props) {
       </div>
 
       <div className="container mx-auto px-4 py-12 md:py-16">
-         <Tabs defaultValue="description" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 gap-4 border-b">
-            <TabsTrigger value="description" className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none">Deskripsi</TabsTrigger>
-            <TabsTrigger value="features" className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none">Fitur</TabsTrigger>
-            <TabsTrigger value="specifications" className="relative rounded-none border-b-2 border-transparent bg-transparent px-4 pb-3 pt-2 font-semibold text-muted-foreground shadow-none transition-none focus-visible:ring-0 data-[state=active]:border-primary data-[state=active]:text-primary data-[state=active]:shadow-none">Spesifikasi</TabsTrigger>
-          </TabsList>
-          <TabsContent value="description" className="py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
+          {/* Left Column: Long Description */}
+          <div className="lg:col-span-3">
+            <h2 className="text-3xl font-headline font-bold mb-6 text-primary">Deskripsi Lengkap</h2>
             <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
               <p>{product.longDescription || product.description}</p>
             </article>
-          </TabsContent>
-          <TabsContent value="features" className="py-8">
-             <ul className="space-y-4 max-w-2xl">
-                {featuresList.map((feature, index) => (
+          </div>
+
+          {/* Right Column: Features & Specs */}
+          <div className="lg:col-span-2">
+            <div className="space-y-8 lg:sticky top-24">
+              {/* Features */}
+              <div>
+                <h3 className="text-2xl font-headline font-bold mb-4">Fitur Utama</h3>
+                <ul className="space-y-4">
+                  {featuresList.map((feature, index) => (
                     <li key={index} className="flex items-start gap-3">
-                    <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                      <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <CheckCircle className="h-4 w-4" />
-                    </div>
-                    <span className="text-muted-foreground">{String(feature)}</span>
+                      </div>
+                      <span className="text-muted-foreground">{String(feature)}</span>
                     </li>
-                ))}
-            </ul>
-          </TabsContent>
-          <TabsContent value="specifications" className="py-8">
-            {specifications.length > 0 ? (
-                <div className="overflow-x-auto max-w-2xl rounded-lg border">
+                  ))}
+                </ul>
+              </div>
+              
+              <hr className="border-border" />
+              
+              {/* Specifications */}
+              <div>
+                <h3 className="text-2xl font-headline font-bold mb-4">Spesifikasi Teknis</h3>
+                {specifications.length > 0 ? (
+                  <div className="overflow-x-auto rounded-lg border bg-card">
                     <Table>
-                        <TableBody>
+                      <TableBody>
                         {specifications.map(([key, value]) => (
-                            <TableRow key={key}>
-                                <TableCell className="font-semibold text-foreground w-1/3">{String(key)}</TableCell>
-                                <TableCell className="text-muted-foreground">{String(value)}</TableCell>
-                            </TableRow>
+                          <TableRow key={key}>
+                            <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
+                            <TableCell className="text-muted-foreground">{String(value)}</TableCell>
+                          </TableRow>
                         ))}
-                        </TableBody>
+                      </TableBody>
                     </Table>
-                </div>
-            ) : (
-                <p className="text-muted-foreground">Tidak ada data spesifikasi untuk produk ini.</p>
-            )}
-          </TabsContent>
-        </Tabs>
+                  </div>
+                ) : (
+                  <p className="text-muted-foreground">Tidak ada data spesifikasi untuk produk ini.</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
     </div>
