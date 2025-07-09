@@ -3,7 +3,7 @@
 
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/db';
-import bcrypt from 'bcryptjs';
+import bcryptjs from 'bcryptjs';
 import { cookies } from 'next/headers';
 
 export async function login(prevState: { message: string } | undefined, formData: FormData) {
@@ -28,7 +28,7 @@ export async function login(prevState: { message: string } | undefined, formData
       return { message: 'Konfigurasi akun bermasalah. Hubungi administrator.' };
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcryptjs.compare(password, user.password);
 
     if (!isPasswordValid) {
       return { message: 'Email atau kata sandi salah.' };
