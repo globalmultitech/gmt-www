@@ -64,20 +64,20 @@ async function main() {
   });
 
   const kioskSubCategory = await prisma.productSubCategory.upsert({
-    where: { id: 1 }, // Using a fixed ID for simplicity in seeding
-    update: { name: 'Kiosk Digital', categoryId: hardwareCategory.id },
+    where: { name_categoryId: { name: 'Kiosk Digital', categoryId: hardwareCategory.id } },
+    update: {},
     create: { name: 'Kiosk Digital', categoryId: hardwareCategory.id },
   });
 
   const queueSubCategory = await prisma.productSubCategory.upsert({
-    where: { id: 2 },
-    update: { name: 'Sistem Antrian', categoryId: hardwareCategory.id },
+    where: { name_categoryId: { name: 'Sistem Antrian', categoryId: hardwareCategory.id } },
+    update: {},
     create: { name: 'Sistem Antrian', categoryId: hardwareCategory.id },
   });
   
   const displaySubCategory = await prisma.productSubCategory.upsert({
-    where: { id: 3 },
-    update: { name: 'Display Informasi', categoryId: hardwareCategory.id },
+    where: { name_categoryId: { name: 'Display Informasi', categoryId: hardwareCategory.id } },
+    update: {},
     create: { name: 'Display Informasi', categoryId: hardwareCategory.id },
   });
   console.log('Categories seeded.');
