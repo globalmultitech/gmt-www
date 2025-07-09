@@ -11,8 +11,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
-    "db:push": "prisma db push",
-    "db:seed": "prisma db seed"
+    "db:push": "prisma generate && prisma db push",
+    "db:seed": "prisma generate && tsx prisma/seed.ts"
   },
   "dependencies": {
     "@genkit-ai/googleai": "^1.13.0",
