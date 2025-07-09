@@ -1,10 +1,10 @@
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "linux-musl-openssl-3.0.x"]
-  previewFeatures = ["driverAdapters"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl"]
 }
 
 datasource db {
@@ -15,8 +15,8 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
   password  String
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -33,7 +33,6 @@ model WebSettings {
   updatedAt     DateTime @updatedAt
 }
 
-// Model for Product Categories
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
   name          String               @unique
@@ -42,12 +41,11 @@ model ProductCategory {
   updatedAt     DateTime             @updatedAt
 }
 
-// Model for Product Sub-Categories
 model ProductSubCategory {
   id         Int             @id @default(autoincrement())
   name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
@@ -55,7 +53,6 @@ model ProductSubCategory {
   @@unique([name, categoryId])
 }
 
-// Model for Products
 model Product {
   id              Int                 @id @default(autoincrement())
   title           String              @unique
@@ -63,12 +60,12 @@ model Product {
   description     String
   longDescription String?             @db.Text
   image           String?
-  features        Json?
+  features        Json
   specifications  Json?
   metaTitle       String?
   metaDescription String?
-  subCategory     ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
-  subCategoryId   Int?
   createdAt       DateTime            @default(now())
   updatedAt       DateTime            @updatedAt
+  subCategoryId   Int
+  subCategory     ProductSubCategory  @relation(fields: [subCategoryId], references: [id], onDelete: Restrict)
 }

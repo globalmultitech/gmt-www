@@ -189,14 +189,9 @@ export default function ProductManagementClientPage({ products, categories }: { 
     }
   }, [createState, updateState, editingProduct, toast]);
   
-  const getJsonString = (data: string | null | undefined, defaultData: any) => {
-    if (!data) return JSON.stringify(defaultData, null, 2);
-    try {
-      const parsed = JSON.parse(data);
-      return JSON.stringify(parsed, null, 2);
-    } catch {
-      return JSON.stringify(defaultData, null, 2);
-    }
+  const getJsonString = (data: any, defaultData: any) => {
+    const valueToConvert = data ?? defaultData;
+    return JSON.stringify(valueToConvert, null, 2);
   };
 
   const featuresDefaultValue = getJsonString(editingProduct?.features, ['Fitur A', 'Fitur B', 'Fitur C']);
