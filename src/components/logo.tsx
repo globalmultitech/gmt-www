@@ -1,7 +1,7 @@
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-export function Logo({ className }: { className?: string }) {
+export function Logo({ className, companyName = "Global Multi Technology" }: { className?: string, companyName?: string }) {
   return (
     <Link href="/" className={cn('flex items-center gap-2', className)}>
       <svg
@@ -18,7 +18,7 @@ export function Logo({ className }: { className?: string }) {
         <path d="M22 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" />
       </svg>
       <span className="hidden sm:inline-block font-headline font-bold text-xl text-primary">
-        Global Multi Technology
+        {companyName}
       </span>
     </Link>
   );

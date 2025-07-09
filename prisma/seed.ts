@@ -1,8 +1,6 @@
-import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import prisma from '../src/lib/db';
+import bcryptjs from 'bcryptjs';
 import 'dotenv/config';
-
-const prisma = new PrismaClient();
 
 async function main() {
   const email = 'admin@gmt.co.id';
@@ -11,8 +9,8 @@ async function main() {
 
   console.log(`Checking for existing user with email: ${email}...`);
 
-  const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(plainPassword, salt);
+  const salt = await bcryptjs.genSalt(10);
+  const hashedPassword = await bcryptjs.hash(plainPassword, salt);
 
   const user = await prisma.user.upsert({
     where: { email: email },
@@ -28,7 +26,35 @@ async function main() {
   });
 
   console.log(`User ${user.email} has been created/confirmed.`);
-  console.log('You can now log in with:');
+
+  console.log('Seeding web settings...');
+  await prisma.webSettings.upsert({
+    where: { id: 1 },
+    update: {}, // Don't update on seed, just ensure it exists
+    create: {
+      id: 1,
+      companyName: 'Global Multi Technology',
+      whatsappSales: '+6281234567890',
+      footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',
+      socialMedia: {
+        twitter: '#',
+        facebook: '#',
+        instagram: '#',
+        linkedin: '#',
+      },
+      menuItems: [
+        { label: 'Beranda', href: '/' },
+        { label: 'Produk', href: '/produk' },
+        { label: 'Solusi', href: '/solusi' },
+        { label: 'Layanan', href: '/layanan' },
+        { label: 'Resources', href: '/resources' },
+        { label: 'Tentang Kami', href: '/tentang-kami' },
+      ],
+    },
+  });
+  console.log('Web settings seeded.');
+
+  console.log('\nSeed completed. You can now log in with:');
   console.log(`Email: ${email}`);
   console.log(`Password: ${plainPassword}`);
 }

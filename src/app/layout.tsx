@@ -1,4 +1,3 @@
-
 'use client';
 
 import type { Metadata } from 'next';
@@ -42,7 +41,7 @@ export default function RootLayout({
         >
           <div className="relative flex min-h-dvh flex-col bg-background">
             {showHeaderFooter && <Header />}
-            {showHeaderFooter ? <main className="flex-1">{children}</main> : children}
+            <main className="flex-1">{children}</main>
             {showHeaderFooter && <Footer />}
           </div>
           <Toaster />

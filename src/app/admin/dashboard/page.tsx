@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users } from "lucide-react";
+import { Users, Settings } from "lucide-react";
 
 export default function AdminDashboardPage() {
     return (
@@ -26,7 +26,18 @@ export default function AdminDashboardPage() {
                                 </Button>
                             </CardContent>
                         </Card>
-                        {/* Other modules can be added here */}
+                         <Card>
+                            <CardHeader>
+                                <Settings className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Pengaturan Web</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola menu, footer, nama perusahaan, dan informasi kontak website.</p>
+                                <Button asChild>
+                                    <Link href="/admin/settings">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
                     </div>
                 </CardContent>
             </Card>

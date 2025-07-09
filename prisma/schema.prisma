@@ -1,21 +1,33 @@
-datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "foreignKeys"
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
 }
 
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.1.x"]
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String
   name      String
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@map("user")
+}
+
+model WebSettings {
+  id            Int      @id @default(1)
+  companyName   String
+  whatsappSales String
+  footerText    String
+  socialMedia   Json
+  menuItems     Json
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("web_settings")
 }

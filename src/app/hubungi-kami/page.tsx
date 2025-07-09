@@ -4,10 +4,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Building, Mail, Phone } from 'lucide-react';
+import { getSettings } from '@/lib/settings';
+import { Building, Mail, Phone, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
-export default function HubungiKamiPage() {
+export default async function HubungiKamiPage() {
+  const settings = await getSettings();
+  const whatsappNumber = settings.whatsappSales;
+  const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=Halo,%20saya%20tertarik%20dengan%20produk/layanan%20Anda.`;
+
   return (
     <>
       <section className="bg-secondary">
@@ -104,12 +110,12 @@ export default function HubungiKamiPage() {
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
                   <div className="bg-primary text-primary-foreground p-3 rounded-full">
-                    <Phone className="h-6 w-6" />
+                    <MessageSquare className="h-6 w-6" />
                   </div>
-                  <h3 className="font-headline text-2xl text-primary">Telepon</h3>
+                  <h3 className="font-headline text-2xl text-primary">WhatsApp</h3>
                 </div>
                 <p className="text-muted-foreground pl-16">
-                    <a href="tel:+62211234567" className="hover:text-accent">+62 (21) 123 4567</a>
+                    <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="hover:text-accent">{whatsappNumber}</a>
                 </p>
               </div>
               <div className="relative h-64 w-full rounded-lg overflow-hidden shadow-md mt-6">
