@@ -15,6 +15,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import type { JsonValue } from '@prisma/client/runtime/library';
+import { getSettings } from '@/lib/settings';
 
 type Props = {
   params: { slug: string };
@@ -68,6 +69,7 @@ const Breadcrumbs = ({ productTitle }: { productTitle: string }) => (
 
 export default async function ProductDetailPage({ params }: Props) {
   const product = await getProductBySlug(params.slug);
+  const settings = await getSettings();
 
   if (!product) {
     notFound();
@@ -80,6 +82,11 @@ export default async function ProductDetailPage({ params }: Props) {
   const featuresList = (product.features && Array.isArray(product.features))
     ? product.features
     : [];
+
+  const whatsappNumber = settings.whatsappSales.replace(/[^0-9]/g, '');
+  const message = `Halo ${settings.companyName}, saya minat produk anda yaitu ${product.title}`;
+  const encodedMessage = encodeURIComponent(message);
+  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
 
 
   return (
@@ -114,9 +121,9 @@ export default async function ProductDetailPage({ params }: Props) {
               <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
               <p className="text-lg text-muted-foreground">{product.description}</p>
               <Button asChild size="lg">
-                <Link href="/hubungi-kami">
+                <Link href={whatsappLink} target="_blank" rel="noopener noreferrer">
                   <Smartphone className="mr-2 h-5 w-5" />
-                  Hubungi Sales untuk Penawaran
+                  Hubungi via WhatsApp
                 </Link>
               </Button>
             </div>
