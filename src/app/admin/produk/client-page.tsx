@@ -201,7 +201,7 @@ export default function ProductManagementClientPage({ products }: { products: Pr
                     {uploadedImageUrl && (
                         <Image src={uploadedImageUrl} alt="Preview" width={80} height={80} className="rounded-md object-cover" />
                     )}
-                     <Input id="image-upload" name="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                     <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
                      {isUploading && <Loader2 className="animate-spin" />}
                 </div>
               </div>
