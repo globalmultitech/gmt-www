@@ -4,97 +4,52 @@ import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Menu, ArrowRight, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
+import { Menu, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../theme-toggle';
-import type { MenuItem, SocialMediaLinks } from '@/lib/settings';
+import type { MenuItem } from '@/lib/settings';
 
 type HeaderClientProps = {
     navItems: MenuItem[];
     companyName: string;
     logoUrl?: string | null;
-    socialLinksData: SocialMediaLinks;
 }
 
-export function HeaderClient({ navItems, companyName, logoUrl, socialLinksData }: HeaderClientProps) {
+export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 80);
+      setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
-    handleScroll(); // check on initial render
+    handleScroll(); 
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
-  
-  const socialIcons = {
-    twitter: <Twitter className="h-4 w-4" />,
-    facebook: <Facebook className="h-4 w-4" />,
-    instagram: <Instagram className="h-4 w-4" />,
-    linkedin: <Linkedin className="h-4 w-4" />,
-  };
-
-  const socialLinks = Object.entries(socialLinksData)
-    .map(([key, href]) => {
-        const platform = key as keyof typeof socialIcons;
-        if (socialIcons[platform]) {
-            return { icon: socialIcons[platform], href, platform };
-        }
-        return null;
-    })
-    .filter(Boolean);
 
   return (
     <header className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+        "fixed top-0 z-50 w-full transition-all duration-300",
+        isScrolled ? 'bg-dark-slate/80 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       )}>
-      {/* Top Bar */}
-      <div className={cn(
-        "bg-secondary/50 dark:bg-secondary/20 transition-all duration-300",
-        isScrolled ? 'max-h-0 py-0 opacity-0 overflow-hidden' : 'max-h-20 py-2 opacity-100'
-      )}>
-        <div className="container mx-auto px-4 flex justify-between items-center text-sm">
-          <div className="flex items-center gap-6 text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 text-primary"/>
-              <span>Jl. Teknologi Raya, Jakarta</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <Mail className="h-4 w-4 text-primary"/>
-              <span>contact@gmt.co.id</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-muted-foreground">
-            {socialLinks.map((social) => (
-              <Link key={social!.platform} href={social!.href} className="hover:text-primary">
-                {social!.icon}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Main Navigation */}
       <div className="container mx-auto px-4">
-        <div className="flex h-20 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           <Logo companyName={companyName} logoUrl={logoUrl} />
 
-          <nav className="hidden lg:flex items-center space-x-8 text-base font-semibold">
+          <nav className="hidden lg:flex items-center space-x-10 text-base font-semibold">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'transition-colors hover:text-primary',
-                  pathname === item.href ? 'text-primary' : 'text-foreground'
+                  'transition-colors hover:text-primary text-white',
+                  pathname === item.href ? 'text-primary' : 'text-white'
                 )}
               >
                 {item.label}
@@ -103,36 +58,28 @@ export function HeaderClient({ navItems, companyName, logoUrl, socialLinksData }
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <div className="flex items-center gap-3">
-                <div className="bg-primary/10 p-3 rounded-full">
-                    <Phone className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                    <p className="text-sm text-muted-foreground">Call Us</p>
-                    <p className="font-bold">+62 812 3456 7890</p>
-                </div>
-            </div>
-            <Button asChild>
+            <Button asChild variant="outline" className="text-white border-white/50 hover:bg-white hover:text-primary">
               <Link href="/hubungi-kami">
                 Get a Quote <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <ThemeToggle />
+            {/* Optional: Add ThemeToggle back if needed */}
+            {/* <ThemeToggle /> */}
           </div>
 
           {/* Mobile Menu */}
           <div className="lg:hidden flex items-center gap-2">
-            <ThemeToggle />
+            {/* <ThemeToggle /> */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Buka menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-0">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-dark-slate p-0">
                 <div className="flex flex-col h-full">
-                  <div className="p-4 border-b">
+                  <div className="p-4 border-b border-border">
                     <Logo companyName={companyName} logoUrl={logoUrl} />
                   </div>
                   <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
@@ -150,8 +97,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, socialLinksData }
                       </Link>
                     ))}
                   </nav>
-                  <div className="mt-auto p-4 space-y-4 border-t">
-                    <Button asChild className="w-full font-bold">
+                  <div className="mt-auto p-4 space-y-4 border-t border-border">
+                    <Button asChild className="w-full font-bold" size="lg">
                       <Link href="/hubungi-kami" onClick={() => setIsMobileMenuOpen(false)}>Get a Quote</Link>
                     </Button>
                   </div>

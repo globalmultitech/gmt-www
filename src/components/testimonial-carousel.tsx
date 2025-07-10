@@ -3,7 +3,6 @@
 
 import { useRef } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
 import {
   Carousel,
   CarouselContent,
@@ -55,20 +54,9 @@ export function TestimonialCarousel() {
             {testimonials.map((testimonial, index) => (
                 <CarouselItem key={index}>
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        <div className="relative">
-                            <Image 
-                                src={testimonial.image}
-                                alt={testimonial.name}
-                                width={570}
-                                height={625}
-                                className="rounded-lg shadow-lg"
-                                data-ai-hint={testimonial.aiHint}
-                            />
-                             <div className="absolute -top-6 -left-6 bg-primary p-4 rounded-full text-white">
-                                <Quote className="h-8 w-8" />
-                            </div>
-                        </div>
                         <div>
+                            <p className="font-semibold text-primary uppercase tracking-widest mb-2">Testimonial</p>
+                            <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6">What our clients say about us</h2>
                             <div className="flex text-yellow-400 mb-4">
                                 <Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" />
                             </div>
@@ -76,11 +64,24 @@ export function TestimonialCarousel() {
                             <h3 className="text-2xl font-bold font-headline">{testimonial.name}</h3>
                             <p className="text-primary font-semibold">{testimonial.role}</p>
                         </div>
+                        <div className="relative hidden lg:block">
+                            <Image 
+                                src={'https://placehold.co/500x600.png'}
+                                alt={testimonial.name}
+                                width={500}
+                                height={600}
+                                className="rounded-lg shadow-lg"
+                                data-ai-hint={testimonial.aiHint}
+                            />
+                             <div className="absolute -top-6 -left-6 bg-primary p-4 rounded-full text-white">
+                                <Quote className="h-8 w-8" />
+                            </div>
+                        </div>
                     </div>
                 </CarouselItem>
             ))}
         </CarouselContent>
-        <div className="absolute -bottom-10 right-0">
+        <div className="absolute -bottom-10 right-0 flex gap-2">
           <CarouselPrevious className="relative left-0 top-0 translate-y-0" />
           <CarouselNext className="relative right-0 top-0 translate-y-0" />
         </div>

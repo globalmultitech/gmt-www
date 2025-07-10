@@ -10,20 +10,21 @@ export default {
   theme: {
     container: {
       center: true,
-      padding: "1rem", // changed from 2rem
+      padding: "1rem",
       screens: {
-        "2xl": "1320px", // changed from 1400px
+        "2xl": "1280px", 
       },
     },
     extend: {
       fontFamily: {
-        body: ['"Public Sans"', 'sans-serif'],
-        headline: ['"Exo 2"', 'sans-serif'],
+        body: ['"Barlow"', 'sans-serif'],
+        headline: ['"Barlow Condensed"', 'sans-serif'],
         code: ['monospace'],
       },
       colors: {
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
+        'dark-slate': 'hsl(var(--dark-slate))',
         card: {
           DEFAULT: 'hsl(var(--card))',
           foreground: 'hsl(var(--card-foreground))',
@@ -88,32 +89,11 @@ export default {
             transform: 'translateY(0)',
           },
         },
-        'background-pan': {
-          '0%': { backgroundPosition: '0% 50%' },
-          '100%': { backgroundPosition: '100% 50%' },
-        },
-        'infinite-scroll': {
-          from: { transform: 'translateX(0)' },
-          to: { transform: 'translateX(-100%)' },
-        },
-        'slide-in-up': {
-          '0%': {
-            opacity: '0',
-            transform: 'translateY(50px)',
-          },
-          '100%': {
-            opacity: '1',
-            transform: 'translateY(0)',
-          },
-        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'fade-in-up': 'fade-in-up 0.8s ease-out forwards',
-        'background-pan': 'background-pan 10s linear infinite alternate',
-        'infinite-scroll': 'infinite-scroll 60s linear infinite',
-        'slide-in-up': 'slide-in-up 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
       },
     },
   },

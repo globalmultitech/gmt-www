@@ -13,6 +13,12 @@ const remotePatterns: NextConfig['images']['remotePatterns'] = [
     port: '',
     pathname: '/**',
   },
+  {
+    protocol: 'https',
+    hostname: 'templates.themekit.dev',
+    port: '',
+    pathname: '/**',
+  },
 ];
 
 if (r2Hostname) {
