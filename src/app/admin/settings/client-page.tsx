@@ -101,279 +101,277 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
 
   return (
     <div>
-      <div className="mb-6">
-          <h1 className="text-3xl font-bold">Pengaturan Website</h1>
-          <p className="text-muted-foreground">Kelola informasi umum, hero section, menu, dan tautan yang tampil di website Anda.</p>
-      </div>
-      <form action={formAction}>
-        <input type="hidden" name="logoUrl" value={logoUrl} />
-        <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
-        <input type="hidden" name="aboutUsImageUrl" value={aboutUsImageUrl} />
-        <input type="hidden" name="ctaImageUrl" value={ctaImageUrl} />
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Hero Section</CardTitle>
-            <CardDescription>Atur tampilan utama yang dilihat pengunjung saat pertama kali membuka website.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-             <div className="space-y-2">
-                <Label htmlFor="hero-image-upload">Gambar Latar Hero</Label>
-                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
-                    {heroImageUrl ? (
-                        <Image src={heroImageUrl} alt="Hero Preview" fill className="object-cover" />
-                    ) : (
-                        <div className="flex items-center justify-center h-full w-full">
-                        <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                        </div>
-                    )}
-                </div>
-                <div className="flex items-center gap-4">
-                  <Input id="hero-image-upload" type="file" onChange={(e) => handleFileChange(e, setHeroImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                  {isUploading && <Loader2 className="animate-spin" />}
-                </div>
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="heroHeadline">Judul Utama (Headline)</Label>
-              <Input id="heroHeadline" name="heroHeadline" defaultValue={settings.heroHeadline ?? ''} />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="heroDescription">Deskripsi</Label>
-              <Textarea id="heroDescription" name="heroDescription" defaultValue={settings.heroDescription ?? ''} />
-            </div>
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="heroButton1Text">Teks Tombol 1</Label>
-                  <Input id="heroButton1Text" name="heroButton1Text" defaultValue={settings.heroButton1Text ?? ''} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="heroButton1Link">Link Tombol 1</Label>
-                  <Input id="heroButton1Link" name="heroButton1Link" defaultValue={settings.heroButton1Link ?? ''} placeholder="/layanan"/>
-                </div>
-            </div>
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="heroButton2Text">Teks Tombol 2</Label>
-                  <Input id="heroButton2Text" name="heroButton2Text" defaultValue={settings.heroButton2Text ?? ''} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="heroButton2Link">Link Tombol 2</Label>
-                  <Input id="heroButton2Link" name="heroButton2Link" defaultValue={settings.heroButton2Link ?? ''} placeholder="/hubungi-kami"/>
-                </div>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>About Us Section</CardTitle>
-            <CardDescription>Atur konten untuk bagian "About Us" di halaman utama.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="about-us-image-upload">Gambar About Us</Label>
-                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
-                    {aboutUsImageUrl ? (
-                        <Image src={aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" />
-                    ) : (
-                        <div className="flex items-center justify-center h-full w-full">
-                        <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                        </div>
-                    )}
-                </div>
-                <div className="flex items-center gap-4">
-                  <Input id="about-us-image-upload" type="file" onChange={(e) => handleFileChange(e, setAboutUsImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                  {isUploading && <Loader2 className="animate-spin" />}
-                </div>
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="aboutUsSubtitle">Sub-judul</Label>
-              <Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} placeholder="ABOUT US" />
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="aboutUsTitle">Judul</Label>
-              <Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} placeholder="We are the best IT solution"/>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="aboutUsDescription">Deskripsi</Label>
-              <Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="aboutUsChecklist">Poin Checklist (JSON)</Label>
-                <Textarea id="aboutUsChecklist" name="aboutUsChecklist" rows={6} defaultValue={aboutUsChecklistJSON} placeholder='[\n  "Poin pertama",\n  "Poin kedua"\n]' />
-                <p className="text-xs text-muted-foreground">Masukkan daftar poin dalam format array JSON.</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Services Section</CardTitle>
-            <CardDescription>Atur konten untuk bagian layanan di halaman utama.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-             <div className="space-y-2">
-              <Label htmlFor="servicesSubtitle">Sub-judul Layanan</Label>
-              <Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} placeholder="WHAT WE DO" />
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="servicesTitle">Judul Layanan</Label>
-              <Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} placeholder="Layanan Profesional Kami"/>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="servicesDescription">Deskripsi Layanan</Label>
-              <Textarea id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} />
-            </div>
-            <div className="space-y-2">
-                <Label htmlFor="professionalServices">Konten Kartu Layanan (JSON)</Label>
-                <Textarea id="professionalServices" name="professionalServices" rows={12} defaultValue={professionalServicesJSON} />
-                <p className="text-xs text-muted-foreground">Masukkan daftar layanan dalam format array JSON. Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>CTA & Trusted By Section</CardTitle>
-            <CardDescription>Atur konten untuk bagian Call-to-Action di halaman utama.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="cta-image-upload">Gambar Latar CTA</Label>
-                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
-                    {ctaImageUrl ? (
-                        <Image src={ctaImageUrl} alt="CTA Preview" fill className="object-cover" />
-                    ) : (
-                        <div className="flex items-center justify-center h-full w-full">
-                        <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                        </div>
-                    )}
-                </div>
-                <div className="flex items-center gap-4">
-                  <Input id="cta-image-upload" type="file" onChange={(e) => handleFileChange(e, setCtaImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                  {isUploading && <Loader2 className="animate-spin" />}
-                </div>
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="ctaHeadline">Judul CTA</Label>
-              <Input id="ctaHeadline" name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} placeholder="Ready to take your business to the next level?" />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="ctaDescription">Deskripsi CTA</Label>
-              <Textarea id="ctaDescription" name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} />
-            </div>
-             <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="ctaButtonText">Teks Tombol CTA</Label>
-                  <Input id="ctaButtonText" name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="ctaButtonLink">Link Tombol CTA</Label>
-                  <Input id="ctaButtonLink" name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} placeholder="/hubungi-kami"/>
-                </div>
-            </div>
-             <div className="space-y-2">
-              <Label htmlFor="trustedByText">Teks "Trusted By"</Label>
-              <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} placeholder="Trusted by the world's leading companies"/>
-            </div>
-             <div className="space-y-2">
-                <Label htmlFor="trustedByLogos">Logo Mitra (JSON)</Label>
-                <Textarea id="trustedByLogos" name="trustedByLogos" rows={8} defaultValue={trustedByLogosJSON} />
-                <p className="text-xs text-muted-foreground">Masukkan daftar logo dalam format array JSON. Contoh: `[{"src": "/url/logo.svg", "alt": "Nama Logo"}]`</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Testimonials Section</CardTitle>
-            <CardDescription>Atur konten untuk bagian testimoni di halaman utama.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="testimonials">Konten Testimoni (JSON)</Label>
-                <Textarea id="testimonials" name="testimonials" rows={12} defaultValue={testimonialsJSON} />
-                <p className="text-xs text-muted-foreground">Masukkan daftar testimoni dalam format array JSON.</p>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Blog Section</CardTitle>
-            <CardDescription>Atur konten untuk bagian blog di halaman utama.</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="blogPosts">Konten Postingan Blog (JSON)</Label>
-                <Textarea id="blogPosts" name="blogPosts" rows={12} defaultValue={blogPostsJSON} />
-                <p className="text-xs text-muted-foreground">Masukkan daftar postingan blog dalam format array JSON.</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>Informasi Umum</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-                <Label htmlFor="image-upload">Logo Perusahaan</Label>
-                <div className="flex items-center gap-4">
-                    {logoUrl ? (
-                        <Image src={logoUrl} alt="Logo Preview" width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
-                    ) : (
-                        <div className="h-10 w-40 rounded-md bg-muted flex items-center justify-center text-sm text-muted-foreground">Tidak ada logo</div>
-                    )}
-                     <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, setLogoUrl)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading}/>
-                     {isUploading && <Loader2 className="animate-spin" />}
-                </div>
-                <p className="text-xs text-muted-foreground">Unggah logo perusahaan Anda. Format yang didukung: PNG, JPG, WEBP, SVG.</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="companyName">Nama Perusahaan</Label>
-              <Input id="companyName" name="companyName" defaultValue={settings.companyName} required />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="whatsappSales">Nomor WhatsApp Sales</Label>
-              <Input id="whatsappSales" name="whatsappSales" defaultValue={settings.whatsappSales} required />
-               <p className="text-xs text-muted-foreground">Gunakan format internasional, contoh: +6281234567890</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="footerText">Teks di Footer</Label>
-              <Textarea id="footerText" name="footerText" defaultValue={settings.footerText} required />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-            <CardHeader>
-                <CardTitle>Pengaturan Lanjutan</CardTitle>
-                <CardDescription>Ubah pengaturan ini hanya jika Anda mengerti format JSON. Kesalahan format dapat menyebabkan halaman error.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6">
-                 <div className="space-y-2">
-                    <Label htmlFor="featureCards">Kartu Fitur (JSON)</Label>
-                    <Textarea id="featureCards" name="featureCards" rows={12} defaultValue={featureCardsJSON} />
-                    <p className="text-xs text-muted-foreground">Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="socialMedia">Link Sosial Media (JSON)</Label>
-                    <Textarea id="socialMedia" name="socialMedia" rows={8} defaultValue={socialMediaJSON} />
-                </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="menuItems">Menu Navigasi (JSON)</Label>
-                    <Textarea id="menuItems" name="menuItems" rows={12} defaultValue={menuItemsJSON} />
-                </div>
-            </CardContent>
-        </Card>
-        
-        <div className="mt-6 flex justify-end">
-             <SubmitButton />
+        <div className="mb-6">
+            <h1 className="text-3xl font-bold">Pengaturan Website</h1>
+            <p className="text-muted-foreground">Kelola informasi umum, hero section, menu, dan tautan yang tampil di website Anda.</p>
         </div>
-      </form>
+        <form action={formAction}>
+            <input type="hidden" name="logoUrl" value={logoUrl} />
+            <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
+            <input type="hidden" name="aboutUsImageUrl" value={aboutUsImageUrl} />
+            <input type="hidden" name="ctaImageUrl" value={ctaImageUrl} />
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Hero Section</CardTitle>
+                    <CardDescription>Atur tampilan utama yang dilihat pengunjung saat pertama kali membuka website.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="hero-image-upload">Gambar Latar Hero</Label>
+                        <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
+                            {heroImageUrl ? (
+                                <Image src={heroImageUrl} alt="Hero Preview" fill className="object-cover" />
+                            ) : (
+                                <div className="flex items-center justify-center h-full w-full">
+                                    <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <Input id="hero-image-upload" type="file" onChange={(e) => handleFileChange(e, setHeroImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                            {isUploading && <Loader2 className="animate-spin" />}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="heroHeadline">Judul Utama (Headline)</Label>
+                        <Input id="heroHeadline" name="heroHeadline" defaultValue={settings.heroHeadline ?? ''} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="heroDescription">Deskripsi</Label>
+                        <Textarea id="heroDescription" name="heroDescription" defaultValue={settings.heroDescription ?? ''} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="heroButton1Text">Teks Tombol 1</Label>
+                            <Input id="heroButton1Text" name="heroButton1Text" defaultValue={settings.heroButton1Text ?? ''} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="heroButton1Link">Link Tombol 1</Label>
+                            <Input id="heroButton1Link" name="heroButton1Link" defaultValue={settings.heroButton1Link ?? ''} placeholder="/layanan"/>
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="heroButton2Text">Teks Tombol 2</Label>
+                            <Input id="heroButton2Text" name="heroButton2Text" defaultValue={settings.heroButton2Text ?? ''} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="heroButton2Link">Link Tombol 2</Label>
+                            <Input id="heroButton2Link" name="heroButton2Link" defaultValue={settings.heroButton2Link ?? ''} placeholder="/hubungi-kami"/>
+                        </div>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>About Us Section</CardTitle>
+                    <CardDescription>Atur konten untuk bagian "About Us" di halaman utama.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="about-us-image-upload">Gambar About Us</Label>
+                        <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
+                            {aboutUsImageUrl ? (
+                                <Image src={aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" />
+                            ) : (
+                                <div className="flex items-center justify-center h-full w-full">
+                                    <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <Input id="about-us-image-upload" type="file" onChange={(e) => handleFileChange(e, setAboutUsImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                            {isUploading && <Loader2 className="animate-spin" />}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="aboutUsSubtitle">Sub-judul</Label>
+                        <Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} placeholder="ABOUT US" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="aboutUsTitle">Judul</Label>
+                        <Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} placeholder="We are the best IT solution"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="aboutUsDescription">Deskripsi</Label>
+                        <Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="aboutUsChecklist">Poin Checklist (JSON)</Label>
+                        <Textarea id="aboutUsChecklist" name="aboutUsChecklist" rows={6} defaultValue={aboutUsChecklistJSON} placeholder='[\n  "Poin pertama",\n  "Poin kedua"\n]' />
+                        <p className="text-xs text-muted-foreground">Masukkan daftar poin dalam format array JSON.</p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>Services Section</CardTitle>
+                    <CardDescription>Atur konten untuk bagian layanan di halaman utama.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="servicesSubtitle">Sub-judul Layanan</Label>
+                        <Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} placeholder="WHAT WE DO" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="servicesTitle">Judul Layanan</Label>
+                        <Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} placeholder="Layanan Profesional Kami"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="servicesDescription">Deskripsi Layanan</Label>
+                        <Textarea id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="professionalServices">Konten Kartu Layanan (JSON)</Label>
+                        <Textarea id="professionalServices" name="professionalServices" rows={12} defaultValue={professionalServicesJSON} />
+                        <p className="text-xs text-muted-foreground">Masukkan daftar layanan dalam format array JSON. Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>CTA & Trusted By Section</CardTitle>
+                    <CardDescription>Atur konten untuk bagian Call-to-Action di halaman utama.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="cta-image-upload">Gambar Latar CTA</Label>
+                        <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
+                            {ctaImageUrl ? (
+                                <Image src={ctaImageUrl} alt="CTA Preview" fill className="object-cover" />
+                            ) : (
+                                <div className="flex items-center justify-center h-full w-full">
+                                    <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                                </div>
+                            )}
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <Input id="cta-image-upload" type="file" onChange={(e) => handleFileChange(e, setCtaImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                            {isUploading && <Loader2 className="animate-spin" />}
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="ctaHeadline">Judul CTA</Label>
+                        <Input id="ctaHeadline" name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} placeholder="Ready to take your business to the next level?" />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="ctaDescription">Deskripsi CTA</Label>
+                        <Textarea id="ctaDescription" name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="ctaButtonText">Teks Tombol CTA</Label>
+                            <Input id="ctaButtonText" name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="ctaButtonLink">Link Tombol CTA</Label>
+                            <Input id="ctaButtonLink" name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} placeholder="/hubungi-kami"/>
+                        </div>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="trustedByText">Teks "Trusted By"</Label>
+                        <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} placeholder="Trusted by the world's leading companies"/>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="trustedByLogos">Logo Mitra (JSON)</Label>
+                        <Textarea id="trustedByLogos" name="trustedByLogos" rows={8} defaultValue={trustedByLogosJSON} />
+                        <p className="text-xs text-muted-foreground">Masukkan daftar logo dalam format array JSON. Contoh: `[{"src": "/url/logo.svg", "alt": "Nama Logo"}]`</p>
+                    </div>
+                </CardContent>
+            </Card>
+            
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>Testimonials Section</CardTitle>
+                    <CardDescription>Atur konten untuk bagian testimoni di halaman utama.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="testimonials">Konten Testimoni (JSON)</Label>
+                        <Textarea id="testimonials" name="testimonials" rows={12} defaultValue={testimonialsJSON} />
+                        <p className="text-xs text-muted-foreground">Masukkan daftar testimoni dalam format array JSON.</p>
+                    </div>
+                </CardContent>
+            </Card>
+            
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>Blog Section</CardTitle>
+                    <CardDescription>Atur konten untuk bagian blog di halaman utama.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="blogPosts">Konten Postingan Blog (JSON)</Label>
+                        <Textarea id="blogPosts" name="blogPosts" rows={12} defaultValue={blogPostsJSON} />
+                        <p className="text-xs text-muted-foreground">Masukkan daftar postingan blog dalam format array JSON.</p>
+                    </div>
+                </CardContent>
+            </Card>
+
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>Informasi Umum</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="image-upload">Logo Perusahaan</Label>
+                        <div className="flex items-center gap-4">
+                            {logoUrl ? (
+                                <Image src={logoUrl} alt="Logo Preview" width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
+                            ) : (
+                                <div className="h-10 w-40 rounded-md bg-muted flex items-center justify-center text-sm text-muted-foreground">Tidak ada logo</div>
+                            )}
+                            <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, setLogoUrl)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading}/>
+                            {isUploading && <Loader2 className="animate-spin" />}
+                        </div>
+                        <p className="text-xs text-muted-foreground">Unggah logo perusahaan Anda. Format yang didukung: PNG, JPG, WEBP, SVG.</p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="companyName">Nama Perusahaan</Label>
+                        <Input id="companyName" name="companyName" defaultValue={settings.companyName} required />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="whatsappSales">Nomor WhatsApp Sales</Label>
+                        <Input id="whatsappSales" name="whatsappSales" defaultValue={settings.whatsappSales} required />
+                        <p className="text-xs text-muted-foreground">Gunakan format internasional, contoh: +6281234567890</p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="footerText">Teks di Footer</Label>
+                        <Textarea id="footerText" name="footerText" defaultValue={settings.footerText} required />
+                    </div>
+                </CardContent>
+            </Card>
+            
+            <Card className="mt-6">
+                <CardHeader>
+                    <CardTitle>Pengaturan Lanjutan</CardTitle>
+                    <CardDescription>Ubah pengaturan ini hanya jika Anda mengerti format JSON. Kesalahan format dapat menyebabkan halaman error.</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                    <div className="space-y-2">
+                        <Label htmlFor="featureCards">Kartu Fitur (JSON)</Label>
+                        <Textarea id="featureCards" name="featureCards" rows={12} defaultValue={featureCardsJSON} />
+                        <p className="text-xs text-muted-foreground">Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="socialMedia">Link Sosial Media (JSON)</Label>
+                        <Textarea id="socialMedia" name="socialMedia" rows={8} defaultValue={socialMediaJSON} />
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="menuItems">Menu Navigasi (JSON)</Label>
+                        <Textarea id="menuItems" name="menuItems" rows={12} defaultValue={menuItemsJSON} />
+                    </div>
+                </CardContent>
+            </Card>
+            
+            <div className="mt-6 flex justify-end">
+                <SubmitButton />
+            </div>
+        </form>
     </div>
   );
 }
-
-    
