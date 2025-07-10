@@ -5,7 +5,6 @@ import { Header } from '@/components/layout/header';
 import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
-import { ThemeProvider } from '@/components/theme-provider';
 import { AppShell } from '@/components/layout/app-shell';
 
 export const metadata: Metadata = {
@@ -19,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className="scroll-smooth" suppressHydrationWarning>
+    <html lang="id" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
@@ -28,18 +27,11 @@ export default function RootLayout({
           rel="stylesheet"
         />
       </head>
-      <body className={cn('font-body antialiased bg-dark-slate')}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
+      <body className={cn('font-body antialiased bg-background')}>
           <AppShell header={<Header />} footer={<Footer />}>
             {children}
           </AppShell>
           <Toaster />
-        </ThemeProvider>
       </body>
     </html>
   );

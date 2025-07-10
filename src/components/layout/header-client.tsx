@@ -8,7 +8,6 @@ import { Menu, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { ThemeToggle } from '../theme-toggle';
 import type { MenuItem } from '@/lib/settings';
 
 type HeaderClientProps = {
@@ -36,7 +35,7 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
   return (
     <header className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-dark-slate/80 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+        isScrolled ? 'bg-background/90 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       )}>
       <div className="container mx-auto px-4">
         <div className="flex h-24 items-center justify-between">
@@ -48,8 +47,9 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'transition-colors hover:text-primary text-white',
-                  pathname === item.href ? 'text-primary' : 'text-white'
+                  'transition-colors hover:text-primary',
+                  pathname === item.href ? 'text-primary' : 'text-foreground',
+                  isScrolled ? 'text-foreground' : 'text-white'
                 )}
               >
                 {item.label}
@@ -58,26 +58,26 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <Button asChild variant="outline" className="text-white border-white/50 hover:bg-white hover:text-primary">
+            <Button asChild variant="outline" className={cn(
+              'border-foreground/50 hover:bg-primary hover:text-primary-foreground hover:border-primary',
+              !isScrolled && 'border-white/50 text-white hover:bg-white hover:text-primary'
+            )}>
               <Link href="/hubungi-kami">
                 Get a Quote <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            {/* Optional: Add ThemeToggle back if needed */}
-            {/* <ThemeToggle /> */}
           </div>
 
           {/* Mobile Menu */}
           <div className="lg:hidden flex items-center gap-2">
-            {/* <ThemeToggle /> */}
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
+                <Button variant="ghost" size="icon" className={cn(isScrolled ? 'text-foreground' : 'text-white', 'hover:bg-foreground/10')}>
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Buka menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-dark-slate p-0">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-0">
                 <div className="flex flex-col h-full">
                   <div className="p-4 border-b border-border">
                     <Logo companyName={companyName} logoUrl={logoUrl} />
@@ -89,8 +89,8 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
                         href={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
-                          'transition-colors hover:text-primary w-full p-2 rounded-md',
-                          pathname === item.href ? 'text-primary font-bold bg-secondary' : 'text-muted-foreground'
+                          'transition-colors hover:text-primary w-full p-2 rounded-md text-foreground',
+                          pathname === item.href && 'text-primary font-bold bg-secondary'
                         )}
                       >
                         {item.label}

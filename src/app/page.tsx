@@ -87,7 +87,7 @@ const blogPosts = [
 
 export default function Home() {
   return (
-    <div className="flex flex-col bg-dark-slate text-foreground">
+    <div className="flex flex-col bg-background text-foreground">
       {/* Hero Section */}
       <section className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}}>
         <div className="absolute inset-0 bg-black/50"></div>
@@ -112,7 +112,7 @@ export default function Home() {
       </section>
 
       {/* Trusted By Section */}
-      <section className="py-16 bg-dark-slate">
+      <section className="py-16 bg-secondary">
         <div className="container mx-auto px-4">
           <h3 className="text-center font-semibold text-muted-foreground mb-8">Featured on</h3>
           <div className="flex flex-wrap justify-center items-center gap-x-12 sm:gap-x-16 gap-y-6">
@@ -161,7 +161,7 @@ export default function Home() {
       </section>
 
        {/* Services Section */}
-      <section className="py-20 md:py-28 bg-dark-slate">
+      <section className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <p className="font-semibold text-primary uppercase tracking-widest mb-2">What we do</p>
@@ -194,7 +194,7 @@ export default function Home() {
       </section>
       
        {/* Projects Section */}
-      <section className="py-20 md:py-28 bg-dark-slate">
+      <section className="py-20 md:py-28 bg-secondary">
           <div className="container mx-auto px-4">
               <div className="text-center max-w-3xl mx-auto mb-16">
                   <p className="font-semibold text-primary uppercase tracking-widest mb-2">Our projects</p>
@@ -227,7 +227,7 @@ export default function Home() {
               </div>
               <div className="grid md:grid-cols-3 gap-8">
                   {blogPosts.map((post, index) => (
-                      <div key={index} className="group bg-card p-6 rounded-lg">
+                      <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
                            <div className="relative overflow-hidden rounded-lg mb-6">
                             <Image src={post.image} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
                            </div>

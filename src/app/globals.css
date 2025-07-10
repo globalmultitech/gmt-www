@@ -4,50 +4,27 @@
 
 @layer base {
   :root {
-    --background: 220 13% 91%;
+    --background: 0 0% 100%;
     --foreground: 224 71.4% 4.1%;
     --card: 0 0% 100%;
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 212 92% 51%; /* bright-blue */
+    --primary: 145 63% 49%; /* WhatsApp Green */
     --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 11%;
-    --muted-foreground: 215 28% 63%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
+    --secondary: 220 13% 96%;
+    --secondary-foreground: 224 71.4% 4.1%;
+    --muted: 220 13% 91%;
+    --muted-foreground: 224 71.4% 20%;
+    --accent: 220 13% 96%;
+    --accent-foreground: 224 71.4% 4.1%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 222 47% 16%; /* darker border */
-    --input: 222 47% 16%;
-    --ring: 212 92% 51%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 145 63% 49%;
     --radius: 0.5rem;
-    --dark-slate: 222 47% 6%; /* bg-dark-slate-blue */
-  }
-
-  .dark {
-    --background: 222 47% 6%; /* dark-slate-blue */
-    --foreground: 210 40% 98%;
-    --card: 222 47% 11%;
-    --card-foreground: 210 40% 98%;
-    --popover: 222 47% 6%;
-    --popover-foreground: 210 40% 98%;
-    --primary: 212 92% 51%; /* bright-blue */
-    --primary-foreground: 0 0% 100%;
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 210 40% 98%;
-    --muted: 222 47% 11%;
-    --muted-foreground: 215 28% 63%;
-    --accent: 217 33% 17%;
-    --accent-foreground: 210 40% 98%;
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 222 47% 16%; /* darker border */
-    --input: 222 47% 16%;
-    --ring: 212 92% 51%;
-    --dark-slate: 222 47% 6%; /* bg-dark-slate-blue */
+    --dark-slate: 222 47% 6%; /* Kept for compatibility but not used in theme */
   }
 }
 
@@ -56,7 +33,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-dark-slate text-foreground;
+    @apply bg-background text-foreground;
   }
   .fade-in {
     animation: fade-in 0.8s ease-out forwards;

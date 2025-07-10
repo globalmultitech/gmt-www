@@ -13,7 +13,6 @@ type ServiceCardProps = {
 export function ServiceCard({ icon, title, description, href }: ServiceCardProps) {
     return (
         <Link href={href} className="group block relative p-8 rounded-lg overflow-hidden bg-secondary border border-border hover:border-primary transition-all duration-300">
-            <div className="absolute inset-0 bg-gradient-to-br from-secondary via-secondary to-dark-slate opacity-100 group-hover:opacity-0 transition-opacity duration-300"></div>
             <div 
                 className="absolute -inset-px rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300" 
                 style={{
