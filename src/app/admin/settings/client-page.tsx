@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useActionState, useEffect, useState } from 'react';
+import { useActionState, useEffect, useState, type ReactNode } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,15 +24,95 @@ function SubmitButton() {
   );
 }
 
+type ImageUrls = {
+  logoUrl: string;
+  heroImageUrl: string;
+  aboutUsImageUrl: string;
+  ctaImageUrl: string;
+};
+
+type ImageUploaderProps = {
+  fieldId: string;
+  fieldName: keyof ImageUrls;
+  label: string;
+  imageUrl: string;
+  altText: string;
+  isUploading: boolean;
+  onFileChange: (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof ImageUrls) => void;
+  accept?: string;
+  imageContainerClassName?: string;
+  imageClassName?: string;
+  placeholder?: ReactNode;
+};
+
+function ImageUploader({
+  fieldId,
+  fieldName,
+  label,
+  imageUrl,
+  altText,
+  isUploading,
+  onFileChange,
+  accept = "image/png, image/jpeg, image/webp",
+  imageContainerClassName = "relative w-full h-48 rounded-md bg-muted overflow-hidden",
+  imageClassName = "object-cover",
+  placeholder = <ImageIcon className="w-10 h-10 text-muted-foreground" />,
+}: ImageUploaderProps) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={fieldId}>{label}</Label>
+      <div className={imageContainerClassName}>
+        {imageUrl ? (
+          <Image src={imageUrl} alt={altText} fill className={imageClassName} />
+        ) : (
+          <div className="flex items-center justify-center h-full w-full">{placeholder}</div>
+        )}
+      </div>
+      <div className="flex items-center gap-4">
+        <Input
+          id={fieldId}
+          type="file"
+          onChange={(e) => onFileChange(e, fieldName)}
+          accept={accept}
+          disabled={isUploading}
+        />
+        {isUploading && <Loader2 className="animate-spin" />}
+      </div>
+    </div>
+  );
+}
+
+type JsonTextareaProps = {
+  fieldId: string;
+  name: string;
+  label: string;
+  defaultValue: string;
+  rows: number;
+  description: ReactNode;
+  placeholder?: string;
+};
+
+function JsonTextarea({ fieldId, name, label, defaultValue, rows, description, placeholder }: JsonTextareaProps) {
+  return (
+    <div className="space-y-2">
+      <Label htmlFor={fieldId}>{label}</Label>
+      <Textarea id={fieldId} name={name} rows={rows} defaultValue={defaultValue} placeholder={placeholder} />
+      <p className="text-xs text-muted-foreground">{description}</p>
+    </div>
+  );
+}
+
 export default function SettingsClientPage({ settings }: { settings: WebSettings }) {
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateWebSettings, undefined);
   
-  const [isUploading, setIsUploading] = useState<string | null>(null);
-  const [logoUrl, setLogoUrl] = useState<string>(settings.logoUrl ?? '');
-  const [heroImageUrl, setHeroImageUrl] = useState<string>(settings.heroImageUrl ?? '');
-  const [aboutUsImageUrl, setAboutUsImageUrl] = useState<string>(settings.aboutUsImageUrl ?? '');
-  const [ctaImageUrl, setCtaImageUrl] = useState<string>(settings.ctaImageUrl ?? '');
+  const [isUploading, setIsUploading] = useState<keyof ImageUrls | null>(null);
+  const [imageUrls, setImageUrls] = useState<ImageUrls>({
+    logoUrl: settings.logoUrl ?? '',
+    heroImageUrl: settings.heroImageUrl ?? '',
+    aboutUsImageUrl: settings.aboutUsImageUrl ?? '',
+    ctaImageUrl: settings.ctaImageUrl ?? '',
+  });
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -44,7 +124,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     return hashHex;
   };
   
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof ImageUrls) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -59,7 +139,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         headers: { 'Content-Type': file.type },
       });
 
-      setter(publicUrl);
+      setImageUrls(prev => ({ ...prev, [fieldName]: publicUrl }));
     } catch (error) {
       console.error("Upload error:", error);
       toast({
@@ -85,19 +165,22 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     }
   }, [state, toast]);
 
-  const getJsonString = (data: any, defaultData: any) => {
-    const valueToConvert = data ?? defaultData;
-    return JSON.stringify(valueToConvert, null, 2);
+  const jsonDefaults = {
+    socialMedia: {},
+    menuItems: [],
+    featureCards: [],
+    aboutUsChecklist: [],
+    professionalServices: [],
+    trustedByLogos: [],
+    testimonials: [],
+    blogPosts: [],
   };
 
-  const socialMediaJSON = getJsonString(settings.socialMedia, {});
-  const menuItemsJSON = getJsonString(settings.menuItems, []);
-  const featureCardsJSON = getJsonString(settings.featureCards, []);
-  const aboutUsChecklistJSON = getJsonString(settings.aboutUsChecklist, []);
-  const professionalServicesJSON = getJsonString(settings.professionalServices, []);
-  const trustedByLogosJSON = getJsonString(settings.trustedByLogos, []);
-  const testimonialsJSON = getJsonString(settings.testimonials, []);
-  const blogPostsJSON = getJsonString(settings.blogPosts, []);
+  const jsonSettings = (Object.keys(jsonDefaults) as Array<keyof typeof jsonDefaults>).reduce((acc, key) => {
+    const value = settings[key as keyof WebSettings] ?? jsonDefaults[key];
+    acc[key] = JSON.stringify(value, null, 2);
+    return acc;
+  }, {} as Record<keyof typeof jsonDefaults, string>);
 
   return (
     <div>
@@ -106,10 +189,9 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
             <p className="text-muted-foreground">Kelola informasi umum, hero section, menu, dan tautan yang tampil di website Anda.</p>
         </div>
         <form action={formAction}>
-            <input type="hidden" name="logoUrl" value={logoUrl} />
-            <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
-            <input type="hidden" name="aboutUsImageUrl" value={aboutUsImageUrl} />
-            <input type="hidden" name="ctaImageUrl" value={ctaImageUrl} />
+            {Object.entries(imageUrls).map(([key, value]) => (
+                <input type="hidden" name={key} value={value} key={key} />
+            ))}
 
             <Card>
                 <CardHeader>
@@ -117,22 +199,15 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                     <CardDescription>Atur tampilan utama yang dilihat pengunjung saat pertama kali membuka website.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="hero-image-upload">Gambar Latar Hero</Label>
-                        <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
-                            {heroImageUrl ? (
-                                <Image src={heroImageUrl} alt="Hero Preview" fill className="object-cover" />
-                            ) : (
-                                <div className="flex items-center justify-center h-full w-full">
-                                    <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Input id="hero-image-upload" type="file" onChange={(e) => handleFileChange(e, 'hero', setHeroImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading === 'hero'}/>
-                            {isUploading === 'hero' && <Loader2 className="animate-spin" />}
-                        </div>
-                    </div>
+                    <ImageUploader
+                        fieldId="hero-image-upload"
+                        fieldName="heroImageUrl"
+                        label="Gambar Latar Hero"
+                        imageUrl={imageUrls.heroImageUrl}
+                        altText="Hero Preview"
+                        isUploading={isUploading === 'heroImageUrl'}
+                        onFileChange={handleFileChange}
+                    />
                     <div className="space-y-2">
                         <Label htmlFor="heroHeadline">Judul Utama (Headline)</Label>
                         <Input id="heroHeadline" name="heroHeadline" defaultValue={settings.heroHeadline ?? ''} />
@@ -170,22 +245,15 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                     <CardDescription>Atur konten untuk bagian "About Us" di halaman utama.</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                    <div className="space-y-2">
-                        <Label htmlFor="about-us-image-upload">Gambar About Us</Label>
-                        <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
-                            {aboutUsImageUrl ? (
-                                <Image src={aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" />
-                            ) : (
-                                <div className="flex items-center justify-center h-full w-full">
-                                    <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                                </div>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                            <Input id="about-us-image-upload" type="file" onChange={(e) => handleFileChange(e, 'about', setAboutUsImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading === 'about'}/>
-                            {isUploading === 'about' && <Loader2 className="animate-spin" />}
-                        </div>
-                    </div>
+                    <ImageUploader
+                        fieldId="about-us-image-upload"
+                        fieldName="aboutUsImageUrl"
+                        label="Gambar About Us"
+                        imageUrl={imageUrls.aboutUsImageUrl}
+                        altText="About Us Preview"
+                        isUploading={isUploading === 'aboutUsImageUrl'}
+                        onFileChange={handleFileChange}
+                    />
                     <div className="space-y-2">
                         <Label htmlFor="aboutUsSubtitle">Sub-judul</Label>
                         <Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} placeholder="ABOUT US" />
@@ -198,11 +266,15 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <Label htmlFor="aboutUsDescription">Deskripsi</Label>
                         <Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="aboutUsChecklist">Poin Checklist (JSON)</Label>
-                        <Textarea id="aboutUsChecklist" name="aboutUsChecklist" rows={6} defaultValue={aboutUsChecklistJSON} placeholder='[\n  "Poin pertama",\n  "Poin kedua"\n]' />
-                        <p className="text-xs text-muted-foreground">Masukkan daftar poin dalam format array JSON.</p>
-                    </div>
+                    <JsonTextarea
+                        fieldId="aboutUsChecklist"
+                        name="aboutUsChecklist"
+                        label="Poin Checklist (JSON)"
+                        defaultValue={jsonSettings.aboutUsChecklist}
+                        rows={6}
+                        placeholder={'[\n  "Poin pertama",\n  "Poin kedua"\n]'}
+                        description="Masukkan daftar poin dalam format array JSON."
+                    />
                 </CardContent>
             </Card>
 
@@ -224,11 +296,10 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <Label htmlFor="servicesDescription">Deskripsi Layanan</Label>
                         <Textarea id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} />
                     </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="professionalServices">Konten Kartu Layanan (JSON)</Label>
-                        <Textarea id="professionalServices" name="professionalServices" rows={12} defaultValue={professionalServicesJSON} />
-                        <p className="text-xs text-muted-foreground">Masukkan daftar layanan dalam format array JSON. Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
-                    </div>
+                    <JsonTextarea
+                        fieldId="professionalServices"
+                        name="professionalServices"
+                        label
                 </CardContent>
             </Card>
 
