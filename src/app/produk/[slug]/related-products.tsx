@@ -17,7 +17,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
   return (
     <section className="bg-secondary py-16 md:py-24">
       <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-headline font-bold mb-8 text-primary">Produk Terkait Lainnya</h2>
+        <h2 className="text-3xl font-headline font-bold mb-8 text-primary">Produk Unggulan Lainnya</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {products.map((product) => {
             const mainImage = (product.images as string[])?.[0];
