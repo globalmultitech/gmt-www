@@ -25,8 +25,10 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); 
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll(); // Call on mount to set initial state
+
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
@@ -39,7 +41,7 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
       )}>
       <div className="container mx-auto px-4">
         <div className="flex h-24 items-center justify-between">
-          <Logo companyName={companyName} logoUrl={logoUrl} />
+          <Logo companyName={companyName} logoUrl={logoUrl} isScrolled={isScrolled} />
 
           <nav className="hidden lg:flex items-center space-x-10 text-base font-semibold">
             {navItems.map((item) => (
@@ -48,8 +50,7 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
                 href={item.href}
                 className={cn(
                   'transition-colors hover:text-primary',
-                  pathname === item.href ? 'text-primary' : 'text-foreground',
-                  isScrolled ? 'text-foreground' : 'text-white'
+                  pathname === item.href ? 'text-primary' : (isScrolled ? 'text-foreground' : 'text-white')
                 )}
               >
                 {item.label}
@@ -80,7 +81,7 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
               <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-0">
                 <div className="flex flex-col h-full">
                   <div className="p-4 border-b border-border">
-                    <Logo companyName={companyName} logoUrl={logoUrl} />
+                    <Logo companyName={companyName} logoUrl={logoUrl} isScrolled={true} />
                   </div>
                   <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
                     {navItems.map((item) => (
