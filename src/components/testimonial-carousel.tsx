@@ -107,7 +107,7 @@ export function TestimonialCarousel() {
                                 className="rounded-lg shadow-lg"
                                 data-ai-hint={testimonial.aiHint}
                             />
-                             <div className="absolute -top-6 -left-6 bg-primary p-4 rounded-full text-white z-10">
+                             <div className="absolute -top-4 -left-4 bg-primary p-4 rounded-full text-white z-10">
                                 <Quote className="h-8 w-8" />
                             </div>
                         </div>
