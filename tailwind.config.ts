@@ -55,6 +55,7 @@ export default {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        'dark-slate': 'hsl(var(--dark-slate))',
         'sky-blue': 'hsl(var(--sky-blue))',
       },
       borderRadius: {

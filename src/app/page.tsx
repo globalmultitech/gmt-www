@@ -146,7 +146,7 @@ export default function Home() {
       </section>
 
       {/* About Section */}
-      <section className="py-20 md:py-28 bg-secondary">
+      <section className="py-20 md:py-28 bg-dark-slate">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
              <div>
