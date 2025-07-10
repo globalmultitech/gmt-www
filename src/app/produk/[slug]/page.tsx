@@ -124,12 +124,10 @@ export default async function ProductDetailPage({ params }: Props) {
               <div className="flex flex-col">
                 <div className="mb-2">
                   <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                </div>
-                <div className="mb-6">
-                    <p className="mt-2 text-lg text-muted-foreground">{product.description}</p>
+                  <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3 my-6">
                   <WhatsAppButton product={product} settings={settings} />
                   {product.tokopediaUrl && (
                     <Button asChild variant="outline" size="lg" className="border-green-500 hover:bg-green-500/10 hover:text-green-600 text-green-600">
@@ -148,12 +146,35 @@ export default async function ProductDetailPage({ params }: Props) {
                     </Button>
                   )}
                 </div>
+
+                 {specifications.length > 0 && (
+                  <Accordion type="single" collapsible className="w-full">
+                    <AccordionItem value="item-specs">
+                      <AccordionTrigger className="text-xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
+                      <AccordionContent>
+                        <div className="overflow-x-auto rounded-lg border bg-card mt-2">
+                            <Table>
+                                <TableBody>
+                                {specifications.map(([key, value]) => (
+                                    <TableRow key={key}>
+                                    <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
+                                    <TableCell className="text-muted-foreground">{String(value)}</TableCell>
+                                    </TableRow>
+                                ))}
+                                </TableBody>
+                            </Table>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  </Accordion>
+                )}
+
               </div>
             </div>
 
             {/* Accordion for More Details */}
             <div className="mt-16">
-              <Accordion type="multiple" defaultValue={['item-1']} className="w-full">
+              <Accordion type="multiple" defaultValue={['item-1']} className="w-full max-w-4xl mx-auto">
                 <AccordionItem value="item-1">
                   <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                   <AccordionContent>
@@ -177,25 +198,6 @@ export default async function ProductDetailPage({ params }: Props) {
                     </ul>
                   </AccordionContent>
                 </AccordionItem>
-                {specifications.length > 0 && (
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
-                  <AccordionContent>
-                    <div className="overflow-x-auto rounded-lg border bg-card mt-4">
-                        <Table>
-                            <TableBody>
-                            {specifications.map(([key, value]) => (
-                                <TableRow key={key}>
-                                <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
-                                <TableCell className="text-muted-foreground">{String(value)}</TableCell>
-                                </TableRow>
-                            ))}
-                            </TableBody>
-                        </Table>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-                )}
               </Accordion>
             </div>
           </div>
