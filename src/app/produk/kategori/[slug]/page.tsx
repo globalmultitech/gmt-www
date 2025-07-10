@@ -8,6 +8,18 @@ import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
+// Fungsi ini memberitahu Next.js halaman dinamis mana yang harus dibuat saat build
+export async function generateStaticParams() {
+  const categories = await prisma.productCategory.findMany({
+    select: { slug: true },
+  });
+ 
+  return categories.map((category) => ({
+    slug: category.slug,
+  }));
+}
+
+
 async function getCategoryBySlug(slug: string) {
   // Step 1: Find the category itself. Use findFirst for flexibility.
   const category = await prisma.productCategory.findFirst({
