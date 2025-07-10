@@ -166,28 +166,24 @@ export default async function Home() {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
              <div>
-              <p className="font-semibold text-primary uppercase tracking-widest mb-2">About us</p>
-              <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6">We are the best IT solution</h2>
-              <p className="text-muted-foreground mb-6">We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world. We believe that technology can be a powerful tool for good, and we are dedicated to using our skills and expertise to make a positive impact.</p>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-                  <span className="font-semibold text-lg">Bespoke software solutions</span>
-                </li>
-                <li className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-                  <span className="font-semibold text-lg">Human-centered design</span>
-                </li>
-                 <li className="flex items-center gap-3">
-                  <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
-                  <span className="font-semibold text-lg">Cloud-native architecture</span>
-                </li>
-              </ul>
+              {settings.aboutUsSubtitle && <p className="font-semibold text-primary uppercase tracking-widest mb-2">{settings.aboutUsSubtitle}</p>}
+              {settings.aboutUsTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6">{settings.aboutUsTitle}</h2>}
+              {settings.aboutUsDescription && <p className="text-muted-foreground mb-6">{settings.aboutUsDescription}</p>}
+              {Array.isArray(settings.aboutUsChecklist) && settings.aboutUsChecklist.length > 0 && (
+                <ul className="space-y-4 mb-8">
+                  {(settings.aboutUsChecklist as string[]).map((item, index) => (
+                     <li key={index} className="flex items-center gap-3">
+                        <CheckCircle className="h-6 w-6 text-primary flex-shrink-0" />
+                        <span className="font-semibold text-lg">{item}</span>
+                      </li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div className="relative">
               <Image 
-                src="https://placehold.co/600x600.png"
-                alt="About Daltech"
+                src={settings.aboutUsImageUrl || 'https://placehold.co/600x600.png'}
+                alt={settings.aboutUsTitle || "About Us Image"}
                 width={570}
                 height={570}
                 className="rounded-lg shadow-lg"

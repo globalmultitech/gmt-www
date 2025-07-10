@@ -81,6 +81,15 @@ async function main() {
             description: 'Lorem consectetur adipiscing elitsed pro.',
         },
       ],
+      aboutUsSubtitle: 'ABOUT US',
+      aboutUsTitle: 'We are the best IT solution',
+      aboutUsDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world. We believe that technology can be a powerful tool for good, and we are dedicated to using our skills and expertise to make a positive impact.',
+      aboutUsImageUrl: 'https://placehold.co/600x600.png',
+      aboutUsChecklist: [
+        "Bespoke software solutions",
+        "Human-centered design",
+        "Cloud-native architecture",
+      ]
     },
   });
   console.log('Web settings seeded.');

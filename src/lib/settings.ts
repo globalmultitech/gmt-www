@@ -16,7 +16,7 @@ export type FeatureCard = {
   description: string;
 };
 
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards'> {
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
@@ -28,6 +28,11 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   heroButton2Text: string | null;
   heroButton2Link: string | null;
   featureCards: FeatureCard[];
+  aboutUsSubtitle: string | null;
+  aboutUsTitle: string | null;
+  aboutUsDescription: string | null;
+  aboutUsImageUrl: string | null;
+  aboutUsChecklist: string[] | any; // any to accommodate prisma json type
 }
 
 const defaultSettings: WebSettings = {
@@ -80,6 +85,15 @@ const defaultSettings: WebSettings = {
         description: 'Lorem consectetur adipiscing elitsed pro.',
     },
   ],
+  aboutUsSubtitle: 'ABOUT US',
+  aboutUsTitle: 'We are the best IT solution',
+  aboutUsDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world. We believe that technology can be a powerful tool for good, and we are dedicated to using our skills and expertise to make a positive impact.',
+  aboutUsImageUrl: 'https://placehold.co/600x600.png',
+  aboutUsChecklist: [
+    "Bespoke software solutions",
+    "Human-centered design",
+    "Cloud-native architecture",
+  ],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -101,6 +115,7 @@ export async function getSettings(): Promise<WebSettings> {
             socialMedia: (settingsFromDb.socialMedia as SocialMediaLinks) ?? defaultSettings.socialMedia,
             menuItems: (settingsFromDb.menuItems as MenuItem[]) ?? defaultSettings.menuItems,
             featureCards: (settingsFromDb.featureCards as FeatureCard[]) ?? defaultSettings.featureCards,
+            aboutUsChecklist: (settingsFromDb.aboutUsChecklist as string[]) ?? defaultSettings.aboutUsChecklist,
         };
 
     } catch (error) {

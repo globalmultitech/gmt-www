@@ -30,6 +30,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [isUploading, setIsUploading] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string>(settings.logoUrl ?? '');
   const [heroImageUrl, setHeroImageUrl] = useState<string>(settings.heroImageUrl ?? '');
+  const [aboutUsImageUrl, setAboutUsImageUrl] = useState<string>(settings.aboutUsImageUrl ?? '');
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -82,9 +83,15 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     }
   }, [state, toast]);
 
-  const socialMediaJSON = JSON.stringify(settings.socialMedia, null, 2);
-  const menuItemsJSON = JSON.stringify(settings.menuItems, null, 2);
-  const featureCardsJSON = JSON.stringify(settings.featureCards, null, 2);
+  const getJsonString = (data: any, defaultData: any) => {
+    const valueToConvert = data ?? defaultData;
+    return JSON.stringify(valueToConvert, null, 2);
+  };
+
+  const socialMediaJSON = getJsonString(settings.socialMedia, {});
+  const menuItemsJSON = getJsonString(settings.menuItems, []);
+  const featureCardsJSON = getJsonString(settings.featureCards, []);
+  const aboutUsChecklistJSON = getJsonString(settings.aboutUsChecklist, []);
 
   return (
     <div>
@@ -95,6 +102,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
       <form action={formAction}>
         <input type="hidden" name="logoUrl" value={logoUrl} />
         <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
+        <input type="hidden" name="aboutUsImageUrl" value={aboutUsImageUrl} />
 
         <Card>
           <CardHeader>
@@ -145,6 +153,48 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                   <Label htmlFor="heroButton2Link">Link Tombol 2</Label>
                   <Input id="heroButton2Link" name="heroButton2Link" defaultValue={settings.heroButton2Link ?? ''} placeholder="/hubungi-kami"/>
                 </div>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>About Us Section</CardTitle>
+            <CardDescription>Atur konten untuk bagian "About Us" di halaman utama.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="about-us-image-upload">Gambar About Us</Label>
+                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
+                    {aboutUsImageUrl ? (
+                        <Image src={aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" />
+                    ) : (
+                        <div className="flex items-center justify-center h-full w-full">
+                        <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                        </div>
+                    )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <Input id="about-us-image-upload" type="file" onChange={(e) => handleFileChange(e, setAboutUsImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                  {isUploading && <Loader2 className="animate-spin" />}
+                </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="aboutUsSubtitle">Sub-judul</Label>
+              <Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} placeholder="ABOUT US" />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="aboutUsTitle">Judul</Label>
+              <Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} placeholder="We are the best IT solution"/>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="aboutUsDescription">Deskripsi</Label>
+              <Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="aboutUsChecklist">Poin Checklist (JSON)</Label>
+                <Textarea id="aboutUsChecklist" name="aboutUsChecklist" rows={6} defaultValue={aboutUsChecklistJSON} placeholder='[\n  "Poin pertama",\n  "Poin kedua"\n]' />
+                <p className="text-xs text-muted-foreground">Masukkan daftar poin dalam format array JSON.</p>
             </div>
           </CardContent>
         </Card>

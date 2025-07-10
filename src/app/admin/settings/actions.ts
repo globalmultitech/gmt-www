@@ -43,6 +43,19 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
+  // About Us section fields
+  aboutUsSubtitle: z.string().optional(),
+  aboutUsTitle: z.string().optional(),
+  aboutUsDescription: z.string().optional(),
+  aboutUsImageUrl: z.string().optional(),
+  aboutUsChecklist: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk checklist About Us tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
 export async function getWebSettings() {
@@ -65,6 +78,11 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     heroButton2Text: formData.get('heroButton2Text'),
     heroButton2Link: formData.get('heroButton2Link'),
     featureCards: formData.get('featureCards'),
+    aboutUsSubtitle: formData.get('aboutUsSubtitle'),
+    aboutUsTitle: formData.get('aboutUsTitle'),
+    aboutUsDescription: formData.get('aboutUsDescription'),
+    aboutUsImageUrl: formData.get('aboutUsImageUrl'),
+    aboutUsChecklist: formData.get('aboutUsChecklist'),
   });
 
   if (!validatedFields.success) {
