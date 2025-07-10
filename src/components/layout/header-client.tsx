@@ -49,7 +49,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             </div>
 
             <div className="hidden lg:flex justify-center flex-1">
-              <nav className="flex items-center space-x-8 text-base font-medium">
+              <nav className="flex items-center space-x-8 text-base font-bold">
                   {navItems.map((item) => (
                   <Link
                       key={item.href}
@@ -57,7 +57,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       className={cn(
                         'transition-colors',
                         isScrolled ? 'text-primary-foreground hover:text-sky-blue' : 'text-primary hover:text-primary/80',
-                        pathname === item.href && 'font-bold'
+                        pathname === item.href && 'underline'
                       )}
                   >
                       {item.label}
