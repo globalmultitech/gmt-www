@@ -89,7 +89,8 @@ async function getRandomProducts(currentProductId: number) {
 
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await getProductBySlug(params.slug);
+  const { slug } = params;
+  const product = await getProductBySlug(slug);
 
   if (!product) {
     return {
@@ -121,7 +122,8 @@ const Breadcrumbs = ({ productTitle }: { productTitle: string }) => (
 );
 
 export default async function ProductDetailPage({ params }: Props) {
-  const product = await getProductBySlug(params.slug);
+  const { slug } = params;
+  const product = await getProductBySlug(slug);
   const settings = await getSettings();
 
   if (!product) {
