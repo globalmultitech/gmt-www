@@ -38,13 +38,13 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   return (
     <header className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-primary/90 backdrop-blur-sm shadow-md' : 'bg-transparent'
+        isScrolled ? 'bg-background shadow-md' : 'bg-transparent'
       )}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
             
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={true} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} />
             </div>
 
             <div className="hidden lg:flex justify-center flex-1">
@@ -54,8 +54,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'transition-colors text-primary-foreground hover:text-white/80',
-                        pathname === item.href && 'font-bold'
+                        'transition-colors text-foreground hover:text-primary',
+                        pathname === item.href && 'font-bold text-primary'
                       )}
                   >
                       {item.label}
@@ -65,7 +65,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             </div>
 
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild variant={isScrolled ? 'secondary' : 'outline'} className={cn(!isScrolled && 'border-white text-white hover:bg-white hover:text-primary')}>
+                <Button asChild variant="outline" className="border-primary text-primary hover:bg-primary hover:text-primary-foreground">
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
             </div>
@@ -73,7 +73,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-white/10">
+                    <Button variant="ghost" size="icon" className="text-foreground hover:bg-muted">
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
