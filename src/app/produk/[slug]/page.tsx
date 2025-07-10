@@ -148,6 +148,33 @@ export default async function ProductDetailPage({ params }: Props) {
                 </div>
 
                 <Accordion type="multiple" collapsible className="w-full">
+                   <AccordionItem value="item-desc">
+                    <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
+                    <AccordionContent>
+                        <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
+                        <p>{product.longDescription || product.description}</p>
+                        </article>
+                    </AccordionContent>
+                  </AccordionItem>
+                  
+                  {featuresList.length > 0 && (
+                     <AccordionItem value="item-features">
+                      <AccordionTrigger className="text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-4 pt-4">
+                            {featuresList.map((feature, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                                <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                <CheckCircle className="h-4 w-4" />
+                                </div>
+                                <span className="text-muted-foreground">{String(feature)}</span>
+                            </li>
+                            ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                  
                   {specifications.length > 0 && (
                     <AccordionItem value="item-specs">
                       <AccordionTrigger className="text-xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
@@ -167,39 +194,8 @@ export default async function ProductDetailPage({ params }: Props) {
                       </AccordionContent>
                     </AccordionItem>
                   )}
-                  {featuresList.length > 0 && (
-                     <AccordionItem value="item-features">
-                      <AccordionTrigger className="text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
-                      <AccordionContent>
-                        <ul className="space-y-4 pt-4">
-                            {featuresList.map((feature, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                                <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                                <CheckCircle className="h-4 w-4" />
-                                </div>
-                                <span className="text-muted-foreground">{String(feature)}</span>
-                            </li>
-                            ))}
-                        </ul>
-                      </AccordionContent>
-                    </AccordionItem>
-                  )}
                 </Accordion>
               </div>
-            </div>
-
-            {/* Accordion for More Details */}
-            <div className="mt-16">
-              <Accordion type="single" defaultValue='item-desc' collapsible className="w-full max-w-4xl mx-auto">
-                <AccordionItem value="item-desc">
-                  <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
-                  <AccordionContent>
-                     <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
-                        <p>{product.longDescription || product.description}</p>
-                     </article>
-                  </AccordionContent>
-                </AccordionItem>
-              </Accordion>
             </div>
           </div>
         </div>
