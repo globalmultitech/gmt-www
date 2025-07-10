@@ -29,7 +29,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Panggil saat mount untuk mengatur state awal
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -56,7 +56,9 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       href={item.href}
                       className={cn(
                         'transition-colors',
-                        isScrolled ? 'text-primary-foreground hover:text-primary-foreground/80' : 'text-foreground hover:text-primary',
+                        isScrolled 
+                          ? 'text-primary-foreground hover:text-primary-foreground/80' 
+                          : 'text-foreground hover:text-primary',
                         pathname === item.href && (isScrolled ? 'font-bold' : 'text-primary font-bold')
                       )}
                   >
