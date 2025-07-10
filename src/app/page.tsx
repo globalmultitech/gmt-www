@@ -6,14 +6,6 @@ import { ServiceCard } from '@/components/service-card';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-const trustedByLogos = [
-  { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-1.png', alt: 'Client Logo 1' },
-  { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-2.png', alt: 'Client Logo 2' },
-  { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-3.png', alt: 'Client Logo 3' },
-  { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-4.png', alt: 'Client Logo 4' },
-  { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-5.png', alt: 'Client Logo 5' },
-];
-
 const featureCards = [
     {
         icon: <MonitorSmartphone className="h-10 w-10 text-primary" />,
@@ -152,18 +144,6 @@ export default function Home() {
           </div>
       </section>
 
-      {/* Trusted By Section */}
-      <section className="pt-20 pb-16 bg-background">
-        <div className="container mx-auto px-4">
-          <h3 className="text-center font-semibold text-muted-foreground mb-8">Featured on</h3>
-          <div className="flex flex-wrap justify-center items-center gap-x-12 sm:gap-x-16 gap-y-6">
-            {trustedByLogos.map((logo, index) => (
-                <Image key={index} src={logo.src} alt={logo.alt} width={120} height={30} className="opacity-50 hover:opacity-100 transition-opacity" />
-            ))}
-          </div>
-        </div>
-      </section>
-      
       {/* About Section */}
       <section className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4">
