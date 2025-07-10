@@ -208,7 +208,7 @@ export default function Home() {
       
        {/* CTA Section */}
        <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}}>
-        <div className="absolute inset-0 bg-primary/90"></div>
+        <div className="absolute inset-0 bg-black/70"></div>
         <div className="relative container mx-auto px-4 text-primary-foreground">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
             <div className="lg:w-2/3">
