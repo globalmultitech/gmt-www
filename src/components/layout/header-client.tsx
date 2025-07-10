@@ -29,7 +29,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
+    handleScroll(); // Call on mount to set initial state
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -39,14 +39,14 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   return (
     <header className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-primary/90 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+        isScrolled ? 'bg-background shadow-md' : 'bg-transparent'
       )}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
             
             {/* Logo */}
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={true} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={!isScrolled} />
             </div>
 
             {/* Desktop Navigation */}
@@ -57,9 +57,11 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'relative transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:origin-center after:scale-x-0 after:bg-primary-foreground after:transition-transform hover:text-white hover:after:scale-x-100',
-                        pathname === item.href ? 'text-white font-bold' : 'text-primary-foreground/90',
-                        isScrolled && pathname === item.href && 'after:scale-x-100'
+                        'transition-colors',
+                        isScrolled
+                          ? 'text-foreground hover:text-primary'
+                          : 'text-white hover:text-white/80',
+                        pathname === item.href && (isScrolled ? 'text-primary' : 'text-white font-bold')
                       )}
                   >
                       {item.label}
@@ -70,7 +72,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
 
             {/* Right Side Actions - Desktop */}
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild variant="secondary">
+                <Button asChild variant={isScrolled ? 'default' : 'secondary'}>
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
             </div>
@@ -79,7 +81,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn('hover:bg-white/10 text-white')}>
+                    <Button variant="ghost" size="icon" className={cn(
+                        'hover:bg-white/10',
+                        isScrolled ? 'text-foreground' : 'text-white'
+                    )}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
