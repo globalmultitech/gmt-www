@@ -92,7 +92,7 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
-  // Blog Posts
+  // Blog Posts - THIS WAS MISSING
   blogPosts: z.string().transform((str, ctx) => {
     try {
       return JSON.parse(str);
