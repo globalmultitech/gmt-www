@@ -56,7 +56,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       href={item.href}
                       className={cn(
                         'transition-colors',
-                        isScrolled ? 'text-primary-foreground hover:text-sky-blue' : 'text-foreground hover:text-primary',
+                        isScrolled ? 'text-primary-foreground hover:text-sky-blue' : 'text-primary hover:text-primary/80',
                         pathname === item.href && 'font-bold'
                       )}
                   >
@@ -77,7 +77,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', isScrolled ? 'text-primary-foreground' : 'text-foreground')}>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', isScrolled ? 'text-primary-foreground' : 'text-primary')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
