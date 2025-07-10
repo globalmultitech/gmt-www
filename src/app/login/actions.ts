@@ -36,7 +36,7 @@ export async function login(prevState: { message: string } | undefined, formData
     
     // If credentials are valid, set the cookie
     const sessionData = { userId: user.id, name: user.name, email: user.email };
-    cookies().set('auth_session', JSON.stringify(sessionData), {
+    await cookies().set('auth_session', JSON.stringify(sessionData), {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 1 week
