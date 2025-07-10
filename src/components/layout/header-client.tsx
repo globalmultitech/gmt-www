@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Logo } from '@/components/logo';
@@ -44,7 +45,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="flex items-center justify-between h-20">
             
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={!isScrolled || isScrolled} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={isScrolled} />
             </div>
 
             <div className="hidden lg:flex justify-center flex-1">
@@ -55,8 +56,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       href={item.href}
                       className={cn(
                         'transition-colors',
-                        isScrolled ? 'text-primary-foreground hover:text-primary-foreground/80' : 'text-primary-foreground hover:text-primary-foreground/80',
-                        pathname === item.href && 'font-bold'
+                        isScrolled 
+                          ? 'text-primary-foreground hover:text-primary-foreground/80' 
+                          : 'text-foreground hover:text-primary',
+                        pathname === item.href && (isScrolled ? 'font-bold' : 'text-primary font-bold')
                       )}
                   >
                       {item.label}
@@ -67,7 +70,9 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
 
             <div className="hidden lg:flex items-center space-x-4">
                 <Button asChild variant="outline" className={cn(
-                   isScrolled ? 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary' : 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary'
+                   isScrolled 
+                    ? 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary' 
+                    : 'border-foreground text-foreground hover:bg-foreground hover:text-background'
                 )}>
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
@@ -76,7 +81,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn(isScrolled ? 'text-primary-foreground hover:bg-muted/20' : 'text-primary-foreground hover:bg-muted/20')}>
+                    <Button variant="ghost" size="icon" className={cn(
+                      "hover:bg-muted/20",
+                      isScrolled ? 'text-primary-foreground' : 'text-foreground'
+                    )}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
