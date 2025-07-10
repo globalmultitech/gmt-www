@@ -67,7 +67,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
                           <div className="flex justify-center mb-6">
                             <DynamicIcon 
                               name={card.icon} 
-                              className={`h-10 w-10 ${['User', 'BarChart', 'Medal', 'MonitorSmartphone'].includes(card.icon) ? 'text-sky-blue' : 'text-primary'}`} 
+                              className="h-10 w-10 text-sky-blue"
                             />
                           </div>
                           <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
@@ -83,8 +83,8 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
              <div>
-              {settings.aboutUsSubtitle && <p className="font-semibold text-primary uppercase tracking-widest mb-2">{settings.aboutUsSubtitle}</p>}
-              {settings.aboutUsTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6">{settings.aboutUsTitle}</h2>}
+              {settings.aboutUsSubtitle && <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">{settings.aboutUsSubtitle}</p>}
+              {settings.aboutUsTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6 text-primary">{settings.aboutUsTitle}</h2>}
               {settings.aboutUsDescription && <p className="text-muted-foreground mb-6">{settings.aboutUsDescription}</p>}
               {Array.isArray(settings.aboutUsChecklist) && settings.aboutUsChecklist.length > 0 && (
                 <ul className="space-y-4 mb-8">
@@ -115,8 +115,8 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
        <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            {settings.servicesSubtitle && <p className="font-semibold text-primary uppercase tracking-widest mb-2">{settings.servicesSubtitle}</p>}
-            {settings.servicesTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold">{settings.servicesTitle}</h2>}
+            {settings.servicesSubtitle && <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">{settings.servicesSubtitle}</p>}
+            {settings.servicesTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">{settings.servicesTitle}</h2>}
             {settings.servicesDescription && <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">{settings.servicesDescription}</p>}
           </div>
            <div className="grid md:grid-cols-2 gap-8">
@@ -195,8 +195,8 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
           <div className="container mx-auto px-4">
               <div className="flex justify-between items-center mb-12">
                 <div>
-                  <p className="font-semibold text-primary uppercase tracking-widest mb-2">OUR PRODUCTS</p>
-                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold">Produk Unggulan Kami</h2>
+                  <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">OUR PRODUCTS</p>
+                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Produk Unggulan Kami</h2>
                 </div>
                 <Link href="/produk" className="font-semibold text-foreground hover:text-primary flex items-center gap-2">
                     Semua Produk <ArrowRight className="h-4 w-4" />
@@ -232,8 +232,8 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       <section className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4">
               <div className="text-center max-w-3xl mx-auto mb-16">
-                  <p className="font-semibold text-primary uppercase tracking-widest mb-2">Our Blog</p>
-                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold">Latest news & articles</h2>
+                  <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">Our Blog</p>
+                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Latest news & articles</h2>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
                   {(settings.blogPosts as BlogPost[]).map((post, index) => (

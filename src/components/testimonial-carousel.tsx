@@ -74,8 +74,8 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
                 <CarouselItem key={index}>
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         <div>
-                            <p className="font-semibold text-primary uppercase tracking-widest mb-2">Testimonial</p>
-                            <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6">What our clients say about us</h2>
+                            <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">Testimonial</p>
+                            <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-6 text-primary">What our clients say about us</h2>
                             <div className="flex text-yellow-400 mb-4">
                                 <Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" /><Star fill="currentColor" />
                             </div>
