@@ -11,7 +11,7 @@ import { Loader2, Image as ImageIcon } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignedURL } from '../actions';
 import Image from 'next/image';
 
@@ -375,3 +375,5 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     </div>
   );
 }
+
+    
