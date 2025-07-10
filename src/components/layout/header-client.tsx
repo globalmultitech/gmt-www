@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Logo } from '@/components/logo';
@@ -30,6 +31,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
+    // Initial check
     handleScroll();
 
     return () => {
@@ -46,8 +48,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
         {/* Top Bar - Hidden on scroll */}
         <div className={cn(
             "container mx-auto px-4 justify-between items-center h-16",
-            "lg:flex", // Use flex for large screens
-            isScrolled ? "hidden" : "flex" // Hide completely on scroll for all screens, but keep flex for non-scrolled mobile
+            "lg:flex",
+            isScrolled ? "hidden" : "flex"
         )}>
             <div className="flex items-center gap-4">
                  <Logo companyName={companyName} logoUrl={logoUrl} />
@@ -72,7 +74,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
         !isScrolled && 'border-t border-primary-foreground/20'
         )}>
         <div className="container mx-auto px-4">
-            <div className={cn("flex items-center justify-between transition-all duration-300", isScrolled ? 'h-16' : 'h-20')}>
+            <div className={cn(
+                "flex items-center justify-between transition-all duration-300", 
+                isScrolled ? 'h-16' : 'h-20'
+            )}>
             
             <div className="hidden lg:flex items-center gap-4">
               <div className={cn(isScrolled ? 'flex' : 'hidden')}>
