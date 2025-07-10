@@ -10,7 +10,7 @@
     --card-foreground: 224 71.4% 4.1%;
     --popover: 0 0% 100%;
     --popover-foreground: 224 71.4% 4.1%;
-    --primary: 145 63% 49%; /* WhatsApp Green */
+    --primary: 149 100% 38%;
     --primary-foreground: 0 0% 100%;
     --secondary: 220 13% 96%;
     --secondary-foreground: 224 71.4% 4.1%;
@@ -22,9 +22,9 @@
     --destructive-foreground: 0 0% 98%;
     --border: 220 13% 91%;
     --input: 220 13% 91%;
-    --ring: 145 63% 49%;
+    --ring: 149 100% 38%;
     --radius: 0.5rem;
-    --dark-slate: 222 47% 6%; /* Kept for compatibility but not used in theme */
+    --dark-slate: 222 47% 6%;
     --sky-blue: 200 80% 50%;
   }
 }
