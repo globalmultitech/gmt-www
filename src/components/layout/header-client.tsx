@@ -46,7 +46,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             
             {/* Logo */}
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={!isScrolled} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} />
             </div>
 
             {/* Desktop Navigation */}
@@ -57,11 +57,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'transition-colors',
-                        isScrolled
-                          ? 'text-foreground hover:text-primary'
-                          : 'text-white hover:text-white/80',
-                        pathname === item.href && (isScrolled ? 'text-primary' : 'text-white font-bold')
+                        'transition-colors text-foreground hover:text-primary',
+                        pathname === item.href && 'text-primary font-bold'
                       )}
                   >
                       {item.label}
@@ -72,7 +69,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
 
             {/* Right Side Actions - Desktop */}
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild variant={isScrolled ? 'default' : 'secondary'}>
+                <Button asChild variant="secondary">
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
             </div>
@@ -81,10 +78,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn(
-                        'hover:bg-white/10',
-                        isScrolled ? 'text-foreground' : 'text-white'
-                    )}>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-primary/10 text-foreground')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
