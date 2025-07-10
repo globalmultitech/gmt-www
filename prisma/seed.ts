@@ -52,6 +52,13 @@ async function main() {
         { label: 'Tentang Kami', href: '/tentang-kami' },
         { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ],
+      heroHeadline: 'Creative solutions to improve your business',
+      heroDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.',
+      heroImageUrl: 'https://placehold.co/1920x1080.png',
+      heroButton1Text: 'Our services',
+      heroButton1Link: '/layanan',
+      heroButton2Text: 'Contact us',
+      heroButton2Link: '/hubungi-kami',
     },
   });
   console.log('Web settings seeded.');

@@ -8,6 +8,7 @@ import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import prisma from '@/lib/db';
 import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
+import { getSettings } from '@/lib/settings';
 
 const featureCards = [
     {
@@ -128,27 +129,39 @@ async function getProducts() {
 
 export default async function Home() {
   const products = await getProducts();
+  const settings = await getSettings();
   
   return (
     <div className="flex flex-col bg-background text-foreground">
       {/* Hero Section */}
-      <section className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}}>
+      <section 
+        className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" 
+        style={{backgroundImage: `url('${settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}')`}}
+        >
         <div className="absolute inset-0 bg-white/50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center text-foreground">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up">
-              Creative solutions to improve your business
-            </h1>
-            <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto fade-in-up" style={{animationDelay: '0.2s'}}>
-              We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.
-            </p>
+            {settings.heroHeadline && (
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up">
+                {settings.heroHeadline}
+              </h1>
+            )}
+            {settings.heroDescription && (
+              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto fade-in-up" style={{animationDelay: '0.2s'}}>
+                {settings.heroDescription}
+              </p>
+            )}
             <div className="flex justify-center items-center gap-4 fade-in-up" style={{animationDelay: '0.4s'}}>
-              <Button asChild size="lg">
-                <Link href="/layanan">Our services</Link>
-              </Button>
-               <Button asChild size="lg" variant="outline" className="border-foreground">
-                <Link href="/hubungi-kami">Contact us</Link>
-              </Button>
+              {settings.heroButton1Text && settings.heroButton1Link && (
+                  <Button asChild size="lg">
+                    <Link href={settings.heroButton1Link}>{settings.heroButton1Text}</Link>
+                  </Button>
+              )}
+               {settings.heroButton2Text && settings.heroButton2Link && (
+                  <Button asChild size="lg" variant="outline" className="border-foreground">
+                    <Link href={settings.heroButton2Link}>{settings.heroButton2Text}</Link>
+                  </Button>
+               )}
             </div>
           </div>
         </div>

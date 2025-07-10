@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Image as ImageIcon } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
@@ -28,7 +28,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [state, formAction] = useActionState(updateWebSettings, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadedImageUrl, setUploadedImageUrl] = useState<string>(settings.logoUrl ?? '');
+  const [logoUrl, setLogoUrl] = useState<string>(settings.logoUrl ?? '');
+  const [heroImageUrl, setHeroImageUrl] = useState<string>(settings.heroImageUrl ?? '');
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -40,7 +41,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     return hashHex;
   };
   
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -55,16 +56,17 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         headers: { 'Content-Type': file.type },
       });
 
-      setUploadedImageUrl(publicUrl);
+      setter(publicUrl);
     } catch (error) {
       console.error("Upload error:", error);
       toast({
         title: 'Upload Gagal',
-        description: 'Gagal mengunggah logo. Silakan periksa pengaturan CORS di R2.',
+        description: 'Gagal mengunggah gambar. Silakan periksa pengaturan CORS di R2.',
         variant: 'destructive',
       });
     } finally {
       setIsUploading(false);
+      event.target.value = '';
     }
   };
 
@@ -87,11 +89,66 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     <div>
         <div className="mb-6">
             <h1 className="text-3xl font-bold">Pengaturan Website</h1>
-            <p className="text-muted-foreground">Kelola informasi umum, menu, dan tautan yang tampil di website Anda.</p>
+            <p className="text-muted-foreground">Kelola informasi umum, hero section, menu, dan tautan yang tampil di website Anda.</p>
         </div>
       <form action={formAction}>
-        <input type="hidden" name="logoUrl" value={uploadedImageUrl} />
+        <input type="hidden" name="logoUrl" value={logoUrl} />
+        <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
+
         <Card>
+          <CardHeader>
+            <CardTitle>Hero Section</CardTitle>
+            <CardDescription>Atur tampilan utama yang dilihat pengunjung saat pertama kali membuka website.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+             <div className="space-y-2">
+                <Label htmlFor="hero-image-upload">Gambar Latar Hero</Label>
+                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
+                    {heroImageUrl ? (
+                        <Image src={heroImageUrl} alt="Hero Preview" fill className="object-cover" />
+                    ) : (
+                        <div className="flex items-center justify-center h-full w-full">
+                        <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                        </div>
+                    )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <Input id="hero-image-upload" type="file" onChange={(e) => handleFileChange(e, setHeroImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                  {isUploading && <Loader2 className="animate-spin" />}
+                </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="heroHeadline">Judul Utama (Headline)</Label>
+              <Input id="heroHeadline" name="heroHeadline" defaultValue={settings.heroHeadline ?? ''} />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="heroDescription">Deskripsi</Label>
+              <Textarea id="heroDescription" name="heroDescription" defaultValue={settings.heroDescription ?? ''} />
+            </div>
+             <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="heroButton1Text">Teks Tombol 1</Label>
+                  <Input id="heroButton1Text" name="heroButton1Text" defaultValue={settings.heroButton1Text ?? ''} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="heroButton1Link">Link Tombol 1</Label>
+                  <Input id="heroButton1Link" name="heroButton1Link" defaultValue={settings.heroButton1Link ?? ''} placeholder="/layanan"/>
+                </div>
+            </div>
+             <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="heroButton2Text">Teks Tombol 2</Label>
+                  <Input id="heroButton2Text" name="heroButton2Text" defaultValue={settings.heroButton2Text ?? ''} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="heroButton2Link">Link Tombol 2</Label>
+                  <Input id="heroButton2Link" name="heroButton2Link" defaultValue={settings.heroButton2Link ?? ''} placeholder="/hubungi-kami"/>
+                </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
           <CardHeader>
             <CardTitle>Informasi Umum</CardTitle>
           </CardHeader>
@@ -99,12 +156,12 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
             <div className="space-y-2">
                 <Label htmlFor="image-upload">Logo Perusahaan</Label>
                 <div className="flex items-center gap-4">
-                    {uploadedImageUrl ? (
-                        <Image src={uploadedImageUrl} alt="Logo Preview" width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
+                    {logoUrl ? (
+                        <Image src={logoUrl} alt="Logo Preview" width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
                     ) : (
                         <div className="h-10 w-40 rounded-md bg-muted flex items-center justify-center text-sm text-muted-foreground">Tidak ada logo</div>
                     )}
-                     <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading}/>
+                     <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, setLogoUrl)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading}/>
                      {isUploading && <Loader2 className="animate-spin" />}
                 </div>
                 <p className="text-xs text-muted-foreground">Unggah logo perusahaan Anda. Format yang didukung: PNG, JPG, WEBP, SVG.</p>

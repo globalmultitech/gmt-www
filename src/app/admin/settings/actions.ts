@@ -26,6 +26,14 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
+  // Hero section fields
+  heroHeadline: z.string().optional(),
+  heroDescription: z.string().optional(),
+  heroImageUrl: z.string().optional(),
+  heroButton1Text: z.string().optional(),
+  heroButton1Link: z.string().optional(),
+  heroButton2Text: z.string().optional(),
+  heroButton2Link: z.string().optional(),
 });
 
 export async function getWebSettings() {
@@ -40,6 +48,13 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     footerText: formData.get('footerText'),
     socialMedia: formData.get('socialMedia'),
     menuItems: formData.get('menuItems'),
+    heroHeadline: formData.get('heroHeadline'),
+    heroDescription: formData.get('heroDescription'),
+    heroImageUrl: formData.get('heroImageUrl'),
+    heroButton1Text: formData.get('heroButton1Text'),
+    heroButton1Link: formData.get('heroButton1Link'),
+    heroButton2Text: formData.get('heroButton2Text'),
+    heroButton2Link: formData.get('heroButton2Link'),
   });
 
   if (!validatedFields.success) {
@@ -48,18 +63,13 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message };
   }
   
-  const { logoUrl, companyName, whatsappSales, footerText, socialMedia, menuItems } = validatedFields.data;
+  const data = validatedFields.data;
 
   try {
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
-            logoUrl,
-            companyName,
-            whatsappSales,
-            footerText,
-            socialMedia,
-            menuItems
+            ...data
         }
     });
 
