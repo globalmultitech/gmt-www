@@ -12,7 +12,14 @@ export function Logo({ className, companyName = "Global Multi Technology", logoU
   return (
     <Link href="/" className={cn('flex items-center gap-3', className)}>
       {logoUrl ? (
-        <Image src={logoUrl} alt={`Logo ${companyName}`} width={140} height={40} className="h-8 md:h-10 w-auto object-contain" priority/>
+        <>
+          <Image src={logoUrl} alt={`Logo ${companyName}`} width={50} height={50} className="h-10 w-10 md:h-12 md:w-12 object-contain" priority/>
+           <span className={cn(
+            "font-headline font-extrabold text-2xl md:text-3xl tracking-wide transition-colors"
+           )}>
+            {companyName}
+          </span>
+        </>
       ) : (
         <span className={cn(
           "font-headline font-extrabold text-3xl tracking-wide transition-colors"
