@@ -28,6 +28,7 @@ export async function generateStaticParams() {
 
 async function getCategoryBySlug(slug: string) {
   const categories = await prisma.productCategory.findMany();
+  // Find the category by comparing its slug-ified name with the slug from the URL
   const category = categories.find(c => toSlug(c.name) === slug);
 
   if (!category) {

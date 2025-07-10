@@ -1,34 +1,57 @@
-datasource db {
-  provider     = "mysql"
-  url          = env("DATABASE_URL")
-  relationMode = "prisma"
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider        = "prisma-client-js"
-  previewFeatures = ["driverAdapters"]
   binaryTargets   = ["native", "rhel-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
-  password  String?
+  password  String
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
-  id            Int      @id @default(1)
-  logoUrl       String?  @db.Text
+  id            Int     @id @default(1)
+  logoUrl       String? @db.Text
   companyName   String
   whatsappSales String
-  footerText    String   @db.Text
+  footerText    String  @db.Text
   socialMedia   Json
   menuItems     Json
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
+}
+
+model ProductCategory {
+  id            Int                 @id @default(autoincrement())
+  name          String              @unique
+  description   String?             @db.Text
+  imageUrl      String?             @db.Text
+  subCategories ProductSubCategory[]
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+}
+
+model ProductSubCategory {
+  id         Int              @id @default(autoincrement())
+  name       String
+  category   ProductCategory  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+  products   Product[]
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @updatedAt
+
+  @@unique([name, categoryId])
 }
 
 model Product {
@@ -40,37 +63,12 @@ model Product {
   images           Json               @default("[]")
   features         Json               @default("[]")
   specifications   Json?
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId    Int
   metaTitle        String?
   metaDescription  String?            @db.Text
   tokopediaUrl     String?
   shopeeUrl        String?
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  subCategoryId    Int
-
-  @@index([subCategoryId])
-}
-
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  description   String?              @db.Text
-  imageUrl      String?              @db.Text
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-  subCategories ProductSubCategory[]
-}
-
-model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
-  name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId Int
-  products   Product[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-
-  @@unique([name, categoryId])
-  @@index([categoryId])
 }
