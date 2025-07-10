@@ -28,7 +28,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateWebSettings, undefined);
   
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState<string | null>(null);
   const [logoUrl, setLogoUrl] = useState<string>(settings.logoUrl ?? '');
   const [heroImageUrl, setHeroImageUrl] = useState<string>(settings.heroImageUrl ?? '');
   const [aboutUsImageUrl, setAboutUsImageUrl] = useState<string>(settings.aboutUsImageUrl ?? '');
@@ -44,11 +44,11 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     return hashHex;
   };
   
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, setter: React.Dispatch<React.SetStateAction<string>>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
+    setIsUploading(fieldName);
     try {
       const checksum = await computeSHA256(file);
       const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
@@ -68,7 +68,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         variant: 'destructive',
       });
     } finally {
-      setIsUploading(false);
+      setIsUploading(null);
       event.target.value = '';
     }
   };
@@ -129,8 +129,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             )}
                         </div>
                         <div className="flex items-center gap-4">
-                            <Input id="hero-image-upload" type="file" onChange={(e) => handleFileChange(e, setHeroImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                            {isUploading && <Loader2 className="animate-spin" />}
+                            <Input id="hero-image-upload" type="file" onChange={(e) => handleFileChange(e, 'hero', setHeroImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading === 'hero'}/>
+                            {isUploading === 'hero' && <Loader2 className="animate-spin" />}
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -182,8 +182,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             )}
                         </div>
                         <div className="flex items-center gap-4">
-                            <Input id="about-us-image-upload" type="file" onChange={(e) => handleFileChange(e, setAboutUsImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                            {isUploading && <Loader2 className="animate-spin" />}
+                            <Input id="about-us-image-upload" type="file" onChange={(e) => handleFileChange(e, 'about', setAboutUsImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading === 'about'}/>
+                            {isUploading === 'about' && <Loader2 className="animate-spin" />}
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -250,8 +250,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             )}
                         </div>
                         <div className="flex items-center gap-4">
-                            <Input id="cta-image-upload" type="file" onChange={(e) => handleFileChange(e, setCtaImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                            {isUploading && <Loader2 className="animate-spin" />}
+                            <Input id="cta-image-upload" type="file" onChange={(e) => handleFileChange(e, 'cta', setCtaImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading === 'cta'}/>
+                            {isUploading === 'cta' && <Loader2 className="animate-spin" />}
                         </div>
                     </div>
                     <div className="space-y-2">
@@ -325,8 +325,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             ) : (
                                 <div className="h-10 w-40 rounded-md bg-muted flex items-center justify-center text-sm text-muted-foreground">Tidak ada logo</div>
                             )}
-                            <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, setLogoUrl)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading}/>
-                            {isUploading && <Loader2 className="animate-spin" />}
+                            <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, 'logo', setLogoUrl)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading === 'logo'}/>
+                            {isUploading === 'logo' && <Loader2 className="animate-spin" />}
                         </div>
                         <p className="text-xs text-muted-foreground">Unggah logo perusahaan Anda. Format yang didukung: PNG, JPG, WEBP, SVG.</p>
                     </div>
