@@ -10,6 +10,12 @@ import {
   TableCell,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
 import { getSettings } from '@/lib/settings';
 import WhatsAppButton from './whatsapp-button';
 import ProductImageGallery from './image-gallery';
@@ -103,13 +109,13 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <>
-      <div className="bg-secondary">
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <Breadcrumbs productTitle={product.title} />
-        </div>
-        
-        <div className="bg-background">
-          <div className="container mx-auto px-4 py-12 md:py-16">
+      <div className="bg-background">
+        <div className="container mx-auto px-4">
+          <div className="py-8 md:py-12">
+            <Breadcrumbs productTitle={product.title} />
+          </div>
+          
+          <div className="pb-12 md:pb-16">
             <div className="grid md:grid-cols-2 gap-8 md:gap-12">
               {/* Image Section */}
               <ProductImageGallery images={product.images as string[]} productTitle={product.title} />
@@ -142,60 +148,55 @@ export default async function ProductDetailPage({ params }: Props) {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
 
-        <div className="container mx-auto px-4 py-12 md:py-16">
-          <div className="grid grid-cols-1 lg:grid-cols-5 gap-12">
-            {/* Left Column: Long Description */}
-            <div className="lg:col-span-3">
-              <h2 className="text-3xl font-headline font-bold mb-6 text-primary">Deskripsi Lengkap</h2>
-              <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none">
-                <p>{product.longDescription || product.description}</p>
-              </article>
-            </div>
-
-            {/* Right Column: Features & Specs */}
-            <div className="lg:col-span-2">
-              <div className="space-y-8 lg:sticky top-24">
-                {/* Features */}
-                <div>
-                  <h3 className="text-2xl font-headline font-bold mb-4">Fitur Utama</h3>
-                  <ul className="space-y-4">
-                    {featuresList.map((feature, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                          <CheckCircle className="h-4 w-4" />
+            {/* Accordion for Details */}
+            <div className="mt-16">
+              <Accordion type="multiple" defaultValue={['item-1']} className="w-full">
+                <AccordionItem value="item-1">
+                  <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
+                  <AccordionContent>
+                     <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
+                        <p>{product.longDescription || product.description}</p>
+                     </article>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-2">
+                  <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
+                  <AccordionContent>
+                    <ul className="space-y-4 pt-4">
+                        {featuresList.map((feature, index) => (
+                        <li key={index} className="flex items-start gap-3">
+                            <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                            <CheckCircle className="h-4 w-4" />
+                            </div>
+                            <span className="text-muted-foreground">{String(feature)}</span>
+                        </li>
+                        ))}
+                    </ul>
+                  </AccordionContent>
+                </AccordionItem>
+                <AccordionItem value="item-3">
+                  <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
+                  <AccordionContent>
+                    {specifications.length > 0 ? (
+                        <div className="overflow-x-auto rounded-lg border bg-card mt-4">
+                        <Table>
+                            <TableBody>
+                            {specifications.map(([key, value]) => (
+                                <TableRow key={key}>
+                                <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
+                                <TableCell className="text-muted-foreground">{String(value)}</TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                        </Table>
                         </div>
-                        <span className="text-muted-foreground">{String(feature)}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                
-                <hr className="border-border" />
-                
-                {/* Specifications */}
-                <div>
-                  <h3 className="text-2xl font-headline font-bold mb-4">Spesifikasi Teknis</h3>
-                  {specifications.length > 0 ? (
-                    <div className="overflow-x-auto rounded-lg border bg-card">
-                      <Table>
-                        <TableBody>
-                          {specifications.map(([key, value]) => (
-                            <TableRow key={key}>
-                              <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
-                              <TableCell className="text-muted-foreground">{String(value)}</TableCell>
-                            </TableRow>
-                          ))}
-                        </TableBody>
-                      </Table>
-                    </div>
-                  ) : (
-                    <p className="text-muted-foreground">Tidak ada data spesifikasi untuk produk ini.</p>
-                  )}
-                </div>
-              </div>
+                    ) : (
+                        <p className="text-muted-foreground pt-4">Tidak ada data spesifikasi untuk produk ini.</p>
+                    )}
+                  </AccordionContent>
+                </AccordionItem>
+              </Accordion>
             </div>
           </div>
         </div>
