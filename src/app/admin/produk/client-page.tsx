@@ -105,6 +105,14 @@ function DeleteButton({ productId }: { productId: number }) {
   );
 }
 
+const generateSlug = (title: string) => {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // remove special chars
+    .replace(/\s+/g, '-')           // replace spaces with -
+    .replace(/-+/g, '-');          // replace multiple - with single -
+}
+
 export default function ProductManagementClientPage({ products, categories }: { products: Product[], categories: CategoryWithSubCategories[] }) {
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -115,18 +123,12 @@ export default function ProductManagementClientPage({ products, categories }: { 
   
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [productTitle, setProductTitle] = useState('');
   const [slug, setSlug] = useState('');
-
-  const generateSlug = (title: string) => {
-    return title
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // remove special chars
-      .replace(/\s+/g, '-')           // replace spaces with -
-      .replace(/-+/g, '-');          // replace multiple - with single -
-  }
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
+    setProductTitle(newTitle);
     setSlug(generateSlug(newTitle));
   }
 
@@ -175,8 +177,15 @@ export default function ProductManagementClientPage({ products, categories }: { 
 
   const handleOpenDialog = (product: Product | null) => {
     setEditingProduct(product);
-    setImageUrls(product?.images as string[] ?? []);
-    setSlug(product?.slug ?? '');
+    if (product) {
+      setProductTitle(product.title);
+      setSlug(product.slug);
+      setImageUrls(product.images as string[] ?? []);
+    } else {
+      setProductTitle('');
+      setSlug('');
+      setImageUrls([]);
+    }
     setDialogOpen(true);
   }
 
@@ -214,7 +223,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
         </Button>
       </div>
 
-      <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) { setEditingProduct(null); setImageUrls([]) }; setDialogOpen(open); }}>
+      <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) { setEditingProduct(null); }; setDialogOpen(open); }}>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
@@ -229,7 +238,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="title">Judul Produk</Label>
-                  <Input id="title" name="title" required defaultValue={editingProduct?.title} onChange={handleTitleChange} />
+                  <Input id="title" name="title" required value={productTitle} onChange={handleTitleChange} />
                 </div>
                 <div className="space-y-1">
                   <Label htmlFor="slug">Slug URL</Label>
