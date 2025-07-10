@@ -4,7 +4,7 @@ import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Menu, ArrowRight } from 'lucide-react';
+import { Menu, Search, Phone, MapPin, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -14,12 +14,15 @@ type HeaderClientProps = {
     navItems: MenuItem[];
     companyName: string;
     logoUrl?: string | null;
+    whatsappNumber: string;
 }
 
-export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientProps) {
+export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }: HeaderClientProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  
+  const phoneNumber = whatsappNumber.replace(/^\+62/, '0');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -27,7 +30,7 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Call on mount to set initial state
+    handleScroll();
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -36,21 +39,37 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
 
   return (
     <header className={cn(
-        "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-background/90 backdrop-blur-sm shadow-lg' : 'bg-transparent'
+        "sticky top-0 z-50 w-full transition-shadow duration-300 bg-primary text-primary-foreground",
+        isScrolled && "shadow-lg"
       )}>
-      <div className="container mx-auto px-4">
-        <div className="flex h-24 items-center justify-between">
-          <Logo companyName={companyName} logoUrl={logoUrl} isScrolled={isScrolled} />
+        {/* Top Bar */}
+        <div className="hidden lg:block bg-primary border-b border-primary-foreground/20">
+            <div className="container mx-auto px-4 flex justify-between items-center h-12">
+                <div className="flex items-center gap-4 text-sm">
+                    <MapPin className="h-4 w-4" />
+                    <span>Jl. Teknologi Raya No. 123, Jakarta Selatan</span>
+                </div>
+                 <div className="flex items-center gap-4">
+                    <Button variant="ghost" size="icon" className="text-primary-foreground hover:bg-primary-foreground/10">
+                        <Search className="h-5 w-5" />
+                    </Button>
+                </div>
+            </div>
+        </div>
 
-          <nav className="hidden lg:flex items-center space-x-10 text-base font-semibold">
+      {/* Main Navigation */}
+      <div className="container mx-auto px-4">
+        <div className="flex h-20 items-center justify-between">
+          <Logo companyName={companyName} logoUrl={logoUrl} isScrolled={true} />
+
+          <nav className="hidden lg:flex items-center space-x-8 text-base font-semibold">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'transition-colors hover:text-primary',
-                  pathname === item.href ? 'text-primary' : (isScrolled ? 'text-foreground' : 'text-white')
+                  'transition-colors hover:text-white/80 flex items-center gap-1',
+                  pathname === item.href ? 'text-white font-bold' : 'text-primary-foreground/80'
                 )}
               >
                 {item.label}
@@ -59,29 +78,28 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
           </nav>
 
           <div className="hidden lg:flex items-center space-x-4">
-            <Button asChild variant="outline" className={cn(
-              'border-foreground/50 hover:bg-primary hover:text-primary-foreground hover:border-primary',
-              !isScrolled && 'border-white/50 text-white hover:bg-white hover:text-primary'
-            )}>
-              <Link href="/hubungi-kami">
-                Get a Quote <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+             <div className="flex items-center gap-3">
+                <Phone className="h-8 w-8 text-white/80"/>
+                <div>
+                    <p className="text-xs text-white/70">CALL US:</p>
+                    <a href={`tel:${phoneNumber}`} className="font-bold text-white text-lg hover:underline">{phoneNumber}</a>
+                </div>
+             </div>
           </div>
 
           {/* Mobile Menu */}
           <div className="lg:hidden flex items-center gap-2">
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className={cn(isScrolled ? 'text-foreground' : 'text-white', 'hover:bg-foreground/10')}>
+                <Button variant="ghost" size="icon" className='text-primary-foreground hover:bg-primary-foreground/10'>
                   <Menu className="h-6 w-6" />
                   <span className="sr-only">Buka menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background p-0">
+              <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-secondary text-foreground p-0">
                 <div className="flex flex-col h-full">
-                  <div className="p-4 border-b border-border">
-                    <Logo companyName={companyName} logoUrl={logoUrl} isScrolled={true} />
+                  <div className="p-4 border-b">
+                    <Logo companyName={companyName} logoUrl={logoUrl} />
                   </div>
                   <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
                     {navItems.map((item) => (
@@ -90,18 +108,22 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
                         href={item.href}
                         onClick={() => setIsMobileMenuOpen(false)}
                         className={cn(
-                          'transition-colors hover:text-primary w-full p-2 rounded-md text-foreground',
-                          pathname === item.href && 'text-primary font-bold bg-secondary'
+                          'transition-colors hover:text-primary w-full p-2 rounded-md',
+                          pathname === item.href && 'text-primary font-bold bg-primary/10'
                         )}
                       >
                         {item.label}
                       </Link>
                     ))}
                   </nav>
-                  <div className="mt-auto p-4 space-y-4 border-t border-border">
-                    <Button asChild className="w-full font-bold" size="lg">
-                      <Link href="/hubungi-kami" onClick={() => setIsMobileMenuOpen(false)}>Get a Quote</Link>
-                    </Button>
+                  <div className="mt-auto p-4 space-y-4 border-t">
+                     <div className="flex items-center gap-3">
+                        <Phone className="h-8 w-8 text-primary"/>
+                        <div>
+                            <p className="text-xs text-muted-foreground">CALL US:</p>
+                            <a href={`tel:${phoneNumber}`} className="font-bold text-primary text-lg hover:underline">{phoneNumber}</a>
+                        </div>
+                     </div>
                   </div>
                 </div>
               </SheetContent>
