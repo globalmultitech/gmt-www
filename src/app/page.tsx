@@ -1,37 +1,76 @@
-import { ArrowRight, CheckCircle, Quote, Star } from 'lucide-react';
+import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { HeroSlider } from '@/components/hero-slider';
 import { ServiceCard } from '@/components/service-card';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
+import { StatsCard } from '@/components/stats-card';
+import { WhyChooseUsCard } from '@/components/why-choose-us-card';
+
+const trustedByLogos = [
+  { src: 'https://placehold.co/150x50.png', alt: 'Client Logo 1' },
+  { src: 'https://placehold.co/150x50.png', alt: 'Client Logo 2' },
+  { src: 'https://placehold.co/150x50.png', alt: 'Client Logo 3' },
+  { src: 'https://placehold.co/150x50.png', alt: 'Client Logo 4' },
+  { src: 'https://placehold.co/150x50.png', alt: 'Client Logo 5' },
+];
+
+const stats = [
+    { value: '2.8x', label: 'Business Growth', icon: <TrendingUp/> },
+    { value: '25+', label: 'Years Experience', icon: <Briefcase/> },
+    { value: '1.2k', label: 'Satisfied Clients', icon: <Handshake/> },
+    { value: '150+', label: 'Expert Members', icon: <Users/> },
+];
 
 const services = [
   {
-    icon: '💻',
+    icon: <Cpu size={40} className="text-primary"/>,
     title: 'IT-Management',
     description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
     href: '/layanan',
   },
   {
-    icon: '📊',
+    icon: <ShieldCheck size={40} className="text-primary"/>,
     title: 'Data Security',
     description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
     href: '/layanan',
   },
   {
-    icon: '📈',
-    title: 'Business Reform',
+    icon: <Code2 size={40} className="text-primary"/>,
+    title: 'Web Development',
     description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
     href: '/layanan',
   },
   {
-    icon: '🚀',
-    title: 'Infrastructure',
+    icon: <Headphones size={40} className="text-primary"/>,
+    title: 'IT Support',
     description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
     href: '/layanan',
   },
 ];
+
+const whyChooseUsItems = [
+    {
+        icon: <TrendingUp/>,
+        title: "Business Growth",
+        description: "We are a passionate team of software engineers."
+    },
+    {
+        icon: <Handshake/>,
+        title: "Great Support",
+        description: "We are a passionate team of software engineers."
+    },
+    {
+        icon: <Users/>,
+        title: "Expert Team",
+        description: "We are a passionate team of software engineers."
+    },
+    {
+        icon: <ShieldCheck/>,
+        title: "Data Security",
+        description: "We are a passionate team of software engineers."
+    }
+]
 
 const projects = [
     {
@@ -81,7 +120,51 @@ const blogPosts = [
 export default function Home() {
   return (
     <div className="flex flex-col bg-background text-foreground">
-      <HeroSlider />
+      {/* Hero Section */}
+      <section className="relative bg-secondary py-20 md:py-32">
+        <div className="container mx-auto px-4">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="fade-in">
+              <p className="font-semibold text-primary uppercase tracking-widest mb-4">IT-Solution</p>
+              <h1 className="text-4xl md:text-6xl font-headline font-extrabold leading-tight mb-6">Providing the best services & IT solution</h1>
+              <p className="text-lg text-muted-foreground mb-8 max-w-lg">We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.</p>
+              <Button asChild size="lg">
+                <Link href="/solusi">Discover More <ArrowRight className="ml-2 h-5 w-5"/></Link>
+              </Button>
+            </div>
+            <div className="grid grid-cols-2 gap-6 fade-in" style={{animationDelay: '0.2s'}}>
+                {stats.map((stat, index) => (
+                    <StatsCard key={index} {...stat} />
+                ))}
+            </div>
+          </div>
+        </div>
+      </section>
+      
+      {/* Trusted By Section */}
+      <section className="py-12 bg-background">
+        <div className="container mx-auto px-4">
+          <h3 className="text-center font-semibold text-muted-foreground mb-6">Trusted by the world's best companies</h3>
+          <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-4">
+            {trustedByLogos.map((logo, index) => (
+                <Image key={index} src={logo.src} alt={logo.alt} width={120} height={40} className="opacity-50 hover:opacity-100 transition-opacity" />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Services Section */}
+      <section className="py-20 md:py-28 bg-secondary">
+        <div className="container mx-auto px-4 text-center">
+           <p className="font-semibold text-primary uppercase tracking-widest mb-2">What we offer</p>
+           <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-16">We provide the best services</h2>
+           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {services.map((service, index) => (
+                <ServiceCard key={index} {...service} />
+            ))}
+           </div>
+        </div>
+      </section>
       
       {/* About Section */}
       <section className="py-20 md:py-28">
@@ -126,18 +209,20 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* Services Section */}
+      
+       {/* Why Choose Us Section */}
       <section className="py-20 md:py-28 bg-secondary">
-        <div className="container mx-auto px-4 text-center">
-           <p className="font-semibold text-primary uppercase tracking-widest mb-2">Our Services</p>
-           <h2 className="text-4xl md:text-5xl font-headline font-extrabold mb-16">What we do</h2>
-           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service, index) => (
-                <ServiceCard key={index} {...service} />
-            ))}
-           </div>
-        </div>
+          <div className="container mx-auto px-4">
+              <div className="text-center mb-16">
+                  <p className="font-semibold text-primary uppercase tracking-widest mb-2">Why choose us</p>
+                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold">We provide the best</h2>
+              </div>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                {whyChooseUsItems.map((item, index) => (
+                    <WhyChooseUsCard key={index} {...item} />
+                ))}
+              </div>
+          </div>
       </section>
 
       {/* Projects Section */}
@@ -168,19 +253,7 @@ export default function Home() {
            <TestimonialCarousel />
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-wrap justify-between items-center py-16">
-            <h2 className="text-3xl md:text-4xl font-headline font-extrabold mb-4 md:mb-0">Become a part of the Daltech success story</h2>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-              <Link href="/hubungi-kami">Get a Free Quote</Link>
-            </Button>
-          </div>
-        </div>
-      </section>
-
+      
        {/* Blog Section */}
       <section className="py-20 md:py-28">
           <div className="container mx-auto px-4">
@@ -208,6 +281,19 @@ export default function Home() {
               </div>
           </div>
       </section>
+
+      {/* CTA Section */}
+      <section className="bg-primary text-primary-foreground">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-wrap justify-between items-center py-16">
+            <h2 className="text-3xl md:text-4xl font-headline font-extrabold mb-4 md:mb-0">Become a part of the Daltech success story</h2>
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Link href="/hubungi-kami">Get a Free Quote</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
     </div>
   );
 }

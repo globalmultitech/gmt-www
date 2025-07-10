@@ -1,9 +1,9 @@
-
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import type { ReactNode } from "react";
 
 type ServiceCardProps = {
-    icon: string;
+    icon: ReactNode;
     title: string;
     description: string;
     href: string;
@@ -11,8 +11,8 @@ type ServiceCardProps = {
 
 export function ServiceCard({ icon, title, description, href }: ServiceCardProps) {
     return (
-        <div className="group bg-card text-card-foreground p-8 rounded-lg text-left shadow-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:-translate-y-2">
-            <div className="text-5xl mb-6 transition-transform duration-300 group-hover:scale-110">
+        <div className="group bg-background text-card-foreground p-8 rounded-lg text-left shadow-md transition-all duration-300 hover:bg-primary hover:text-primary-foreground hover:-translate-y-2">
+            <div className="mb-6 transition-transform duration-300 group-hover:scale-110">
                 {icon}
             </div>
             <h3 className="font-headline font-bold text-2xl mb-4">{title}</h3>
