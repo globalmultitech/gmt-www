@@ -122,12 +122,14 @@ export default async function ProductDetailPage({ params }: Props) {
 
               {/* Details Section */}
               <div className="flex flex-col">
-                <div className="mb-4">
+                <div className="mb-2">
                   <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                  <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
+                </div>
+                <div className="mb-6">
+                    <p className="mt-2 text-lg text-muted-foreground">{product.description}</p>
                 </div>
                 
-                <div className="mt-6 flex flex-wrap items-center gap-3">
+                <div className="flex flex-wrap items-center gap-3">
                   <WhatsAppButton product={product} settings={settings} />
                   {product.tokopediaUrl && (
                     <Button asChild variant="outline" size="lg" className="border-green-500 hover:bg-green-500/10 hover:text-green-600 text-green-600">
@@ -146,10 +148,29 @@ export default async function ProductDetailPage({ params }: Props) {
                     </Button>
                   )}
                 </div>
+
+                {/* Technical Specifications Table */}
+                 {specifications.length > 0 && (
+                    <div className="mt-8">
+                        <h3 className="text-lg font-semibold text-primary mb-2">Spesifikasi Teknis</h3>
+                        <div className="overflow-x-auto rounded-lg border bg-card">
+                        <Table>
+                            <TableBody>
+                            {specifications.map(([key, value]) => (
+                                <TableRow key={key}>
+                                <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
+                                <TableCell className="text-muted-foreground">{String(value)}</TableCell>
+                                </TableRow>
+                            ))}
+                            </TableBody>
+                        </Table>
+                        </div>
+                    </div>
+                )}
               </div>
             </div>
 
-            {/* Accordion for Details */}
+            {/* Accordion for More Details */}
             <div className="mt-16">
               <Accordion type="multiple" defaultValue={['item-1']} className="w-full">
                 <AccordionItem value="item-1">
@@ -173,27 +194,6 @@ export default async function ProductDetailPage({ params }: Props) {
                         </li>
                         ))}
                     </ul>
-                  </AccordionContent>
-                </AccordionItem>
-                <AccordionItem value="item-3">
-                  <AccordionTrigger className="text-2xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
-                  <AccordionContent>
-                    {specifications.length > 0 ? (
-                        <div className="overflow-x-auto rounded-lg border bg-card mt-4">
-                        <Table>
-                            <TableBody>
-                            {specifications.map(([key, value]) => (
-                                <TableRow key={key}>
-                                <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
-                                <TableCell className="text-muted-foreground">{String(value)}</TableCell>
-                                </TableRow>
-                            ))}
-                            </TableBody>
-                        </Table>
-                        </div>
-                    ) : (
-                        <p className="text-muted-foreground pt-4">Tidak ada data spesifikasi untuk produk ini.</p>
-                    )}
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
