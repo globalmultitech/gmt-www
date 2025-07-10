@@ -7,32 +7,8 @@ import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import prisma from '@/lib/db';
 import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
-import { getSettings, type FeatureCard, type ProfessionalService, type TrustedByLogo } from '@/lib/settings';
+import { getSettings, type FeatureCard, type ProfessionalService, type TrustedByLogo, type BlogPost } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
-
-const blogPosts = [
-    {
-        image: 'https://placehold.co/600x400.png',
-        aiHint: 'server room',
-        date: 'July 10, 2024',
-        author: 'Admin',
-        title: 'Technology that is powering the digital world',
-    },
-    {
-        image: 'https://placehold.co/600x400.png',
-        aiHint: 'cyber security lock',
-        date: 'July 11, 2024',
-        author: 'Admin',
-        title: 'The role of AI in transforming industries',
-    },
-    {
-        image: 'https://placehold.co/600x400.png',
-        aiHint: 'team collaboration meeting',
-        date: 'July 12, 2024',
-        author: 'Admin',
-        title: 'How to choose the right IT solutions provider',
-    },
-];
 
 async function getProducts() {
   return prisma.product.findMany({
@@ -263,7 +239,7 @@ export default async function Home() {
                   <h2 className="text-4xl md:text-5xl font-headline font-extrabold">Latest news & articles</h2>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
-                  {blogPosts.map((post, index) => (
+                  {(settings.blogPosts as BlogPost[]).map((post, index) => (
                       <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                            <div className="relative overflow-hidden rounded-lg mb-6">
                             <Image src={post.image} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
@@ -272,9 +248,9 @@ export default async function Home() {
                                <span>{post.date}</span> / <span>By {post.author}</span>
                            </div>
                            <h3 className="text-xl font-bold font-headline mb-4 group-hover:text-primary transition-colors">
-                               <Link href="/resources">{post.title}</Link>
+                               <Link href={post.href}>{post.title}</Link>
                            </h3>
-                           <Link href="/resources" className="font-semibold text-primary flex items-center gap-2">
+                           <Link href={post.href} className="font-semibold text-primary flex items-center gap-2">
                                 Read More <ArrowRight className="h-4 w-4" />
                            </Link>
                       </div>

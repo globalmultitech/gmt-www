@@ -92,6 +92,15 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
+  // Blog Posts
+  blogPosts: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk postingan blog tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
 export async function getWebSettings() {
@@ -131,6 +140,7 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     trustedByText: formData.get('trustedByText'),
     trustedByLogos: formData.get('trustedByLogos'),
     testimonials: formData.get('testimonials'),
+    blogPosts: formData.get('blogPosts'),
   });
 
   if (!validatedFields.success) {

@@ -96,6 +96,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const professionalServicesJSON = getJsonString(settings.professionalServices, []);
   const trustedByLogosJSON = getJsonString(settings.trustedByLogos, []);
   const testimonialsJSON = getJsonString(settings.testimonials, []);
+  const blogPostsJSON = getJsonString(settings.blogPosts, []);
 
   return (
     <div>
@@ -292,6 +293,20 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <Label htmlFor="testimonials">Konten Testimoni (JSON)</Label>
                 <Textarea id="testimonials" name="testimonials" rows={12} defaultValue={testimonialsJSON} />
                 <p className="text-xs text-muted-foreground">Masukkan daftar testimoni dalam format array JSON.</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Blog Section</CardTitle>
+            <CardDescription>Atur konten untuk bagian blog di halaman utama.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="blogPosts">Konten Postingan Blog (JSON)</Label>
+                <Textarea id="blogPosts" name="blogPosts" rows={12} defaultValue={blogPostsJSON} />
+                <p className="text-xs text-muted-foreground">Masukkan daftar postingan blog dalam format array JSON.</p>
             </div>
           </CardContent>
         </Card>

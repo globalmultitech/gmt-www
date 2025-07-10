@@ -36,7 +36,16 @@ export type Testimonial = {
     aiHint?: string;
 };
 
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos' | 'testimonials'> {
+export type BlogPost = {
+  image: string;
+  aiHint: string;
+  date: string;
+  author: string;
+  title: string;
+  href: string;
+};
+
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos' | 'testimonials' | 'blogPosts'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
@@ -65,6 +74,7 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   trustedByText: string | null;
   trustedByLogos: TrustedByLogo[] | any; // any to accommodate prisma json type
   testimonials: Testimonial[] | any;
+  blogPosts: BlogPost[] | any;
 }
 
 const defaultSettings: WebSettings = {
@@ -202,6 +212,16 @@ const defaultSettings: WebSettings = {
         aiHint: 'professional woman portrait',
     },
   ],
+  blogPosts: [
+      {
+        image: 'https://placehold.co/600x400.png',
+        aiHint: 'server room',
+        date: 'July 10, 2024',
+        author: 'Admin',
+        title: 'Technology that is powering the digital world',
+        href: '#'
+      }
+  ],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -227,6 +247,7 @@ export async function getSettings(): Promise<WebSettings> {
             professionalServices: (settingsFromDb.professionalServices as ProfessionalService[] | null) ?? defaultSettings.professionalServices,
             trustedByLogos: (settingsFromDb.trustedByLogos as TrustedByLogo[] | null) ?? defaultSettings.trustedByLogos,
             testimonials: (settingsFromDb.testimonials as Testimonial[] | null) ?? defaultSettings.testimonials,
+            blogPosts: (settingsFromDb.blogPosts as BlogPost[] | null) ?? defaultSettings.blogPosts,
         };
 
     } catch (error) {
