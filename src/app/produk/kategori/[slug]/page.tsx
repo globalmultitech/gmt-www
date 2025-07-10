@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
 const toSlug = (name: string) => {
+  if (!name) return '';
   return name
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
