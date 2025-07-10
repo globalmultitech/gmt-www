@@ -67,7 +67,7 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
           </div>
           
           <div className="lg:col-span-2">
-            <h3 className="font-headline font-bold text-foreground text-xl mb-6">Company</h3>
+            <h3 className="font-headline font-bold text-muted-foreground text-xl mb-6">Company</h3>
             <ul className="space-y-4">
               {footerLinks1.map((link) => (
                 <li key={link.label}>
@@ -79,7 +79,7 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
             </ul>
           </div>
            <div className="lg:col-span-2">
-            <h3 className="font-headline font-bold text-foreground text-xl mb-6">Resources</h3>
+            <h3 className="font-headline font-bold text-muted-foreground text-xl mb-6">Resources</h3>
             <ul className="space-y-4">
               {footerLinks2.map((link) => (
                 <li key={link.label}>
@@ -92,7 +92,7 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
           </div>
 
           <div className="lg:col-span-4">
-              <h3 className="font-headline font-bold text-foreground text-xl mb-6">Subscribe</h3>
+              <h3 className="font-headline font-bold text-muted-foreground text-xl mb-6">Subscribe</h3>
               <p className="text-muted-foreground mb-4">Subscribe to our newsletter to get the latest updates.</p>
               <form className="flex gap-2">
                 <Input type="email" placeholder="Enter your email" className="bg-secondary focus:bg-background h-12"/>
