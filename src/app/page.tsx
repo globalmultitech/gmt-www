@@ -1,9 +1,10 @@
-import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones } from 'lucide-react';
+import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones, MonitorSmartphone, BarChart, Medal, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ServiceCard } from '@/components/service-card';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 const trustedByLogos = [
   { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-1.png', alt: 'Client Logo 1' },
@@ -12,6 +13,29 @@ const trustedByLogos = [
   { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-4.png', alt: 'Client Logo 4' },
   { src: 'https://templates.themekit.dev/execoore/wp-content/uploads/sites/11/2023/10/partner-light-5.png', alt: 'Client Logo 5' },
 ];
+
+const featureCards = [
+    {
+        icon: <MonitorSmartphone className="h-10 w-10 text-primary" />,
+        title: 'Smart softwares',
+        description: 'Duis aute irure dolor in repreherita ineto.',
+    },
+    {
+        icon: <BarChart className="h-10 w-10 text-primary" />,
+        title: 'Trusted security',
+        description: 'Lorem consectetur adipi elitsed tempono.',
+    },
+    {
+        icon: <Medal className="h-10 w-10 text-primary" />,
+        title: 'Awards winners',
+        description: 'Ariento mesfato prodo arte e eli manifesto.',
+    },
+    {
+        icon: <User className="h-10 w-10 text-primary" />,
+        title: 'Great experience',
+        description: 'Lorem consectetur adipiscing elitsed pro.',
+    },
+]
 
 const services = [
   {
@@ -103,7 +127,7 @@ export default function Home() {
               <Button asChild size="lg">
                 <Link href="/layanan">Our services</Link>
               </Button>
-               <Button asChild size="lg" variant="outline">
+               <Button asChild size="lg" variant="outline" className="border-foreground">
                 <Link href="/hubungi-kami">Contact us</Link>
               </Button>
             </div>
@@ -111,8 +135,25 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Feature Cards Section */}
+      <section className="bg-background">
+          <div className="container mx-auto px-4 relative z-10 -mt-20">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                  {featureCards.map((card, index) => (
+                      <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg">
+                          <div className="flex justify-center mb-6">
+                            {card.icon}
+                          </div>
+                          <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
+                          <p className="text-muted-foreground">{card.description}</p>
+                      </Card>
+                  ))}
+              </div>
+          </div>
+      </section>
+
       {/* Trusted By Section */}
-      <section className="py-16 bg-secondary">
+      <section className="pt-20 pb-16 bg-background">
         <div className="container mx-auto px-4">
           <h3 className="text-center font-semibold text-muted-foreground mb-8">Featured on</h3>
           <div className="flex flex-wrap justify-center items-center gap-x-12 sm:gap-x-16 gap-y-6">
@@ -124,7 +165,7 @@ export default function Home() {
       </section>
       
       {/* About Section */}
-      <section className="py-20 md:py-28 bg-background">
+      <section className="py-20 md:py-28 bg-secondary">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
              <div>
@@ -161,7 +202,7 @@ export default function Home() {
       </section>
 
        {/* Services Section */}
-      <section className="py-20 md:py-28 bg-secondary">
+      <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
                 <p className="font-semibold text-primary uppercase tracking-widest mb-2">What we do</p>
