@@ -63,8 +63,8 @@ type Props = {
 };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  // We only need basic category info for metadata, no need to include all products
-  const category = await prisma.productCategory.findUnique({ where: { slug: params.slug } });
+  const { slug } = params;
+  const category = await prisma.productCategory.findUnique({ where: { slug } });
 
   if (!category) {
     return {
@@ -95,7 +95,8 @@ const Breadcrumbs = ({ categoryName }: { categoryName: string }) => (
 
 
 export default async function CategoryProductPage({ params }: Props) {
-  const category = await getCategoryBySlug(params.slug);
+  const { slug } = params;
+  const category = await getCategoryBySlug(slug);
 
   if (!category) {
     notFound();
