@@ -9,29 +9,34 @@ import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
 async function getCategoryBySlug(slug: string) {
-  const category = await prisma.productCategory.findUnique({
+  // Step 1: Find the category itself first.
+  // We use findFirst because it's more flexible for complex queries than findUnique,
+  // although here we just need it for the slug.
+  const category = await prisma.productCategory.findFirst({
     where: { slug },
-    include: {
-      subCategories: {
-        include: {
-          products: {
-            orderBy: {
-              createdAt: 'asc',
-            },
-          },
-        },
+  });
+
+  if (!category) {
+    return null;
+  }
+
+  // Step 2: Find all products that belong to this category
+  // by matching the categoryId in their subCategory.
+  const products = await prisma.product.findMany({
+    where: {
+      subCategory: {
+        categoryId: category.id,
       },
+    },
+    orderBy: {
+      createdAt: 'asc',
     },
   });
 
-  if (!category) return null;
-
-  // Flatten products from all subcategories into a single array
-  const allProducts = category.subCategories.flatMap(sub => sub.products);
-
+  // Step 3: Combine the results.
   return {
     ...category,
-    products: allProducts,
+    products,
   };
 }
 
