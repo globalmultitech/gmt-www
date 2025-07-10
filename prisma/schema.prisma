@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -19,56 +19,56 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model WebSettings {
-  id            Int     @id @default(1)
-  logoUrl       String? @db.Text
-  companyName   String
-  whatsappSales String
-  footerText    String  @db.Text
-  socialMedia   Json
-  menuItems     Json
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model Product {
+  id               Int                 @id @default(autoincrement())
+  title            String              @unique
+  slug             String              @unique
+  description      String
+  longDescription  String?
+  images           Json?
+  features         Json?
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?
+  tokopediaUrl     String?
+  shopeeUrl        String?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  subCategory      ProductSubCategory  @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  Int
 }
 
 model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  slug          String               @unique
-  description   String?              @db.Text
-  imageUrl      String?              @db.Text
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
+  id             Int                  @id @default(autoincrement())
+  name           String               @unique
+  slug           String               @unique
+  description    String?
+  imageUrl       String?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  subCategories  ProductSubCategory[]
 }
 
 model ProductSubCategory {
-  id         Int      @id @default(autoincrement())
-  name       String
-  categoryId Int
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  products   Product[]
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id          Int      @id @default(autoincrement())
+  name        String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  Int
+  products    Product[]
 
   @@unique([name, categoryId])
 }
 
-model Product {
-  id               Int      @id @default(autoincrement())
-  title            String   @unique
-  slug             String   @unique
-  description      String   @db.Text
-  longDescription  String?  @db.Text
-  images           Json
-  features         Json
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?  @db.Text
-  tokopediaUrl     String?  @db.Text
-  shopeeUrl        String?  @db.Text
-  subCategoryId    Int
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Restrict)
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+model WebSettings {
+  id              Int      @id @default(1)
+  logoUrl         String?
+  companyName     String
+  whatsappSales   String
+  footerText      String
+  socialMedia     Json
+  menuItems       Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
