@@ -20,94 +20,81 @@ model User {
 }
 
 model WebSettings {
-  id                    Int     @id @default(1)
-  logoUrl               String?
-  companyName           String
-  whatsappSales         String
-  footerText            String
-  socialMedia           Json? // { twitter: string, facebook: string, ... }
-  menuItems             Json? // [{ label: string, href: string }]
-  
-  // Hero Section
-  heroHeadline          String?
-  heroDescription       String?
-  heroImageUrl          String?
-  heroButton1Text       String?
-  heroButton1Link       String?
-  heroButton2Text       String?
-  heroButton2Link       String?
-  
-  // Feature Cards
-  featureCards          Json? // [{ icon: string, title: string, description: string }]
-
-  // About Us Section
-  aboutUsSubtitle       String?
-  aboutUsTitle          String?
-  aboutUsDescription    String?
-  aboutUsImageUrl       String?
-  aboutUsChecklist      Json? // string[]
-
-  // Services Section
-  servicesSubtitle      String?
-  servicesTitle         String?
-  servicesDescription   String?
-  professionalServices  Json? // [{ icon: string, title: string, description: string, details: string[] }]
-
-  // CTA Section
-  ctaHeadline           String?
-  ctaDescription        String?
-  ctaImageUrl           String?
-  ctaButtonText         String?
-  ctaButtonLink         String?
-  trustedByText         String?
-  trustedByLogos        Json? // [{ src: string, alt: string }]
-
-  createdAt             DateTime @default(now())
-  updatedAt             DateTime @updatedAt
-}
-
-model Product {
-  id                Int      @id @default(autoincrement())
-  title             String
-  slug              String   @unique
-  description       String
-  longDescription   String?
-  images            Json     // string[]
-  features          Json     // string[]
-  specifications    Json?
-  metaTitle         String?
-  metaDescription   String?
-
-  tokopediaUrl      String?
-  shopeeUrl         String?
-  
-  subCategoryId     Int
-  subCategory       ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id                  Int      @id @default(1)
+  logoUrl             String?
+  companyName         String
+  whatsappSales       String
+  footerText          String
+  socialMedia         Json
+  menuItems           Json
+  heroHeadline        String?
+  heroDescription     String?
+  heroImageUrl        String?
+  heroButton1Text     String?
+  heroButton1Link     String?
+  heroButton2Text     String?
+  heroButton2Link     String?
+  featureCards        Json
+  aboutUsSubtitle     String?
+  aboutUsTitle        String?
+  aboutUsDescription  String?
+  aboutUsImageUrl     String?
+  aboutUsChecklist    Json
+  servicesSubtitle    String?
+  servicesTitle       String?
+  servicesDescription String?
+  professionalServices Json
+  ctaHeadline         String?
+  ctaDescription      String?
+  ctaImageUrl         String?
+  ctaButtonText       String?
+  ctaButtonLink       String?
+  trustedByText       String?
+  trustedByLogos      Json
+  testimonials        Json
+  blogPosts           Json
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 }
 
 model ProductCategory {
-  id             Int      @id @default(autoincrement())
-  name           String   @unique
+  id             Int                  @id @default(autoincrement())
+  name           String               @unique
   description    String?
   imageUrl       String?
   subCategories  ProductSubCategory[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
 }
 
 model ProductSubCategory {
   id          Int      @id @default(autoincrement())
   name        String
-  products    Product[]
-  
+  category    ProductCategory @relation(fields: [categoryId], references: [id])
   categoryId  Int
-  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  
+  products    Product[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   @@unique([name, categoryId])
+}
+
+
+model Product {
+  id               Int      @id @default(autoincrement())
+  title            String
+  slug             String   @unique
+  description      String
+  longDescription  String?
+  images           Json     @default("[]")
+  features         Json     @default("[]")
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?
+  tokopediaUrl     String?
+  shopeeUrl        String?
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  Int
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
