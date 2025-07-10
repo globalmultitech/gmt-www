@@ -122,10 +122,8 @@ export default async function ProductDetailPage({ params }: Props) {
 
               {/* Details Section */}
               <div className="flex flex-col">
-                <div className="mb-2">
-                  <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                  <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
-                </div>
+                <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
+                <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
                 
                 <div className="flex flex-wrap items-center gap-3 my-6">
                   <WhatsAppButton product={product} settings={settings} />
@@ -147,7 +145,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   )}
                 </div>
 
-                <Accordion type="multiple" collapsible className="w-full">
+                <Accordion type="multiple" className="w-full">
                    <AccordionItem value="item-desc">
                     <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                     <AccordionContent>
