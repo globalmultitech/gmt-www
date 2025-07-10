@@ -60,7 +60,23 @@ async function main() {
   const hardwareCategory = await prisma.productCategory.upsert({
     where: { name: 'Perangkat Keras' },
     update: {},
-    create: { name: 'Perangkat Keras' },
+    create: { 
+      name: 'Perangkat Keras',
+      slug: 'perangkat-keras',
+      description: 'Solusi perangkat keras inovatif untuk perbankan dan layanan keuangan, dirancang untuk keandalan dan efisiensi.',
+      imageUrl: 'https://placehold.co/600x400.png'
+    },
+  });
+
+  const softwareCategory = await prisma.productCategory.upsert({
+    where: { name: 'Perangkat Lunak' },
+    update: {},
+    create: { 
+      name: 'Perangkat Lunak',
+      slug: 'perangkat-lunak',
+      description: 'Aplikasi dan platform canggih untuk mengoptimalkan operasional, meningkatkan layanan, dan mendorong transformasi digital.',
+      imageUrl: 'https://placehold.co/600x400.png'
+    },
   });
 
   const kioskSubCategory = await prisma.productSubCategory.upsert({
@@ -165,12 +181,8 @@ async function main() {
 
   for (const productData of productsToSeed) {
     await prisma.product.upsert({
-      where: { title: productData.title },
-      update: {
-        ...productData,
-        // @ts-ignore
-        image: undefined // Remove old field if it exists
-      },
+      where: { slug: productData.slug },
+      update: productData,
       create: productData,
     });
     console.log(`Product "${productData.title}" seeded.`);

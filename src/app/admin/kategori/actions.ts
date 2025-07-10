@@ -22,16 +22,34 @@ export async function getCategoriesWithSubcategories() {
 // Category Actions
 const CategorySchema = z.object({
   name: z.string().min(1, 'Nama kategori tidak boleh kosong'),
+  slug: z.string().min(1, 'Slug tidak boleh kosong').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
 });
 
 export async function createCategory(prevState: { message: string } | undefined, formData: FormData) {
-  const validatedFields = CategorySchema.safeParse({ name: formData.get('name') });
-  if (!validatedFields.success) return { message: 'Input tidak valid.' };
+  const validatedFields = CategorySchema.safeParse({ 
+    name: formData.get('name'),
+    slug: formData.get('slug'),
+    description: formData.get('description'),
+    imageUrl: formData.get('imageUrl'),
+  });
+  if (!validatedFields.success) {
+    const error = validatedFields.error.flatten().fieldErrors;
+    const message = Object.values(error).flat()[0] || "Input tidak valid";
+    return { message };
+  }
 
   try {
-    await prisma.productCategory.create({ data: { name: validatedFields.data.name } });
+    const existingSlug = await prisma.productCategory.findUnique({ where: { slug: validatedFields.data.slug } });
+    if(existingSlug) {
+      return { message: 'Slug sudah digunakan oleh kategori lain.'}
+    }
+
+    await prisma.productCategory.create({ data: validatedFields.data });
     revalidatePath('/admin/kategori');
-    revalidatePath('/admin/produk');
+    revalidatePath('/produk');
+    revalidatePath('/produk/kategori', 'layout');
     return { message: 'Kategori berhasil dibuat.' };
   } catch (e) {
     return { message: 'Gagal membuat kategori.' };
@@ -40,13 +58,28 @@ export async function createCategory(prevState: { message: string } | undefined,
 
 export async function updateCategory(prevState: { message: string } | undefined, formData: FormData) {
   const id = Number(formData.get('id'));
-  const validatedFields = CategorySchema.safeParse({ name: formData.get('name') });
-  if (!validatedFields.success) return { message: 'Input tidak valid.' };
-
+  const validatedFields = CategorySchema.safeParse({ 
+    name: formData.get('name'),
+    slug: formData.get('slug'),
+    description: formData.get('description'),
+    imageUrl: formData.get('imageUrl'),
+  });
+  if (!validatedFields.success) {
+    const error = validatedFields.error.flatten().fieldErrors;
+    const message = Object.values(error).flat()[0] || "Input tidak valid";
+    return { message };
+  }
+  
   try {
-    await prisma.productCategory.update({ where: { id }, data: { name: validatedFields.data.name } });
+    const existingSlug = await prisma.productCategory.findFirst({ where: { slug: validatedFields.data.slug, id: { not: id } } });
+    if(existingSlug) {
+      return { message: 'Slug sudah digunakan oleh kategori lain.'}
+    }
+
+    await prisma.productCategory.update({ where: { id }, data: validatedFields.data });
     revalidatePath('/admin/kategori');
-     revalidatePath('/admin/produk');
+    revalidatePath('/produk');
+    revalidatePath('/produk/kategori', 'layout');
     return { message: 'Kategori berhasil diperbarui.' };
   } catch (e) {
     return { message: 'Gagal memperbarui kategori.' };
@@ -57,7 +90,8 @@ export async function deleteCategory(id: number) {
   try {
     await prisma.productCategory.delete({ where: { id } });
     revalidatePath('/admin/kategori');
-     revalidatePath('/admin/produk');
+    revalidatePath('/produk');
+    revalidatePath('/produk/kategori', 'layout');
     return { message: 'Kategori berhasil dihapus.' };
   } catch (e) {
     return { message: 'Gagal menghapus kategori. Pastikan tidak ada sub-kategori di dalamnya.' };
