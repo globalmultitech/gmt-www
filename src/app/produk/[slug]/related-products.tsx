@@ -14,19 +14,36 @@ import {
   CarouselPrevious,
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 
 type RelatedProductsProps = {
   products: Product[];
 };
 
 export default function RelatedProducts({ products }: RelatedProductsProps) {
-  const plugin = useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: true })
-  );
+  const [isClient, setIsClient] = useState(false);
+  const autoplayPlugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }));
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   if (products.length === 0) {
     return null;
+  }
+  
+  if (!isClient) {
+    // Return a static version or skeleton on the server to prevent hydration mismatch
+    return (
+        <section className="bg-secondary py-16 md:py-24">
+            <div className="container mx-auto px-4">
+                <h2 className="text-3xl font-headline font-bold mb-8 text-primary">Produk Unggulan Lainnya</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {/* Render static placeholders or skeletons */}
+                </div>
+            </div>
+        </section>
+    );
   }
 
   return (
@@ -39,9 +56,9 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
             loop: true,
             slidesToScroll: 1,
           }}
-          plugins={[plugin.current]}
-          onMouseEnter={plugin.current.stop}
-          onMouseLeave={plugin.current.reset}
+          plugins={[autoplayPlugin.current]}
+          onMouseEnter={autoplayPlugin.current.stop}
+          onMouseLeave={autoplayPlugin.current.reset}
           className="w-full"
         >
           <CarouselContent>
