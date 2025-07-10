@@ -73,7 +73,7 @@ export default function SolusiPage() {
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
-                    <div className="bg-secondary p-3 rounded-full">{solution.icon}</div>
+                    <div className="bg-primary/10 p-3 rounded-full">{solution.icon}</div>
                     <h2 className="text-3xl font-headline font-bold text-primary">{solution.title}</h2>
                   </div>
                   <p className="text-muted-foreground">{solution.description}</p>
@@ -99,8 +99,8 @@ export default function SolusiPage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Tim kami siap membantu merancang solusi kustom yang paling sesuai untuk tantangan bisnis Anda.
           </p>
-          <Link href="/hubungi-kami" className="inline-flex items-center justify-center h-12 px-8 rounded-md bg-primary text-primary-foreground font-bold shadow hover:bg-primary/90 transition-colors">
-              Diskusikan Proyek Anda <ArrowRight className="ml-2 h-5 w-5" />
+          <Link href="/hubungi-kami">
+            <Button size="lg">Diskusikan Proyek Anda <ArrowRight className="ml-2 h-5 w-5" /></Button>
           </Link>
         </div>
       </section>

@@ -38,7 +38,9 @@ export default function TentangKamiPage() {
           <div className="grid md:grid-cols-2 gap-12">
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Rocket className="h-8 w-8 text-accent"/>
+                <div className="bg-primary/10 p-3 rounded-full">
+                  <Rocket className="h-8 w-8 text-primary"/>
+                </div>
                 <h2 className="text-3xl font-headline font-bold text-primary">Misi Kami</h2>
               </div>
               <p className="text-muted-foreground text-lg">
@@ -47,7 +49,9 @@ export default function TentangKamiPage() {
             </div>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <Eye className="h-8 w-8 text-accent"/>
+                <div className="bg-primary/10 p-3 rounded-full">
+                  <Eye className="h-8 w-8 text-primary"/>
+                </div>
                 <h2 className="text-3xl font-headline font-bold text-primary">Visi Kami</h2>
               </div>
               <p className="text-muted-foreground text-lg">
@@ -75,7 +79,7 @@ export default function TentangKamiPage() {
                      <div className="h-4 w-4 rounded-full bg-primary ring-4 ring-secondary"></div>
                   </div>
                   <div className="md:w-5/12">
-                     <Card className="shadow-lg">
+                     <Card className="shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl">
                         <CardHeader>
                             <CardTitle className="font-headline text-accent text-2xl">{item.year}</CardTitle>
                             <p className="text-muted-foreground">{item.event}</p>

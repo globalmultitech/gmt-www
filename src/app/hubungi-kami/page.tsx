@@ -85,7 +85,7 @@ export default async function HubungiKamiPage() {
             <div className="md:col-span-5 lg:col-span-4 space-y-8">
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
-                  <div className="bg-primary text-primary-foreground p-3 rounded-full">
+                  <div className="bg-primary/10 text-primary p-3 rounded-full">
                     <Building className="h-6 w-6" />
                   </div>
                   <h3 className="font-headline text-2xl text-primary">Kantor Pusat</h3>
@@ -98,7 +98,7 @@ export default async function HubungiKamiPage() {
               </div>
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
-                  <div className="bg-primary text-primary-foreground p-3 rounded-full">
+                   <div className="bg-primary/10 text-primary p-3 rounded-full">
                     <Mail className="h-6 w-6" />
                   </div>
                   <h3 className="font-headline text-2xl text-primary">Email</h3>
@@ -109,7 +109,7 @@ export default async function HubungiKamiPage() {
               </div>
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
-                  <div className="bg-primary text-primary-foreground p-3 rounded-full">
+                  <div className="bg-primary/10 text-primary p-3 rounded-full">
                     <MessageSquare className="h-6 w-6" />
                   </div>
                   <h3 className="font-headline text-2xl text-primary">WhatsApp</h3>

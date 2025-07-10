@@ -2,6 +2,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Bot, Code2, Headphones, Layers, Handshake, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
 
 const services = [
   {
@@ -66,9 +67,9 @@ export default function LayananPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             {services.map((service) => (
-              <Card key={service.title} className="transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
+              <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="flex flex-row items-center gap-4">
-                  <div className="bg-secondary p-4 rounded-full">{service.icon}</div>
+                  <div className="bg-primary/10 p-4 rounded-full">{service.icon}</div>
                   <div>
                     <CardTitle className="font-headline text-2xl">{service.title}</CardTitle>
                     <CardDescription className="mt-1">{service.description}</CardDescription>
