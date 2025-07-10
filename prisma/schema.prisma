@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+  provider        = "prisma-client-js"
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -14,61 +14,65 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
+  name      String?
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  description   String?              @db.Text
-  imageUrl      String?
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
-  name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId Int
-  products   Product[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-
-  @@unique([name, categoryId])
+model WebSettings {
+  id             Int     @id @default(1)
+  logoUrl        String? @db.Text
+  companyName    String
+  whatsappSales  String
+  footerText     String  @db.Text
+  socialMedia    Json
+  menuItems      Json
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
 }
 
 model Product {
-  id               Int                @id @default(autoincrement())
-  title            String
-  slug             String             @unique
-  description      String             @db.Text
-  longDescription  String?            @db.Text
-  images           Json?              @default("[]")
-  features         Json?              @default("[]")
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?            @db.Text
-  tokopediaUrl     String?
-  shopeeUrl        String?
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId    Int
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  id              Int      @id @default(autoincrement())
+  title           String
+  slug            String   @unique
+  description     String   @db.Text
+  longDescription String?  @db.Text
+  images          Json     @default("[]")
+  features        Json
+  specifications  Json?
+  metaTitle       String?
+  metaDescription String?  @db.Text
+  tokopediaUrl    String?
+  shopeeUrl       String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId   Int
 }
 
-model WebSettings {
-  id            Int      @id @default(1)
-  logoUrl       String?
-  companyName   String
-  whatsappSales String
-  footerText    String   @db.Text
-  socialMedia   Json?
-  menuItems     Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+model ProductCategory {
+  id             Int      @id @default(autoincrement())
+  name           String   @unique
+  description    String?  @db.Text
+  imageUrl       String?  @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subCategories ProductSubCategory[]
+}
+
+model ProductSubCategory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  category    ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId  Int
+  
+  products    Product[]
+
+  @@unique([name, categoryId])
 }
