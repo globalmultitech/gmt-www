@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider        = "prisma-client-js"
-  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {
@@ -14,7 +14,7 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
+  name      String?
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -60,15 +60,15 @@ model Product {
   slug             String             @unique
   description      String             @db.Text
   longDescription  String?            @db.Text
-  images           Json?
-  features         Json?
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?            @db.Text
+  images           Json // Array of image URLs
+  features         Json // Array of strings
+  specifications   Json? // JSON object for key-value pairs
   tokopediaUrl     String?
   shopeeUrl        String?
+  metaTitle        String?
+  metaDescription  String?
   subCategoryId    Int
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Restrict)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 }
