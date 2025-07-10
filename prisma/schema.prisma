@@ -1,14 +1,14 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+}
+
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
-}
-
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 model User {
@@ -26,21 +26,21 @@ model WebSettings {
   companyName   String
   whatsappSales String
   footerText    String
-  socialMedia   Json
-  menuItems     Json
+  socialMedia   Json?
+  menuItems     Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
-  name          String
+  name          String               @unique
   slug          String               @unique
   description   String?              @db.Text
   imageUrl      String?
+  subCategories ProductSubCategory[]
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
-  subCategories ProductSubCategory[]
 }
 
 model ProductSubCategory {
@@ -59,17 +59,17 @@ model Product {
   id               Int                @id @default(autoincrement())
   title            String
   slug             String             @unique
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId  Int
   description      String             @db.Text
   longDescription  String?            @db.Text
-  images           Json?              @default("[]")
-  features         Json
+  images           Json?
+  features         Json?
   specifications   Json?
   metaTitle        String?
   metaDescription  String?
   tokopediaUrl     String?
   shopeeUrl        String?
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId    Int
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
 }
