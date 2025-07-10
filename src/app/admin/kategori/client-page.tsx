@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useActionState, useEffect, useTransition } from 'react';
@@ -20,6 +21,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -123,6 +125,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
           closeDialog();
         }
       }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [state]);
     return formAction;
   };

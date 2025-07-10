@@ -7,8 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Image as ImageIcon } from 'lucide-react';
-import type { WebSettings } from '@/lib/settings';
+import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
+import type { WebSettings, MenuItem } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -104,6 +104,23 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     ctaImageUrl: settings.ctaImageUrl ?? '',
   });
 
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? []);
+
+  const handleMenuChange = (index: number, field: 'label' | 'href', value: string) => {
+    const newMenuItems = [...menuItems];
+    newMenuItems[index][field] = value;
+    setMenuItems(newMenuItems);
+  };
+
+  const addMenuItem = () => {
+    setMenuItems([...menuItems, { label: '', href: '' }]);
+  };
+
+  const removeMenuItem = (index: number) => {
+    const newMenuItems = menuItems.filter((_, i) => i !== index);
+    setMenuItems(newMenuItems);
+  };
+
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
@@ -162,6 +179,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <input type="hidden" name="heroImageUrl" value={imageUrls.heroImageUrl} />
         <input type="hidden" name="aboutUsImageUrl" value={imageUrls.aboutUsImageUrl} />
         <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
+        <input type="hidden" name="menuItems" value={JSON.stringify(menuItems)} />
 
         {/* Card: Informasi Umum */}
         <Card>
@@ -174,6 +192,46 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
               <div className="space-y-2"><Label htmlFor="footerText">Teks di Footer</Label><Textarea id="footerText" name="footerText" defaultValue={settings.footerText} required /></div>
             </div>
           </CardContent>
+        </Card>
+
+        {/* Card: Menu Navigasi */}
+        <Card className="mt-6">
+            <CardHeader>
+                <CardTitle>Menu Navigasi</CardTitle>
+                <CardDescription>Atur item yang muncul di menu navigasi utama.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+                {menuItems.map((item, index) => (
+                    <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
+                        <div className="grid grid-cols-2 gap-2 flex-grow">
+                            <div className="space-y-1">
+                                <Label htmlFor={`menu-label-${index}`} className="text-xs">Label</Label>
+                                <Input
+                                    id={`menu-label-${index}`}
+                                    value={item.label}
+                                    onChange={(e) => handleMenuChange(index, 'label', e.target.value)}
+                                    placeholder="Beranda"
+                                />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor={`menu-href-${index}`} className="text-xs">Tautan (Href)</Label>
+                                <Input
+                                    id={`menu-href-${index}`}
+                                    value={item.href}
+                                    onChange={(e) => handleMenuChange(index, 'href', e.target.value)}
+                                    placeholder="/"
+                                />
+                            </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeMenuItem(index)} className="text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ))}
+                <Button type="button" variant="outline" onClick={addMenuItem}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Item Menu
+                </Button>
+            </CardContent>
         </Card>
         
         {/* Card: Hero Section */}
@@ -196,53 +254,25 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
           </CardContent>
         </Card>
 
-        {/* Card: About Us Section */}
-        <Card className="mt-6">
-            <CardHeader><CardTitle>About Us Section</CardTitle></CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-6">
-                <ImageUploader fieldId="aboutus-image-upload" fieldName="aboutUsImageUrl" label="Gambar About Us" imageUrl={imageUrls.aboutUsImageUrl} altText="About Us Preview" isUploading={isUploading} onFileChange={handleFileChange} />
-                <div className="space-y-4">
-                    <div className="space-y-2"><Label htmlFor="aboutUsSubtitle">Sub-judul</Label><Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} /></div>
-                    <div className="space-y-2"><Label htmlFor="aboutUsTitle">Judul</Label><Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} /></div>
-                    <div className="space-y-2"><Label htmlFor="aboutUsDescription">Deskripsi</Label><Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} /></div>
-                </div>
-            </CardContent>
-        </Card>
-
-        {/* Card: CTA Section */}
-        <Card className="mt-6">
-            <CardHeader><CardTitle>Call-to-Action (CTA) Section</CardTitle></CardHeader>
-            <CardContent className="grid md:grid-cols-2 gap-6">
-                <ImageUploader fieldId="cta-image-upload" fieldName="ctaImageUrl" label="Gambar Latar CTA" imageUrl={imageUrls.ctaImageUrl} altText="CTA Preview" isUploading={isUploading} onFileChange={handleFileChange} />
-                <div className="space-y-4">
-                    <div className="space-y-2"><Label htmlFor="ctaHeadline">Judul CTA</Label><Input id="ctaHeadline" name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} /></div>
-                    <div className="space-y-2"><Label htmlFor="ctaDescription">Deskripsi CTA</Label><Textarea id="ctaDescription" name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} /></div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2"><Label htmlFor="ctaButtonText">Teks Tombol CTA</Label><Input id="ctaButtonText" name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} /></div>
-                        <div className="space-y-2"><Label htmlFor="ctaButtonLink">Link Tombol CTA</Label><Input id="ctaButtonLink" name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} /></div>
-                    </div>
-                    <div className="space-y-2"><Label htmlFor="trustedByText">Teks "Trusted By"</Label><Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} /></div>
-                </div>
-            </CardContent>
-        </Card>
-        
-        {/* Card: Pengaturan Lanjutan (JSON) */}
-        <Card className="mt-6">
-            <CardHeader>
-                <CardTitle>Pengaturan Lanjutan (Format JSON)</CardTitle>
-                <CardDescription>Ubah data JSON di bawah ini untuk mengatur menu, kartu fitur, layanan, testimoni, dll. Harap berhati-hati.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <JsonTextarea id="menuItems" name="menuItems" label="Menu Navigasi" defaultValue={getJsonString(settings.menuItems, [])} />
-                <JsonTextarea id="featureCards" name="featureCards" label="Kartu Fitur" defaultValue={getJsonString(settings.featureCards, [])} description="Gunakan nama ikon dari lucide.dev" />
-                <JsonTextarea id="aboutUsChecklist" name="aboutUsChecklist" label="Checklist About Us" defaultValue={getJsonString(settings.aboutUsChecklist, [])} />
-                <JsonTextarea id="professionalServices" name="professionalServices" label="Layanan Profesional" defaultValue={getJsonString(settings.professionalServices, [])} />
-                <JsonTextarea id="trustedByLogos" name="trustedByLogos" label="Logo Mitra" defaultValue={getJsonString(settings.trustedByLogos, [])} />
-                <JsonTextarea id="testimonials" name="testimonials" label="Testimoni" defaultValue={getJsonString(settings.testimonials, [])} />
-                <JsonTextarea id="blogPosts" name="blogPosts" label="Postingan Blog" defaultValue={getJsonString(settings.blogPosts, [])} />
-                <JsonTextarea id="socialMedia" name="socialMedia" label="Link Sosial Media" defaultValue={getJsonString(settings.socialMedia, {})} />
-            </CardContent>
-        </Card>
+        {/* JSON textareas for other fields - these can be replaced with forms later */}
+        <textarea name="socialMedia" defaultValue={getJsonString(settings.socialMedia, {})} className="hidden" />
+        <textarea name="featureCards" defaultValue={getJsonString(settings.featureCards, [])} className="hidden" />
+        <textarea name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} className="hidden" />
+        <textarea name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} className="hidden" />
+        <textarea name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} className="hidden" />
+        <textarea name="aboutUsChecklist" defaultValue={getJsonString(settings.aboutUsChecklist, [])} className="hidden" />
+        <textarea name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} className="hidden" />
+        <textarea name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} className="hidden" />
+        <textarea name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} className="hidden" />
+        <textarea name="professionalServices" defaultValue={getJsonString(settings.professionalServices, [])} className="hidden" />
+        <textarea name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} className="hidden" />
+        <textarea name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} className="hidden" />
+        <textarea name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} className="hidden" />
+        <textarea name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} className="hidden" />
+        <textarea name="trustedByText" defaultValue={settings.trustedByText ?? ''} className="hidden" />
+        <textarea name="trustedByLogos" defaultValue={getJsonString(settings.trustedByLogos, [])} className="hidden" />
+        <textarea name="testimonials" defaultValue={getJsonString(settings.testimonials, [])} className="hidden" />
+        <textarea name="blogPosts" defaultValue={getJsonString(settings.blogPosts, [])} className="hidden" />
 
         <div className="mt-8 flex justify-end">
           <SubmitButton />
