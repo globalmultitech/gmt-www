@@ -1,14 +1,19 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider      = "prisma-client-js"
+  // Recommended for serverless environments like Vercel
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
+  // Use the pooled URL for querying, which is essential for serverless environments.
+  url      = env("DATABASE_URL_POOL")
 }
 
 model User {
@@ -21,7 +26,7 @@ model User {
 }
 
 model WebSettings {
-  id            Int      @id @default(1)
+  id            Int     @id @default(1)
   logoUrl       String?
   companyName   String
   whatsappSales String
@@ -56,20 +61,20 @@ model ProductSubCategory {
 }
 
 model Product {
-  id               Int                @id @default(autoincrement())
+  id               Int                 @id @default(autoincrement())
   title            String
-  slug             String             @unique
+  slug             String              @unique
   description      String
   longDescription  String?
-  images           Json
-  features         Json
-  specifications   Json?
+  images           Json                @default("[]") // Store image URLs as a JSON array
+  features         Json                @default("[]") // Store features as a JSON array
+  specifications   Json?                              // Store specs as a JSON object
   metaTitle        String?
   metaDescription  String?
   tokopediaUrl     String?
   shopeeUrl        String?
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId  Int
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
+  subCategoryId    Int?
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
 }
