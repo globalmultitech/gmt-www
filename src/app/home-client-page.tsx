@@ -30,7 +30,6 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
         className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" 
         style={{backgroundImage: `url('${settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}')`}}
         >
-        <div className="absolute inset-0 bg-white/50"></div>
         <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (

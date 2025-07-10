@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, MenuItem } from '@/lib/settings';
+import type { WebSettings, MenuItem, SocialMediaLinks } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,13 +18,11 @@ import Image from 'next/image';
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="w-48">
+    <Button type="submit" disabled={pending} className="w-48 sticky bottom-8">
       {pending ? <Loader2 className="animate-spin" /> : 'Simpan Perubahan'}
     </Button>
   );
 }
-
-// ========== Komponen Baru untuk Logika yang Lebih Bersih ==========
 
 type ImageUrls = {
   logoUrl: string;
@@ -70,28 +68,6 @@ function ImageUploader({ fieldId, fieldName, label, imageUrl, altText, isUploadi
   );
 }
 
-type JsonTextareaProps = {
-  id: string;
-  name: string;
-  label: string;
-  defaultValue: string;
-  rows?: number;
-  description?: string;
-};
-
-function JsonTextarea({ id, name, label, defaultValue, rows = 8, description }: JsonTextareaProps) {
-    return (
-        <div className="space-y-2">
-            <Label htmlFor={id}>{label}</Label>
-            <Textarea id={id} name={name} rows={rows} defaultValue={defaultValue} />
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
-        </div>
-    );
-}
-
-
-// ========== Komponen Utama yang Ditulis Ulang ==========
-
 export default function SettingsClientPage({ settings }: { settings: WebSettings }) {
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateWebSettings, undefined);
@@ -105,6 +81,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   });
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? []);
+  const [socialLinks, setSocialLinks] = useState<SocialMediaLinks>(settings.socialMedia ?? {});
 
   const handleMenuChange = (index: number, field: 'label' | 'href', value: string) => {
     const newMenuItems = [...menuItems];
@@ -112,14 +89,13 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     setMenuItems(newMenuItems);
   };
 
-  const addMenuItem = () => {
-    setMenuItems([...menuItems, { label: '', href: '' }]);
+  const addMenuItem = () => setMenuItems([...menuItems, { label: '', href: '' }]);
+  const removeMenuItem = (index: number) => setMenuItems(menuItems.filter((_, i) => i !== index));
+  
+  const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => {
+    setSocialLinks(prev => ({ ...prev, [platform]: value }));
   };
 
-  const removeMenuItem = (index: number) => {
-    const newMenuItems = menuItems.filter((_, i) => i !== index);
-    setMenuItems(newMenuItems);
-  };
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -173,13 +149,22 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <p className="text-muted-foreground">Kelola semua konten dinamis yang tampil di website Anda dari sini.</p>
       </div>
 
-      <form action={formAction}>
-        {/* Hidden inputs untuk menyimpan URL gambar */}
+      <form action={formAction} className="space-y-6">
+        {/* Hidden inputs untuk menyimpan URL gambar & data JSON */}
         <input type="hidden" name="logoUrl" value={imageUrls.logoUrl} />
         <input type="hidden" name="heroImageUrl" value={imageUrls.heroImageUrl} />
         <input type="hidden" name="aboutUsImageUrl" value={imageUrls.aboutUsImageUrl} />
         <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
         <input type="hidden" name="menuItems" value={JSON.stringify(menuItems)} />
+        <input type="hidden" name="socialMedia" value={JSON.stringify(socialLinks)} />
+
+        {/* These textareas will be replaced with proper forms in the future */}
+        <textarea name="featureCards" defaultValue={getJsonString(settings.featureCards, [])} className="hidden" />
+        <textarea name="aboutUsChecklist" defaultValue={getJsonString(settings.aboutUsChecklist, [])} className="hidden" />
+        <textarea name="professionalServices" defaultValue={getJsonString(settings.professionalServices, [])} className="hidden" />
+        <textarea name="trustedByLogos" defaultValue={getJsonString(settings.trustedByLogos, [])} className="hidden" />
+        <textarea name="testimonials" defaultValue={getJsonString(settings.testimonials, [])} className="hidden" />
+        <textarea name="blogPosts" defaultValue={getJsonString(settings.blogPosts, [])} className="hidden" />
 
         {/* Card: Informasi Umum */}
         <Card>
@@ -193,37 +178,45 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
             </div>
           </CardContent>
         </Card>
+        
+        {/* Social Media Links */}
+        <Card>
+            <CardHeader><CardTitle>Link Sosial Media</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {(['twitter', 'facebook', 'instagram', 'linkedin'] as const).map(platform => (
+                    <div className="space-y-1" key={platform}>
+                        <Label htmlFor={`social-${platform}`} className="capitalize">{platform}</Label>
+                        <Input
+                            id={`social-${platform}`}
+                            value={socialLinks[platform] || ''}
+                            onChange={(e) => handleSocialChange(platform, e.target.value)}
+                            placeholder={`https://${platform}.com/nama_akun`}
+                        />
+                    </div>
+                ))}
+            </CardContent>
+        </Card>
 
         {/* Card: Menu Navigasi */}
-        <Card className="mt-6">
+        <Card>
             <CardHeader>
                 <CardTitle>Menu Navigasi</CardTitle>
                 <CardDescription>Atur item yang muncul di menu navigasi utama.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
                 {menuItems.map((item, index) => (
-                    <div key={index} className="flex items-center gap-2 p-2 border rounded-md">
+                    <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                         <div className="grid grid-cols-2 gap-2 flex-grow">
                             <div className="space-y-1">
                                 <Label htmlFor={`menu-label-${index}`} className="text-xs">Label</Label>
-                                <Input
-                                    id={`menu-label-${index}`}
-                                    value={item.label}
-                                    onChange={(e) => handleMenuChange(index, 'label', e.target.value)}
-                                    placeholder="Beranda"
-                                />
+                                <Input id={`menu-label-${index}`} value={item.label} onChange={(e) => handleMenuChange(index, 'label', e.target.value)} placeholder="Beranda" />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor={`menu-href-${index}`} className="text-xs">Tautan (Href)</Label>
-                                <Input
-                                    id={`menu-href-${index}`}
-                                    value={item.href}
-                                    onChange={(e) => handleMenuChange(index, 'href', e.target.value)}
-                                    placeholder="/"
-                                />
+                                <Input id={`menu-href-${index}`} value={item.href} onChange={(e) => handleMenuChange(index, 'href', e.target.value)} placeholder="/" />
                             </div>
                         </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeMenuItem(index)} className="text-destructive">
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeMenuItem(index)} className="text-destructive h-9 w-9">
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
@@ -235,7 +228,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         </Card>
         
         {/* Card: Hero Section */}
-        <Card className="mt-6">
+        <Card>
           <CardHeader><CardTitle>Hero Section</CardTitle><CardDescription>Atur tampilan utama di halaman depan.</CardDescription></CardHeader>
           <CardContent className="grid md:grid-cols-2 gap-6">
             <ImageUploader fieldId="hero-image-upload" fieldName="heroImageUrl" label="Gambar Latar Hero" imageUrl={imageUrls.heroImageUrl} altText="Hero Preview" isUploading={isUploading} onFileChange={handleFileChange} />
@@ -254,25 +247,56 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
           </CardContent>
         </Card>
 
-        {/* JSON textareas for other fields - these can be replaced with forms later */}
-        <textarea name="socialMedia" defaultValue={getJsonString(settings.socialMedia, {})} className="hidden" />
-        <textarea name="featureCards" defaultValue={getJsonString(settings.featureCards, [])} className="hidden" />
-        <textarea name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} className="hidden" />
-        <textarea name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} className="hidden" />
-        <textarea name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} className="hidden" />
-        <textarea name="aboutUsChecklist" defaultValue={getJsonString(settings.aboutUsChecklist, [])} className="hidden" />
-        <textarea name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} className="hidden" />
-        <textarea name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} className="hidden" />
-        <textarea name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} className="hidden" />
-        <textarea name="professionalServices" defaultValue={getJsonString(settings.professionalServices, [])} className="hidden" />
-        <textarea name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} className="hidden" />
-        <textarea name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} className="hidden" />
-        <textarea name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} className="hidden" />
-        <textarea name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} className="hidden" />
-        <textarea name="trustedByText" defaultValue={settings.trustedByText ?? ''} className="hidden" />
-        <textarea name="trustedByLogos" defaultValue={getJsonString(settings.trustedByLogos, [])} className="hidden" />
-        <textarea name="testimonials" defaultValue={getJsonString(settings.testimonials, [])} className="hidden" />
-        <textarea name="blogPosts" defaultValue={getJsonString(settings.blogPosts, [])} className="hidden" />
+        {/* About Us Section */}
+        <Card>
+            <CardHeader><CardTitle>About Us Section</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-2 gap-6">
+                 <ImageUploader fieldId="about-us-image-upload" fieldName="aboutUsImageUrl" label="Gambar About Us" imageUrl={imageUrls.aboutUsImageUrl} altText="About Us Preview" isUploading={isUploading} onFileChange={handleFileChange} />
+                <div className="space-y-4">
+                    <div className="space-y-2"><Label htmlFor="aboutUsSubtitle">Subjudul</Label><Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} /></div>
+                    <div className="space-y-2"><Label htmlFor="aboutUsTitle">Judul</Label><Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} /></div>
+                    <div className="space-y-2"><Label htmlFor="aboutUsDescription">Deskripsi</Label><Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} /></div>
+                </div>
+            </CardContent>
+        </Card>
+
+        {/* Services Section */}
+        <Card>
+            <CardHeader><CardTitle>Services Section</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} /></div>
+                <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} /></div>
+                <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Textarea id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} /></div>
+            </CardContent>
+        </Card>
+
+        {/* CTA Section */}
+        <Card>
+            <CardHeader><CardTitle>CTA Section</CardTitle></CardHeader>
+            <CardContent className="grid md:grid-cols-2 gap-6">
+                <ImageUploader fieldId="cta-image-upload" fieldName="ctaImageUrl" label="Gambar CTA" imageUrl={imageUrls.ctaImageUrl} altText="CTA Preview" isUploading={isUploading} onFileChange={handleFileChange} />
+                <div className="space-y-4">
+                    <div className="space-y-2"><Label htmlFor="ctaHeadline">Headline</Label><Input id="ctaHeadline" name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} /></div>
+                    <div className="space-y-2"><Label htmlFor="ctaDescription">Deskripsi</Label><Textarea id="ctaDescription" name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} /></div>
+                    <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2"><Label htmlFor="ctaButtonText">Teks Tombol</Label><Input id="ctaButtonText" name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} /></div>
+                        <div className="space-y-2"><Label htmlFor="ctaButtonLink">Link Tombol</Label><Input id="ctaButtonLink" name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} /></div>
+                    </div>
+                </div>
+            </CardContent>
+        </Card>
+
+        {/* Trusted By Section */}
+         <Card>
+            <CardHeader><CardTitle>Trusted By Section</CardTitle></CardHeader>
+            <CardContent>
+                <div className="space-y-2">
+                    <Label htmlFor="trustedByText">Teks</Label>
+                    <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} />
+                    <p className="text-xs text-muted-foreground pt-2">Untuk logo, silakan edit melalui Textarea JSON di paling bawah halaman ini (sementara).</p>
+                </div>
+            </CardContent>
+        </Card>
 
         <div className="mt-8 flex justify-end">
           <SubmitButton />
