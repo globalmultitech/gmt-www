@@ -19,9 +19,9 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
 const defaultSettings: WebSettings = {
   id: 1,
   logoUrl: null,
-  companyName: 'Global Multi Technology',
+  companyName: 'Daltech',
   whatsappSales: '+6281234567890',
-  footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',
+  footerText: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses succeed.',
   socialMedia: {
     twitter: '#',
     facebook: '#',
@@ -35,6 +35,7 @@ const defaultSettings: WebSettings = {
     { label: 'Layanan', href: '/layanan' },
     { label: 'Resources', href: '/resources' },
     { label: 'Tentang Kami', href: '/tentang-kami' },
+    { label: 'Hubungi Kami', href: '/hubungi-kami' },
   ],
   createdAt: new Date(),
   updatedAt: new Date(),

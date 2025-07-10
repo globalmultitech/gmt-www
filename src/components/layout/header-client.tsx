@@ -4,57 +4,97 @@ import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { Menu, ArrowRight } from 'lucide-react';
+import { Menu, ArrowRight, MapPin, Mail, Phone, Facebook, Twitter, Instagram, Linkedin } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { ThemeToggle } from '../theme-toggle';
-import type { MenuItem } from '@/lib/settings';
+import type { MenuItem, SocialMediaLinks } from '@/lib/settings';
 
 type HeaderClientProps = {
     navItems: MenuItem[];
     companyName: string;
     logoUrl?: string | null;
+    socialLinksData: SocialMediaLinks;
 }
 
-export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientProps) {
+export function HeaderClient({ navItems, companyName, logoUrl, socialLinksData }: HeaderClientProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
+      setIsScrolled(window.scrollY > 80);
     };
     window.addEventListener('scroll', handleScroll);
+    handleScroll(); // check on initial render
     return () => {
       window.removeEventListener('scroll', handleScroll);
     };
   }, []);
+  
+  const socialIcons = {
+    twitter: <Twitter className="h-4 w-4" />,
+    facebook: <Facebook className="h-4 w-4" />,
+    instagram: <Instagram className="h-4 w-4" />,
+    linkedin: <Linkedin className="h-4 w-4" />,
+  };
+
+  const socialLinks = Object.entries(socialLinksData)
+    .map(([key, href]) => {
+        const platform = key as keyof typeof socialIcons;
+        if (socialIcons[platform]) {
+            return { icon: socialIcons[platform], href, platform };
+        }
+        return null;
+    })
+    .filter(Boolean);
 
   return (
     <header className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-secondary/80 backdrop-blur-sm shadow-md py-2' : 'bg-transparent py-4'
+        isScrolled ? 'bg-background/80 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       )}>
-      <div className="container">
-        <div className={cn(
-            "flex h-16 items-center justify-between px-4 sm:px-6 transition-all duration-300",
-            !isScrolled && 'bg-card dark:bg-secondary text-card-foreground rounded-full shadow-2xl',
-            isScrolled && 'bg-transparent rounded-none shadow-none'
-        )}>
+      {/* Top Bar */}
+      <div className={cn(
+        "bg-secondary/50 dark:bg-secondary/20 transition-all duration-300",
+        isScrolled ? 'max-h-0 py-0 opacity-0 overflow-hidden' : 'max-h-20 py-2 opacity-100'
+      )}>
+        <div className="container mx-auto px-4 flex justify-between items-center text-sm">
+          <div className="flex items-center gap-6 text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <MapPin className="h-4 w-4 text-primary"/>
+              <span>Jl. Teknologi Raya, Jakarta</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Mail className="h-4 w-4 text-primary"/>
+              <span>contact@gmt.co.id</span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 text-muted-foreground">
+            {socialLinks.map((social) => (
+              <Link key={social!.platform} href={social!.href} className="hover:text-primary">
+                {social!.icon}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Main Navigation */}
+      <div className="container mx-auto px-4">
+        <div className="flex h-20 items-center justify-between">
           <Logo companyName={companyName} logoUrl={logoUrl} />
 
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <nav className="hidden lg:flex items-center space-x-8 text-base font-semibold">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'transition-colors hover:text-primary uppercase tracking-wider',
-                  !isScrolled 
-                    ? (pathname === item.href ? 'text-primary' : 'text-card-foreground hover:text-primary') 
-                    : (pathname === item.href ? 'text-primary font-semibold' : 'text-foreground')
+                  'transition-colors hover:text-primary',
+                  pathname === item.href ? 'text-primary' : 'text-foreground'
                 )}
               >
                 {item.label}
@@ -62,18 +102,27 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
             ))}
           </nav>
 
-          <div className="hidden md:flex items-center space-x-2">
-            <ThemeToggle />
-            <Button asChild className="font-bold text-primary-foreground bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 transition-all duration-300 transform hover:scale-105 rounded-full">
+          <div className="hidden lg:flex items-center space-x-4">
+            <div className="flex items-center gap-3">
+                <div className="bg-primary/10 p-3 rounded-full">
+                    <Phone className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                    <p className="text-sm text-muted-foreground">Call Us</p>
+                    <p className="font-bold">+62 812 3456 7890</p>
+                </div>
+            </div>
+            <Button asChild>
               <Link href="/hubungi-kami">
-                Hubungi Kami <ArrowRight className="ml-2 h-4 w-4" />
+                Get a Quote <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu */}
-          <div className="md:hidden flex items-center gap-2">
-             <ThemeToggle />
+          <div className="lg:hidden flex items-center gap-2">
+            <ThemeToggle />
             <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon">
@@ -102,11 +151,8 @@ export function HeaderClient({ navItems, companyName, logoUrl }: HeaderClientPro
                     ))}
                   </nav>
                   <div className="mt-auto p-4 space-y-4 border-t">
-                    <Button asChild className="w-full font-bold text-primary-foreground bg-gradient-to-r from-primary to-accent">
-                      <Link href="/hubungi-kami" onClick={() => setIsMobileMenuOpen(false)}>Hubungi Kami</Link>
-                    </Button>
-                     <Button asChild variant="outline" className="w-full">
-                      <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>Admin Login</Link>
+                    <Button asChild className="w-full font-bold">
+                      <Link href="/hubungi-kami" onClick={() => setIsMobileMenuOpen(false)}>Get a Quote</Link>
                     </Button>
                   </div>
                 </div>
