@@ -23,8 +23,6 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   
-  const phoneNumber = whatsappNumber.replace(/^\+62/, '0');
-
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
@@ -41,14 +39,14 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   return (
     <header className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-background shadow-md' : 'bg-transparent'
+        isScrolled ? 'bg-primary/90 backdrop-blur-sm shadow-lg' : 'bg-transparent'
       )}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
             
             {/* Logo */}
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={!isScrolled} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={true} />
             </div>
 
             {/* Desktop Navigation */}
@@ -59,8 +57,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'relative transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:origin-center after:scale-x-0 after:bg-primary after:transition-transform hover:after:scale-x-100',
-                        pathname === item.href ? 'text-primary' : (isScrolled ? 'text-foreground' : 'text-white'),
+                        'relative transition-colors after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:origin-center after:scale-x-0 after:bg-primary-foreground after:transition-transform hover:text-white hover:after:scale-x-100',
+                        pathname === item.href ? 'text-white font-bold' : 'text-primary-foreground/90',
                         isScrolled && pathname === item.href && 'after:scale-x-100'
                       )}
                   >
@@ -72,7 +70,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
 
             {/* Right Side Actions - Desktop */}
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild>
+                <Button asChild variant="secondary">
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
             </div>
@@ -81,7 +79,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn('hover:bg-primary-foreground/10', isScrolled ? 'text-foreground' : 'text-white')}>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-white/10 text-white')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
@@ -89,7 +87,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                 <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background text-foreground p-0">
                     <div className="flex flex-col h-full">
                     <div className="p-4 border-b">
-                        <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={false} />
+                        <Logo companyName={companyName} logoUrl={logoUrl} />
                     </div>
                     <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
                         {navItems.map((item) => (
