@@ -57,24 +57,33 @@ const services = [
   },
 ];
 
-const projects = [
+const newServices = [
     {
         image: 'https://placehold.co/600x400.png',
-        aiHint: 'data analytics dashboard',
-        category: 'Data Security',
-        title: 'Network Security',
+        aiHint: 'professional man portrait',
+        title: 'Security audit',
+        price: '$50',
+        type: 'Software',
+        client: 'Private',
+        description: 'Excepteur sint occaecat cupidatat non proidento in culpa qui officia deserunt mollit anim id est laborum.',
     },
     {
         image: 'https://placehold.co/600x400.png',
-        aiHint: 'cloud infrastructure diagram',
-        category: 'Cloud',
-        title: 'Cloud Integration',
+        aiHint: 'team meeting collaboration',
+        title: 'Performance checks',
+        price: '$80',
+        type: 'App',
+        client: 'Private',
+        description: 'Excepteur sint occaecat cupidatat non proidento in culpa qui officia deserunt mollit anim id est laborum.',
     },
     {
         image: 'https://placehold.co/600x400.png',
-        aiHint: 'mobile app interface',
-        category: 'Development',
-        title: 'App Development',
+        aiHint: 'business people laptop',
+        title: 'Vulnerability report',
+        price: '$50',
+        type: 'App',
+        client: 'Business',
+        description: 'Excepteur sint occaecat cupidatat non proidento in culpa qui officia deserunt mollit anim id est laborum.',
     },
 ];
 
@@ -242,24 +251,41 @@ export default function Home() {
         </div>
       </section>
       
-       {/* Projects Section */}
+       {/* Services Section */}
       <section className="py-20 md:py-28 bg-dark-slate">
           <div className="container mx-auto px-4">
-              <div className="text-center max-w-3xl mx-auto mb-16">
-                  <p className="font-semibold text-primary uppercase tracking-widest mb-2">Our projects</p>
-                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold">Our latest case studies</h2>
+              <div className="flex justify-between items-center mb-12">
+                <div>
+                  <p className="font-semibold text-primary uppercase tracking-widest mb-2">OUR SERVICES</p>
+                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold">Core Technology services</h2>
+                </div>
+                <Link href="/layanan" className="font-semibold text-foreground hover:text-primary flex items-center gap-2">
+                    All services <ArrowRight className="h-4 w-4" />
+                </Link>
               </div>
               <div className="grid md:grid-cols-3 gap-8">
-                  {projects.map((project, index) => (
-                      <div key={index} className="group relative overflow-hidden rounded-lg">
-                          <Image src={project.image} alt={project.title} width={400} height={400} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={project.aiHint}/>
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                          <div className="absolute bottom-0 left-0 p-6 text-white">
-                              <p className="text-primary font-semibold text-sm">{project.category}</p>
-
-                              <h3 className="text-2xl font-bold font-headline mt-1 transition-colors group-hover:text-primary">
-                                <Link href="#">{project.title}</Link>
-                              </h3>
+                  {newServices.map((service, index) => (
+                      <div key={index} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+                          <div className="relative h-56">
+                            <Image src={service.image} alt={service.title} fill className="object-cover" data-ai-hint={service.aiHint}/>
+                          </div>
+                          <div className="p-6">
+                            <h3 className="text-xl font-bold font-headline mb-4 text-primary group-hover:text-primary-dark transition-colors">{service.title}</h3>
+                            <div className="grid grid-cols-3 gap-4 text-sm mb-4 border-b pb-4">
+                                <div>
+                                    <p className="text-muted-foreground text-xs uppercase font-semibold">PRICE</p>
+                                    <p className="font-bold">{service.price}</p>
+                                </div>
+                                <div>
+                                    <p className="text-muted-foreground text-xs uppercase font-semibold">TYPE</p>
+                                    <p className="font-bold">{service.type}</p>
+                                </div>
+                                <div>
+                                    <p className="text-muted-foreground text-xs uppercase font-semibold">CLIENT</p>
+                                    <p className="font-bold">{service.client}</p>
+                                </div>
+                            </div>
+                            <p className="text-muted-foreground text-sm">{service.description}</p>
                           </div>
                       </div>
                   ))}
