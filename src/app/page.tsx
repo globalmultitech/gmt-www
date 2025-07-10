@@ -1,11 +1,11 @@
 
-import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones, MonitorSmartphone, BarChart, Medal, User } from 'lucide-react';
+import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones, MonitorSmartphone, BarChart, Medal, User, Bot, Layers } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { ServiceCard } from '@/components/service-card';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 const featureCards = [
     {
@@ -30,30 +30,50 @@ const featureCards = [
     },
 ]
 
-const services = [
+const layananKami = [
   {
-    icon: <Cpu size={32} />,
-    title: 'IT-Management',
-    description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
-    href: '/layanan',
+    icon: <Headphones className="h-8 w-8 text-primary" />,
+    title: 'Layanan Purna Jual',
+    description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal. Tim kami siap membantu mengatasi setiap kendala.',
+    details: [
+      'Dukungan teknis on-site dan remote.',
+      'Kontrak pemeliharaan preventif.',
+      'Ketersediaan suku cadang asli.',
+      'Layanan perbaikan perangkat keras.',
+    ],
   },
   {
-    icon: <ShieldCheck size={32} />,
-    title: 'Data Security',
-    description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
-    href: '/layanan',
+    icon: <Layers className="h-8 w-8 text-primary" />,
+    title: 'Integrasi Sistem',
+    description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien. Kami ahli dalam mengintegrasikan sistem yang berbeda untuk kelancaran alur kerja.',
+    details: [
+      'Integrasi dengan Core Banking System.',
+      'Penyatuan platform hardware dan software.',
+      'Pengembangan API kustom.',
+      'Sinkronisasi data antar sistem.',
+    ],
   },
   {
-    icon: <Code2 size={32} />,
-    title: 'Web Development',
-    description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
-    href: '/layanan',
+    icon: <Code2 className="h-8 w-8 text-primary" />,
+    title: 'Pengembangan Perangkat Lunak',
+    description: 'Butuh solusi yang tidak tersedia di pasaran? Tim pengembang kami siap merancang dan membangun perangkat lunak kustom yang sesuai dengan kebutuhan unik bisnis Anda.',
+    details: [
+      'Analisis kebutuhan dan desain sistem.',
+      'Pengembangan aplikasi web dan mobile.',
+      'Jaminan kualitas dan pengujian menyeluruh.',
+      'Dukungan dan pengembangan berkelanjutan.',
+    ],
   },
   {
-    icon: <Headphones size={32} />,
-    title: 'IT Support',
-    description: 'We provide to you the best choices for you. Adjust it to your needs and make sure you undergo.',
-    href: '/layanan',
+    icon: <Bot className="h-8 w-8 text-primary" />,
+    title: 'Penyewaan atau Outsourcing',
+    description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Layanan penyewaan dan outsourcing kami memberikan fleksibilitas untuk pertumbuhan bisnis Anda.',
+    details: [
+      'Opsi sewa perangkat keras (kiosk, dll).',
+      'Pengelolaan operasional IT oleh tim kami.',
+      'Skalabilitas sesuai kebutuhan.',
+      'Fokus pada bisnis inti Anda, serahkan IT pada kami.',
+    ],
   },
 ];
 
@@ -203,15 +223,36 @@ export default function Home() {
        {/* Services Section */}
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-16">
-                <p className="font-semibold text-primary uppercase tracking-widest mb-2">What we do</p>
-                <h2 className="text-4xl md:text-5xl font-headline font-extrabold">We provide the best services for you</h2>
-            </div>
-           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {services.map((service, index) => (
-                <ServiceCard key={index} {...service} />
+          <div className="text-center max-w-3xl mx-auto mb-16">
+            <p className="font-semibold text-primary uppercase tracking-widest mb-2">What we do</p>
+            <h2 className="text-4xl md:text-5xl font-headline font-extrabold">Layanan Profesional Kami</h2>
+            <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+              Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.
+            </p>
+          </div>
+           <div className="grid md:grid-cols-2 gap-8">
+            {layananKami.map((service) => (
+              <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                <CardHeader className="flex flex-row items-center gap-4">
+                  <div className="bg-primary/10 p-4 rounded-full">{service.icon}</div>
+                  <div>
+                    <CardTitle className="font-headline text-2xl">{service.title}</CardTitle>
+                    <CardDescription className="mt-1">{service.description}</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 pt-4 border-t">
+                    {service.details.map((detail, index) => (
+                      <li key={index} className="flex items-start gap-3">
+                        <Handshake className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{detail}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
             ))}
-           </div>
+          </div>
         </div>
       </section>
       
