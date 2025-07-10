@@ -56,6 +56,18 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
+  // Services section fields
+  servicesSubtitle: z.string().optional(),
+  servicesTitle: z.string().optional(),
+  servicesDescription: z.string().optional(),
+  professionalServices: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk layanan profesional tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
 export async function getWebSettings() {
@@ -83,6 +95,10 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     aboutUsDescription: formData.get('aboutUsDescription'),
     aboutUsImageUrl: formData.get('aboutUsImageUrl'),
     aboutUsChecklist: formData.get('aboutUsChecklist'),
+    servicesSubtitle: formData.get('servicesSubtitle'),
+    servicesTitle: formData.get('servicesTitle'),
+    servicesDescription: formData.get('servicesDescription'),
+    professionalServices: formData.get('professionalServices'),
   });
 
   if (!validatedFields.success) {

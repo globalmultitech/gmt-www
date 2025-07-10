@@ -92,6 +92,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const menuItemsJSON = getJsonString(settings.menuItems, []);
   const featureCardsJSON = getJsonString(settings.featureCards, []);
   const aboutUsChecklistJSON = getJsonString(settings.aboutUsChecklist, []);
+  const professionalServicesJSON = getJsonString(settings.professionalServices, []);
 
   return (
     <div>
@@ -195,6 +196,32 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <Label htmlFor="aboutUsChecklist">Poin Checklist (JSON)</Label>
                 <Textarea id="aboutUsChecklist" name="aboutUsChecklist" rows={6} defaultValue={aboutUsChecklistJSON} placeholder='[\n  "Poin pertama",\n  "Poin kedua"\n]' />
                 <p className="text-xs text-muted-foreground">Masukkan daftar poin dalam format array JSON.</p>
+            </div>
+          </CardContent>
+        </Card>
+        
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Services Section</CardTitle>
+            <CardDescription>Atur konten untuk bagian layanan di halaman utama.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+             <div className="space-y-2">
+              <Label htmlFor="servicesSubtitle">Sub-judul Layanan</Label>
+              <Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} placeholder="WHAT WE DO" />
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="servicesTitle">Judul Layanan</Label>
+              <Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} placeholder="Layanan Profesional Kami"/>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="servicesDescription">Deskripsi Layanan</Label>
+              <Textarea id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} />
+            </div>
+            <div className="space-y-2">
+                <Label htmlFor="professionalServices">Konten Kartu Layanan (JSON)</Label>
+                <Textarea id="professionalServices" name="professionalServices" rows={12} defaultValue={professionalServicesJSON} />
+                <p className="text-xs text-muted-foreground">Masukkan daftar layanan dalam format array JSON. Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
             </div>
           </CardContent>
         </Card>

@@ -89,6 +89,55 @@ async function main() {
         "Bespoke software solutions",
         "Human-centered design",
         "Cloud-native architecture",
+      ],
+      servicesSubtitle: 'WHAT WE DO',
+      servicesTitle: 'Layanan Profesional Kami',
+      servicesDescription: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.',
+      professionalServices: [
+        {
+          icon: 'Headphones',
+          title: 'Layanan Purna Jual',
+          description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal. Tim kami siap membantu mengatasi setiap kendala.',
+          details: [
+            'Dukungan teknis on-site dan remote.',
+            'Kontrak pemeliharaan preventif.',
+            'Ketersediaan suku cadang asli.',
+            'Layanan perbaikan perangkat keras.',
+          ],
+        },
+        {
+          icon: 'Layers',
+          title: 'Integrasi Sistem',
+          description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien. Kami ahli dalam mengintegrasikan sistem yang berbeda untuk kelancaran alur kerja.',
+          details: [
+            'Integrasi dengan Core Banking System.',
+            'Penyatuan platform hardware dan software.',
+            'Pengembangan API kustom.',
+            'Sinkronisasi data antar sistem.',
+          ],
+        },
+        {
+          icon: 'Code2',
+          title: 'Pengembangan Perangkat Lunak',
+          description: 'Butuh solusi yang tidak tersedia di pasaran? Tim pengembang kami siap merancang dan membangun perangkat lunak kustom yang sesuai dengan kebutuhan unik bisnis Anda.',
+          details: [
+            'Analisis kebutuhan dan desain sistem.',
+            'Pengembangan aplikasi web dan mobile.',
+            'Jaminan kualitas dan pengujian menyeluruh.',
+            'Dukungan dan pengembangan berkelanjutan.',
+          ],
+        },
+        {
+          icon: 'Bot',
+          title: 'Penyewaan atau Outsourcing',
+          description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Layanan penyewaan dan outsourcing kami memberikan fleksibilitas untuk pertumbuhan bisnis Anda.',
+          details: [
+            'Opsi sewa perangkat keras (kiosk, dll).',
+            'Pengelolaan operasional IT oleh tim kami.',
+            'Skalabilitas sesuai kebutuhan.',
+            'Fokus pada bisnis inti Anda, serahkan IT pada kami.',
+          ],
+        },
       ]
     },
   });
