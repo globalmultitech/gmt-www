@@ -35,6 +35,7 @@ export default async function Home() {
         className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" 
         style={{backgroundImage: `url('${settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}')`}}
         >
+        <div className="absolute inset-0 bg-black/30"></div>
         <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (
@@ -70,7 +71,10 @@ export default async function Home() {
                   {settings.featureCards.map((card: FeatureCard, index: number) => (
                       <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                           <div className="flex justify-center mb-6">
-                            <DynamicIcon name={card.icon} className="h-10 w-10 text-primary" />
+                            <DynamicIcon 
+                              name={card.icon} 
+                              className={`h-10 w-10 ${card.icon === 'User' ? 'text-sky-blue' : 'text-primary'}`} 
+                            />
                           </div>
                           <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
                           <p className="text-muted-foreground">{card.description}</p>
