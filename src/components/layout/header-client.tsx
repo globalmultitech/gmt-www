@@ -29,7 +29,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll(); // Call on mount to set initial state
+    handleScroll(); // Panggil saat mount untuk mengatur state awal
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
@@ -39,17 +39,15 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   return (
     <header className={cn(
         "sticky top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-background shadow-md' : 'bg-transparent'
+        isScrolled ? 'bg-primary/90 backdrop-blur-sm shadow-md' : 'bg-transparent'
       )}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
             
-            {/* Logo */}
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} forceWhiteText={isScrolled} />
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden lg:flex justify-center flex-1">
               <nav className="flex items-center space-x-8 text-base font-medium">
                   {navItems.map((item) => (
@@ -57,8 +55,9 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'transition-colors text-foreground hover:text-primary',
-                        pathname === item.href && 'text-primary font-bold'
+                        'transition-colors',
+                        isScrolled ? 'text-primary-foreground hover:text-primary-foreground/80' : 'text-foreground hover:text-primary',
+                        pathname === item.href && (isScrolled ? 'font-bold' : 'text-primary font-bold')
                       )}
                   >
                       {item.label}
@@ -67,18 +66,16 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
               </nav>
             </div>
 
-            {/* Right Side Actions - Desktop */}
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild variant="secondary">
+                <Button asChild variant={isScrolled ? 'secondary' : 'default'}>
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
             </div>
 
-            {/* Mobile Menu Trigger */}
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn('hover:bg-primary/10 text-foreground')}>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-primary/10', isScrolled ? 'text-primary-foreground' : 'text-foreground')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>
