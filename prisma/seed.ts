@@ -153,6 +153,29 @@ async function main() {
           { src: '/logo-placeholder-5.svg', alt: 'Client Logo 5' },
           { src: '/logo-placeholder-6.svg', alt: 'Client Logo 6' },
       ],
+      testimonials: [
+        {
+            quote: "We've been using Daltech for a few years now, and we're very happy with the results. They're a great team to work with, and they're always willing to go the extra mile to help us succeed.",
+            name: 'John Doe',
+            role: 'CEO, Company',
+            image: 'https://placehold.co/100x100.png',
+            aiHint: 'professional man portrait',
+        },
+        {
+            quote: "The team at Daltech is incredibly talented and passionate about what they do. They took the time to understand our business and our goals, and they delivered a solution that exceeded our expectations.",
+            name: 'Jane Smith',
+            role: 'CTO, Another Corp',
+            image: 'https://placehold.co/100x100.png',
+            aiHint: 'professional woman portrait',
+        },
+        {
+            quote: "Daltech's data security services are top-notch. They helped us identify and mitigate a number of potential vulnerabilities, and we're now confident that our data is safe and secure.",
+            name: 'Peter Jones',
+            role: 'Head of IT, Tech Inc.',
+            image: 'https://placehold.co/100x100.png',
+            aiHint: 'smiling man portrait',
+        },
+      ]
     },
   });
   console.log('Web settings seeded.');

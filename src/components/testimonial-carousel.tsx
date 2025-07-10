@@ -13,30 +13,7 @@ import {
 import Autoplay from 'embla-carousel-autoplay';
 import { Quote, Star } from 'lucide-react';
 import { Skeleton } from './ui/skeleton';
-
-const testimonials = [
-    {
-        quote: "We've been using Daltech for a few years now, and we're very happy with the results. They're a great team to work with, and they're always willing to go the extra mile to help us succeed.",
-        name: 'John Doe',
-        role: 'CEO, Company',
-        image: 'https://placehold.co/100x100.png',
-        aiHint: 'professional man portrait',
-    },
-    {
-        quote: "The team at Daltech is incredibly talented and passionate about what they do. They took the time to understand our business and our goals, and they delivered a solution that exceeded our expectations.",
-        name: 'Jane Smith',
-        role: 'CTO, Another Corp',
-        image: 'https://placehold.co/100x100.png',
-        aiHint: 'professional woman portrait',
-    },
-    {
-        quote: "Daltech's data security services are top-notch. They helped us identify and mitigate a number of potential vulnerabilities, and we're now confident that our data is safe and secure.",
-        name: 'Peter Jones',
-        role: 'Head of IT, Tech Inc.',
-        image: 'https://placehold.co/100x100.png',
-        aiHint: 'smiling man portrait',
-    },
-];
+import type { Testimonial } from '@/lib/settings';
 
 function TestimonialSkeleton() {
     return (
@@ -62,7 +39,7 @@ function TestimonialSkeleton() {
     )
 }
 
-export function TestimonialCarousel() {
+export function TestimonialCarousel({ testimonials }: { testimonials: Testimonial[] }) {
   const [isClient, setIsClient] = useState(false);
   const plugin = useRef(
     Autoplay({ delay: 6000, stopOnInteraction: true })
@@ -74,6 +51,14 @@ export function TestimonialCarousel() {
 
   if (!isClient) {
     return <TestimonialSkeleton />;
+  }
+
+  if (!testimonials || testimonials.length === 0) {
+    return (
+        <div className="text-center py-12 text-muted-foreground">
+            <p>Belum ada testimoni untuk ditampilkan.</p>
+        </div>
+    );
   }
 
   return (
@@ -100,12 +85,12 @@ export function TestimonialCarousel() {
                         </div>
                         <div className="relative hidden lg:block">
                             <Image 
-                                src={'https://placehold.co/600x400.png'}
+                                src={testimonial.image || 'https://placehold.co/600x400.png'}
                                 alt={testimonial.name}
                                 width={600}
                                 height={400}
                                 className="rounded-lg shadow-lg"
-                                data-ai-hint={testimonial.aiHint}
+                                data-ai-hint={testimonial.aiHint || 'person'}
                             />
                              <div className="absolute -top-4 -left-4 bg-primary p-4 rounded-full text-white z-10">
                                 <Quote className="h-8 w-8" />

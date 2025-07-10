@@ -28,7 +28,15 @@ export type TrustedByLogo = {
   alt: string;
 };
 
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos'> {
+export type Testimonial = {
+    quote: string;
+    name: string;
+    role: string;
+    image: string;
+    aiHint?: string;
+};
+
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos' | 'testimonials'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
@@ -56,6 +64,7 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   ctaButtonLink: string | null;
   trustedByText: string | null;
   trustedByLogos: TrustedByLogo[] | any; // any to accommodate prisma json type
+  testimonials: Testimonial[] | any;
 }
 
 const defaultSettings: WebSettings = {
@@ -177,6 +186,22 @@ const defaultSettings: WebSettings = {
     { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
     { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
   ],
+  testimonials: [
+    {
+        quote: "We've been using Daltech for a few years now, and we're very happy with the results. They're a great team to work with, and they're always willing to go the extra mile to help us succeed.",
+        name: 'John Doe',
+        role: 'CEO, Company',
+        image: 'https://placehold.co/100x100.png',
+        aiHint: 'professional man portrait',
+    },
+    {
+        quote: "The team at Daltech is incredibly talented and passionate about what they do. They took the time to understand our business and our goals, and they delivered a solution that exceeded our expectations.",
+        name: 'Jane Smith',
+        role: 'CTO, Another Corp',
+        image: 'https://placehold.co/100x100.png',
+        aiHint: 'professional woman portrait',
+    },
+  ],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -201,6 +226,7 @@ export async function getSettings(): Promise<WebSettings> {
             aboutUsChecklist: (settingsFromDb.aboutUsChecklist as string[]) ?? defaultSettings.aboutUsChecklist,
             professionalServices: (settingsFromDb.professionalServices as ProfessionalService[] | null) ?? defaultSettings.professionalServices,
             trustedByLogos: (settingsFromDb.trustedByLogos as TrustedByLogo[] | null) ?? defaultSettings.trustedByLogos,
+            testimonials: (settingsFromDb.testimonials as Testimonial[] | null) ?? defaultSettings.testimonials,
         };
 
     } catch (error) {

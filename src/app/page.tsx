@@ -213,7 +213,7 @@ export default async function Home() {
       {/* Testimonial Section */}
       <section className="py-20 md:py-28 bg-background">
         <div className="container mx-auto px-4">
-           <TestimonialCarousel />
+           <TestimonialCarousel testimonials={settings.testimonials} />
         </div>
       </section>
       

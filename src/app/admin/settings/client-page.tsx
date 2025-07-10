@@ -95,6 +95,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const aboutUsChecklistJSON = getJsonString(settings.aboutUsChecklist, []);
   const professionalServicesJSON = getJsonString(settings.professionalServices, []);
   const trustedByLogosJSON = getJsonString(settings.trustedByLogos, []);
+  const testimonialsJSON = getJsonString(settings.testimonials, []);
 
   return (
     <div>
@@ -277,6 +278,20 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <Label htmlFor="trustedByLogos">Logo Mitra (JSON)</Label>
                 <Textarea id="trustedByLogos" name="trustedByLogos" rows={8} defaultValue={trustedByLogosJSON} />
                 <p className="text-xs text-muted-foreground">Masukkan daftar logo dalam format array JSON. Contoh: `[{"src": "/url/logo.svg", "alt": "Nama Logo"}]`</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Testimonials Section</CardTitle>
+            <CardDescription>Atur konten untuk bagian testimoni di halaman utama.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="testimonials">Konten Testimoni (JSON)</Label>
+                <Textarea id="testimonials" name="testimonials" rows={12} defaultValue={testimonialsJSON} />
+                <p className="text-xs text-muted-foreground">Masukkan daftar testimoni dalam format array JSON.</p>
             </div>
           </CardContent>
         </Card>

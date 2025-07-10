@@ -83,6 +83,15 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
+  // Testimonials
+  testimonials: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk testimonial tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
 export async function getWebSettings() {
@@ -121,6 +130,7 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     ctaButtonLink: formData.get('ctaButtonLink'),
     trustedByText: formData.get('trustedByText'),
     trustedByLogos: formData.get('trustedByLogos'),
+    testimonials: formData.get('testimonials'),
   });
 
   if (!validatedFields.success) {
