@@ -102,6 +102,15 @@ const blogPosts = [
     },
 ];
 
+const trustedByLogos = [
+    { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
+    { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
+    { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
+    { src: '/logo-placeholder-4.svg', alt: 'Client Logo 4' },
+    { src: '/logo-placeholder-5.svg', alt: 'Client Logo 5' },
+    { src: '/logo-placeholder-6.svg', alt: 'Client Logo 6' },
+];
+
 export default function Home() {
   return (
     <div className="flex flex-col bg-background text-foreground">
@@ -198,13 +207,31 @@ export default function Home() {
       </section>
       
        {/* CTA Section */}
-      <section className="py-20 md:py-24 bg-primary text-primary-foreground">
-        <div className="container mx-auto px-4 text-center">
-            <h2 className="text-3xl md:text-5xl font-headline font-extrabold mb-4">Let's build something great together</h2>
-            <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-8">Ready to start a project? We are here to help you.</p>
-            <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-              <Link href="/hubungi-kami">Get a Free Quote</Link>
-            </Button>
+       <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}}>
+        <div className="absolute inset-0 bg-primary/90"></div>
+        <div className="relative container mx-auto px-4 text-primary-foreground">
+          <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
+            <div className="lg:w-2/3">
+              <h2 className="text-3xl md:text-4xl font-headline font-extrabold">Ready to take your business to the next level?</h2>
+              <p className="mt-2 text-lg text-primary-foreground/80">Let's discuss how our IT solutions can help you achieve your goals.</p>
+            </div>
+            <div className="flex-shrink-0">
+              <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                <Link href="/hubungi-kami">Get Started Now</Link>
+              </Button>
+            </div>
+          </div>
+          <div className="mt-12 border-t border-primary-foreground/20 pt-8">
+             <h3 className="text-center font-semibold uppercase tracking-widest mb-6">Trusted by the world's leading companies</h3>
+             <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
+                {trustedByLogos.map((logo, index) => (
+                   <div key={index} className="relative h-9 w-32 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
+                       {/* This is a placeholder for a real SVG logo */}
+                       <svg className="w-full h-full text-white" fill="currentColor" viewBox="0 0 100 30"><text x="50" y="20" fontSize="12" textAnchor="middle">LOGO</text></svg>
+                   </div>
+                ))}
+             </div>
+          </div>
         </div>
       </section>
       
