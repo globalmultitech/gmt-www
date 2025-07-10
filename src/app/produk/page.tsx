@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
 import { ArrowRight, Package } from 'lucide-react';
@@ -13,6 +12,14 @@ async function getCategories() {
       name: 'asc',
     },
   });
+}
+
+const toSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // remove special chars
+    .replace(/\s+/g, '-')           // replace spaces with -
+    .replace(/-+/g, '-');          // replace multiple - with single -
 }
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -48,7 +55,7 @@ export default async function ProdukPage() {
           {categories.length > 0 ? (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {categories.map((category) => (
-                  <Link key={category.id} href={`/produk/kategori/${category.slug}`} className="group block">
+                  <Link key={category.id} href={`/produk/kategori/${toSlug(category.name)}`} className="group block">
                      <Card className="flex flex-col h-full overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                         <div className="relative h-56 w-full">
                            {category.imageUrl ? (

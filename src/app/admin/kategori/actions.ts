@@ -22,7 +22,6 @@ export async function getCategoriesWithSubcategories() {
 // Category Actions
 const CategorySchema = z.object({
   name: z.string().min(1, 'Nama kategori tidak boleh kosong'),
-  slug: z.string().min(1, 'Slug tidak boleh kosong').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
 });
@@ -30,7 +29,6 @@ const CategorySchema = z.object({
 export async function createCategory(prevState: { message: string } | undefined, formData: FormData) {
   const validatedFields = CategorySchema.safeParse({ 
     name: formData.get('name'),
-    slug: formData.get('slug'),
     description: formData.get('description'),
     imageUrl: formData.get('imageUrl'),
   });
@@ -41,9 +39,9 @@ export async function createCategory(prevState: { message: string } | undefined,
   }
 
   try {
-    const existingSlug = await prisma.productCategory.findUnique({ where: { slug: validatedFields.data.slug } });
-    if(existingSlug) {
-      return { message: 'Slug sudah digunakan oleh kategori lain.'}
+    const existingName = await prisma.productCategory.findUnique({ where: { name: validatedFields.data.name } });
+    if(existingName) {
+      return { message: 'Nama kategori sudah digunakan.'}
     }
 
     await prisma.productCategory.create({ data: validatedFields.data });
@@ -60,7 +58,6 @@ export async function updateCategory(prevState: { message: string } | undefined,
   const id = Number(formData.get('id'));
   const validatedFields = CategorySchema.safeParse({ 
     name: formData.get('name'),
-    slug: formData.get('slug'),
     description: formData.get('description'),
     imageUrl: formData.get('imageUrl'),
   });
@@ -71,9 +68,9 @@ export async function updateCategory(prevState: { message: string } | undefined,
   }
   
   try {
-    const existingSlug = await prisma.productCategory.findFirst({ where: { slug: validatedFields.data.slug, id: { not: id } } });
-    if(existingSlug) {
-      return { message: 'Slug sudah digunakan oleh kategori lain.'}
+    const existingName = await prisma.productCategory.findFirst({ where: { name: validatedFields.data.name, id: { not: id } } });
+    if(existingName) {
+      return { message: 'Nama kategori sudah digunakan.'}
     }
 
     await prisma.productCategory.update({ where: { id }, data: validatedFields.data });

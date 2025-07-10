@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Home, ChevronRight, CheckCircle, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -8,29 +7,33 @@ import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
 
-// Fungsi ini memberitahu Next.js halaman dinamis mana yang harus dibuat saat build
+const toSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // remove special chars
+    .replace(/\s+/g, '-')           // replace spaces with -
+    .replace(/-+/g, '-');          // replace multiple - with single -
+}
+
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
-    select: { slug: true },
+    select: { name: true },
   });
  
   return categories.map((category) => ({
-    slug: category.slug,
+    slug: toSlug(category.name),
   }));
 }
 
-
 async function getCategoryBySlug(slug: string) {
-  // Step 1: Find the category itself.
-  const category = await prisma.productCategory.findUnique({
-    where: { slug },
-  });
+  // Find the category by its name, converted to a slug format
+  const categories = await prisma.productCategory.findMany();
+  const category = categories.find(c => toSlug(c.name) === slug);
 
   if (!category) {
     return null;
   }
 
-  // Step 2: Get all sub-category IDs belonging to this main category.
   const subCategories = await prisma.productSubCategory.findMany({
       where: { categoryId: category.id },
       select: { id: true },
@@ -38,7 +41,6 @@ async function getCategoryBySlug(slug: string) {
   
   const subCategoryIds = subCategories.map(sc => sc.id);
 
-  // Step 3: Find all products that belong to any of those sub-categories.
   const products = await prisma.product.findMany({
     where: {
       subCategoryId: {
@@ -50,7 +52,6 @@ async function getCategoryBySlug(slug: string) {
     },
   });
 
-  // Step 4: Combine the results.
   return {
     ...category,
     products,
@@ -64,7 +65,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = params;
-  const category = await prisma.productCategory.findUnique({ where: { slug } });
+  const categories = await prisma.productCategory.findMany();
+  const category = categories.find(c => toSlug(c.name) === slug);
 
   if (!category) {
     return {

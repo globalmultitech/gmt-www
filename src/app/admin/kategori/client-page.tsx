@@ -49,15 +49,6 @@ function SubmitButton({ children }: { children: React.ReactNode }) {
   );
 }
 
-const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // remove special chars
-      .replace(/\s+/g, '-')           // replace spaces with -
-      .replace(/-+/g, '-');          // replace multiple - with single -
-}
-
-
 export default function CategoryManagementClientPage({ categories }: { categories: CategoryWithSubCategories[] }) {
   const { toast } = useToast();
 
@@ -68,14 +59,6 @@ export default function CategoryManagementClientPage({ categories }: { categorie
   
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
-  const [categoryName, setCategoryName] = useState('');
-  const [slug, setSlug] = useState('');
-
-  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newName = e.target.value;
-    setCategoryName(newName);
-    setSlug(generateSlug(newName));
-  }
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -116,19 +99,14 @@ export default function CategoryManagementClientPage({ categories }: { categorie
     }
   };
 
-
   const closeDialog = () => {
     setDialogState({ mode: null });
     setImageUrl('');
-    setCategoryName('');
-    setSlug('');
   }
   
   const openEditDialog = (category: ProductCategory) => {
     setDialogState({ mode: 'editCategory', data: category });
     setImageUrl(category.imageUrl || '');
-    setCategoryName(category.name);
-    setSlug(category.slug);
   }
 
   const useFormActionWithToast = (action: any, modeToClose: typeof dialogState.mode) => {
@@ -272,17 +250,11 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-2 gap-4">
-                          <div className="space-y-1">
-                            <Label htmlFor="name">Nama Kategori</Label>
-                            <Input id="name" name="name" required value={categoryName} onChange={handleNameChange} />
-                          </div>
-                          <div className="space-y-1">
-                            <Label htmlFor="slug">Slug</Label>
-                            <Input id="slug" name="slug" required value={slug} onChange={(e) => setSlug(e.target.value)} />
-                          </div>
+                        <div className="space-y-1">
+                          <Label htmlFor="name">Nama Kategori</Label>
+                          <Input id="name" name="name" required defaultValue={(dialogState.data as ProductCategory)?.name ?? ''} />
                         </div>
-
+                        
                         <div className="space-y-1">
                           <Label htmlFor="description">Deskripsi</Label>
                           <Textarea id="description" name="description" defaultValue={(dialogState.data as ProductCategory)?.description ?? ''} />
