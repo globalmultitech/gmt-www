@@ -50,6 +50,7 @@ async function main() {
         { label: 'Layanan', href: '/layanan' },
         { label: 'Resources', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
+        { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ],
     },
   });
@@ -58,8 +59,32 @@ async function main() {
   console.log('Seeding categories and sub-categories...');
   const hardwareCategory = await prisma.productCategory.upsert({
     where: { name: 'Perangkat Keras' },
-    update: {},
-    create: { name: 'Perangkat Keras' },
+    update: {
+        slug: 'perangkat-keras',
+        description: 'Solusi perangkat keras inovatif untuk perbankan dan layanan keuangan, dirancang untuk keandalan dan efisiensi.',
+        imageUrl: 'https://placehold.co/600x400.png'
+    },
+    create: { 
+      name: 'Perangkat Keras',
+      slug: 'perangkat-keras',
+      description: 'Solusi perangkat keras inovatif untuk perbankan dan layanan keuangan, dirancang untuk keandalan dan efisiensi.',
+      imageUrl: 'https://placehold.co/600x400.png'
+    },
+  });
+
+  const softwareCategory = await prisma.productCategory.upsert({
+    where: { name: 'Perangkat Lunak' },
+    update: {
+        slug: 'perangkat-lunak',
+        description: 'Aplikasi dan platform canggih untuk mengoptimalkan operasional, meningkatkan layanan, dan mendorong transformasi digital.',
+        imageUrl: 'https://placehold.co/600x400.png'
+    },
+    create: { 
+      name: 'Perangkat Lunak',
+      slug: 'perangkat-lunak',
+      description: 'Aplikasi dan platform canggih untuk mengoptimalkan operasional, meningkatkan layanan, dan mendorong transformasi digital.',
+      imageUrl: 'https://placehold.co/600x400.png'
+    },
   });
 
   const kioskSubCategory = await prisma.productSubCategory.upsert({
@@ -89,7 +114,7 @@ async function main() {
       slug: 'digital-kiosk-gmt-k1',
       description: 'Solusi layanan mandiri interaktif untuk perbankan modern. Meningkatkan efisiensi dan pengalaman nasabah.',
       longDescription: 'Digital Kiosk GMT-K1 merupakan terobosan dalam layanan perbankan mandiri. Dirancang dengan desain yang elegan dan futuristik, kiosk ini memungkinkan nasabah untuk melakukan berbagai transaksi tanpa perlu antri di teller, mulai dari pembukaan rekening, transfer, hingga pembayaran tagihan. Dibangun dengan material berkualitas tinggi dan sistem keamanan berlapis, GMT-K1 adalah investasi cerdas untuk modernisasi cabang bank Anda.',
-      image: '',
+      images: [],
       features: [
         "Layar sentuh 21.5 inci Full HD responsif",
         "Dilengkapi NFC dan QR Code Reader terintegrasi",
@@ -107,6 +132,8 @@ async function main() {
       },
       metaTitle: 'Jual Digital Kiosk GMT-K1 | Solusi Perbankan Modern',
       metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.',
+      tokopediaUrl: '',
+      shopeeUrl: '',
       subCategoryId: kioskSubCategory.id,
     },
     {
@@ -114,7 +141,7 @@ async function main() {
       slug: 'smartq-queue-system',
       description: 'Sistem antrian cerdas yang mengurangi waktu tunggu dan mengoptimalkan alur layanan pelanggan di cabang.',
       longDescription: 'Tinggalkan sistem antrian konvensional dan beralih ke SmartQ. Solusi manajemen antrian kami tidak hanya mengatur alur nasabah, tetapi juga mengumpulkan data berharga untuk analisis performa layanan. Nasabah dapat mengambil nomor antrian dari jarak jauh melalui aplikasi mobile, memantau status antrian secara real-time, dan mendapatkan estimasi waktu tunggu yang akurat. Ini adalah kunci untuk meningkatkan kepuasan dan loyalitas nasabah.',
-      image: '',
+      images: [],
       features: [
         "Manajemen antrian multi-layanan dan multi-teller",
         "Tiket antrian virtual via aplikasi mobile atau QR code",
@@ -129,6 +156,8 @@ async function main() {
       },
       metaTitle: 'SmartQ Queue System | Sistem Antrian Cerdas',
       metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.',
+      tokopediaUrl: '',
+      shopeeUrl: '',
       subCategoryId: queueSubCategory.id,
     },
     {
@@ -136,7 +165,7 @@ async function main() {
       slug: 'forexrate-display-f-32',
       description: 'Tampilan informasi kurs mata uang asing yang akurat, real-time, dan profesional untuk cabang bank Anda.',
       longDescription: 'Sajikan informasi kurs valuta asing dengan cara yang modern dan dapat diandalkan menggunakan ForexRate Display F-32. Dengan layar 32 inci beresolusi tinggi, informasi kurs menjadi jelas terbaca dari berbagai sudut. Sistem kami terhubung langsung ke sumber data terpercaya untuk memastikan kurs selalu up-to-date secara real-time. Konten tambahan seperti video promosi atau berita juga dapat ditampilkan, menjadikannya alat komunikasi yang efektif di dalam cabang.',
-      image: '',
+      images: [],
       features: [
         "Layar 32 inci profesional dengan kecerahan tinggi",
         "Pembaruan kurs otomatis dan real-time dari sumber terpercaya",
@@ -152,13 +181,15 @@ async function main() {
       },
       metaTitle: 'ForexRate Display F-32 | Papan Kurs Digital',
       metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.',
+      tokopediaUrl: '',
+      shopeeUrl: '',
       subCategoryId: displaySubCategory.id,
     }
   ];
 
   for (const productData of productsToSeed) {
     await prisma.product.upsert({
-      where: { title: productData.title },
+      where: { slug: productData.slug },
       update: productData,
       create: productData,
     });
