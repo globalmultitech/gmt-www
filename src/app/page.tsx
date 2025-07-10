@@ -1,3 +1,4 @@
+
 import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones, MonitorSmartphone, BarChart, Medal, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -132,7 +133,7 @@ export default function Home() {
           <div className="container mx-auto px-4 relative z-10 -mt-20">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                   {featureCards.map((card, index) => (
-                      <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg">
+                      <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                           <div className="flex justify-center mb-6">
                             {card.icon}
                           </div>
