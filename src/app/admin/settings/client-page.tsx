@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
@@ -100,10 +101,10 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
 
   return (
     <div>
-        <div className="mb-6">
-            <h1 className="text-3xl font-bold">Pengaturan Website</h1>
-            <p className="text-muted-foreground">Kelola informasi umum, hero section, menu, dan tautan yang tampil di website Anda.</p>
-        </div>
+      <div className="mb-6">
+          <h1 className="text-3xl font-bold">Pengaturan Website</h1>
+          <p className="text-muted-foreground">Kelola informasi umum, hero section, menu, dan tautan yang tampil di website Anda.</p>
+      </div>
       <form action={formAction}>
         <input type="hidden" name="logoUrl" value={logoUrl} />
         <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
@@ -374,3 +375,5 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     </div>
   );
 }
+
+    
