@@ -9,7 +9,6 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  proxyUrl = env("DATABASE_PROXY_URL")
 }
 
 model User {
@@ -22,7 +21,7 @@ model User {
 }
 
 model WebSettings {
-  id            Int     @id @default(1)
+  id            Int      @id @default(1)
   logoUrl       String?
   companyName   String
   whatsappSales String
@@ -35,13 +34,13 @@ model WebSettings {
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
-  name          String
+  name          String               @unique
   slug          String               @unique
   description   String?
   imageUrl      String?
+  subCategories ProductSubCategory[]
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
-  subCategories ProductSubCategory[]
 }
 
 model ProductSubCategory {
@@ -57,20 +56,20 @@ model ProductSubCategory {
 }
 
 model Product {
-  id               Int                 @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   title            String
-  slug             String              @unique
+  slug             String             @unique
   description      String
   longDescription  String?
-  images           Json                @default("[]")
+  images           Json
   features         Json
   specifications   Json?
   metaTitle        String?
   metaDescription  String?
   tokopediaUrl     String?
   shopeeUrl        String?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
-  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
-  subCategoryId    Int?
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
