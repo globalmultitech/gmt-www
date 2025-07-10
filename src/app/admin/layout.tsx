@@ -15,25 +15,24 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [isHidden, setIsHidden] = useState(false);
-  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
+    let lastScrollY = window.scrollY;
+
     const controlNavbar = () => {
-      if (typeof window !== 'undefined') {
-        if (window.scrollY > lastScrollY && window.scrollY > 100) { // if scroll down
-          setIsHidden(true);
-        } else { // if scroll up
-          setIsHidden(false);
-        }
-        setLastScrollY(window.scrollY);
+      if (window.scrollY > lastScrollY && window.scrollY > 100) { // if scroll down
+        setIsHidden(true);
+      } else { // if scroll up
+        setIsHidden(false);
       }
+      lastScrollY = window.scrollY;
     };
 
     window.addEventListener('scroll', controlNavbar);
     return () => {
       window.removeEventListener('scroll', controlNavbar);
     };
-  }, [lastScrollY]);
+  }, []);
 
   const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard className="h-5 w-5" /> },
