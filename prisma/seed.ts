@@ -51,6 +51,7 @@ async function main() {
         { label: 'Layanan', href: '/layanan' },
         { label: 'Resources', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
+        { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ],
     },
   });
@@ -59,7 +60,11 @@ async function main() {
   console.log('Seeding categories and sub-categories...');
   const hardwareCategory = await prisma.productCategory.upsert({
     where: { name: 'Perangkat Keras' },
-    update: {},
+    update: {
+        slug: 'perangkat-keras',
+        description: 'Solusi perangkat keras inovatif untuk perbankan dan layanan keuangan, dirancang untuk keandalan dan efisiensi.',
+        imageUrl: 'https://placehold.co/600x400.png'
+    },
     create: { 
       name: 'Perangkat Keras',
       slug: 'perangkat-keras',
@@ -70,7 +75,11 @@ async function main() {
 
   const softwareCategory = await prisma.productCategory.upsert({
     where: { name: 'Perangkat Lunak' },
-    update: {},
+    update: {
+        slug: 'perangkat-lunak',
+        description: 'Aplikasi dan platform canggih untuk mengoptimalkan operasional, meningkatkan layanan, dan mendorong transformasi digital.',
+        imageUrl: 'https://placehold.co/600x400.png'
+    },
     create: { 
       name: 'Perangkat Lunak',
       slug: 'perangkat-lunak',
