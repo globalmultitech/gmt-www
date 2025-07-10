@@ -48,18 +48,18 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
 
 
   return (
-    <footer className="bg-background">
+    <footer className="bg-primary text-primary-foreground">
       <div className="container mx-auto px-4">
         {/* Top Footer Section */}
         <div className="py-20 grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4">
             <Logo companyName={companyName} logoUrl={logoUrl} />
-            <p className="text-muted-foreground mt-6 text-base">
+            <p className="text-primary-foreground/80 mt-6 text-base">
               {footerText}
             </p>
              <div className="flex space-x-4 mt-6">
                 {socialLinks.map((social) => (
-                <Link key={social!.platform} href={social!.href} className="text-muted-foreground hover:text-primary">
+                <Link key={social!.platform} href={social!.href} className="text-primary-foreground/80 hover:text-primary-foreground">
                     {social!.icon}
                 </Link>
                 ))}
@@ -67,11 +67,11 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
           </div>
           
           <div className="lg:col-span-2">
-            <h3 className="font-headline font-bold text-muted-foreground text-xl mb-6">Company</h3>
+            <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Company</h3>
             <ul className="space-y-4">
               {footerLinks1.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-base text-muted-foreground hover:text-primary transition-colors">
+                  <Link href={link.href} className="text-base text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -79,11 +79,11 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
             </ul>
           </div>
            <div className="lg:col-span-2">
-            <h3 className="font-headline font-bold text-muted-foreground text-xl mb-6">Resources</h3>
+            <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Resources</h3>
             <ul className="space-y-4">
               {footerLinks2.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="text-base text-muted-foreground hover:text-primary transition-colors">
+                  <Link href={link.href} className="text-base text-primary-foreground/80 hover:text-primary-foreground transition-colors">
                     {link.label}
                   </Link>
                 </li>
@@ -92,11 +92,11 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
           </div>
 
           <div className="lg:col-span-4">
-              <h3 className="font-headline font-bold text-muted-foreground text-xl mb-6">Subscribe</h3>
-              <p className="text-muted-foreground mb-4">Subscribe to our newsletter to get the latest updates.</p>
+              <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Subscribe</h3>
+              <p className="text-primary-foreground/80 mb-4">Subscribe to our newsletter to get the latest updates.</p>
               <form className="flex gap-2">
-                <Input type="email" placeholder="Enter your email" className="bg-secondary focus:bg-background h-12"/>
-                <Button type="submit" size="lg">
+                <Input type="email" placeholder="Enter your email" className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-background focus:text-foreground h-12"/>
+                <Button type="submit" size="lg" variant="secondary">
                     <ArrowRight className="h-5 w-5"/>
                 </Button>
               </form>
@@ -104,11 +104,11 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
         </div>
 
         {/* Bottom Footer Section */}
-        <div className="py-6 flex flex-wrap justify-between items-center gap-4 border-t">
-          <p className="text-sm text-muted-foreground">&copy; {new Date().getFullYear()} {companyName}. All Rights Reserved.</p>
-          <div className="flex space-x-6 text-sm text-muted-foreground">
-             <Link href="#" className="hover:text-primary">Terms & Conditions</Link>
-             <Link href="#" className="hover:text-primary">Privacy Policy</Link>
+        <div className="py-6 flex flex-wrap justify-between items-center gap-4 border-t border-primary-foreground/20">
+          <p className="text-sm text-primary-foreground/80">&copy; {new Date().getFullYear()} {companyName}. All Rights Reserved.</p>
+          <div className="flex space-x-6 text-sm text-primary-foreground/80">
+             <Link href="#" className="hover:text-primary-foreground">Terms & Conditions</Link>
+             <Link href="#" className="hover:text-primary-foreground">Privacy Policy</Link>
           </div>
         </div>
       </div>

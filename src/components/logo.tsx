@@ -15,7 +15,7 @@ export function Logo({ className, companyName = "Global Multi Technology", logoU
         <Image src={logoUrl} alt={`Logo ${companyName}`} width={140} height={40} className="h-8 md:h-10 w-auto object-contain" priority/>
       ) : (
         <span className={cn(
-          "font-headline font-extrabold text-3xl tracking-wide transition-colors text-foreground"
+          "font-headline font-extrabold text-3xl tracking-wide transition-colors"
         )}>
           {companyName}
         </span>
