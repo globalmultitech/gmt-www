@@ -7,7 +7,7 @@ import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import prisma from '@/lib/db';
 import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
-import { getSettings, type FeatureCard, type ProfessionalService } from '@/lib/settings';
+import { getSettings, type FeatureCard, type ProfessionalService, type TrustedByLogo } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
 
 const blogPosts = [
@@ -32,15 +32,6 @@ const blogPosts = [
         author: 'Admin',
         title: 'How to choose the right IT solutions provider',
     },
-];
-
-const trustedByLogos = [
-    { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
-    { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
-    { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
-    { src: '/logo-placeholder-4.svg', alt: 'Client Logo 4' },
-    { src: '/logo-placeholder-5.svg', alt: 'Client Logo 5' },
-    { src: '/logo-placeholder-6.svg', alt: 'Client Logo 6' },
 ];
 
 async function getProducts() {
@@ -184,31 +175,38 @@ export default async function Home() {
       </section>
       
        {/* CTA Section */}
-       <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: "url('https://placehold.co/1920x1080.png')"}}>
+       <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: `url('${settings.ctaImageUrl || 'https://placehold.co/1920x1080.png'}')`}}>
         <div className="absolute inset-0 bg-black/70"></div>
         <div className="relative container mx-auto px-4 text-primary-foreground">
           <div className="flex flex-col lg:flex-row justify-between items-center gap-8">
             <div className="lg:w-2/3">
-              <h2 className="text-3xl md:text-4xl font-headline font-extrabold">Ready to take your business to the next level?</h2>
-              <p className="mt-2 text-lg text-primary-foreground/80">Let's discuss how our IT solutions can help you achieve your goals.</p>
+              {settings.ctaHeadline && <h2 className="text-3xl md:text-4xl font-headline font-extrabold">{settings.ctaHeadline}</h2>}
+              {settings.ctaDescription && <p className="mt-2 text-lg text-primary-foreground/80">{settings.ctaDescription}</p>}
             </div>
-            <div className="flex-shrink-0">
-              <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                <Link href="/hubungi-kami">Get a Quote</Link>
-              </Button>
-            </div>
+            {settings.ctaButtonText && settings.ctaButtonLink && (
+                <div className="flex-shrink-0">
+                  <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                    <Link href={settings.ctaButtonLink}>{settings.ctaButtonText}</Link>
+                  </Button>
+                </div>
+            )}
           </div>
-          <div className="mt-12 border-t border-primary-foreground/20 pt-8">
-             <h3 className="text-center font-semibold uppercase tracking-widest mb-6">Trusted by the world's leading companies</h3>
-             <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
-                {trustedByLogos.map((logo, index) => (
-                   <div key={index} className="relative h-9 w-32 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
-                       {/* This is a placeholder for a real SVG logo */}
-                       <svg className="w-full h-full text-white" fill="currentColor" viewBox="0 0 100 30"><text x="50" y="20" fontSize="12" textAnchor="middle">LOGO</text></svg>
-                   </div>
-                ))}
-             </div>
-          </div>
+          {Array.isArray(settings.trustedByLogos) && settings.trustedByLogos.length > 0 && (
+              <div className="mt-12 border-t border-primary-foreground/20 pt-8">
+                {settings.trustedByText && <h3 className="text-center font-semibold uppercase tracking-widest mb-6">{settings.trustedByText}</h3>}
+                <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
+                    {(settings.trustedByLogos as TrustedByLogo[]).map((logo, index) => (
+                      <div key={index} className="relative h-9 w-32 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
+                          {logo.src.endsWith('.svg') ? (
+                              <Image src={logo.src} alt={logo.alt} fill className="object-contain" />
+                          ) : (
+                              <svg className="w-full h-full text-white" fill="currentColor" viewBox="0 0 100 30"><text x="50" y="20" fontSize="12" textAnchor="middle">LOGO</text></svg>
+                          )}
+                      </div>
+                    ))}
+                </div>
+              </div>
+          )}
         </div>
       </section>
       

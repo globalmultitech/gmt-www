@@ -31,6 +31,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [logoUrl, setLogoUrl] = useState<string>(settings.logoUrl ?? '');
   const [heroImageUrl, setHeroImageUrl] = useState<string>(settings.heroImageUrl ?? '');
   const [aboutUsImageUrl, setAboutUsImageUrl] = useState<string>(settings.aboutUsImageUrl ?? '');
+  const [ctaImageUrl, setCtaImageUrl] = useState<string>(settings.ctaImageUrl ?? '');
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -93,6 +94,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const featureCardsJSON = getJsonString(settings.featureCards, []);
   const aboutUsChecklistJSON = getJsonString(settings.aboutUsChecklist, []);
   const professionalServicesJSON = getJsonString(settings.professionalServices, []);
+  const trustedByLogosJSON = getJsonString(settings.trustedByLogos, []);
 
   return (
     <div>
@@ -104,6 +106,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <input type="hidden" name="logoUrl" value={logoUrl} />
         <input type="hidden" name="heroImageUrl" value={heroImageUrl} />
         <input type="hidden" name="aboutUsImageUrl" value={aboutUsImageUrl} />
+        <input type="hidden" name="ctaImageUrl" value={ctaImageUrl} />
 
         <Card>
           <CardHeader>
@@ -222,6 +225,58 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <Label htmlFor="professionalServices">Konten Kartu Layanan (JSON)</Label>
                 <Textarea id="professionalServices" name="professionalServices" rows={12} defaultValue={professionalServicesJSON} />
                 <p className="text-xs text-muted-foreground">Masukkan daftar layanan dalam format array JSON. Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>CTA & Trusted By Section</CardTitle>
+            <CardDescription>Atur konten untuk bagian Call-to-Action di halaman utama.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <div className="space-y-2">
+                <Label htmlFor="cta-image-upload">Gambar Latar CTA</Label>
+                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden">
+                    {ctaImageUrl ? (
+                        <Image src={ctaImageUrl} alt="CTA Preview" fill className="object-cover" />
+                    ) : (
+                        <div className="flex items-center justify-center h-full w-full">
+                        <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                        </div>
+                    )}
+                </div>
+                <div className="flex items-center gap-4">
+                  <Input id="cta-image-upload" type="file" onChange={(e) => handleFileChange(e, setCtaImageUrl)} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                  {isUploading && <Loader2 className="animate-spin" />}
+                </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="ctaHeadline">Judul CTA</Label>
+              <Input id="ctaHeadline" name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} placeholder="Ready to take your business to the next level?" />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ctaDescription">Deskripsi CTA</Label>
+              <Textarea id="ctaDescription" name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} />
+            </div>
+             <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="ctaButtonText">Teks Tombol CTA</Label>
+                  <Input id="ctaButtonText" name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="ctaButtonLink">Link Tombol CTA</Label>
+                  <Input id="ctaButtonLink" name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} placeholder="/hubungi-kami"/>
+                </div>
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="trustedByText">Teks "Trusted By"</Label>
+              <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} placeholder="Trusted by the world's leading companies"/>
+            </div>
+             <div className="space-y-2">
+                <Label htmlFor="trustedByLogos">Logo Mitra (JSON)</Label>
+                <Textarea id="trustedByLogos" name="trustedByLogos" rows={8} defaultValue={trustedByLogosJSON} />
+                <p className="text-xs text-muted-foreground">Masukkan daftar logo dalam format array JSON. Contoh: `[{"src": "/url/logo.svg", "alt": "Nama Logo"}]`</p>
             </div>
           </CardContent>
         </Card>

@@ -23,7 +23,12 @@ export type ProfessionalService = {
   details: string[];
 };
 
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices'> {
+export type TrustedByLogo = {
+  src: string;
+  alt: string;
+};
+
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
@@ -44,6 +49,13 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   servicesTitle: string | null;
   servicesDescription: string | null;
   professionalServices: ProfessionalService[] | any; // any to accommodate prisma json type
+  ctaHeadline: string | null;
+  ctaDescription: string | null;
+  ctaImageUrl: string | null;
+  ctaButtonText: string | null;
+  ctaButtonLink: string | null;
+  trustedByText: string | null;
+  trustedByLogos: TrustedByLogo[] | any; // any to accommodate prisma json type
 }
 
 const defaultSettings: WebSettings = {
@@ -154,6 +166,17 @@ const defaultSettings: WebSettings = {
       ],
     },
   ],
+  ctaHeadline: 'Ready to take your business to the next level?',
+  ctaDescription: "Let's discuss how our IT solutions can help you achieve your goals.",
+  ctaImageUrl: 'https://placehold.co/1920x1080.png',
+  ctaButtonText: 'Get a Quote',
+  ctaButtonLink: '/hubungi-kami',
+  trustedByText: "Trusted by the world's leading companies",
+  trustedByLogos: [
+    { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
+    { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
+    { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
+  ],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -177,6 +200,7 @@ export async function getSettings(): Promise<WebSettings> {
             featureCards: (settingsFromDb.featureCards as FeatureCard[]) ?? defaultSettings.featureCards,
             aboutUsChecklist: (settingsFromDb.aboutUsChecklist as string[]) ?? defaultSettings.aboutUsChecklist,
             professionalServices: (settingsFromDb.professionalServices as ProfessionalService[] | null) ?? defaultSettings.professionalServices,
+            trustedByLogos: (settingsFromDb.trustedByLogos as TrustedByLogo[] | null) ?? defaultSettings.trustedByLogos,
         };
 
     } catch (error) {

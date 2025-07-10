@@ -138,7 +138,21 @@ async function main() {
             'Fokus pada bisnis inti Anda, serahkan IT pada kami.',
           ],
         },
-      ]
+      ],
+      ctaHeadline: 'Ready to take your business to the next level?',
+      ctaDescription: "Let's discuss how our IT solutions can help you achieve your goals.",
+      ctaImageUrl: 'https://placehold.co/1920x1080.png',
+      ctaButtonText: 'Get a Quote',
+      ctaButtonLink: '/hubungi-kami',
+      trustedByText: "Trusted by the world's leading companies",
+      trustedByLogos: [
+          { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
+          { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
+          { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
+          { src: '/logo-placeholder-4.svg', alt: 'Client Logo 4' },
+          { src: '/logo-placeholder-5.svg', alt: 'Client Logo 5' },
+          { src: '/logo-placeholder-6.svg', alt: 'Client Logo 6' },
+      ],
     },
   });
   console.log('Web settings seeded.');

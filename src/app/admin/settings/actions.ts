@@ -68,6 +68,21 @@ const SettingsSchema = z.object({
       return z.NEVER;
     }
   }),
+  // CTA Section fields
+  ctaHeadline: z.string().optional(),
+  ctaDescription: z.string().optional(),
+  ctaImageUrl: z.string().optional(),
+  ctaButtonText: z.string().optional(),
+  ctaButtonLink: z.string().optional(),
+  trustedByText: z.string().optional(),
+  trustedByLogos: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk logo mitra tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
 export async function getWebSettings() {
@@ -99,6 +114,13 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     servicesTitle: formData.get('servicesTitle'),
     servicesDescription: formData.get('servicesDescription'),
     professionalServices: formData.get('professionalServices'),
+    ctaHeadline: formData.get('ctaHeadline'),
+    ctaDescription: formData.get('ctaDescription'),
+    ctaImageUrl: formData.get('ctaImageUrl'),
+    ctaButtonText: formData.get('ctaButtonText'),
+    ctaButtonLink: formData.get('ctaButtonLink'),
+    trustedByText: formData.get('trustedByText'),
+    trustedByLogos: formData.get('trustedByLogos'),
   });
 
   if (!validatedFields.success) {
