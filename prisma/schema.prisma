@@ -1,21 +1,20 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-generator client {
-  provider      = "prisma-client-js"
-  binaryTargets = ["native", "rhel-openssl-3.0.x"]
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+  binaryTargets   = ["native", "rhel-openssl-3.0.x"]
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
-  password  String
+  password  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -32,43 +31,46 @@ model WebSettings {
   updatedAt     DateTime @updatedAt
 }
 
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  description   String?              @db.Text
-  imageUrl      String?              @db.Text
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
-  name       String
-  categoryId Int
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  products   Product[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-
-  @@unique([name, categoryId])
-}
-
 model Product {
   id               Int                @id @default(autoincrement())
   title            String
   slug             String             @unique
   description      String             @db.Text
   longDescription  String?            @db.Text
-  images           Json // Array of image URLs
-  features         Json // Array of strings
-  specifications   Json? // JSON object for key-value pairs
+  images           Json               @default("[]")
+  features         Json               @default("[]")
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?            @db.Text
   tokopediaUrl     String?
   shopeeUrl        String?
-  metaTitle        String?
-  metaDescription  String?
-  subCategoryId    Int
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Restrict)
   createdAt        DateTime           @default(now())
   updatedAt        DateTime           @updatedAt
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId    Int
+
+  @@index([subCategoryId])
+}
+
+model ProductCategory {
+  id            Int                  @id @default(autoincrement())
+  name          String               @unique
+  description   String?              @db.Text
+  imageUrl      String?              @db.Text
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  subCategories ProductSubCategory[]
+}
+
+model ProductSubCategory {
+  id         Int             @id @default(autoincrement())
+  name       String
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+  products   Product[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+
+  @@unique([name, categoryId])
+  @@index([categoryId])
 }
