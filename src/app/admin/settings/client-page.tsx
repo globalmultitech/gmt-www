@@ -321,7 +321,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <Label htmlFor="image-upload">Logo Perusahaan</Label>
                         <div className="flex items-center gap-4">
                             {logoUrl ? (
-                                <Image src={logoUrl} alt="Logo Preview" width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
+                                <Image src={logoUrl} alt={`Logo ${settings.companyName}`} width={140} height={32} className="rounded-md object-contain bg-muted p-1 h-10 w-auto" />
                             ) : (
                                 <div className="h-10 w-40 rounded-md bg-muted flex items-center justify-center text-sm text-muted-foreground">Tidak ada logo</div>
                             )}
@@ -375,5 +375,3 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     </div>
   );
 }
-
-    
