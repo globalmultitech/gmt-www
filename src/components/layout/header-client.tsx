@@ -39,7 +39,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   return (
     <header className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-primary/90 shadow-md' : 'bg-transparent'
+        isScrolled ? 'bg-primary/90 backdrop-blur-sm shadow-md' : 'bg-transparent'
       )}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
@@ -55,9 +55,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'transition-colors',
-                        isScrolled ? 'text-primary-foreground hover:text-sky-blue' : 'text-primary hover:text-primary/80',
-                        pathname === item.href && 'underline'
+                        'relative transition-colors duration-300',
+                        isScrolled ? 'text-primary-foreground' : 'text-primary',
+                        'after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-current after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100',
+                        pathname === item.href ? 'after:scale-x-100' : ''
                       )}
                   >
                       {item.label}
