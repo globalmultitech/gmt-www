@@ -17,9 +17,9 @@ async function getCategories() {
 const toSlug = (name: string) => {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // remove special chars
-    .replace(/\s+/g, '-')           // replace spaces with -
-    .replace(/-+/g, '-');          // replace multiple - with single -
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 export async function generateMetadata(): Promise<Metadata> {

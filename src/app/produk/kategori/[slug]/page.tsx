@@ -10,9 +10,9 @@ import { notFound } from 'next/navigation';
 const toSlug = (name: string) => {
   return name
     .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') // remove special chars
-    .replace(/\s+/g, '-')           // replace spaces with -
-    .replace(/-+/g, '-');          // replace multiple - with single -
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 export async function generateStaticParams() {
@@ -26,7 +26,6 @@ export async function generateStaticParams() {
 }
 
 async function getCategoryBySlug(slug: string) {
-  // Find the category by its name, converted to a slug format
   const categories = await prisma.productCategory.findMany();
   const category = categories.find(c => toSlug(c.name) === slug);
 
@@ -65,7 +64,7 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = params;
-  const categories = await prisma.productCategory.findMany();
+  const categories = await prisma.productCategory.findMany({ select: { name: true, description: true, imageUrl: true } });
   const category = categories.find(c => toSlug(c.name) === slug);
 
   if (!category) {
