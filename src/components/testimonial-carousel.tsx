@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import Image from 'next/image';
 import {
   Carousel,
@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { Quote, Star } from 'lucide-react';
+import { Skeleton } from './ui/skeleton';
 
 const testimonials = [
     {
@@ -37,10 +38,43 @@ const testimonials = [
     },
 ];
 
+function TestimonialSkeleton() {
+    return (
+        <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <Skeleton className="h-6 w-32 mb-2" />
+                <Skeleton className="h-12 w-3/4 mb-6" />
+                <div className="flex text-yellow-400 mb-4">
+                    <Star /><Star /><Star /><Star /><Star />
+                </div>
+                <Skeleton className="h-6 w-full mb-2" />
+                <Skeleton className="h-6 w-5/6 mb-6" />
+                <Skeleton className="h-8 w-40 mb-2" />
+                <Skeleton className="h-6 w-32" />
+            </div>
+            <div className="relative hidden lg:block">
+                <Skeleton className="w-[500px] h-[600px] rounded-lg" />
+                 <div className="absolute -top-6 -left-6 bg-primary p-4 rounded-full text-white">
+                    <Quote className="h-8 w-8" />
+                </div>
+            </div>
+        </div>
+    )
+}
+
 export function TestimonialCarousel() {
+  const [isClient, setIsClient] = useState(false);
   const plugin = useRef(
     Autoplay({ delay: 6000, stopOnInteraction: true })
   );
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return <TestimonialSkeleton />;
+  }
 
   return (
     <Carousel

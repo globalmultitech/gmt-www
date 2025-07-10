@@ -1,3 +1,4 @@
+
 'use client';
 
 import type { Product } from '@prisma/client';
@@ -15,10 +16,34 @@ import {
 } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { useRef, useEffect, useState } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type RelatedProductsProps = {
   products: Product[];
 };
+
+function RelatedProductsSkeleton() {
+    return (
+        <section className="bg-secondary py-16 md:py-24">
+            <div className="container mx-auto px-4">
+                <h2 className="text-3xl font-headline font-bold mb-8 text-primary">Produk Unggulan Lainnya</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {[...Array(4)].map((_, i) => (
+                        <Card key={i} className="flex flex-col h-full overflow-hidden">
+                           <Skeleton className="h-48 w-full" />
+                           <CardHeader className="flex-grow">
+                             <Skeleton className="h-6 w-3/4" />
+                           </CardHeader>
+                           <CardContent>
+                               <Skeleton className="h-10 w-full" />
+                           </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+    );
+}
 
 export default function RelatedProducts({ products }: RelatedProductsProps) {
   const [isClient, setIsClient] = useState(false);
@@ -33,17 +58,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
   }
   
   if (!isClient) {
-    // Return a static version or skeleton on the server to prevent hydration mismatch
-    return (
-        <section className="bg-secondary py-16 md:py-24">
-            <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-headline font-bold mb-8 text-primary">Produk Unggulan Lainnya</h2>
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {/* Render static placeholders or skeletons */}
-                </div>
-            </div>
-        </section>
-    );
+    return <RelatedProductsSkeleton />;
   }
 
   return (
