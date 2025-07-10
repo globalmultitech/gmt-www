@@ -39,7 +39,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   return (
     <header className={cn(
         "fixed top-0 z-50 w-full transition-all duration-300",
-        isScrolled ? 'bg-primary/90 backdrop-blur-sm shadow-md' : 'bg-transparent'
+        isScrolled ? 'bg-primary/90 shadow-md' : 'bg-transparent'
       )}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">

@@ -35,8 +35,8 @@ export default async function Home() {
         className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" 
         style={{backgroundImage: `url('${settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}')`}}
         >
-        <div className="absolute inset-0 bg-white/50"></div>
-        <div className="container mx-auto px-4 relative z-10 text-center text-foreground">
+        <div className="absolute inset-0 bg-black/30"></div>
+        <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up">
@@ -44,7 +44,7 @@ export default async function Home() {
               </h1>
             )}
             {settings.heroDescription && (
-              <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto fade-in-up" style={{animationDelay: '0.2s'}}>
+              <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto fade-in-up" style={{animationDelay: '0.2s'}}>
                 {settings.heroDescription}
               </p>
             )}
@@ -55,7 +55,7 @@ export default async function Home() {
                   </Button>
               )}
                {settings.heroButton2Text && settings.heroButton2Link && (
-                  <Button asChild size="lg" variant="outline" className="border-foreground">
+                  <Button asChild size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
                     <Link href={settings.heroButton2Link}>{settings.heroButton2Text}</Link>
                   </Button>
                )}
