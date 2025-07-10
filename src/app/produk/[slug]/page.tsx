@@ -28,6 +28,18 @@ type Props = {
   params: { slug: string };
 };
 
+// Fungsi ini memberitahu Next.js halaman dinamis mana yang harus dibuat saat build
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    select: { slug: true },
+  });
+ 
+  return products.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
+
 async function getProductBySlug(slug: string) {
   const product = await prisma.product.findUnique({
     where: { slug },
