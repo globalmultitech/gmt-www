@@ -31,7 +31,6 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
     };
     
     window.addEventListener('scroll', handleScroll, { passive: true });
-    // Initial check
     handleScroll();
 
     return () => {
@@ -41,8 +40,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
 
   return (
     <header className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-300 bg-primary",
-        isScrolled && 'shadow-lg'
+        "sticky top-0 z-50 w-full transition-all duration-300 bg-primary"
       )}>
 
         {/* Top Bar - Hidden on scroll */}
@@ -80,9 +78,6 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             )}>
             
             <div className="hidden lg:flex items-center gap-4">
-              <div className={cn(isScrolled ? 'flex' : 'hidden')}>
-                 <Logo companyName={companyName} logoUrl={logoUrl} />
-              </div>
               <nav className="flex items-center space-x-8 text-base font-semibold">
                   {navItems.map((item) => (
                   <Link
@@ -94,7 +89,6 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       )}
                   >
                       {item.label}
-                      {/* {item.label !== 'Beranda' && <ChevronDown className="h-4 w-4" />} */}
                   </Link>
                   ))}
               </nav>
