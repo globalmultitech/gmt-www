@@ -327,7 +327,7 @@ export default async function Home() {
               </div>
               <div className="grid md:grid-cols-3 gap-8">
                   {blogPosts.map((post, index) => (
-                      <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-shadow">
+                      <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                            <div className="relative overflow-hidden rounded-lg mb-6">
                             <Image src={post.image} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
                            </div>
