@@ -21,8 +21,8 @@ export async function generateStaticParams() {
 
 
 async function getCategoryBySlug(slug: string) {
-  // Step 1: Find the category itself. Use findFirst for flexibility.
-  const category = await prisma.productCategory.findFirst({
+  // Step 1: Find the category itself.
+  const category = await prisma.productCategory.findUnique({
     where: { slug },
   });
 
@@ -31,18 +31,18 @@ async function getCategoryBySlug(slug: string) {
   }
 
   // Step 2: Get all sub-category IDs belonging to this main category.
-  const subCategoryIds = await prisma.productSubCategory.findMany({
+  const subCategories = await prisma.productSubCategory.findMany({
       where: { categoryId: category.id },
       select: { id: true },
   });
   
-  const ids = subCategoryIds.map(sc => sc.id);
+  const subCategoryIds = subCategories.map(sc => sc.id);
 
   // Step 3: Find all products that belong to any of those sub-categories.
   const products = await prisma.product.findMany({
     where: {
       subCategoryId: {
-        in: ids,
+        in: subCategoryIds,
       },
     },
     orderBy: {
