@@ -84,6 +84,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
 
   const socialMediaJSON = JSON.stringify(settings.socialMedia, null, 2);
   const menuItemsJSON = JSON.stringify(settings.menuItems, null, 2);
+  const featureCardsJSON = JSON.stringify(settings.featureCards, null, 2);
 
   return (
     <div>
@@ -188,6 +189,11 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <CardDescription>Ubah pengaturan ini hanya jika Anda mengerti format JSON. Kesalahan format dapat menyebabkan halaman error.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+                 <div className="space-y-2">
+                    <Label htmlFor="featureCards">Kartu Fitur (JSON)</Label>
+                    <Textarea id="featureCards" name="featureCards" rows={12} defaultValue={featureCardsJSON} />
+                    <p className="text-xs text-muted-foreground">Gunakan nama ikon dari <a href="https://lucide.dev/icons/" target="_blank" rel="noopener noreferrer" className="underline">lucide.dev</a>.</p>
+                </div>
                  <div className="space-y-2">
                     <Label htmlFor="socialMedia">Link Sosial Media (JSON)</Label>
                     <Textarea id="socialMedia" name="socialMedia" rows={8} defaultValue={socialMediaJSON} />

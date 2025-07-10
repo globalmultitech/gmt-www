@@ -34,6 +34,15 @@ const SettingsSchema = z.object({
   heroButton1Link: z.string().optional(),
   heroButton2Text: z.string().optional(),
   heroButton2Link: z.string().optional(),
+  // Feature cards
+  featureCards: z.string().transform((str, ctx) => {
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk kartu fitur tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
 export async function getWebSettings() {
@@ -55,6 +64,7 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     heroButton1Link: formData.get('heroButton1Link'),
     heroButton2Text: formData.get('heroButton2Text'),
     heroButton2Link: formData.get('heroButton2Link'),
+    featureCards: formData.get('featureCards'),
   });
 
   if (!validatedFields.success) {

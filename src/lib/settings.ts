@@ -10,7 +10,13 @@ export type SocialMediaLinks = {
   [key: string]: string;
 };
 
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems'> {
+export type FeatureCard = {
+  icon: string;
+  title: string;
+  description: string;
+};
+
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
@@ -21,6 +27,7 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   heroButton1Link: string | null;
   heroButton2Text: string | null;
   heroButton2Link: string | null;
+  featureCards: FeatureCard[];
 }
 
 const defaultSettings: WebSettings = {
@@ -51,6 +58,28 @@ const defaultSettings: WebSettings = {
   heroButton1Link: '/layanan',
   heroButton2Text: 'Contact us',
   heroButton2Link: '/hubungi-kami',
+  featureCards: [
+    {
+        icon: 'MonitorSmartphone',
+        title: 'Smart softwares',
+        description: 'Duis aute irure dolor in repreherita ineto.',
+    },
+    {
+        icon: 'BarChart',
+        title: 'Trusted security',
+        description: 'Lorem consectetur adipi elitsed tempono.',
+    },
+    {
+        icon: 'Medal',
+        title: 'Awards winners',
+        description: 'Ariento mesfato prodo arte e eli manifesto.',
+    },
+    {
+        icon: 'User',
+        title: 'Great experience',
+        description: 'Lorem consectetur adipiscing elitsed pro.',
+    },
+  ],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -71,6 +100,7 @@ export async function getSettings(): Promise<WebSettings> {
             ...settingsFromDb,
             socialMedia: (settingsFromDb.socialMedia as SocialMediaLinks) ?? defaultSettings.socialMedia,
             menuItems: (settingsFromDb.menuItems as MenuItem[]) ?? defaultSettings.menuItems,
+            featureCards: (settingsFromDb.featureCards as FeatureCard[]) ?? defaultSettings.featureCards,
         };
 
     } catch (error) {

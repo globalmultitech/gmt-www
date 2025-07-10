@@ -1,37 +1,14 @@
 
-import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones, MonitorSmartphone, BarChart, Medal, User, Bot, Layers } from 'lucide-react';
+import { ArrowRight, CheckCircle, Quote, Star, Users, ShieldCheck, TrendingUp, Handshake, Briefcase, Cpu, Code2, Headphones, Layers, Bot } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { ServiceCard } from '@/components/service-card';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import prisma from '@/lib/db';
 import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
-import { getSettings } from '@/lib/settings';
-
-const featureCards = [
-    {
-        icon: <MonitorSmartphone className="h-10 w-10 text-primary" />,
-        title: 'Smart softwares',
-        description: 'Duis aute irure dolor in repreherita ineto.',
-    },
-    {
-        icon: <BarChart className="h-10 w-10 text-primary" />,
-        title: 'Trusted security',
-        description: 'Lorem consectetur adipi elitsed tempono.',
-    },
-    {
-        icon: <Medal className="h-10 w-10 text-primary" />,
-        title: 'Awards winners',
-        description: 'Ariento mesfato prodo arte e eli manifesto.',
-    },
-    {
-        icon: <User className="h-10 w-10 text-primary" />,
-        title: 'Great experience',
-        description: 'Lorem consectetur adipiscing elitsed pro.',
-    },
-]
+import { getSettings, type FeatureCard } from '@/lib/settings';
+import { DynamicIcon } from '@/components/dynamic-icon';
 
 const layananKami = [
   {
@@ -171,10 +148,10 @@ export default async function Home() {
       <section className="bg-dark-slate">
           <div className="container mx-auto px-4 relative z-10 -mt-20">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {featureCards.map((card, index) => (
+                  {settings.featureCards.map((card: FeatureCard, index: number) => (
                       <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                           <div className="flex justify-center mb-6">
-                            {card.icon}
+                            <DynamicIcon name={card.icon} className="h-10 w-10 text-primary" />
                           </div>
                           <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
                           <p className="text-muted-foreground">{card.description}</p>
@@ -234,13 +211,13 @@ export default async function Home() {
            <div className="grid md:grid-cols-2 gap-8">
             {layananKami.map((service) => (
               <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-                <CardHeader className="flex flex-row items-center gap-4">
+                <div className="flex flex-row items-center gap-4 p-6">
                   <div className="bg-primary/10 p-4 rounded-full">{service.icon}</div>
                   <div>
-                    <CardTitle className="font-headline text-2xl">{service.title}</CardTitle>
-                    <CardDescription className="mt-1">{service.description}</CardDescription>
+                    <h3 className="font-headline text-2xl font-bold">{service.title}</h3>
+                    <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
                   </div>
-                </CardHeader>
+                </div>
                 <CardContent>
                   <ul className="space-y-3 pt-4 border-t">
                     {service.details.map((detail, index) => (

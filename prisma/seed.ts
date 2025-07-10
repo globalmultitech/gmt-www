@@ -59,6 +59,28 @@ async function main() {
       heroButton1Link: '/layanan',
       heroButton2Text: 'Contact us',
       heroButton2Link: '/hubungi-kami',
+      featureCards: [
+        {
+            icon: 'MonitorSmartphone',
+            title: 'Smart softwares',
+            description: 'Duis aute irure dolor in repreherita ineto.',
+        },
+        {
+            icon: 'BarChart',
+            title: 'Trusted security',
+            description: 'Lorem consectetur adipi elitsed tempono.',
+        },
+        {
+            icon: 'Medal',
+            title: 'Awards winners',
+            description: 'Ariento mesfato prodo arte e eli manifesto.',
+        },
+        {
+            icon: 'User',
+            title: 'Great experience',
+            description: 'Lorem consectetur adipiscing elitsed pro.',
+        },
+      ],
     },
   });
   console.log('Web settings seeded.');
