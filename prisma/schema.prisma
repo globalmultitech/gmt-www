@@ -3,6 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
+  output   = "../../../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -20,34 +21,34 @@ model User {
 }
 
 model WebSettings {
-  id            Int     @id @default(1)
+  id            Int      @id @default(1)
   logoUrl       String?
   companyName   String
   whatsappSales String
   footerText    String
-  socialMedia   Json
-  menuItems     Json
+  socialMedia   Json?
+  menuItems     Json?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }
 
 model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  slug          String               @unique
+  id            Int                 @id @default(autoincrement())
+  name          String              @unique
+  slug          String              @unique
   description   String?
   imageUrl      String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
   subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
 }
 
 model ProductSubCategory {
   id         Int             @id @default(autoincrement())
   name       String
-  products   Product[]
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products   Product[]
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 
@@ -55,20 +56,20 @@ model ProductSubCategory {
 }
 
 model Product {
-  id               Int                 @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   title            String
-  slug             String              @unique
+  slug             String             @unique
   description      String
   longDescription  String?
-  images           Json                @default("[]")
-  features         Json                @default("[]")
+  images           Json?
+  features         Json?
   specifications   Json?
   metaTitle        String?
   metaDescription  String?
   tokopediaUrl     String?
   shopeeUrl        String?
-  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id], onDelete: SetNull)
-  subCategoryId    Int?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  subCategoryId    Int
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
