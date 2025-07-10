@@ -39,6 +39,9 @@ import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
 import type { User } from '@prisma/client';
 import { createUser, deleteUser, updateUser } from './actions';
 import { useFormStatus } from 'react-dom';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -228,7 +231,7 @@ export default function UserManagementClientPage({ users }: { users: User[] }) {
                 <TableRow key={user.id}>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
-                  <TableCell>{new Date(user.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>
+                  <TableCell>{format(new Date(user.createdAt), "d MMMM yyyy", { locale: id })}</TableCell>
                   <TableCell className="text-right">
                     <Button variant="ghost" size="icon" onClick={() => setEditingUser(user)}>
                       <Pencil className="h-4 w-4" />

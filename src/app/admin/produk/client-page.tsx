@@ -49,6 +49,8 @@ import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { getSignedURL } from '../actions';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 type CategoryWithSubCategories = ProductCategory & {
   subCategories: ProductSubCategory[];
@@ -359,7 +361,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
                       )}
                     </TableCell>
                     <TableCell className="font-medium">{product.title}</TableCell>
-                    <TableCell>{new Date(product.createdAt).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</TableCell>
+                    <TableCell>{format(new Date(product.createdAt), "d MMMM yyyy", { locale: id })}</TableCell>
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => handleOpenDialog(product)}>
                         <Pencil className="h-4 w-4" />
