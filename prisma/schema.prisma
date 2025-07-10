@@ -1,25 +1,20 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
 
 generator client {
   provider      = "prisma-client-js"
-  // Recommended for serverless environments like Vercel
   binaryTargets = ["native", "rhel-openssl-1.0.x"]
-}
-
-datasource db {
-  provider = "postgresql"
-  // Use the pooled URL for querying, which is essential for serverless environments.
-  url      = env("DATABASE_URL_POOL")
 }
 
 model User {
   id        Int      @id @default(autoincrement())
-  name      String
   email     String   @unique
+  name      String
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -39,13 +34,13 @@ model WebSettings {
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
-  name          String               @unique
+  name          String
   slug          String               @unique
-  description   String?
+  description   String?              @db.Text
   imageUrl      String?
-  subCategories ProductSubCategory[]
   createdAt     DateTime             @default(now())
   updatedAt     DateTime             @updatedAt
+  subCategories ProductSubCategory[]
 }
 
 model ProductSubCategory {
@@ -61,20 +56,20 @@ model ProductSubCategory {
 }
 
 model Product {
-  id               Int                 @id @default(autoincrement())
+  id               Int                @id @default(autoincrement())
   title            String
-  slug             String              @unique
-  description      String
-  longDescription  String?
-  images           Json                @default("[]") // Store image URLs as a JSON array
-  features         Json                @default("[]") // Store features as a JSON array
-  specifications   Json?                              // Store specs as a JSON object
+  slug             String             @unique
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId  Int
+  description      String             @db.Text
+  longDescription  String?            @db.Text
+  images           Json?              @default("[]")
+  features         Json
+  specifications   Json?
   metaTitle        String?
   metaDescription  String?
   tokopediaUrl     String?
   shopeeUrl        String?
-  subCategory      ProductSubCategory? @relation(fields: [subCategoryId], references: [id])
-  subCategoryId    Int?
-  createdAt        DateTime            @default(now())
-  updatedAt        DateTime            @updatedAt
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
