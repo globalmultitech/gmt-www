@@ -243,7 +243,7 @@ export default function Home() {
       </section>
       
        {/* Projects Section */}
-      <section className="py-20 md:py-28 bg-secondary">
+      <section className="py-20 md:py-28 bg-dark-slate">
           <div className="container mx-auto px-4">
               <div className="text-center max-w-3xl mx-auto mb-16">
                   <p className="font-semibold text-primary uppercase tracking-widest mb-2">Our projects</p>
