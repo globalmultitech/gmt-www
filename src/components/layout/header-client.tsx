@@ -55,8 +55,9 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       key={item.href}
                       href={item.href}
                       className={cn(
-                        'transition-colors text-foreground hover:text-primary',
-                        pathname === item.href && 'text-primary font-bold'
+                        'transition-colors text-foreground',
+                        isScrolled ? 'hover:text-sky-blue' : 'hover:text-primary',
+                        pathname === item.href && (isScrolled ? 'text-sky-blue font-bold' : 'text-primary font-bold')
                       )}
                   >
                       {item.label}
@@ -66,7 +67,9 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             </div>
 
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild variant="outline" className='border-foreground text-foreground hover:bg-foreground hover:text-background'>
+                <Button asChild variant="outline" className={cn(
+                  'border-foreground text-foreground hover:bg-foreground hover:text-background',
+                )}>
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
             </div>
@@ -74,7 +77,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className='text-foreground hover:bg-muted/20'>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', isScrolled ? 'text-primary-foreground' : 'text-foreground')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>

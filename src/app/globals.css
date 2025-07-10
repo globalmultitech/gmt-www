@@ -25,6 +25,7 @@
     --ring: 145 63% 49%;
     --radius: 0.5rem;
     --dark-slate: 222 47% 6%; /* Kept for compatibility but not used in theme */
+    --sky-blue: 200 80% 50%;
   }
 }
 
