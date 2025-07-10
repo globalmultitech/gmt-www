@@ -53,7 +53,7 @@ function TestimonialSkeleton() {
                 <Skeleton className="h-6 w-32" />
             </div>
             <div className="relative hidden lg:block">
-                <Skeleton className="w-[300px] h-[450px] rounded-lg" />
+                <Skeleton className="w-[600px] h-[400px] rounded-lg" />
                  <div className="absolute -top-6 -left-6 bg-primary p-4 rounded-full text-white">
                     <Quote className="h-8 w-8" />
                 </div>
@@ -102,8 +102,8 @@ export function TestimonialCarousel() {
                             <Image 
                                 src={'https://placehold.co/600x400.png'}
                                 alt={testimonial.name}
-                                width={300}
-                                height={450}
+                                width={600}
+                                height={400}
                                 className="rounded-lg shadow-lg"
                                 data-ai-hint={testimonial.aiHint}
                             />
