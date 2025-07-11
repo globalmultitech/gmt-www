@@ -41,6 +41,7 @@ export async function login(prevState: { message: string } | undefined, formData
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 1 week
       path: '/',
+      sameSite: 'lax', // Fix for cross-site cookie issues in modern browsers
     });
 
   } catch (error) {
