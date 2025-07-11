@@ -17,7 +17,6 @@ const toSlug = (name: string) => {
 const NewsItemSchema = z.object({
     id: z.number(), 
     title: z.string().default(''),
-    slug: z.string().optional(),
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
@@ -72,11 +71,22 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     }
 
     for (const item of newsItemsFromClient) {
-        if (item.id > Date.now() && !item.title && !item.category && !item.content) {
+        // Skip empty new items
+        if (!item.title && !item.category && !item.content) {
             continue;
         }
+
+        const finalSlug = toSlug(item.title);
         
-        const finalSlug = item.slug || toSlug(item.title);
+        // If there's a title but slug generation fails, something is wrong with the title.
+        if (item.title && !finalSlug) {
+            return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan URL yang valid.` };
+        }
+        
+        // Don't process items without a title
+        if (!item.title) {
+            continue;
+        }
 
         const sanitizedData = {
             title: item.title,
@@ -87,21 +97,15 @@ export async function updateResourcesPageSettings(prevState: { message: string }
         };
         
         if (dbItemIds.has(item.id)) {
-            if (finalSlug) {
-                const existingSlug = await prisma.newsItem.findFirst({ where: { slug: finalSlug, id: { not: item.id } }});
-                if(existingSlug) {
-                    return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan.` };
-                }
-            }
+             const existingSlug = await prisma.newsItem.findFirst({ where: { slug: finalSlug, id: { not: item.id } }});
+             if(existingSlug) {
+                 return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan oleh artikel lain.` };
+             }
             operations.push(prisma.newsItem.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
-             if (finalSlug) {
-                const existingSlug = await prisma.newsItem.findFirst({ where: { slug: finalSlug }});
-                if(existingSlug) {
-                    return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan.` };
-                }
-             } else if (item.title) {
-                 return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan slug yang valid.` };
+             const existingSlug = await prisma.newsItem.findFirst({ where: { slug: finalSlug }});
+             if(existingSlug) {
+                 return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan oleh artikel lain.` };
              }
             operations.push(prisma.newsItem.create({ data: sanitizedData }));
         }
