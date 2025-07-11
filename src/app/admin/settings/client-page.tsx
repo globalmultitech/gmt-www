@@ -37,10 +37,9 @@ const availableIcons = [
     'ScreenShare', 'Search', 'Send', 'Server', 'Settings', 'Share', 'Share2', 'Shield',
     'ShieldCheck', 'ShoppingBag', 'ShoppingCart', 'Slack', 'Sliders', 'Smartphone', 'Speaker',
     'Star', 'Sun', 'Sunrise', 'Sunset', 'Table', 'Tag', 'Target', 'Terminal', 'ThumbsDown',
-    'ThumbsUp', 'ToggleLeft', 'ToggleRight', 'Tools', 'Trash', 'Trash2', 'TrendingDown',
-    'TrendingUp', 'Truck', 'Twitch', 'Twitter', 'Type', 'Umbrella', 'Unlock', 'Upload', 'User',
-    'UserCheck', 'UserPlus', 'UserX', 'Users', 'Video', 'Voicemail', 'Wallet', 'Watch',
-    'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap'
+    'ThumbsUp', 'ToggleLeft', 'ToggleRight', 'Trash', 'Trash2', 'TrendingDown',
+    'TrendingUp', 'Truck', 'Twitch', 'Twitter', 'Type', 'Umbrella', 'Unlock', 'Upload', 'UserCheck', 'UserPlus', 'UserX', 'Users', 'Video', 'Voicemail', 'Wallet', 'Watch',
+    'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap', 'Tools'
 ].sort();
 
 
@@ -274,7 +273,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             name={`socialMedia[${platform}]`}
                             value={socialLinks[platform] || ''}
                             onChange={(e) => handleSocialChange(platform, e.target.value)}
-                            placeholder={`https://${platform}.com/nama_akun`}
+                            placeholder={`https://www.${platform}.com/nama_akun`}
                         />
                     </div>
                 ))}

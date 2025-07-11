@@ -6,7 +6,7 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
 
-// Define schemas for nested objects first, making all fields optional
+// Define schemas for nested objects first, making all fields optional and providing defaults
 const MenuItemSchema = z.object({
   label: z.string().optional().default(''),
   href: z.string().optional().default(''),
@@ -110,7 +110,7 @@ function getAsObject(formData: FormData, key: string) {
     return obj;
 }
 
-// Helper function to extract an array of objects
+// Helper function to extract an array of objects, now more robust
 function getAsArrayOfObjects(formData: FormData, key: string) {
     const items: { [key: number]: any } = {};
     const regex = new RegExp(`^${key}\\[(\\d+)\\]\\[(.*?)\\]$`);
@@ -124,17 +124,12 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
                 items[index] = {};
             }
             
-            // Handle nested arrays like 'details' in 'professionalServices'
             const detailMatch = field.match(/^details\[(\d+)\]$/);
             if (detailMatch) {
                 if (!items[index].details) {
                     items[index].details = [];
                 }
                 const detailIndex = parseInt(detailMatch[1], 10);
-                // Ensure array is large enough
-                while (items[index].details.length <= detailIndex) {
-                    items[index].details.push('');
-                }
                 items[index].details[detailIndex] = value;
             } else {
                 items[index][field] = value;
@@ -152,8 +147,9 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
         // Filter out items that are completely empty
         if (!item || typeof item !== 'object') return false;
         return Object.values(item).some(value => {
+            if (typeof value === 'string') return value.trim() !== '';
             if (Array.isArray(value)) return value.length > 0;
-            return typeof value === 'string' && value.trim() !== '';
+            return false; // Filter out if all values are empty or non-existent
         });
     });
 }
