@@ -15,6 +15,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { getSignedURL } from '../actions';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
+// A curated list of relevant Lucide icons for business/tech contexts
+const availableIcons = [
+    'Activity', 'Airplay', 'AlarmClock', 'AlertCircle', 'Archive', 'ArrowDownCircle', 'ArrowUpCircle',
+    'Award', 'Banknote', 'BarChart', 'BarChart2', 'BarChart3', 'BarChart4', 'Bell', 'Briefcase',
+    'Building', 'Building2', 'Calculator', 'Calendar', 'Camera', 'CheckCircle', 'CheckSquare',
+    'ChevronDown', 'ChevronUp', 'Clipboard', 'Clock', 'Cloud', 'CloudDrizzle', 'CloudLightning',
+    'CloudRain', 'CloudSnow', 'Code', 'Code2', 'Codepen', 'Codesandbox', 'Cog', 'Compass',
+    'Contact', 'Copy', 'Cpu', 'CreditCard', 'Database', 'Disc', 'Download', 'Edit', 'Edit2',
+    'Edit3', 'ExternalLink', 'Eye', 'Facebook', 'File', 'FileText', 'Filter', 'Flag', 'Folder',
+    'GitBranch', 'GitCommit', 'GitMerge', 'GitPullRequest', 'Github', 'Globe', 'HardDrive',
+    'Headphones', 'Heart', 'HelpCircle', 'Home', 'Image', 'Inbox', 'Info', 'Instagram', 'Key',
+
+    'Landmark', 'Layers', 'Layout', 'LifeBuoy', 'Lightbulb', 'LineChart', 'Link', 'Linkedin',
+    'List', 'Lock', 'LogIn', 'LogOut', 'Mail', 'Map', 'MapPin', 'Maximize', 'Medal',
+    'Menu', 'MessageCircle', 'MessageSquare', 'Mic', 'Minimize', 'Monitor', 'MonitorSmartphone',
+    'Moon', 'MoreHorizontal', 'MoreVertical', 'MousePointer', 'Move', 'Music', 'Package',
+    'Paperclip', 'Pause', 'PenTool', 'Percent', 'Phone', 'PieChart', 'Play', 'Power', 'Printer',
+    'QrCode', 'Radio', 'RefreshCcw', 'RefreshCw', 'Repeat', 'Rocket', 'Save', 'Scale', 'Scissors',
+    'ScreenShare', 'Search', 'Send', 'Server', 'Settings', 'Share', 'Share2', 'Shield',
+    'ShieldCheck', 'ShoppingBag', 'ShoppingCart', 'Slack', 'Sliders', 'Smartphone', 'Speaker',
+    'Star', 'Sun', 'Sunrise', 'Sunset', 'Table', 'Tag', 'Target', 'Terminal', 'ThumbsDown',
+    'ThumbsUp', 'ToggleLeft', 'ToggleRight', 'Tool', 'Trash', 'Trash2', 'TrendingDown',
+    'TrendingUp', 'Truck', 'Twitch', 'Twitter', 'Type', 'Umbrella', 'Unlock', 'Upload', 'User',
+    'UserCheck', 'UserPlus', 'UserX', 'Users', 'Video', 'Voicemail', 'Wallet', 'Watch',
+    'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap'
+].sort();
+
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -75,7 +104,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   
   const [isUploading, setIsUploading] = useState(false);
   
-  // States for all dynamic fields
   const [imageUrls, setImageUrls] = useState<ImageUrls>({
     logoUrl: settings.logoUrl ?? '',
     heroImageUrl: settings.heroImageUrl ?? '',
@@ -93,7 +121,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(settings.blogPosts ?? []);
 
 
-  // Generic handlers for arrays of objects
   const handleArrayOfObjectsChange = <T,>(index: number, field: keyof T, value: string, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => {
       const newState = [...state];
       newState[index] = { ...newState[index], [field]: value };
@@ -102,7 +129,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const addArrayOfObjectsItem = <T,>(newItem: T, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState([...state, newItem]);
   const removeArrayOfObjectsItem = <T,>(index: number, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState(state.filter((_, i) => i !== index));
 
-  // Generic handlers for arrays of strings
   const handleArrayOfStringsChange = (index: number, value: string, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => {
       const newState = [...state];
       newState[index] = value;
@@ -111,15 +137,16 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const addArrayOfStringsItem = (state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState([...state, '']);
   const removeArrayOfStringsItem = (index: number, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState(state.filter((_, i) => i !== index));
 
-  // Specific handlers
   const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => setSocialLinks(prev => ({ ...prev, [platform]: value }));
   const handleServiceDetailChange = (serviceIndex: number, detailIndex: number, value: string) => {
     const newServices = [...professionalServices];
+    if(!newServices[serviceIndex].details) newServices[serviceIndex].details = [];
     newServices[serviceIndex].details[detailIndex] = value;
     setProfessionalServices(newServices);
   }
   const addServiceDetail = (serviceIndex: number) => {
     const newServices = [...professionalServices];
+    if(!newServices[serviceIndex].details) newServices[serviceIndex].details = [];
     newServices[serviceIndex].details.push('');
     setProfessionalServices(newServices);
   }
@@ -206,9 +233,9 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
           <CardContent className="grid md:grid-cols-2 gap-6">
             <ImageUploader fieldId="logo-upload" fieldName="logoUrl" label="Logo Perusahaan" imageUrl={imageUrls.logoUrl} altText="Logo Preview" isUploading={isUploading} onFileChange={handleFileChange} />
             <div className="space-y-4">
-              <div className="space-y-2"><Label htmlFor="companyName">Nama Perusahaan</Label><Input id="companyName" name="companyName" defaultValue={settings.companyName} required /></div>
-              <div className="space-y-2"><Label htmlFor="whatsappSales">Nomor WhatsApp Sales</Label><Input id="whatsappSales" name="whatsappSales" defaultValue={settings.whatsappSales} required placeholder="+6281234567890" /></div>
-              <div className="space-y-2"><Label htmlFor="footerText">Teks di Footer</Label><Textarea id="footerText" name="footerText" defaultValue={settings.footerText} required /></div>
+              <div className="space-y-2"><Label htmlFor="companyName">Nama Perusahaan</Label><Input id="companyName" name="companyName" defaultValue={settings.companyName} /></div>
+              <div className="space-y-2"><Label htmlFor="whatsappSales">Nomor WhatsApp Sales</Label><Input id="whatsappSales" name="whatsappSales" defaultValue={settings.whatsappSales} placeholder="+6281234567890" /></div>
+              <div className="space-y-2"><Label htmlFor="footerText">Teks di Footer</Label><Textarea id="footerText" name="footerText" defaultValue={settings.footerText} /></div>
             </div>
           </CardContent>
         </Card>
@@ -312,9 +339,27 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 {featureCards.map((card, index) => (
                     <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                         <div className="grid grid-cols-3 gap-2 flex-grow">
-                            <div className="space-y-1">
+                             <div className="space-y-1">
                                 <Label htmlFor={`fc-icon-${index}`} className="text-xs">Ikon (Lucide)</Label>
-                                <Input id={`fc-icon-${index}`} name={`featureCards[${index}][icon]`} value={card.icon} onChange={(e) => handleArrayOfObjectsChange(index, 'icon', e.target.value, featureCards, setFeatureCards)} />
+                                <Select
+                                    name={`featureCards[${index}][icon]`}
+                                    value={card.icon}
+                                    onValueChange={(value) => handleArrayOfObjectsChange(index, 'icon', value, featureCards, setFeatureCards)}
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue placeholder="Pilih ikon..." />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {availableIcons.map(iconName => (
+                                            <SelectItem key={iconName} value={iconName}>
+                                                <div className="flex items-center gap-2">
+                                                    <DynamicIcon name={iconName} className="h-4 w-4" />
+                                                    <span>{iconName}</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                    </SelectContent>
+                                </Select>
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor={`fc-title-${index}`} className="text-xs">Judul</Label>
@@ -380,7 +425,25 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2 flex-grow">
                                     <div className="space-y-1">
                                         <Label className="text-xs">Ikon</Label>
-                                        <Input name={`professionalServices[${serviceIndex}][icon]`} value={service.icon} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'icon', e.target.value, professionalServices, setProfessionalServices)} />
+                                         <Select
+                                            name={`professionalServices[${serviceIndex}][icon]`}
+                                            value={service.icon}
+                                            onValueChange={(value) => handleArrayOfObjectsChange(serviceIndex, 'icon', value, professionalServices, setProfessionalServices)}
+                                        >
+                                            <SelectTrigger>
+                                                <SelectValue placeholder="Pilih ikon..." />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {availableIcons.map(iconName => (
+                                                    <SelectItem key={iconName} value={iconName}>
+                                                        <div className="flex items-center gap-2">
+                                                            <DynamicIcon name={iconName} className="h-4 w-4" />
+                                                            <span>{iconName}</span>
+                                                        </div>
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
                                     </div>
                                     <div className="space-y-1">
                                         <Label className="text-xs">Judul</Label>
@@ -397,7 +460,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             </div>
                             <div className="pl-4 ml-4 border-l space-y-2">
                                 <Label className="text-xs font-semibold">Detail Layanan</Label>
-                                {service.details.map((detail, detailIndex) => (
+                                {(service.details || []).map((detail, detailIndex) => (
                                     <div key={detailIndex} className="flex items-center gap-2">
                                         <Input name={`professionalServices[${serviceIndex}][details][${detailIndex}]`} value={detail} onChange={e => handleServiceDetailChange(serviceIndex, detailIndex, e.target.value)} />
                                         <Button type="button" variant="ghost" size="icon" onClick={() => removeServiceDetail(serviceIndex, detailIndex)} className="text-destructive h-8 w-8">
