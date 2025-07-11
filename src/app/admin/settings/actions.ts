@@ -146,10 +146,11 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
     }).filter(item => {
         // Filter out items that are completely empty
         if (!item || typeof item !== 'object') return false;
+        // Check if any value in the object is a non-empty string.
         return Object.values(item).some(value => {
             if (typeof value === 'string') return value.trim() !== '';
             if (Array.isArray(value)) return value.length > 0;
-            return false; // Filter out if all values are empty or non-existent
+            return false;
         });
     });
 }
@@ -242,3 +243,5 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
+
+    

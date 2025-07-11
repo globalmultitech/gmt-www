@@ -39,7 +39,7 @@ const availableIcons = [
     'Star', 'Sun', 'Sunrise', 'Sunset', 'Table', 'Tag', 'Target', 'Terminal', 'ThumbsDown',
     'ThumbsUp', 'ToggleLeft', 'ToggleRight', 'Trash', 'Trash2', 'TrendingDown',
     'TrendingUp', 'Truck', 'Twitch', 'Twitter', 'Type', 'Umbrella', 'Unlock', 'Upload', 'UserCheck', 'UserPlus', 'UserX', 'Users', 'Video', 'Voicemail', 'Wallet', 'Watch',
-    'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap', 'Tools'
+    'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap'
 ].sort();
 
 
@@ -636,3 +636,5 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     </div>
   );
 }
+
+    

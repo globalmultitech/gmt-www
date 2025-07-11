@@ -1,3 +1,4 @@
+
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 import 'dotenv/config';
@@ -360,3 +361,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+    
