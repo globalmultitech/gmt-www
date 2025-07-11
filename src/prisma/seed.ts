@@ -37,6 +37,10 @@ async function main() {
       companyName: 'Global Multi Technology',
       whatsappSales: '+6281234567890',
       footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',
+      address: '139 Baker St, E1 7PT, London',
+      contactEmail: 'contacts@example.com',
+      contactPhone: '(02) 123 333 444',
+      openingHours: '8am-5pm Mon - Fri',
       socialMedia: {
         twitter: '#',
         facebook: '#',
@@ -46,11 +50,8 @@ async function main() {
       menuItems: [
         { label: 'Beranda', href: '/' },
         { label: 'Produk', href: '/produk' },
-        { label: 'Solusi', href: '/solusi' },
         { label: 'Layanan', href: '/layanan' },
-        { label: 'Resources', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
-        { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ],
       heroHeadline: 'Creative solutions to improve your business',
       heroDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.',
@@ -146,12 +147,12 @@ async function main() {
       ctaButtonLink: '/hubungi-kami',
       trustedByText: "Trusted by the world's leading companies",
       trustedByLogos: [
-          { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
-          { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
-          { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
-          { src: '/logo-placeholder-4.svg', alt: 'Client Logo 4' },
-          { src: '/logo-placeholder-5.svg', alt: 'Client Logo 5' },
-          { src: '/logo-placeholder-6.svg', alt: 'Client Logo 6' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 1' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 2' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 3' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 4' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 5' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 6' },
       ],
       testimonials: [
         {
