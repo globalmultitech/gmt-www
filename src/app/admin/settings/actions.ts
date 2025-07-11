@@ -7,8 +7,8 @@ import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
 
 const MenuItemSchema = z.object({
-  label: z.string(),
-  href: z.string(),
+  label: z.string().optional(),
+  href: z.string().optional(),
 });
 
 const SocialMediaLinksSchema = z.object({
@@ -19,48 +19,48 @@ const SocialMediaLinksSchema = z.object({
 });
 
 const FeatureCardSchema = z.object({
-    icon: z.string(),
-    title: z.string(),
-    description: z.string(),
+    icon: z.string().optional(),
+    title: z.string().optional(),
+    description: z.string().optional(),
 });
 
 const ProfessionalServiceDetailSchema = z.string();
 
 const ProfessionalServiceSchema = z.object({
-    icon: z.string(),
-    title: z.string(),
-    description: z.string(),
-    details: z.array(ProfessionalServiceDetailSchema),
+    icon: z.string().optional(),
+    title: z.string().optional(),
+    description: z.string().optional(),
+    details: z.array(ProfessionalServiceDetailSchema).optional(),
 });
 
 const TestimonialSchema = z.object({
-    quote: z.string(),
-    name: z.string(),
-    role: z.string(),
-    image: z.string(),
+    quote: z.string().optional(),
+    name: z.string().optional(),
+    role: z.string().optional(),
+    image: z.string().optional(),
     aiHint: z.string().optional(),
 });
 
 const BlogPostSchema = z.object({
-    image: z.string(),
-    aiHint: z.string(),
-    date: z.string(),
-    author: z.string(),
-    title: z.string(),
-    href: z.string(),
+    image: z.string().optional(),
+    aiHint: z.string().optional(),
+    date: z.string().optional(),
+    author: z.string().optional(),
+    title: z.string().optional(),
+    href: z.string().optional(),
 });
 
 
 const TrustedByLogoSchema = z.object({
-  src: z.string(),
-  alt: z.string(),
+  src: z.string().optional(),
+  alt: z.string().optional(),
 });
 
 const SettingsSchema = z.object({
   logoUrl: z.string().optional(),
-  companyName: z.string().min(1, 'Nama perusahaan tidak boleh kosong'),
-  whatsappSales: z.string().min(1, 'Nomor WhatsApp tidak boleh kosong'),
-  footerText: z.string().min(1, 'Teks footer tidak boleh kosong'),
+  companyName: z.string().optional(),
+  whatsappSales: z.string().optional(),
+  footerText: z.string().optional(),
   address: z.string().optional(),
   contactEmail: z.string().optional(),
   contactPhone: z.string().optional(),
@@ -146,16 +146,16 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
     return Object.values(items).filter(item => {
         if (typeof item !== 'object' || item === null) return false;
         
-        // Check for nested details array and filter it first
+        // Clean up nested details array first
         if (Array.isArray(item.details)) {
             item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
         }
 
         // Check if any of the main properties of the item has a value.
-        return Object.keys(item).some(key => {
-            const value = item[key];
-            if (key === 'details') {
-                return Array.isArray(value) && value.length > 0;
+        // This will now correctly filter out items where all fields are empty strings.
+        return Object.values(item).some(value => {
+            if (Array.isArray(value)) {
+                return value.length > 0;
             }
             return typeof value === 'string' && value.trim() !== '';
         });
@@ -261,4 +261,3 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
-
