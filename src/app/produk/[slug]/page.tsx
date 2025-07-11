@@ -182,7 +182,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                   <AccordionContent>
                       <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
-                      <p>{product.longDescription || product.description}</p>
+                        <div dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }} />
                       </article>
                   </AccordionContent>
                 </AccordionItem>

@@ -22,6 +22,7 @@ import { createProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import RichTextEditor from './rich-text-editor';
 
 type CategoryWithSubCategories = ProductCategory & {
   subCategories: ProductSubCategory[];
@@ -61,6 +62,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const [imageUrls, setImageUrls] = useState<string[]>((product?.images as string[]) ?? []);
   const [productTitle, setProductTitle] = useState(product?.title ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
+  const [longDescription, setLongDescription] = useState(product?.longDescription ?? '');
   const [features, setFeatures] = useState<string[]>(Array.isArray(product?.features) ? product.features : ['']);
   const [specifications, setSpecifications] = useState<{ key: string, value: string }[]>(
     product?.specifications && typeof product.specifications === 'object'
@@ -140,6 +142,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
         {isEditing && <input type="hidden" name="id" value={product.id} />}
         <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
         <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f.trim() !== ''))} />
+        <input type="hidden" name="longDescription" value={longDescription} />
         <input type="hidden" name="specifications" value={JSON.stringify(
             Object.fromEntries(specifications.filter(s => s.key.trim() !== '').map(s => [s.key, s.value]))
         )} />
@@ -161,8 +164,8 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                             <Textarea id="description" name="description" required defaultValue={product?.description} />
                         </div>
                         <div className="space-y-1">
-                            <Label htmlFor="longDescription">Deskripsi Lengkap</Label>
-                            <Textarea id="longDescription" name="longDescription" rows={8} defaultValue={product?.longDescription ?? ''} />
+                          <Label>Deskripsi Lengkap</Label>
+                          <RichTextEditor value={longDescription} onChange={setLongDescription} />
                         </div>
                     </CardContent>
                 </Card>
