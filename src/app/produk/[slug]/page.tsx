@@ -1,4 +1,5 @@
 
+
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
@@ -142,7 +143,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <>
-      <div className="bg-background pt-20">
+      <div className="bg-secondary pt-20">
         <div className="container mx-auto px-4">
           <div className="py-8 md:py-12">
             <Breadcrumbs productTitle={product.title} />
