@@ -12,7 +12,6 @@ import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCar
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSignedURL } from '../actions';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -56,7 +55,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [state, formAction] = useActionState(updateWebSettings, undefined);
 
   const [formState, setFormState] = useState(settings);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingStates, setUploadingStates] = useState<{[key: string]: boolean | {[key: number]: boolean}}>({});
   const [isDirty, setIsDirty] = useState(false);
 
   useEffect(() => {
@@ -98,52 +97,41 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => {
     setFormState(prev => ({...prev, socialMedia: {...prev.socialMedia, [platform]: value}}));
   };
-  
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  };
-  
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof WebSettings) => {
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof WebSettings, index?: number, subField?: 'image' | 'src') => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
-    try {
-      const checksum = await computeSHA256(file);
-      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-      
-      await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-      handleFieldChange(fieldName, publicUrl);
+    const uploadingKey = index !== undefined ? `${fieldName}-${index}` : fieldName;
+    setUploadingStates(prev => ({ ...prev, [uploadingKey]: true }));
 
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const { publicUrl } = await res.json();
+      
+      if (index !== undefined && subField) {
+        handleArrayChange(fieldName, index, subField, publicUrl);
+      } else {
+        handleFieldChange(fieldName, publicUrl);
+      }
     } catch (error) {
       console.error("Upload error:", error);
       toast({ title: 'Upload Gagal', variant: 'destructive' });
     } finally {
-      setIsUploading(false);
+      setUploadingStates(prev => ({ ...prev, [uploadingKey]: false }));
       event.target.value = '';
     }
   };
 
-  const handleDynamicImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, field: keyof WebSettings, index: number, subField: 'image' | 'src') => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      setIsUploading(true);
-      try {
-        const checksum = await computeSHA256(file);
-        const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-        await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-        handleArrayChange(field, index, subField, publicUrl);
-      } catch (error) {
-        console.error("Upload error:", error);
-        toast({ title: 'Upload Gagal', variant: 'destructive' });
-      } finally {
-        setIsUploading(false);
-        event.target.value = '';
-      }
-  }
 
   useEffect(() => {
     if (state?.message) {
@@ -181,8 +169,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                     {formState.logoUrl ? ( <Image src={formState.logoUrl} alt="Logo Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <Input id={'logo-upload'} type="file" onChange={(e) => handleImageUpload(e, 'logoUrl')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
-                                    {isUploading && <Loader2 className="animate-spin" />}
+                                    <Input id={'logo-upload'} type="file" onChange={(e) => handleImageUpload(e, 'logoUrl')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={!!uploadingStates['logoUrl']} />
+                                    {uploadingStates['logoUrl'] && <Loader2 className="animate-spin" />}
                                 </div>
                             </div>
                             <div className="space-y-4">
@@ -281,8 +269,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                     {formState.heroImageUrl ? ( <Image src={formState.heroImageUrl} alt="Hero Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <Input id={'hero-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'heroImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
-                                    {isUploading && <Loader2 className="animate-spin" />}
+                                    <Input id={'hero-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'heroImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={!!uploadingStates['heroImageUrl']} />
+                                    {uploadingStates['heroImageUrl'] && <Loader2 className="animate-spin" />}
                                 </div>
                             </div>
                             <div className="space-y-4">
@@ -361,8 +349,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                     {formState.aboutUsImageUrl ? ( <Image src={formState.aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <Input id={'about-us-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'aboutUsImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
-                                    {isUploading && <Loader2 className="animate-spin" />}
+                                    <Input id={'about-us-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'aboutUsImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={!!uploadingStates['aboutUsImageUrl']} />
+                                    {uploadingStates['aboutUsImageUrl'] && <Loader2 className="animate-spin" />}
                                 </div>
                             </div>
                             <div className="space-y-4">
@@ -400,8 +388,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                     {formState.ctaImageUrl ? ( <Image src={formState.ctaImageUrl} alt="CTA Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
-                                    <Input id={'cta-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'ctaImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
-                                    {isUploading && <Loader2 className="animate-spin" />}
+                                    <Input id={'cta-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'ctaImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={!!uploadingStates['ctaImageUrl']} />
+                                    {uploadingStates['ctaImageUrl'] && <Loader2 className="animate-spin" />}
                                 </div>
                             </div>
                             <div className="space-y-4">
@@ -438,7 +426,10 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                         <div className="grid grid-cols-1 gap-2 flex-grow">
                                             <div className="space-y-1">
                                                 <Label htmlFor={`logo-file-${index}`} className="text-xs">File Gambar Logo</Label>
-                                                <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleDynamicImageUpload(e, 'trustedByLogos', index, 'src')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
+                                                <div className="flex items-center gap-2">
+                                                    <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleImageUpload(e, 'trustedByLogos', index, 'src')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={!!(uploadingStates['trustedByLogos'] as any)?.[index]} />
+                                                    {(uploadingStates['trustedByLogos'] as any)?.[index] && <Loader2 className="animate-spin" />}
+                                                </div>
                                             </div>
                                             <div className="space-y-1">
                                                 <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
@@ -470,7 +461,10 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                         <div className="relative w-24 h-24 rounded-md bg-muted overflow-hidden border">
                                             {item.image ? ( <Image src={item.image} alt={item.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                                         </div>
-                                        <Input type="file" onChange={(e) => handleDynamicImageUpload(e, 'testimonials', index, 'image')} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/>
+                                        <div className="flex items-center gap-2 w-24">
+                                            <Input type="file" onChange={(e) => handleImageUpload(e, 'testimonials', index, 'image')} accept="image/png, image/jpeg" disabled={!!(uploadingStates['testimonials'] as any)?.[index]} className="w-full"/>
+                                            {(uploadingStates['testimonials'] as any)?.[index] && <Loader2 className="animate-spin" />}
+                                        </div>
                                     </div>
                                     <div className="flex-grow space-y-2">
                                     <div className="space-y-1">

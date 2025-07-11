@@ -12,7 +12,6 @@ import type { WebSettings } from '@/lib/settings';
 import { updateSolutions, updateSolusiPageSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSignedURL } from '../../actions';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -73,7 +72,7 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
 
   const [isHeaderDirty, setIsHeaderDirty] = useState(false);
   const [isSolutionsDirty, setIsSolutionsDirty] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingStates, setUploadingStates] = useState<{[key: number]: boolean}>({});
 
   useEffect(() => {
     setHeaderForm({
@@ -149,27 +148,29 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
     });
   };
 
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  };
-
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
       const file = event.target.files?.[0];
       if (!file) return;
-      setIsUploading(true);
+
+      setUploadingStates(prev => ({...prev, [index]: true}));
+      const formData = new FormData();
+      formData.append('file', file);
+      
       try {
-        const checksum = await computeSHA256(file);
-        const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-        await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        });
+        if (!res.ok) {
+            throw new Error('Failed to upload image');
+        }
+        const { publicUrl } = await res.json();
         handleSolutionChange(index, 'image', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
         toast({ title: 'Upload Gagal', variant: 'destructive' });
       } finally {
-        setIsUploading(false);
+        setUploadingStates(prev => ({...prev, [index]: false}));
         event.target.value = '';
       }
   }
@@ -250,7 +251,10 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
                             <div className="relative w-full h-32 rounded-md bg-muted overflow-hidden border">
                                 {solution.image ? ( <Image src={solution.image} alt={solution.title} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                             </div>
-                            <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg" disabled={isUploading}/>
+                            <div className="flex items-center gap-2">
+                              <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[index]}/>
+                              {uploadingStates[index] && <Loader2 className="h-4 w-4 animate-spin" />}
+                            </div>
                         </div>
                          <div className="space-y-1">
                             <Label className="text-xs">AI Hint (u/ gambar)</Label>

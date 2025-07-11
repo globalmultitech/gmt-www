@@ -8,11 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
-import { updateResourcesPageSettings } from './actions';
+import { updateResourcesPageSettings, updateNewsItems } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSignedURL } from '../../actions';
 import Image from 'next/image';
+import type { NewsItem } from '@prisma/client';
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
@@ -23,64 +23,87 @@ function SubmitButton({ isDirty }: { isDirty: boolean }) {
   );
 }
 
-export default function ResourcesPageClientPage({ settings }: { settings: WebSettings }) {
-  const { toast } = useToast();
-  const [state, formAction] = useActionState(updateResourcesPageSettings, undefined);
+type ResourcesPageClientProps = {
+  settings: WebSettings;
+  initialNewsItems: NewsItem[];
+};
 
-  const initialFormState = {
+export default function ResourcesPageClientPage({ settings, initialNewsItems }: ResourcesPageClientProps) {
+  const { toast } = useToast();
+  const [headerState, headerFormAction] = useActionState(updateResourcesPageSettings, undefined);
+  const [newsState, newsFormAction] = useActionState(updateNewsItems, undefined);
+
+  const [headerForm, setHeaderForm] = useState({
     resourcesPageTitle: settings.resourcesPageTitle ?? '',
     resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
-    newsItems: settings.newsItems ?? [],
-  };
+  });
 
-  const [formState, setFormState] = useState(initialFormState);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(initialNewsItems);
+
   const [isUploading, setIsUploading] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
+  const [isHeaderDirty, setIsHeaderDirty] = useState(false);
+  const [isNewsDirty, setIsNewsDirty] = useState(false);
 
   useEffect(() => {
-    setFormState(initialFormState);
+    setHeaderForm({
+      resourcesPageTitle: settings.resourcesPageTitle ?? '',
+      resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
+    });
+    setNewsItems(initialNewsItems);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings]);
+  }, [settings, initialNewsItems]);
 
   useEffect(() => {
-    setIsDirty(JSON.stringify(formState) !== JSON.stringify(initialFormState));
-  }, [formState, initialFormState]);
+    setIsHeaderDirty(JSON.stringify(headerForm) !== JSON.stringify({
+      resourcesPageTitle: settings.resourcesPageTitle ?? '',
+      resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
+    }));
+  }, [headerForm, settings]);
 
-  const handleFieldChange = (field: keyof typeof initialFormState, value: any) => {
-    setFormState(prev => ({ ...prev, [field]: value }));
+  useEffect(() => {
+    setIsNewsDirty(JSON.stringify(newsItems) !== JSON.stringify(initialNewsItems));
+  }, [newsItems, initialNewsItems]);
+
+  const handleHeaderChange = (field: keyof typeof headerForm, value: string) => {
+    setHeaderForm(prev => ({ ...prev, [field]: value }));
   };
 
   const handleItemChange = (index: number, field: string, value: string) => {
-    setFormState(prev => {
-        const newItems = [...prev.newsItems];
+    setNewsItems(prev => {
+        const newItems = [...prev];
+        // @ts-ignore
         newItems[index] = {...newItems[index], [field]: value};
-        return {...prev, newsItems: newItems};
+        return newItems;
     });
   };
 
   const addItem = () => {
-    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { title: '', category: '', date: '', image: '', aiHint: ''}]}));
+    // @ts-ignore
+    setNewsItems(prev => [...prev, { id: Date.now(), title: '', category: '', date: '', image: '', aiHint: '', createdAt: new Date(), updatedAt: new Date() }]);
   };
 
   const removeItem = (index: number) => {
-    setFormState(prev => ({...prev, newsItems: prev.newsItems.filter((_, i) => i !== index)}));
-  };
-
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+    setNewsItems(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
       const file = event.target.files?.[0];
       if (!file) return;
       setIsUploading(true);
+      const formData = new FormData();
+      formData.append("file", file);
+      
       try {
-        const checksum = await computeSHA256(file);
-        const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-        await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to upload image');
+        }
+        
+        const { publicUrl } = await res.json();
         handleItemChange(index, 'image', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
@@ -92,18 +115,28 @@ export default function ResourcesPageClientPage({ settings }: { settings: WebSet
   }
 
   useEffect(() => {
-    if (state?.message) {
-      const isSuccess = state.message.includes('berhasil');
+    if (headerState?.message) {
+      const isSuccess = headerState.message.includes('berhasil');
       toast({
         title: isSuccess ? 'Sukses' : 'Gagal',
-        description: state.message,
+        description: headerState.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
-      if (isSuccess) {
-        setIsDirty(false);
-      }
+      if (isSuccess) setIsHeaderDirty(false);
     }
-  }, [state, toast]);
+  }, [headerState, toast]);
+
+  useEffect(() => {
+    if (newsState?.message) {
+      const isSuccess = newsState.message.includes('berhasil');
+      toast({
+        title: isSuccess ? 'Sukses' : 'Gagal',
+        description: newsState.message,
+        variant: isSuccess ? 'default' : 'destructive',
+      });
+      if (isSuccess) setIsNewsDirty(false);
+    }
+  }, [newsState, toast]);
 
   return (
     <div>
@@ -112,45 +145,55 @@ export default function ResourcesPageClientPage({ settings }: { settings: WebSet
         <p className="text-muted-foreground">Kelola berita dan artikel yang tampil di halaman Resources.</p>
       </div>
 
-      <form action={formAction} className="space-y-6">
-        <input type="hidden" name="resourcesData" value={JSON.stringify(formState)} />
+      <form action={headerFormAction} className="space-y-6 mb-6">
+        <input type="hidden" name="headerData" value={JSON.stringify(headerForm)} />
         <Card>
             <CardHeader>
                 <CardTitle>Header Halaman</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="resourcesPageTitle">Judul Halaman</Label><Input id="resourcesPageTitle" value={formState.resourcesPageTitle} onChange={e => handleFieldChange('resourcesPageTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="resourcesPageSubtitle">Subjudul Halaman</Label><Input id="resourcesPageSubtitle" value={formState.resourcesPageSubtitle} onChange={e => handleFieldChange('resourcesPageSubtitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="resourcesPageTitle">Judul Halaman</Label><Input id="resourcesPageTitle" value={headerForm.resourcesPageTitle} onChange={e => handleHeaderChange('resourcesPageTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="resourcesPageSubtitle">Subjudul Halaman</Label><Input id="resourcesPageSubtitle" value={headerForm.resourcesPageSubtitle} onChange={e => handleHeaderChange('resourcesPageSubtitle', e.target.value)} /></div>
+                <div className="flex justify-end">
+                    <SubmitButton isDirty={isHeaderDirty}/>
+                </div>
             </CardContent>
         </Card>
+      </form>
 
+      <form action={newsFormAction} className="space-y-6">
+        <input type="hidden" name="newsData" value={JSON.stringify(newsItems)} />
         <Card>
             <CardHeader>
                 <CardTitle>Berita Terbaru</CardTitle>
                 <CardDescription>Kelola daftar berita yang ditampilkan di halaman Resources.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {formState.newsItems.map((item, index) => (
-                    <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                        <div className="flex-shrink-0 space-y-2"><div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">{item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}</div><Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg" disabled={isUploading} className="w-40" /></div>
+                {newsItems.map((item, index) => (
+                    <div key={item.id} className="flex items-start gap-4 p-4 border rounded-md">
+                        <div className="flex-shrink-0 space-y-2">
+                          <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
+                            {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
+                          </div>
+                          <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading} className="w-40" />
+                        </div>
                         <div className="flex-grow space-y-2">
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1"><Label className="text-xs">Judul</Label><Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} /></div>
                                 <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
                                 <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input value={item.date} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">AI Hint</Label><Input value={item.aiHint} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">AI Hint</Label><Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
                             </div>
                         </div>
                         <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
                 <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Berita</Button>
+                 <div className="flex justify-end pt-4">
+                  <SubmitButton isDirty={isNewsDirty}/>
+                </div>
             </CardContent>
         </Card>
-
-        <div className="mt-8 flex justify-end">
-          <SubmitButton isDirty={isDirty}/>
-        </div>
       </form>
     </div>
   );

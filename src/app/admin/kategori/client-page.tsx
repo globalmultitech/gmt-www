@@ -35,7 +35,6 @@ import {
 } from './actions';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
-import { getSignedURL } from '../actions';
 import { Textarea } from '@/components/ui/textarea';
 
 type CategoryWithSubCategories = ProductCategory & {
@@ -62,32 +61,27 @@ export default function CategoryManagementClientPage({ categories }: { categorie
   const [isUploading, setIsUploading] = useState(false);
   const [imageUrl, setImageUrl] = useState('');
 
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    return hashHex;
-  };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
     try {
-      const checksum = await computeSHA256(file);
-      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-      
-      await fetch(signedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
+      const res = await fetch('/api/upload', {
+        method: 'POST',
+        body: formData,
       });
 
+      if (!res.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const { publicUrl } = await res.json();
       setImageUrl(publicUrl);
+
     } catch (error) {
       console.error("Upload error:", error);
       toast({
@@ -167,8 +161,8 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                 <Accordion type="multiple" className="w-full">
                     {categories.map((category) => (
                         <AccordionItem value={`category-${category.id}`} key={category.id}>
-                            <div className="flex justify-between items-center pr-4">
-                                <AccordionTrigger className="font-semibold text-lg hover:no-underline flex-grow">
+                             <div className="flex justify-between items-center pr-4 border-b">
+                                <AccordionTrigger className="font-semibold text-lg hover:no-underline flex-grow py-4">
                                     <div className="flex items-center gap-4">
                                         <div className="relative w-16 h-10 rounded-md bg-muted overflow-hidden">
                                         {category.imageUrl ? (
@@ -182,7 +176,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                                         <span>{category.name}</span>
                                     </div>
                                 </AccordionTrigger>
-                                <div className="flex items-center gap-1 pl-2">
+                                <div className="flex items-center gap-1 pl-2 shrink-0">
                                     <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(category)}>
                                         <Pencil className="h-4 w-4" />
                                     </Button>
@@ -206,7 +200,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                                 </div>
                             </div>
                             <AccordionContent>
-                                <div className="pl-4 space-y-2">
+                                <div className="pl-4 space-y-2 pt-4">
                                     {category.subCategories.length === 0 && <p className="text-sm text-muted-foreground">Belum ada sub-kategori.</p>}
                                     {category.subCategories.map((sub) => (
                                         <div key={sub.id} className="flex justify-between items-center p-2 rounded-md hover:bg-secondary">

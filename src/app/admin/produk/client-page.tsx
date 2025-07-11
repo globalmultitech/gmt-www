@@ -49,7 +49,6 @@ import type { Product, ProductCategory, ProductSubCategory } from '@prisma/clien
 import { createProduct, deleteProduct, updateProduct } from './actions';
 import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
-import { getSignedURL } from '../actions';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 
@@ -136,31 +135,25 @@ export default function ProductManagementClientPage({ products, categories }: { 
     setSlug(generateSlug(newTitle));
   }
 
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    const hashHex = hashArray
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-    return hashHex;
-  };
-
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const checksum = await computeSHA256(file);
-      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-      
-      await fetch(signedUrl, {
-        method: 'PUT',
-        body: file,
-        headers: { 'Content-Type': file.type },
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
       });
 
+      if (!res.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const { publicUrl } = await res.json();
       setImageUrls(prev => [...prev, publicUrl]);
     } catch (error) {
       console.error("Upload error:", error);

@@ -12,7 +12,6 @@ import type { WebSettings } from '@/lib/settings';
 import { updateLayananPageSettings, updateProfessionalServices } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSignedURL } from '../../actions';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -156,23 +155,25 @@ export default function LayananPageClientPage({ settings, initialServices }: Lay
     });
   };
 
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
-  };
-  
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
     try {
-      const checksum = await computeSHA256(file);
-      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-      
-      await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) {
+        throw new Error("Failed to upload image");
+      }
+
+      const { publicUrl } = await res.json();
       handleHeaderChange('servicesPageHeaderImageUrl', publicUrl);
 
     } catch (error) {

@@ -9,11 +9,11 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
-import { updateTentangKamiPageSettings } from './actions';
+import { updateTentangKamiPageSettings, updateTimeline, updateTeamMembers } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { getSignedURL } from '../../actions';
 import Image from 'next/image';
+import type { TimelineEvent, TeamMember } from '@prisma/client';
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
@@ -24,100 +24,170 @@ function SubmitButton({ isDirty }: { isDirty: boolean }) {
   );
 }
 
-export default function TentangKamiPageClientPage({ settings }: { settings: WebSettings }) {
+type TentangKamiPageClientProps = {
+  settings: WebSettings;
+  initialTimeline: TimelineEvent[];
+  initialTeamMembers: TeamMember[];
+};
+
+export default function TentangKamiPageClientPage({ settings, initialTimeline, initialTeamMembers }: TentangKamiPageClientProps) {
   const { toast } = useToast();
-  const [state, formAction] = useActionState(updateTentangKamiPageSettings, undefined);
+  const [headerState, headerFormAction] = useActionState(updateTentangKamiPageSettings, undefined);
+  const [timelineState, timelineFormAction] = useActionState(updateTimeline, undefined);
+  const [teamState, teamFormAction] = useActionState(updateTeamMembers, undefined);
   
-  const initialFormState = {
+  const [headerForm, setHeaderForm] = useState({
     aboutPageTitle: settings.aboutPageTitle ?? '',
     aboutPageSubtitle: settings.aboutPageSubtitle ?? '',
     missionTitle: settings.missionTitle ?? '',
     missionText: settings.missionText ?? '',
     visionTitle: settings.visionTitle ?? '',
     visionText: settings.visionText ?? '',
-    timeline: settings.timeline ?? [],
-    teamMembers: settings.teamMembers ?? [],
-  };
+  });
+  
+  const [timeline, setTimeline] = useState<TimelineEvent[]>(initialTimeline);
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(initialTeamMembers);
 
-  const [formState, setFormState] = useState(initialFormState);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
+  const [uploadingStates, setUploadingStates] = useState<{[key: number]: boolean}>({});
+  const [isHeaderDirty, setIsHeaderDirty] = useState(false);
+  const [isTimelineDirty, setIsTimelineDirty] = useState(false);
+  const [isTeamDirty, setIsTeamDirty] = useState(false);
 
   useEffect(() => {
-    setFormState(initialFormState);
+    setHeaderForm({
+      aboutPageTitle: settings.aboutPageTitle ?? '',
+      aboutPageSubtitle: settings.aboutPageSubtitle ?? '',
+      missionTitle: settings.missionTitle ?? '',
+      missionText: settings.missionText ?? '',
+      visionTitle: settings.visionTitle ?? '',
+      visionText: settings.visionText ?? '',
+    });
+    setTimeline(initialTimeline);
+    setTeamMembers(initialTeamMembers);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings]);
+  }, [settings, initialTimeline, initialTeamMembers]);
 
   useEffect(() => {
-    setIsDirty(JSON.stringify(formState) !== JSON.stringify(initialFormState));
-  }, [formState, initialFormState]);
+    setIsHeaderDirty(JSON.stringify(headerForm) !== JSON.stringify({
+      aboutPageTitle: settings.aboutPageTitle ?? '',
+      aboutPageSubtitle: settings.aboutPageSubtitle ?? '',
+      missionTitle: settings.missionTitle ?? '',
+      missionText: settings.missionText ?? '',
+      visionTitle: settings.visionTitle ?? '',
+      visionText: settings.visionText ?? '',
+    }));
+  }, [headerForm, settings]);
+  
+  useEffect(() => {
+      setIsTimelineDirty(JSON.stringify(timeline) !== JSON.stringify(initialTimeline));
+  }, [timeline, initialTimeline]);
+  
+  useEffect(() => {
+      setIsTeamDirty(JSON.stringify(teamMembers) !== JSON.stringify(initialTeamMembers));
+  }, [teamMembers, initialTeamMembers]);
 
-  const handleFieldChange = (field: keyof typeof initialFormState, value: any) => {
-    setFormState(prev => ({ ...prev, [field]: value }));
+  const handleHeaderChange = (field: keyof typeof headerForm, value: string) => {
+    setHeaderForm(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleArrayChange = (field: 'timeline' | 'teamMembers', index: number, subField: string, value: string) => {
-    setFormState(prev => {
-      const newArray = [...prev[field]];
+  const handleTimelineChange = (index: number, field: keyof TimelineEvent, value: string) => {
+    setTimeline(prev => {
+      const newTimeline = [...prev];
       // @ts-ignore
-      newArray[index] = { ...newArray[index], [subField]: value };
-      return { ...prev, [field]: newArray };
+      newTimeline[index] = { ...newTimeline[index], [field]: value };
+      return newTimeline;
     });
   };
 
-  const addItemToArray = (field: 'timeline' | 'teamMembers') => {
-    if (field === 'timeline') {
-      setFormState(prev => ({...prev, timeline: [...prev.timeline, { year: '', event: ''}]}));
-    } else {
-      setFormState(prev => ({...prev, teamMembers: [...prev.teamMembers, { name: '', role: '', image: '', linkedin: '', aiHint: ''}]}));
-    }
-  };
-
-  const removeItemFromArray = (field: 'timeline' | 'teamMembers', index: number) => {
-    setFormState(prev => {
-      const newArray = prev[field].filter((_, i) => i !== index);
-      return { ...prev, [field]: newArray };
+  const handleTeamChange = (index: number, field: keyof TeamMember, value: string) => {
+    setTeamMembers(prev => {
+      const newMembers = [...prev];
+       // @ts-ignore
+      newMembers[index] = { ...newMembers[index], [field]: value };
+      return newMembers;
     });
   };
 
-  const computeSHA256 = async (file: File) => {
-    const buffer = await file.arrayBuffer();
-    const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
+  const addTimelineItem = () => {
+    // @ts-ignore
+    setTimeline(prev => [...prev, { id: Date.now(), year: '', event: '', createdAt: new Date(), updatedAt: new Date() }]);
+  };
+  const removeTimelineItem = (index: number) => {
+    setTimeline(prev => prev.filter((_, i) => i !== index));
+  };
+  
+  const addTeamMember = () => {
+    // @ts-ignore
+    setTeamMembers(prev => [...prev, { id: Date.now(), name: '', role: '', image: '', linkedin: '#', aiHint: '', createdAt: new Date(), updatedAt: new Date() }]);
+  };
+  const removeTeamMember = (index: number) => {
+    setTeamMembers(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
       const file = event.target.files?.[0];
       if (!file) return;
-      setIsUploading(true);
+
+      setUploadingStates(prev => ({...prev, [index]: true}));
+      const formData = new FormData();
+      formData.append('file', file);
+      
       try {
-        const checksum = await computeSHA256(file);
-        const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-        await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-        handleArrayChange('teamMembers', index, 'image', publicUrl);
+        const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!res.ok) {
+            throw new Error('Failed to upload image');
+        }
+        
+        const { publicUrl } = await res.json();
+        handleTeamChange(index, 'image', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
         toast({ title: 'Upload Gagal', variant: 'destructive' });
       } finally {
-        setIsUploading(false);
+        setUploadingStates(prev => ({...prev, [index]: false}));
         event.target.value = '';
       }
   }
 
   useEffect(() => {
-    if (state?.message) {
-      const isSuccess = state.message.includes('berhasil');
+    if (headerState?.message) {
+      const isSuccess = headerState.message.includes('berhasil');
       toast({
         title: isSuccess ? 'Sukses' : 'Gagal',
-        description: state.message,
+        description: headerState.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
-      if (isSuccess) {
-        setIsDirty(false);
-      }
+      if (isSuccess) setIsHeaderDirty(false);
     }
-  }, [state, toast]);
+  }, [headerState, toast]);
+
+  useEffect(() => {
+    if (timelineState?.message) {
+      const isSuccess = timelineState.message.includes('berhasil');
+      toast({
+        title: isSuccess ? 'Sukses' : 'Gagal',
+        description: timelineState.message,
+        variant: isSuccess ? 'default' : 'destructive',
+      });
+      if (isSuccess) setIsTimelineDirty(false);
+    }
+  }, [timelineState, toast]);
+
+  useEffect(() => {
+    if (teamState?.message) {
+      const isSuccess = teamState.message.includes('berhasil');
+      toast({
+        title: isSuccess ? 'Sukses' : 'Gagal',
+        description: teamState.message,
+        variant: isSuccess ? 'default' : 'destructive',
+      });
+      if (isSuccess) setIsTeamDirty(false);
+    }
+  }, [teamState, toast]);
 
   return (
     <div>
@@ -126,74 +196,87 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
         <p className="text-muted-foreground">Kelola konten yang tampil di halaman Tentang Kami.</p>
       </div>
 
-      <form action={formAction} className="space-y-6">
-        <input type="hidden" name="tentangKamiData" value={JSON.stringify(formState)} />
+      <form action={headerFormAction} className="space-y-6">
+        <input type="hidden" name="tentangKamiData" value={JSON.stringify(headerForm)} />
         <Card>
             <CardHeader>
-                <CardTitle>Header Halaman</CardTitle>
+                <CardTitle>Header, Misi & Visi</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="aboutPageTitle">Judul Halaman</Label><Input id="aboutPageTitle" value={formState.aboutPageTitle} onChange={e => handleFieldChange('aboutPageTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="aboutPageSubtitle">Subjudul Halaman</Label><Input id="aboutPageSubtitle" value={formState.aboutPageSubtitle} onChange={e => handleFieldChange('aboutPageSubtitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="aboutPageTitle">Judul Halaman</Label><Input id="aboutPageTitle" value={headerForm.aboutPageTitle} onChange={e => handleHeaderChange('aboutPageTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="aboutPageSubtitle">Subjudul Halaman</Label><Input id="aboutPageSubtitle" value={headerForm.aboutPageSubtitle} onChange={e => handleHeaderChange('aboutPageSubtitle', e.target.value)} /></div>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
+                    <div className="space-y-2"><Label htmlFor="missionTitle">Judul Misi</Label><Input id="missionTitle" value={headerForm.missionTitle} onChange={e => handleHeaderChange('missionTitle', e.target.value)} /></div>
+                    <div className="space-y-2"><Label htmlFor="missionText">Teks Misi</Label><Textarea id="missionText" value={headerForm.missionText} onChange={e => handleHeaderChange('missionText', e.target.value)} /></div>
+                    <div className="space-y-2"><Label htmlFor="visionTitle">Judul Visi</Label><Input id="visionTitle" value={headerForm.visionTitle} onChange={e => handleHeaderChange('visionTitle', e.target.value)} /></div>
+                    <div className="space-y-2"><Label htmlFor="visionText">Teks Visi</Label><Textarea id="visionText" value={headerForm.visionText} onChange={e => handleHeaderChange('visionText', e.target.value)} /></div>
+                </div>
+                 <div className="flex justify-end">
+                    <SubmitButton isDirty={isHeaderDirty}/>
+                </div>
             </CardContent>
         </Card>
+      </form>
 
-        <Card>
-            <CardHeader>
-                <CardTitle>Misi & Visi</CardTitle>
-            </CardHeader>
-            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label htmlFor="missionTitle">Judul Misi</Label><Input id="missionTitle" value={formState.missionTitle} onChange={e => handleFieldChange('missionTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="missionText">Teks Misi</Label><Textarea id="missionText" value={formState.missionText} onChange={e => handleFieldChange('missionText', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="visionTitle">Judul Visi</Label><Input id="visionTitle" value={formState.visionTitle} onChange={e => handleFieldChange('visionTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="visionText">Teks Visi</Label><Textarea id="visionText" value={formState.visionText} onChange={e => handleFieldChange('visionText', e.target.value)} /></div>
-            </CardContent>
-        </Card>
-
+      <form action={timelineFormAction} className="space-y-6 mt-6">
+        <input type="hidden" name="timelineData" value={JSON.stringify(timeline)} />
         <Card>
             <CardHeader>
                 <CardTitle>Sejarah Perusahaan (Timeline)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {formState.timeline.map((item, index) => (
-                    <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
+                {timeline.map((item, index) => (
+                    <div key={item.id} className="flex items-end gap-2 p-2 border rounded-md">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
-                            <div className="space-y-1"><Label className="text-xs">Tahun</Label><Input value={item.year} onChange={e => handleArrayChange('timeline', index, 'year', e.target.value)} /></div>
-                            <div className="space-y-1"><Label className="text-xs">Kejadian</Label><Input value={item.event} onChange={e => handleArrayChange('timeline', index, 'event', e.target.value)} /></div>
+                            <div className="space-y-1"><Label className="text-xs">Tahun</Label><Input value={item.year} onChange={e => handleTimelineChange(index, 'year', e.target.value)} /></div>
+                            <div className="space-y-1"><Label className="text-xs">Kejadian</Label><Input value={item.event} onChange={e => handleTimelineChange(index, 'event', e.target.value)} /></div>
                         </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('timeline', index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeTimelineItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => addItemToArray('timeline')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Sejarah</Button>
+                <Button type="button" variant="outline" onClick={addTimelineItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Sejarah</Button>
+                <div className="flex justify-end">
+                    <SubmitButton isDirty={isTimelineDirty}/>
+                </div>
             </CardContent>
         </Card>
+      </form>
 
+      <form action={teamFormAction} className="space-y-6 mt-6">
+        <input type="hidden" name="teamData" value={JSON.stringify(teamMembers)} />
         <Card>
             <CardHeader>
                 <CardTitle>Tim Kami</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {formState.teamMembers.map((member, index) => (
-                    <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                        <div className="flex-shrink-0 space-y-2"><div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden border">{member.image ? ( <Image src={member.image} alt={member.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}</div><Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/></div>
+                {teamMembers.map((member, index) => (
+                    <div key={member.id} className="flex items-start gap-4 p-4 border rounded-md">
+                        <div className="flex-shrink-0 space-y-2">
+                          <div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden border">
+                            {member.image ? ( <Image src={member.image} alt={member.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                          </div>
+                          <div className="flex items-center gap-2 w-24">
+                            <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[index]} className="w-full"/>
+                            {uploadingStates[index] && <Loader2 className="h-4 w-4 animate-spin" />}
+                          </div>
+                        </div>
                         <div className="flex-grow space-y-2">
                             <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1"><Label className="text-xs">Nama</Label><Input value={member.name} onChange={e => handleArrayChange('teamMembers', index, 'name', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Jabatan</Label><Input value={member.role} onChange={e => handleArrayChange('teamMembers', index, 'role', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input value={member.linkedin} onChange={e => handleArrayChange('teamMembers', index, 'linkedin', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input value={member.aiHint} onChange={e => handleArrayChange('teamMembers', index, 'aiHint', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Nama</Label><Input value={member.name} onChange={e => handleTeamChange(index, 'name', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Jabatan</Label><Input value={member.role} onChange={e => handleTeamChange(index, 'role', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input value={member.linkedin || ''} onChange={e => handleTeamChange(index, 'linkedin', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input value={member.aiHint || ''} onChange={e => handleTeamChange(index, 'aiHint', e.target.value)} /></div>
                             </div>
                         </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('teamMembers', index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeTeamMember(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => addItemToArray('teamMembers')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Anggota Tim</Button>
+                <Button type="button" variant="outline" onClick={addTeamMember}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Anggota Tim</Button>
+                 <div className="flex justify-end">
+                    <SubmitButton isDirty={isTeamDirty}/>
+                </div>
             </CardContent>
         </Card>
-
-        <div className="mt-8 flex justify-end">
-          <SubmitButton isDirty={isDirty}/>
-        </div>
       </form>
     </div>
   );
