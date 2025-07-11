@@ -1,3 +1,5 @@
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Eye, Flag, Rocket, Users, Linkedin } from 'lucide-react';
@@ -22,11 +24,10 @@ const teamMembers = [
 export default function TentangKamiPage() {
   return (
     <>
-      <section className="relative h-[50vh] bg-primary text-primary-foreground flex items-center justify-center">
-        <Image src="https://placehold.co/1920x1080.png" alt="Tim Global Multi Technology" layout="fill" objectFit="cover" className="opacity-20" data-ai-hint="office team working"/>
-        <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-headline font-bold">Tentang Kami</h1>
-          <p className="mt-4 text-xl text-primary-foreground/80 max-w-3xl mx-auto">
+      <section className="bg-dark-slate">
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Tentang Kami</h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
             Mendorong Inovasi, Memberdayakan Pertumbuhan.
           </p>
         </div>
