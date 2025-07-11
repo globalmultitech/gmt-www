@@ -10,7 +10,7 @@ import prisma from '@/lib/db';
 export default async function ResourcesPage() {
   const settings = await getSettings();
   const newsItems = await prisma.newsItem.findMany({
-    orderBy: { date: 'desc' }
+    orderBy: { id: 'desc' }
   });
 
   return (
