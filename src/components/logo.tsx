@@ -14,7 +14,7 @@ export function Logo({
   className,
   companyName = 'Global Multi Technology',
   logoUrl,
-  scrolled,
+  scrolled, // kept for prop compatibility, but not used for sizing
   variant = 'default',
 }: LogoProps) {
   const imageSizeClasses = {
@@ -39,8 +39,8 @@ export function Logo({
           <Image
             src={logoUrl}
             alt={`Logo ${companyName}`}
-            width={variant === 'footer' ? 80 : 80}
-            height={variant === 'footer' ? 80 : 80}
+            width={80}
+            height={80}
             className={cn('object-contain', imageSizeClasses[variant])}
             priority
           />
