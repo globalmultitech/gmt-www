@@ -110,7 +110,7 @@ export default async function CategoryProductPage({ params }: Props) {
   return (
     <>
       {/* Page Header */}
-      <section className="bg-secondary">
+      <section className="bg-secondary pt-20">
         <div className="container mx-auto px-4 py-8">
             <Breadcrumbs categoryName={category.name} />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{category.name}</h1>
