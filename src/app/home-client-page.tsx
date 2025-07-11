@@ -252,7 +252,7 @@ export default function HomeClientPage({ products, settings, professionalService
                         <div key={post.id} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                             <div className="relative overflow-hidden rounded-lg mb-6">
                               <Link href={`/resources/${post.slug}`}>
-                                <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint || 'news article'}/>
+                                <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint="news article"/>
                               </Link>
                             </div>
                             <div className="text-sm text-muted-foreground mb-2">
@@ -286,3 +286,5 @@ export default function HomeClientPage({ products, settings, professionalService
     </div>
   );
 }
+
+    
