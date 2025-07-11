@@ -81,7 +81,7 @@ export default function SolusiPage() {
                   <ul className="space-y-2 pt-2">
                     {solution.keyPoints.map((point, i) => (
                       <li key={i} className="flex items-start gap-3">
-                        <Handshake className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                        <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
                         <span className="text-muted-foreground">{point}</span>
                       </li>
                     ))}

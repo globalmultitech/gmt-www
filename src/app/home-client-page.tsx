@@ -136,7 +136,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
                   <ul className="space-y-3 pt-4 border-t">
                     {service.details.map((detail, index) => (
                       <li key={index} className="flex items-start gap-3">
-                        <Handshake className="h-5 w-5 text-accent mt-1 flex-shrink-0" />
+                        <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
                         <span className="text-sm text-muted-foreground">{detail}</span>
                       </li>
                     ))}
