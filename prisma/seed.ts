@@ -158,11 +158,14 @@ async function main() {
   console.log('Web settings seeded.');
 
   // Clear existing page-specific data
+  console.log('Clearing old page data...');
   await prisma.professionalService.deleteMany({});
   await prisma.solution.deleteMany({});
   await prisma.timelineEvent.deleteMany({});
   await prisma.teamMember.deleteMany({});
   await prisma.newsItem.deleteMany({});
+  console.log('Old page data cleared.');
+
 
   console.log('Seeding Professional Services...');
   await prisma.professionalService.createMany({
@@ -516,5 +519,4 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
     

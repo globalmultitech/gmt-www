@@ -15,14 +15,13 @@ const toSlug = (name: string) => {
     .replace(/-+/g, '-'); // replace multiple - with single -
 };
 
-// Simplified schema for client data. ID is not validated here.
 const NewsItemSchema = z.object({
     id: z.number(), 
     title: z.string().default(''),
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
-    // slug is handled server-side
+    slug: z.string().optional(),
 });
 
 const ResourcesPageSettingsSchema = z.object({
@@ -64,7 +63,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     
     // Filter out client items that are just empty shells (no title)
     const validClientItems = newsItemsFromClient.filter(item => item.title.trim());
-    const validClientItemIds = new Set(validClientItems.map(s => s.id));
+    const validClientItemIds = new Set(validClientItems.map(s => s.id).filter(id => id < Date.now()));
 
     const operations = [];
 
@@ -79,17 +78,13 @@ export async function updateResourcesPageSettings(prevState: { message: string }
         
         const finalSlug = toSlug(item.title);
         
-        if (!finalSlug) {
-            // This case should be prevented by the filter above, but as a safeguard.
-            continue;
-        }
+        // This case should be prevented by the filter above, but as a safeguard.
+        if (!finalSlug) continue;
         
-        // Check for slug uniqueness before committing
         const existingSlugItem = await prisma.newsItem.findFirst({ 
             where: { 
                 slug: finalSlug, 
-                // Exclude the current item from the check if it's an update
-                id: { not: dbItemIds.has(item.id) ? item.id : -1 } 
+                id: { not: dbItemIds.has(item.id) ? item.id : 0 } // use 0 for new items
             }
         });
         
@@ -105,7 +100,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             content: item.content,
         };
 
-        // Use the presence of the ID in the database's list to determine if it's an update or create
         if (dbItemIds.has(item.id)) {
             // Update existing item
             operations.push(prisma.newsItem.update({ where: { id: item.id }, data: sanitizedData }));
@@ -149,3 +143,4 @@ export async function generateBlogPostContent(title: string) {
         return { error: 'Gagal menghasilkan konten dari AI. Silakan coba lagi nanti.' };
     }
 }
+    
