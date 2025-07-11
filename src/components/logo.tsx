@@ -19,7 +19,7 @@ export function Logo({
 }: LogoProps) {
   const imageSizeClasses = {
     default: 'h-10 w-10 md:h-12 md:w-12',
-    footer: 'h-12 w-12 md:h-16 md:w-16',
+    footer: 'h-14 w-14 md:h-20 md:w-20',
   };
 
   const textSizeClasses = {
@@ -39,8 +39,8 @@ export function Logo({
           <Image
             src={logoUrl}
             alt={`Logo ${companyName}`}
-            width={variant === 'footer' ? 64 : 50}
-            height={variant === 'footer' ? 64 : 50}
+            width={variant === 'footer' ? 80 : 50}
+            height={variant === 'footer' ? 80 : 50}
             className={cn('object-contain', imageSizeClasses[variant])}
             priority
           />
