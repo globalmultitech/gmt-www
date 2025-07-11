@@ -60,24 +60,26 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
       {/* Feature Cards Section */}
-      <section className="bg-dark-slate">
-          <div className="container mx-auto px-4 relative z-10 -mt-20">
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {(settings.featureCards as FeatureCard[]).map((card: FeatureCard, index: number) => (
-                      <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                          <div className="flex justify-center mb-6">
-                            <DynamicIcon 
-                              name={card.icon} 
-                              className="h-10 w-10 text-sky-blue"
-                            />
-                          </div>
-                          <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
-                          <p className="text-muted-foreground">{card.description}</p>
-                      </Card>
-                  ))}
-              </div>
-          </div>
-      </section>
+      {settings.featureCards && settings.featureCards.length > 0 && (
+        <section className="bg-dark-slate">
+            <div className="container mx-auto px-4 relative z-10 -mt-20">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {(settings.featureCards as FeatureCard[]).map((card: FeatureCard, index: number) => (
+                        <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                            <div className="flex justify-center mb-6">
+                              <DynamicIcon 
+                                name={card.icon} 
+                                className="h-10 w-10 text-sky-blue"
+                              />
+                            </div>
+                            <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
+                            <p className="text-muted-foreground">{card.description}</p>
+                        </Card>
+                    ))}
+                </div>
+            </div>
+        </section>
+      )}
 
       {/* About Section */}
       <section className="py-20 md:py-28 bg-dark-slate">
@@ -113,40 +115,42 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
        {/* Services Section */}
-       <section className="py-20 md:py-28 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            {settings.servicesSubtitle && <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">{settings.servicesSubtitle}</p>}
-            {settings.servicesTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">{settings.servicesTitle}</h2>}
-            {settings.servicesDescription && <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">{settings.servicesDescription}</p>}
-          </div>
-           <div className="grid md:grid-cols-2 gap-8">
-            {(settings.professionalServices as ProfessionalService[]).map((service) => (
-              <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-                <div className="flex flex-row items-center gap-4 p-6">
-                  <div className="bg-primary/10 p-4 rounded-full">
-                    <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-headline text-2xl font-bold">{service.title}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
-                  </div>
-                </div>
-                <CardContent>
-                  <ul className="space-y-3 pt-4 border-t">
-                    {service.details.map((detail, index) => (
-                      <li key={index} className="flex items-start gap-3">
-                        <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
+       {settings.professionalServices && settings.professionalServices.length > 0 && (
+          <section className="py-20 md:py-28 bg-background">
+            <div className="container mx-auto px-4">
+              <div className="text-center max-w-3xl mx-auto mb-16">
+                {settings.servicesSubtitle && <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">{settings.servicesSubtitle}</p>}
+                {settings.servicesTitle && <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">{settings.servicesTitle}</h2>}
+                {settings.servicesDescription && <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">{settings.servicesDescription}</p>}
+              </div>
+              <div className="grid md:grid-cols-2 gap-8">
+                {(settings.professionalServices as ProfessionalService[]).map((service) => (
+                  <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                    <div className="flex flex-row items-center gap-4 p-6">
+                      <div className="bg-primary/10 p-4 rounded-full">
+                        <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
+                      </div>
+                      <div>
+                        <h3 className="font-headline text-2xl font-bold">{service.title}</h3>
+                        <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
+                      </div>
+                    </div>
+                    <CardContent>
+                      <ul className="space-y-3 pt-4 border-t">
+                        {service.details.map((detail, index) => (
+                          <li key={index} className="flex items-start gap-3">
+                            <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
+                            <span className="text-sm text-muted-foreground">{detail}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
       
        {/* CTA Section */}
        <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: `url('${settings.ctaImageUrl || 'https://placehold.co/1920x1080.png'}')`}}>
@@ -185,11 +189,13 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
       
       {/* Testimonial Section */}
-      <section className="py-20 md:py-28 bg-background">
-        <div className="container mx-auto px-4">
-           <TestimonialCarousel testimonials={settings.testimonials} />
-        </div>
-      </section>
+      {settings.testimonials && settings.testimonials.length > 0 && (
+        <section className="py-20 md:py-28 bg-background">
+          <div className="container mx-auto px-4">
+            <TestimonialCarousel testimonials={settings.testimonials} />
+          </div>
+        </section>
+      )}
       
        {/* Products Section */}
       <section className="py-20 md:py-28 bg-dark-slate">
@@ -230,32 +236,34 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
        {/* Blog Section */}
-      <section className="py-20 md:py-28 bg-background">
-          <div className="container mx-auto px-4">
-              <div className="text-center max-w-3xl mx-auto mb-16">
-                  <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">Our Blog</p>
-                  <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Latest news & articles</h2>
-              </div>
-              <div className="grid md:grid-cols-3 gap-8">
-                  {(settings.blogPosts as BlogPost[]).map((post, index) => (
-                      <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
-                           <div className="relative overflow-hidden rounded-lg mb-6">
-                            <Image src={post.image} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
-                           </div>
-                           <div className="text-sm text-muted-foreground mb-2">
-                               <span>{post.date}</span> / <span>By {post.author}</span>
-                           </div>
-                           <h3 className="text-xl font-bold font-headline mb-4 group-hover:text-primary transition-colors">
-                               <Link href={post.href}>{post.title}</Link>
-                           </h3>
-                           <Link href={post.href} className="font-semibold text-primary flex items-center gap-2">
+      {settings.blogPosts && settings.blogPosts.length > 0 && (
+        <section className="py-20 md:py-28 bg-background">
+            <div className="container mx-auto px-4">
+                <div className="text-center max-w-3xl mx-auto mb-16">
+                    <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">Our Blog</p>
+                    <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Latest news & articles</h2>
+                </div>
+                <div className="grid md:grid-cols-3 gap-8">
+                    {(settings.blogPosts as BlogPost[]).map((post, index) => (
+                        <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+                            <div className="relative overflow-hidden rounded-lg mb-6">
+                              <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
+                            </div>
+                            <div className="text-sm text-muted-foreground mb-2">
+                                <span>{post.date}</span> / <span>By {post.author}</span>
+                            </div>
+                            <h3 className="text-xl font-bold font-headline mb-4 group-hover:text-primary transition-colors">
+                                <Link href={post.href}>{post.title}</Link>
+                            </h3>
+                            <Link href={post.href} className="font-semibold text-primary flex items-center gap-2">
                                 Read More <ArrowRight className="h-4 w-4" />
-                           </Link>
-                      </div>
-                  ))}
-              </div>
-          </div>
-      </section>
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </section>
+      )}
     </div>
   );
 }

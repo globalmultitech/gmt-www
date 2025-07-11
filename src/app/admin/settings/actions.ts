@@ -6,7 +6,6 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
 
-// Define schemas for nested objects first, making all fields optional and providing defaults
 const MenuItemSchema = z.object({
   label: z.string().optional().default(''),
   href: z.string().optional().default(''),
@@ -23,13 +22,6 @@ const FeatureCardSchema = z.object({
     icon: z.string().optional().default(''),
     title: z.string().optional().default(''),
     description: z.string().optional().default(''),
-});
-
-const ProfessionalServiceSchema = z.object({
-    icon: z.string().optional().default(''),
-    title: z.string().optional().default(''),
-    description: z.string().optional().default(''),
-    details: z.array(z.string()).optional().default([]),
 });
 
 const TestimonialSchema = z.object({
@@ -54,37 +46,6 @@ const TrustedByLogoSchema = z.object({
   alt: z.string().optional().default(''),
 });
 
-const SolutionSchema = z.object({
-    icon: z.string().optional().default(''),
-    title: z.string().optional().default(''),
-    description: z.string().optional().default(''),
-    image: z.string().optional().default(''),
-    keyPoints: z.array(z.string()).optional().default([]),
-});
-
-const TimelineEventSchema = z.object({
-    year: z.string().optional().default(''),
-    event: z.string().optional().default(''),
-});
-
-const TeamMemberSchema = z.object({
-    name: z.string().optional().default(''),
-    role: z.string().optional().default(''),
-    image: z.string().optional().default(''),
-    linkedin: z.string().optional().default(''),
-    aiHint: z.string().optional().default(''),
-});
-
-const NewsItemSchema = z.object({
-    title: z.string().optional().default(''),
-    date: z.string().optional().default(''),
-    category: z.string().optional().default(''),
-    image: z.string().optional().default(''),
-    aiHint: z.string().optional().default(''),
-});
-
-
-// Main settings schema, all fields are optional
 const SettingsSchema = z.object({
   logoUrl: z.string().optional(),
   companyName: z.string().optional(),
@@ -112,7 +73,6 @@ const SettingsSchema = z.object({
   servicesSubtitle: z.string().optional(),
   servicesTitle: z.string().optional(),
   servicesDescription: z.string().optional(),
-  professionalServices: z.array(ProfessionalServiceSchema).optional(),
   ctaHeadline: z.string().optional(),
   ctaDescription: z.string().optional(),
   ctaImageUrl: z.string().optional(),
@@ -122,34 +82,9 @@ const SettingsSchema = z.object({
   trustedByLogos: z.array(TrustedByLogoSchema).optional(),
   testimonials: z.array(TestimonialSchema).optional(),
   blogPosts: z.array(BlogPostSchema).optional(),
-
-  // New Page Content Fields
-  servicesPageTitle: z.string().optional(),
-  servicesPageSubtitle: z.string().optional(),
-  servicesPageCommitmentTitle: z.string().optional(),
-  servicesPageCommitmentText: z.string().optional(),
-  servicesPageHeaderImageUrl: z.string().optional(),
-  
-  solutionsPageTitle: z.string().optional(),
-  solutionsPageSubtitle: z.string().optional(),
-  solutions: z.array(SolutionSchema).optional(),
-
-  aboutPageTitle: z.string().optional(),
-  aboutPageSubtitle: z.string().optional(),
-  missionTitle: z.string().optional(),
-  missionText: z.string().optional(),
-  visionTitle: z.string().optional(),
-  visionText: z.string().optional(),
-  timeline: z.array(TimelineEventSchema).optional(),
-  teamMembers: z.array(TeamMemberSchema).optional(),
-
-  resourcesPageTitle: z.string().optional(),
-  resourcesPageSubtitle: z.string().optional(),
-  newsItems: z.array(NewsItemSchema).optional(),
 });
 
 
-// Helper function to extract a simple object (like socialMedia)
 function getAsObject(formData: FormData, key: string) {
     const obj: { [key: string]: any } = {};
     for (const [path, value] of formData.entries()) {
@@ -164,7 +99,6 @@ function getAsObject(formData: FormData, key: string) {
     return obj;
 }
 
-// Helper function to extract an array of objects, now more robust
 function getAsArrayOfObjects(formData: FormData, key: string) {
     const items: { [key: number]: any } = {};
     const regex = new RegExp(`^${key}\\[(\\d+)\\]\\[(.*?)\\]$`);
@@ -177,34 +111,12 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
             if (!items[index]) {
                 items[index] = {};
             }
-            
-            const detailMatch = field.match(/^(details|keyPoints)\[(\d+)\]$/);
-            if (detailMatch) {
-                const arrayField = detailMatch[1];
-                if (!items[index][arrayField]) {
-                    items[index][arrayField] = [];
-                }
-                const detailIndex = parseInt(detailMatch[2], 10);
-                items[index][arrayField][detailIndex] = value;
-            } else {
-                items[index][field] = value;
-            }
+            items[index][field] = value;
         }
     }
     
-    return Object.values(items).map(item => {
-        // Clean up nested arrays by removing empty strings
-        if (Array.isArray(item.details)) {
-            item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
-        }
-        if (Array.isArray(item.keyPoints)) {
-            item.keyPoints = item.keyPoints.filter(point => typeof point === 'string' && point.trim() !== '');
-        }
-        return item;
-    }).filter(item => {
-        // Filter out items that are completely empty
+    return Object.values(items).filter(item => {
         if (!item || typeof item !== 'object') return false;
-        // Check if any value in the object is a non-empty string or a non-empty array.
         return Object.values(item).some(value => {
             if (typeof value === 'string') return value.trim() !== '';
             if (Array.isArray(value)) return value.length > 0;
@@ -260,7 +172,6 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         servicesSubtitle: formData.get('servicesSubtitle'),
         servicesTitle: formData.get('servicesTitle'),
         servicesDescription: formData.get('servicesDescription'),
-        professionalServices: getAsArrayOfObjects(formData, 'professionalServices'),
         ctaHeadline: formData.get('ctaHeadline'),
         ctaDescription: formData.get('ctaDescription'),
         ctaImageUrl: formData.get('ctaImageUrl'),
@@ -270,30 +181,6 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         trustedByLogos: getAsArrayOfObjects(formData, 'trustedByLogos'),
         testimonials: getAsArrayOfObjects(formData, 'testimonials'),
         blogPosts: getAsArrayOfObjects(formData, 'blogPosts'),
-        
-        // New Page Content Fields
-        servicesPageTitle: formData.get('servicesPageTitle'),
-        servicesPageSubtitle: formData.get('servicesPageSubtitle'),
-        servicesPageCommitmentTitle: formData.get('servicesPageCommitmentTitle'),
-        servicesPageCommitmentText: formData.get('servicesPageCommitmentText'),
-        servicesPageHeaderImageUrl: formData.get('servicesPageHeaderImageUrl'),
-
-        solutionsPageTitle: formData.get('solutionsPageTitle'),
-        solutionsPageSubtitle: formData.get('solutionsPageSubtitle'),
-        solutions: getAsArrayOfObjects(formData, 'solutions'),
-
-        aboutPageTitle: formData.get('aboutPageTitle'),
-        aboutPageSubtitle: formData.get('aboutPageSubtitle'),
-        missionTitle: formData.get('missionTitle'),
-        missionText: formData.get('missionText'),
-        visionTitle: formData.get('visionTitle'),
-        visionText: formData.get('visionText'),
-        timeline: getAsArrayOfObjects(formData, 'timeline'),
-        teamMembers: getAsArrayOfObjects(formData, 'teamMembers'),
-
-        resourcesPageTitle: formData.get('resourcesPageTitle'),
-        resourcesPageSubtitle: formData.get('resourcesPageSubtitle'),
-        newsItems: getAsArrayOfObjects(formData, 'newsItems'),
     };
 
     const validatedFields = SettingsSchema.safeParse(dataToValidate);
@@ -308,12 +195,46 @@ export async function updateWebSettings(prevState: { message: string } | undefin
       return { message: message || "Input tidak valid. Silakan periksa kembali." };
     }
     
-    const data = validatedFields.data;
+    const { ...data } = validatedFields.data;
 
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
-            ...data
+          logoUrl: data.logoUrl,
+          companyName: data.companyName,
+          whatsappSales: data.whatsappSales,
+          footerText: data.footerText,
+          address: data.address,
+          contactEmail: data.contactEmail,
+          contactPhone: data.contactPhone,
+          openingHours: data.openingHours,
+          socialMedia: data.socialMedia,
+          menuItems: data.menuItems,
+          heroHeadline: data.heroHeadline,
+          heroDescription: data.heroDescription,
+          heroImageUrl: data.heroImageUrl,
+          heroButton1Text: data.heroButton1Text,
+          heroButton1Link: data.heroButton1Link,
+          heroButton2Text: data.heroButton2Text,
+          heroButton2Link: data.heroButton2Link,
+          featureCards: data.featureCards,
+          aboutUsSubtitle: data.aboutUsSubtitle,
+          aboutUsTitle: data.aboutUsTitle,
+          aboutUsDescription: data.aboutUsDescription,
+          aboutUsImageUrl: data.aboutUsImageUrl,
+          aboutUsChecklist: data.aboutUsChecklist,
+          servicesSubtitle: data.servicesSubtitle,
+          servicesTitle: data.servicesTitle,
+          servicesDescription: data.servicesDescription,
+          ctaHeadline: data.ctaHeadline,
+          ctaDescription: data.ctaDescription,
+          ctaImageUrl: data.ctaImageUrl,
+          ctaButtonText: data.ctaButtonText,
+          ctaButtonLink: data.ctaButtonLink,
+          trustedByText: data.trustedByText,
+          trustedByLogos: data.trustedByLogos,
+          testimonials: data.testimonials,
+          blogPosts: data.blogPosts,
         }
     });
 

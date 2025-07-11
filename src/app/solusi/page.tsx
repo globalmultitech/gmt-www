@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, Briefcase, Handshake, MessageSquareHeart } from 'lucide-react';
 import Image from 'next/image';
@@ -67,9 +68,9 @@ export default async function SolusiPage() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
             Tim kami siap membantu merancang solusi kustom yang paling sesuai untuk tantangan bisnis Anda.
           </p>
-          <Link href="/hubungi-kami">
-            <Button size="lg">Diskusikan Proyek Anda <ArrowRight className="ml-2 h-5 w-5" /></Button>
-          </Link>
+          <Button asChild size="lg">
+            <Link href="/hubungi-kami">Diskusikan Proyek Anda <ArrowRight className="ml-2 h-5 w-5" /></Link>
+          </Button>
         </div>
       </section>
     </>

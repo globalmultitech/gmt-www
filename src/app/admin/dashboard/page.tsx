@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, Settings, Package, Shapes } from "lucide-react";
+import { Users, Settings, Package, Shapes, Newspaper, FileText, Building2, Handshake } from "lucide-react";
 
 export default function AdminDashboardPage() {
     return (
@@ -13,14 +13,14 @@ export default function AdminDashboardPage() {
                     <CardDescription>Pilih salah satu modul di bawah untuk mulai mengelola konten.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <Card>
                             <CardHeader>
                                 <Package className="h-8 w-8 text-primary mb-2" />
                                 <CardTitle>Manajemen Produk</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground text-sm mb-4">Tambah, edit, atau hapus produk yang ditampilkan di halaman publik.</p>
+                                <p className="text-muted-foreground text-sm mb-4">Tambah, edit, atau hapus produk yang ditampilkan.</p>
                                 <Button asChild>
                                     <Link href="/admin/produk">Buka Modul</Link>
                                 </Button>
@@ -32,21 +32,9 @@ export default function AdminDashboardPage() {
                                 <CardTitle>Manajemen Kategori</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground text-sm mb-4">Kelola kategori dan sub-kategori untuk semua produk.</p>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola kategori dan sub-kategori untuk produk.</p>
                                 <Button asChild>
                                     <Link href="/admin/kategori">Buka Modul</Link>
-                                </Button>
-                            </CardContent>
-                        </Card>
-                         <Card>
-                            <CardHeader>
-                                <Users className="h-8 w-8 text-primary mb-2" />
-                                <CardTitle>Manajemen User</CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <p className="text-muted-foreground text-sm mb-4">Tambah, edit, atau hapus akun user yang dapat mengakses dashboard ini.</p>
-                                <Button asChild>
-                                    <Link href="/admin/users">Buka Modul</Link>
                                 </Button>
                             </CardContent>
                         </Card>
@@ -56,9 +44,69 @@ export default function AdminDashboardPage() {
                                 <CardTitle>Pengaturan Web</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground text-sm mb-4">Kelola menu, footer, nama perusahaan, dan informasi kontak website.</p>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola info umum, menu, footer, dan halaman utama.</p>
                                 <Button asChild>
                                     <Link href="/admin/settings">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <FileText className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Halaman Layanan</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola konten yang ada di halaman Layanan.</p>
+                                <Button asChild>
+                                    <Link href="/admin/pages/layanan">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <Handshake className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Halaman Solusi</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola konten yang ada di halaman Solusi.</p>
+                                <Button asChild>
+                                    <Link href="/admin/pages/solusi">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                        <Card>
+                            <CardHeader>
+                                <Building2 className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Halaman Tentang Kami</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola konten yang ada di halaman Tentang Kami.</p>
+                                <Button asChild>
+                                    <Link href="/admin/pages/tentang-kami">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                            <CardHeader>
+                                <Newspaper className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Halaman Resources</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola berita dan artikel yang ada di halaman Resources.</p>
+                                <Button asChild>
+                                    <Link href="/admin/pages/resources">Buka Modul</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
+                         <Card>
+                            <CardHeader>
+                                <Users className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Manajemen User</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola akun user yang dapat mengakses dashboard.</p>
+                                <Button asChild>
+                                    <Link href="/admin/users">Buka Modul</Link>
                                 </Button>
                             </CardContent>
                         </Card>

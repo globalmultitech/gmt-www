@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard, ProfessionalService, Testimonial, BlogPost, TimelineEvent, TeamMember, Solution, NewsItem } from '@/lib/settings';
+import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard, Testimonial, BlogPost } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -18,7 +18,6 @@ import { DynamicIcon } from '@/components/dynamic-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
-// A curated list of relevant Lucide icons for business/tech contexts
 const availableIcons = [
     'Activity', 'Airplay', 'AlarmClock', 'AlertCircle', 'Archive', 'ArrowDownCircle', 'ArrowUpCircle',
     'Award', 'Banknote', 'BarChart', 'BarChart2', 'BarChart3', 'BarChart4', 'Bell', 'Briefcase',
@@ -38,8 +37,8 @@ const availableIcons = [
     'ScreenShare', 'Search', 'Send', 'Server', 'Settings', 'Share', 'Share2', 'Shield',
     'ShieldCheck', 'ShoppingBag', 'ShoppingCart', 'Slack', 'Sliders', 'Smartphone', 'Speaker',
     'Star', 'Sun', 'Sunrise', 'Sunset', 'Table', 'Tag', 'Target', 'Terminal', 'ThumbsDown',
-    'ThumbsUp', 'ToggleLeft', 'ToggleRight', 'Trash', 'Trash2', 'TrendingDown',
-    'TrendingUp', 'Truck', 'Twitch', 'Twitter', 'Type', 'Umbrella', 'Unlock', 'Upload', 'UserCheck', 'UserPlus', 'UserX', 'Users', 'Video', 'Voicemail', 'Wallet', 'Watch',
+    'ThumbsUp', 'ToggleLeft', 'ToggleRight', 'Trash', 'Trash2', 'TrendingUp',
+    'Truck', 'Twitch', 'Twitter', 'Type', 'Umbrella', 'Unlock', 'Upload', 'UserCheck', 'UserPlus', 'UserX', 'Users', 'Video', 'Voicemail', 'Wallet', 'Watch',
     'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap'
 ].sort();
 
@@ -58,7 +57,6 @@ type ImageUrls = {
   heroImageUrl: string;
   aboutUsImageUrl: string;
   ctaImageUrl: string;
-  servicesPageHeaderImageUrl: string;
 };
 
 type ImageUploaderProps = {
@@ -109,7 +107,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     heroImageUrl: settings.heroImageUrl ?? '',
     aboutUsImageUrl: settings.aboutUsImageUrl ?? '',
     ctaImageUrl: settings.ctaImageUrl ?? '',
-    servicesPageHeaderImageUrl: settings.servicesPageHeaderImageUrl ?? '',
   });
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? [{ label: '', href: '' }]);
@@ -117,13 +114,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? [{ src: '', alt: ''}]);
   const [featureCards, setFeatureCards] = useState<FeatureCard[]>(settings.featureCards ?? []);
   const [aboutUsChecklist, setAboutUsChecklist] = useState<string[]>(settings.aboutUsChecklist ?? ['']);
-  const [professionalServices, setProfessionalServices] = useState<ProfessionalService[]>(settings.professionalServices ?? []);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(settings.testimonials ?? []);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(settings.blogPosts ?? []);
-  const [solutions, setSolutions] = useState<Solution[]>(settings.solutions ?? []);
-  const [timeline, setTimeline] = useState<TimelineEvent[]>(settings.timeline ?? []);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(settings.teamMembers ?? []);
-  const [newsItems, setNewsItems] = useState<NewsItem[]>(settings.newsItems ?? []);
 
 
   const handleArrayOfObjectsChange = <T,>(index: number, field: keyof T, value: string | string[], state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => {
@@ -143,24 +135,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const removeArrayOfStringsItem = (index: number, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState(state.filter((_, i) => i !== index));
 
   const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => setSocialLinks(prev => ({ ...prev, [platform]: value }));
-  const handleServiceDetailChange = (serviceIndex: number, detailIndex: number, value: string) => {
-    const newServices = [...professionalServices];
-    if(!newServices[serviceIndex].details) newServices[serviceIndex].details = [];
-    newServices[serviceIndex].details[detailIndex] = value;
-    setProfessionalServices(newServices);
-  }
-  const addServiceDetail = (serviceIndex: number) => {
-    const newServices = [...professionalServices];
-    if(!newServices[serviceIndex].details) newServices[serviceIndex].details = [];
-    newServices[serviceIndex].details.push('');
-    setProfessionalServices(newServices);
-  }
-  const removeServiceDetail = (serviceIndex: number, detailIndex: number) => {
-    const newServices = [...professionalServices];
-    newServices[serviceIndex].details = newServices[serviceIndex].details.filter((_, i) => i !== detailIndex);
-    setProfessionalServices(newServices);
-  }
-
+  
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
     const hashBuffer = await crypto.subtle.digest("SHA-256", buffer);
@@ -230,7 +205,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <input type="hidden" name="heroImageUrl" value={imageUrls.heroImageUrl} />
         <input type="hidden" name="aboutUsImageUrl" value={imageUrls.aboutUsImageUrl} />
         <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
-        <input type="hidden" name="servicesPageHeaderImageUrl" value={imageUrls.servicesPageHeaderImageUrl} />
 
         <Accordion type="multiple" className="w-full space-y-4" defaultValue={['item-1']}>
             <AccordionItem value="item-1">
@@ -439,72 +413,15 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Services Section</AccordionTrigger>
                 <AccordionContent>
                     <Card>
-                        <CardContent className="space-y-4 pt-6">
+                        <CardHeader>
+                            <CardTitle>Konten Section Layanan</CardTitle>
+                            <CardDescription>Konten ini (judul, subjudul) akan tampil di Halaman Utama. Daftar layanannya sendiri diambil dari pengaturan di halaman Layanan.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} /></div>
                                 <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} /></div>
                                 <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Input id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} /></div>
-                            </div>
-                            <div className="pt-4 border-t">
-                                <h3 className="font-semibold mb-2">Layanan Profesional (Tampil di Halaman Utama)</h3>
-                                {professionalServices.map((service, serviceIndex) => (
-                                    <div key={serviceIndex} className="space-y-2 p-4 border rounded-md mb-4">
-                                        <div className="flex items-end gap-2">
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 flex-grow">
-                                                <div className="space-y-1">
-                                                    <Label className="text-xs">Ikon</Label>
-                                                    <Select
-                                                        name={`professionalServices[${serviceIndex}][icon]`}
-                                                        value={service.icon}
-                                                        onValueChange={(value) => handleArrayOfObjectsChange(serviceIndex, 'icon', value, professionalServices, setProfessionalServices)}
-                                                    >
-                                                        <SelectTrigger>
-                                                            <SelectValue placeholder="Pilih ikon..." />
-                                                        </SelectTrigger>
-                                                        <SelectContent>
-                                                            {availableIcons.map(iconName => (
-                                                                <SelectItem key={iconName} value={iconName}>
-                                                                    <div className="flex items-center gap-2">
-                                                                        <DynamicIcon name={iconName} className="h-4 w-4" />
-                                                                        <span>{iconName}</span>
-                                                                    </div>
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <Label className="text-xs">Judul</Label>
-                                                    <Input name={`professionalServices[${serviceIndex}][title]`} value={service.title} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'title', e.target.value, professionalServices, setProfessionalServices)} />
-                                                </div>
-                                                <div className="space-y-1">
-                                                    <Label className="text-xs">Deskripsi</Label>
-                                                    <Input name={`professionalServices[${serviceIndex}][description]`} value={service.description} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'description', e.target.value, professionalServices, setProfessionalServices)} />
-                                                </div>
-                                            </div>
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(serviceIndex, professionalServices, setProfessionalServices)} className="text-destructive h-9 w-9">
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                        <div className="pl-4 ml-4 border-l space-y-2">
-                                            <Label className="text-xs font-semibold">Detail Layanan</Label>
-                                            {(service.details || []).map((detail, detailIndex) => (
-                                                <div key={detailIndex} className="flex items-center gap-2">
-                                                    <Input name={`professionalServices[${serviceIndex}][details][${detailIndex}]`} value={detail} onChange={e => handleServiceDetailChange(serviceIndex, detailIndex, e.target.value)} />
-                                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeServiceDetail(serviceIndex, detailIndex)} className="text-destructive h-8 w-8">
-                                                        <Trash2 className="h-4 w-4" />
-                                                    </Button>
-                                                </div>
-                                            ))}
-                                            <Button type="button" variant="outline" size="sm" onClick={() => addServiceDetail(serviceIndex)}>
-                                                <PlusCircle className="mr-2 h-4 w-4" /> Tambah Detail
-                                            </Button>
-                                        </div>
-                                    </div>
-                                ))}
-                                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ icon: 'Activity', title: '', description: '', details: []}, professionalServices, setProfessionalServices)}>
-                                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Layanan
-                                </Button>
                             </div>
                         </CardContent>
                     </Card>
@@ -622,9 +539,13 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
             
             <AccordionItem value="item-12">
                 <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Postingan Blog</AccordionTrigger>
-                <AccordionContent>
+                 <AccordionContent>
                     <Card>
-                        <CardContent className="space-y-4 pt-6">
+                        <CardHeader>
+                            <CardTitle>Konten Section Blog</CardTitle>
+                            <CardDescription>Konten ini akan tampil di Halaman Utama. Daftar postingan blognya sendiri diambil dari konten statis di halaman Resources.</CardDescription>
+                        </CardHeader>
+                        <CardContent className="space-y-4">
                             {blogPosts.map((item, index) => (
                                 <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
                                     <input type="hidden" name={`blogPosts[${index}][image]`} value={item.image} />
@@ -656,7 +577,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">AI Hint (untuk gambar)</Label>
-                                                <Input name={`blogPosts[${index}][aiHint]`} value={item.aiHint} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, blogPosts, setBlogPosts)} />
+                                                <Input name={`blogPosts[${index}][aiHint]`} value={item.aiHint ?? ''} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, blogPosts, setBlogPosts)} />
                                             </div>
                                     </div>
                                     </div>
@@ -672,186 +593,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                     </Card>
                 </AccordionContent>
             </AccordionItem>
-
-             <AccordionItem value="item-13">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Layanan</AccordionTrigger>
-                <AccordionContent>
-                    <Card>
-                      <CardHeader>
-                        <CardTitle>Konten Halaman Layanan</CardTitle>
-                      </CardHeader>
-                       <CardContent className="space-y-4">
-                           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div className="space-y-2"><Label htmlFor="servicesPageTitle">Judul Halaman</Label><Input id="servicesPageTitle" name="servicesPageTitle" defaultValue={settings.servicesPageTitle} /></div>
-                                <div className="space-y-2"><Label htmlFor="servicesPageSubtitle">Subjudul Halaman</Label><Input id="servicesPageSubtitle" name="servicesPageSubtitle" defaultValue={settings.servicesPageSubtitle} /></div>
-                           </div>
-                           <div className="pt-4 border-t">
-                               <h3 className="font-semibold mb-2">Daftar Layanan</h3>
-                               {/* The 'professionalServices' state is reused here. No need for a new state. */}
-                               {professionalServices.map((service, serviceIndex) => (
-                                   <div key={serviceIndex} className="space-y-2 p-4 border rounded-md mb-4">
-                                       {/* This form is identical to the one in the Homepage > Services section, as we're reusing the data */}
-                                        <div className="flex items-end gap-2">
-                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 flex-grow">
-                                                <div className="space-y-1">
-                                                    <Label className="text-xs">Ikon</Label>
-                                                    <Select name={`professionalServices[${serviceIndex}][icon]`} value={service.icon} onValueChange={(value) => handleArrayOfObjectsChange(serviceIndex, 'icon', value, professionalServices, setProfessionalServices)} >
-                                                        <SelectTrigger><SelectValue placeholder="Pilih ikon..." /></SelectTrigger>
-                                                        <SelectContent>{availableIcons.map(iconName => (<SelectItem key={iconName} value={iconName}><div className="flex items-center gap-2"><DynamicIcon name={iconName} className="h-4 w-4" /><span>{iconName}</span></div></SelectItem>))}</SelectContent>
-                                                    </Select>
-                                                </div>
-                                                <div className="space-y-1"><Label className="text-xs">Judul</Label><Input name={`professionalServices[${serviceIndex}][title]`} value={service.title} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'title', e.target.value, professionalServices, setProfessionalServices)} /></div>
-                                                <div className="space-y-1"><Label className="text-xs">Deskripsi</Label><Input name={`professionalServices[${serviceIndex}][description]`} value={service.description} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'description', e.target.value, professionalServices, setProfessionalServices)} /></div>
-                                            </div>
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(serviceIndex, professionalServices, setProfessionalServices)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                                        </div>
-                                        <div className="pl-4 ml-4 border-l space-y-2">
-                                            <Label className="text-xs font-semibold">Detail Layanan</Label>
-                                            {(service.details || []).map((detail, detailIndex) => (<div key={detailIndex} className="flex items-center gap-2"><Input name={`professionalServices[${serviceIndex}][details][${detailIndex}]`} value={detail} onChange={e => handleServiceDetailChange(serviceIndex, detailIndex, e.target.value)} /><Button type="button" variant="ghost" size="icon" onClick={() => removeServiceDetail(serviceIndex, detailIndex)} className="text-destructive h-8 w-8"><Trash2 className="h-4 w-4" /></Button></div>))}
-                                            <Button type="button" variant="outline" size="sm" onClick={() => addServiceDetail(serviceIndex)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Detail</Button>
-                                        </div>
-                                   </div>
-                               ))}
-                               <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ icon: 'Activity', title: '', description: '', details: []}, professionalServices, setProfessionalServices)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Layanan</Button>
-                           </div>
-                           <div className="pt-4 border-t">
-                               <h3 className="font-semibold mb-2">Bagian Komitmen Keamanan</h3>
-                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div className="space-y-2"><Label htmlFor="servicesPageCommitmentTitle">Judul Komitmen</Label><Input id="servicesPageCommitmentTitle" name="servicesPageCommitmentTitle" defaultValue={settings.servicesPageCommitmentTitle} /></div>
-                                    <div className="space-y-2"><Label htmlFor="servicesPageCommitmentText">Teks Komitmen</Label><Textarea id="servicesPageCommitmentText" name="servicesPageCommitmentText" defaultValue={settings.servicesPageCommitmentText} /></div>
-                               </div>
-                               <div className="mt-4"><ImageUploader fieldId="services-page-header-image-upload" fieldName="servicesPageHeaderImageUrl" label="Gambar Komitmen" imageUrl={imageUrls.servicesPageHeaderImageUrl} altText="Commitment Image Preview" isUploading={isUploading} onFileChange={handleFileChange} /></div>
-                           </div>
-                       </CardContent>
-                    </Card>
-                </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="item-14">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Solusi</AccordionTrigger>
-                <AccordionContent>
-                    <Card>
-                      <CardHeader><CardTitle>Konten Halaman Solusi</CardTitle></CardHeader>
-                      <CardContent className="space-y-4">
-                          <div className="space-y-2"><Label htmlFor="solutionsPageTitle">Judul Halaman</Label><Input id="solutionsPageTitle" name="solutionsPageTitle" defaultValue={settings.solutionsPageTitle} /></div>
-                          <div className="space-y-2"><Label htmlFor="solutionsPageSubtitle">Subjudul Halaman</Label><Textarea id="solutionsPageSubtitle" name="solutionsPageSubtitle" defaultValue={settings.solutionsPageSubtitle} /></div>
-                          <div className="pt-4 border-t">
-                            <h3 className="font-semibold mb-2">Daftar Solusi</h3>
-                            {solutions.map((solution, index) => (
-                                <div key={index} className="space-y-2 p-4 border rounded-md mb-4">
-                                  <div className="flex items-end gap-2">
-                                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
-                                          <div className="space-y-1"><Label className="text-xs">Ikon</Label><Select name={`solutions[${index}][icon]`} value={solution.icon} onValueChange={(value) => handleArrayOfObjectsChange(index, 'icon', value, solutions, setSolutions)}><SelectTrigger><SelectValue placeholder="Pilih ikon..." /></SelectTrigger><SelectContent>{availableIcons.map(iconName => (<SelectItem key={iconName} value={iconName}><div className="flex items-center gap-2"><DynamicIcon name={iconName} className="h-4 w-4" /><span>{iconName}</span></div></SelectItem>))}</SelectContent></Select></div>
-                                          <div className="space-y-1"><Label className="text-xs">Judul</Label><Input name={`solutions[${index}][title]`} value={solution.title} onChange={e => handleArrayOfObjectsChange(index, 'title', e.target.value, solutions, setSolutions)} /></div>
-                                          <div className="md:col-span-2 space-y-1"><Label className="text-xs">Deskripsi</Label><Textarea name={`solutions[${index}][description]`} value={solution.description} onChange={e => handleArrayOfObjectsChange(index, 'description', e.target.value, solutions, setSolutions)} /></div>
-                                      </div>
-                                      <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, solutions, setSolutions)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                                  </div>
-                                   <div className="pl-4 ml-4 border-l space-y-2">
-                                      <Label className="text-xs font-semibold">Poin Kunci</Label>
-                                      {(solution.keyPoints || []).map((point, pointIndex) => (<div key={pointIndex} className="flex items-center gap-2"><Input name={`solutions[${index}][keyPoints][${pointIndex}]`} value={point} onChange={e => handleArrayOfObjectsChange(index, 'keyPoints', (solution.keyPoints || []).map((p, i) => i === pointIndex ? e.target.value : p), solutions, setSolutions)} /><Button type="button" variant="ghost" size="icon" onClick={() => handleArrayOfObjectsChange(index, 'keyPoints', (solution.keyPoints || []).filter((_, i) => i !== pointIndex), solutions, setSolutions)} className="text-destructive h-8 w-8"><Trash2 className="h-4 w-4" /></Button></div>))}
-                                      <Button type="button" variant="outline" size="sm" onClick={() => handleArrayOfObjectsChange(index, 'keyPoints', [...(solution.keyPoints || []), ''], solutions, setSolutions)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
-                                  </div>
-                                  <div className="pt-2">
-                                      <Label className="text-xs">Gambar</Label>
-                                      <input type="hidden" name={`solutions[${index}][image]`} value={solution.image} />
-                                      <div className="relative w-full h-32 rounded-md bg-muted overflow-hidden border">
-                                          {solution.image ? ( <Image src={solution.image} alt={solution.title} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
-                                      </div>
-                                      <Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', solutions, setSolutions)} accept="image/png, image/jpeg" disabled={isUploading}/>
-                                  </div>
-                                </div>
-                            ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({icon: 'Briefcase', title: '', description: '', image: '', keyPoints: []}, solutions, setSolutions)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Solusi</Button>
-                          </div>
-                      </CardContent>
-                    </Card>
-                </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="item-15">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Tentang Kami</AccordionTrigger>
-                <AccordionContent>
-                   <Card>
-                      <CardHeader><CardTitle>Konten Halaman Tentang Kami</CardTitle></CardHeader>
-                      <CardContent className="space-y-4">
-                          <div className="space-y-2"><Label htmlFor="aboutPageTitle">Judul Halaman</Label><Input id="aboutPageTitle" name="aboutPageTitle" defaultValue={settings.aboutPageTitle} /></div>
-                          <div className="space-y-2"><Label htmlFor="aboutPageSubtitle">Subjudul Halaman</Label><Input id="aboutPageSubtitle" name="aboutPageSubtitle" defaultValue={settings.aboutPageSubtitle} /></div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
-                            <div className="space-y-2"><Label htmlFor="missionTitle">Judul Misi</Label><Input id="missionTitle" name="missionTitle" defaultValue={settings.missionTitle} /></div>
-                            <div className="space-y-2"><Label htmlFor="missionText">Teks Misi</Label><Textarea id="missionText" name="missionText" defaultValue={settings.missionText} /></div>
-                            <div className="space-y-2"><Label htmlFor="visionTitle">Judul Visi</Label><Input id="visionTitle" name="visionTitle" defaultValue={settings.visionTitle} /></div>
-                            <div className="space-y-2"><Label htmlFor="visionText">Teks Visi</Label><Textarea id="visionText" name="visionText" defaultValue={settings.visionText} /></div>
-                          </div>
-                          <div className="pt-4 border-t">
-                            <h3 className="font-semibold mb-2">Sejarah Perusahaan (Timeline)</h3>
-                            {timeline.map((item, index) => (
-                                <div key={index} className="flex items-end gap-2 p-2 border rounded-md mb-2">
-                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
-                                      <div className="space-y-1"><Label className="text-xs">Tahun</Label><Input name={`timeline[${index}][year]`} value={item.year} onChange={e => handleArrayOfObjectsChange(index, 'year', e.target.value, timeline, setTimeline)} /></div>
-                                      <div className="space-y-1"><Label className="text-xs">Kejadian</Label><Input name={`timeline[${index}][event]`} value={item.event} onChange={e => handleArrayOfObjectsChange(index, 'event', e.target.value, timeline, setTimeline)} /></div>
-                                  </div>
-                                  <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, timeline, setTimeline)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                                </div>
-                            ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ year: '', event: ''}, timeline, setTimeline)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Sejarah</Button>
-                          </div>
-                          <div className="pt-4 border-t">
-                            <h3 className="font-semibold mb-2">Tim Kami</h3>
-                            {teamMembers.map((member, index) => (
-                              <div key={index} className="flex items-start gap-4 p-4 border rounded-md mb-2">
-                                  <input type="hidden" name={`teamMembers[${index}][image]`} value={member.image} />
-                                  <div className="flex-shrink-0 space-y-2"><div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden border">{member.image ? ( <Image src={member.image} alt={member.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}</div><Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', teamMembers, setTeamMembers)} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/></div>
-                                  <div className="flex-grow space-y-2">
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="space-y-1"><Label className="text-xs">Nama</Label><Input name={`teamMembers[${index}][name]`} value={member.name} onChange={e => handleArrayOfObjectsChange(index, 'name', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                        <div className="space-y-1"><Label className="text-xs">Jabatan</Label><Input name={`teamMembers[${index}][role]`} value={member.role} onChange={e => handleArrayOfObjectsChange(index, 'role', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                        <div className="space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input name={`teamMembers[${index}][linkedin]`} value={member.linkedin} onChange={e => handleArrayOfObjectsChange(index, 'linkedin', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                        <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input name={`teamMembers[${index}][aiHint]`} value={member.aiHint} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                    </div>
-                                  </div>
-                                  <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, teamMembers, setTeamMembers)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                              </div>
-                            ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ name: '', role: '', image: '', linkedin: '', aiHint: ''}, teamMembers, setTeamMembers)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Anggota Tim</Button>
-                          </div>
-                      </CardContent>
-                   </Card>
-                </AccordionContent>
-            </AccordionItem>
-            
-             <AccordionItem value="item-16">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Resources</AccordionTrigger>
-                <AccordionContent>
-                    <Card>
-                        <CardHeader><CardTitle>Konten Halaman Resources</CardTitle></CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2"><Label htmlFor="resourcesPageTitle">Judul Halaman</Label><Input id="resourcesPageTitle" name="resourcesPageTitle" defaultValue={settings.resourcesPageTitle} /></div>
-                            <div className="space-y-2"><Label htmlFor="resourcesPageSubtitle">Subjudul Halaman</Label><Textarea id="resourcesPageSubtitle" name="resourcesPageSubtitle" defaultValue={settings.resourcesPageSubtitle} /></div>
-                            <div className="pt-4 border-t">
-                                <h3 className="font-semibold mb-2">Berita Terbaru</h3>
-                                {newsItems.map((item, index) => (
-                                    <div key={index} className="flex items-start gap-4 p-4 border rounded-md mb-2">
-                                        <input type="hidden" name={`newsItems[${index}][image]`} value={item.image} />
-                                        <div className="flex-shrink-0 space-y-2"><div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">{item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}</div><Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', newsItems, setNewsItems)} accept="image/png, image/jpeg" disabled={isUploading} className="w-40" /></div>
-                                        <div className="flex-grow space-y-2">
-                                            <div className="grid grid-cols-2 gap-2">
-                                                <div className="space-y-1"><Label className="text-xs">Judul</Label><Input name={`newsItems[${index}][title]`} value={item.title} onChange={e => handleArrayOfObjectsChange(index, 'title', e.target.value, newsItems, setNewsItems)} /></div>
-                                                <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input name={`newsItems[${index}][category]`} value={item.category} onChange={e => handleArrayOfObjectsChange(index, 'category', e.target.value, newsItems, setNewsItems)} /></div>
-                                                <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input name={`newsItems[${index}][date]`} value={item.date} onChange={e => handleArrayOfObjectsChange(index, 'date', e.target.value, newsItems, setNewsItems)} /></div>
-                                                <div className="space-y-1"><Label className="text-xs">AI Hint</Label><Input name={`newsItems[${index}][aiHint]`} value={item.aiHint} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, newsItems, setNewsItems)} /></div>
-                                            </div>
-                                        </div>
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, newsItems, setNewsItems)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                                    </div>
-                                ))}
-                                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ title: '', category: '', date: '', image: '', aiHint: ''}, newsItems, setNewsItems)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Berita</Button>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </AccordionContent>
-            </AccordionItem>
-
         </Accordion>
 
         <div className="mt-8 flex justify-end">

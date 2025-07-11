@@ -1,29 +1,11 @@
-
-'use client';
-
 import { Card, CardHeader } from '@/components/ui/card';
 import { Eye, Rocket, Linkedin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
 import { getSettings } from '@/lib/settings';
-import type { WebSettings } from '@/lib/settings';
 
-export default function TentangKamiPage() {
-  const [settings, setSettings] = useState<WebSettings | null>(null);
-
-  useEffect(() => {
-    async function fetchSettings() {
-      const fetchedSettings = await getSettings();
-      setSettings(fetchedSettings);
-    }
-    fetchSettings();
-  }, []);
-
-  if (!settings) {
-    // Optional: add a loading skeleton here
-    return <div>Loading...</div>;
-  }
+export default async function TentangKamiPage() {
+  const settings = await getSettings();
 
   const timeline = settings.timeline ?? [];
   const teamMembers = settings.teamMembers ?? [];
