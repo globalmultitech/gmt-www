@@ -7,50 +7,50 @@ import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
 
 const MenuItemSchema = z.object({
-  label: z.string().optional(),
-  href: z.string().optional(),
+  label: z.string().optional().default(''),
+  href: z.string().optional().default(''),
 });
 
 const SocialMediaLinksSchema = z.object({
-  twitter: z.string().optional(),
-  facebook: z.string().optional(),
-  instagram: z.string().optional(),
-  linkedin: z.string().optional(),
+  twitter: z.string().optional().default(''),
+  facebook: z.string().optional().default(''),
+  instagram: z.string().optional().default(''),
+  linkedin: z.string().optional().default(''),
 });
 
 const FeatureCardSchema = z.object({
-    icon: z.string().optional(),
-    title: z.string().optional(),
-    description: z.string().optional(),
+    icon: z.string().optional().default(''),
+    title: z.string().optional().default(''),
+    description: z.string().optional().default(''),
 });
 
 const ProfessionalServiceSchema = z.object({
-    icon: z.string().optional(),
-    title: z.string().optional(),
-    description: z.string().optional(),
-    details: z.array(z.string()).optional(),
+    icon: z.string().optional().default(''),
+    title: z.string().optional().default(''),
+    description: z.string().optional().default(''),
+    details: z.array(z.string()).optional().default([]),
 });
 
 const TestimonialSchema = z.object({
-    quote: z.string().optional(),
-    name: z.string().optional(),
-    role: z.string().optional(),
-    image: z.string().optional(),
-    aiHint: z.string().optional(),
+    quote: z.string().optional().default(''),
+    name: z.string().optional().default(''),
+    role: z.string().optional().default(''),
+    image: z.string().optional().default(''),
+    aiHint: z.string().optional().default(''),
 });
 
 const BlogPostSchema = z.object({
-    image: z.string().optional(),
-    aiHint: z.string().optional(),
-    date: z.string().optional(),
-    author: z.string().optional(),
-    title: z.string().optional(),
-    href: z.string().optional(),
+    image: z.string().optional().default(''),
+    aiHint: z.string().optional().default(''),
+    date: z.string().optional().default(''),
+    author: z.string().optional().default(''),
+    title: z.string().optional().default(''),
+    href: z.string().optional().default(''),
 });
 
 const TrustedByLogoSchema = z.object({
-  src: z.string().optional(),
-  alt: z.string().optional(),
+  src: z.string().optional().default(''),
+  alt: z.string().optional().default(''),
 });
 
 const SettingsSchema = z.object({
@@ -130,13 +130,16 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
         }
     }
     
-    return Object.values(items).filter(item => {
-        if (typeof item !== 'object' || item === null) return false;
-        
+    // Filter out completely empty objects and clean up details arrays
+    return Object.values(items).map(item => {
+        if (typeof item !== 'object' || item === null) return null;
         if (Array.isArray(item.details)) {
             item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
         }
-
+        return item;
+    }).filter(item => {
+        if (!item) return false;
+        // An item is considered non-empty if at least one of its values is a non-empty string or a non-empty array
         return Object.values(item).some(value => {
             if (Array.isArray(value)) {
                 return value.length > 0;
@@ -164,76 +167,79 @@ export async function getWebSettings() {
 }
 
 export async function updateWebSettings(prevState: { message: string } | undefined, formData: FormData) {
-  
-  const menuItems = getAsArrayOfObjects(formData, 'menuItems');
-  const socialMedia = getAsObject(formData, 'socialMedia');
-  const trustedByLogos = getAsArrayOfObjects(formData, 'trustedByLogos');
-  const featureCards = getAsArrayOfObjects(formData, 'featureCards');
-  const aboutUsChecklist = getAsArrayOfStrings(formData, 'aboutUsChecklist');
-  const professionalServices = getAsArrayOfObjects(formData, 'professionalServices');
-  const testimonials = getAsArrayOfObjects(formData, 'testimonials');
-  const blogPosts = getAsArrayOfObjects(formData, 'blogPosts');
-
-  const validatedFields = SettingsSchema.safeParse({
-    logoUrl: formData.get('logoUrl'),
-    companyName: formData.get('companyName'),
-    whatsappSales: formData.get('whatsappSales'),
-    footerText: formData.get('footerText'),
-    address: formData.get('address'),
-    contactEmail: formData.get('contactEmail'),
-    contactPhone: formData.get('contactPhone'),
-    openingHours: formData.get('openingHours'),
-    socialMedia: socialMedia,
-    menuItems: menuItems,
-    heroHeadline: formData.get('heroHeadline'),
-    heroDescription: formData.get('heroDescription'),
-    heroImageUrl: formData.get('heroImageUrl'),
-    heroButton1Text: formData.get('heroButton1Text'),
-    heroButton1Link: formData.get('heroButton1Link'),
-    heroButton2Text: formData.get('heroButton2Text'),
-    heroButton2Link: formData.get('heroButton2Link'),
-    featureCards: featureCards,
-    aboutUsSubtitle: formData.get('aboutUsSubtitle'),
-    aboutUsTitle: formData.get('aboutUsTitle'),
-    aboutUsDescription: formData.get('aboutUsDescription'),
-    aboutUsImageUrl: formData.get('aboutUsImageUrl'),
-    aboutUsChecklist: aboutUsChecklist,
-    servicesSubtitle: formData.get('servicesSubtitle'),
-    servicesTitle: formData.get('servicesTitle'),
-    servicesDescription: formData.get('servicesDescription'),
-    professionalServices: professionalServices,
-    ctaHeadline: formData.get('ctaHeadline'),
-    ctaDescription: formData.get('ctaDescription'),
-    ctaImageUrl: formData.get('ctaImageUrl'),
-    ctaButtonText: formData.get('ctaButtonText'),
-    ctaButtonLink: formData.get('ctaButtonLink'),
-    trustedByText: formData.get('trustedByText'),
-    trustedByLogos: trustedByLogos,
-    testimonials: testimonials,
-    blogPosts: blogPosts,
-  });
-
-  if (!validatedFields.success) {
-    const errorMessages = validatedFields.error.flatten().fieldErrors;
-    console.log(JSON.stringify(errorMessages, null, 2));
-    const message = Object.entries(errorMessages)
-        .map(([key, value]) => `${key}: ${value.join(', ')}`)
-        .join('; ');
-        
-    return { message: message || "Input tidak valid. Silakan periksa kembali." };
-  }
-  
-  const data = validatedFields.data;
-
   try {
+    const menuItems = getAsArrayOfObjects(formData, 'menuItems');
+    const socialMedia = getAsObject(formData, 'socialMedia');
+    const trustedByLogos = getAsArrayOfObjects(formData, 'trustedByLogos');
+    const featureCards = getAsArrayOfObjects(formData, 'featureCards');
+    const aboutUsChecklist = getAsArrayOfStrings(formData, 'aboutUsChecklist');
+    const professionalServices = getAsArrayOfObjects(formData, 'professionalServices');
+    const testimonials = getAsArrayOfObjects(formData, 'testimonials');
+    const blogPosts = getAsArrayOfObjects(formData, 'blogPosts');
+
+    const dataToValidate = {
+        logoUrl: formData.get('logoUrl'),
+        companyName: formData.get('companyName'),
+        whatsappSales: formData.get('whatsappSales'),
+        footerText: formData.get('footerText'),
+        address: formData.get('address'),
+        contactEmail: formData.get('contactEmail'),
+        contactPhone: formData.get('contactPhone'),
+        openingHours: formData.get('openingHours'),
+        socialMedia,
+        menuItems,
+        heroHeadline: formData.get('heroHeadline'),
+        heroDescription: formData.get('heroDescription'),
+        heroImageUrl: formData.get('heroImageUrl'),
+        heroButton1Text: formData.get('heroButton1Text'),
+        heroButton1Link: formData.get('heroButton1Link'),
+        heroButton2Text: formData.get('heroButton2Text'),
+        heroButton2Link: formData.get('heroButton2Link'),
+        featureCards,
+        aboutUsSubtitle: formData.get('aboutUsSubtitle'),
+        aboutUsTitle: formData.get('aboutUsTitle'),
+        aboutUsDescription: formData.get('aboutUsDescription'),
+        aboutUsImageUrl: formData.get('aboutUsImageUrl'),
+        aboutUsChecklist,
+        servicesSubtitle: formData.get('servicesSubtitle'),
+        servicesTitle: formData.get('servicesTitle'),
+        servicesDescription: formData.get('servicesDescription'),
+        professionalServices,
+        ctaHeadline: formData.get('ctaHeadline'),
+        ctaDescription: formData.get('ctaDescription'),
+        ctaImageUrl: formData.get('ctaImageUrl'),
+        ctaButtonText: formData.get('ctaButtonText'),
+        ctaButtonLink: formData.get('ctaButtonLink'),
+        trustedByText: formData.get('trustedByText'),
+        trustedByLogos,
+        testimonials,
+        blogPosts,
+    };
+
+    const validatedFields = SettingsSchema.safeParse(dataToValidate);
+
+    if (!validatedFields.success) {
+      console.error('Validation error in settings:', JSON.stringify(validatedFields.error.flatten(), null, 2));
+      const errorMessages = validatedFields.error.flatten().fieldErrors;
+      const message = Object.entries(errorMessages)
+          .map(([key, value]) => `${key}: ${value.join(', ')}`)
+          .join('; ');
+          
+      return { message: message || "Input tidak valid. Silakan periksa kembali." };
+    }
+    
+    const data = validatedFields.data;
+
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
             ...data
         }
     });
+
     revalidatePath('/', 'layout');
     return { message: 'Pengaturan berhasil diperbarui.' };
+
   } catch (error) {
     console.error('Update settings error:', error);
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
