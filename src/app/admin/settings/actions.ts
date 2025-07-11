@@ -65,8 +65,8 @@ const SettingsSchema = z.object({
   contactEmail: z.string().optional(),
   contactPhone: z.string().optional(),
   openingHours: z.string().optional(),
-  socialMedia: SocialMediaLinksSchema,
-  menuItems: z.array(MenuItemSchema),
+  socialMedia: SocialMediaLinksSchema.optional(),
+  menuItems: z.array(MenuItemSchema).optional(),
   // Hero section fields
   heroHeadline: z.string().optional(),
   heroDescription: z.string().optional(),
@@ -76,18 +76,18 @@ const SettingsSchema = z.object({
   heroButton2Text: z.string().optional(),
   heroButton2Link: z.string().optional(),
   // Feature cards
-  featureCards: z.array(FeatureCardSchema),
+  featureCards: z.array(FeatureCardSchema).optional(),
   // About Us section fields
   aboutUsSubtitle: z.string().optional(),
   aboutUsTitle: z.string().optional(),
   aboutUsDescription: z.string().optional(),
   aboutUsImageUrl: z.string().optional(),
-  aboutUsChecklist: z.array(z.string()),
+  aboutUsChecklist: z.array(z.string()).optional(),
   // Services section fields
   servicesSubtitle: z.string().optional(),
   servicesTitle: z.string().optional(),
   servicesDescription: z.string().optional(),
-  professionalServices: z.array(ProfessionalServiceSchema),
+  professionalServices: z.array(ProfessionalServiceSchema).optional(),
   // CTA Section fields
   ctaHeadline: z.string().optional(),
   ctaDescription: z.string().optional(),
@@ -95,11 +95,11 @@ const SettingsSchema = z.object({
   ctaButtonText: z.string().optional(),
   ctaButtonLink: z.string().optional(),
   trustedByText: z.string().optional(),
-  trustedByLogos: z.array(TrustedByLogoSchema),
+  trustedByLogos: z.array(TrustedByLogoSchema).optional(),
   // Testimonials
-  testimonials: z.array(TestimonialSchema),
+  testimonials: z.array(TestimonialSchema).optional(),
   // Blog Posts
-  blogPosts: z.array(BlogPostSchema),
+  blogPosts: z.array(BlogPostSchema).optional(),
 });
 
 function getAsObject(formData: FormData, key: string) {
@@ -141,17 +141,27 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
         }
     }
     
-    // Clean up any empty details arrays
-    Object.values(items).forEach(item => {
-        if(item.details) {
-            item.details = item.details.filter(Boolean);
+    // Convert to array and filter out potentially empty objects,
+    // keeping only those where at least one key has a non-empty string value.
+    return Object.values(items).filter(item => {
+        if (typeof item !== 'object' || item === null) return false;
+        
+        // Check for nested details array and filter it first
+        if (Array.isArray(item.details)) {
+            item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
         }
+
+        // Check if any of the main properties of the item has a value.
+        return Object.keys(item).some(key => {
+            const value = item[key];
+            if (key === 'details') {
+                return Array.isArray(value) && value.length > 0;
+            }
+            return typeof value === 'string' && value.trim() !== '';
+        });
     });
-    
-    return Object.values(items).filter(item => 
-      Object.values(item).some(v => typeof v === 'string' && v.trim() !== '')
-    );
 }
+
 
 function getAsArrayOfStrings(formData: FormData, key: string) {
     const items: string[] = [];
@@ -221,10 +231,15 @@ export async function updateWebSettings(prevState: { message: string } | undefin
   });
 
   if (!validatedFields.success) {
-    const error = validatedFields.error.flatten().fieldErrors;
-    console.log(JSON.stringify(error, null, 2));
-    const message = Object.values(error).flat()[0] || "Input tidak valid";
-    return { message };
+    const errorMessages = validatedFields.error.flatten().fieldErrors;
+    console.log(JSON.stringify(errorMessages, null, 2));
+
+    // Combine error messages for a more informative toast
+    const message = Object.entries(errorMessages)
+        .map(([key, value]) => `${key}: ${value.join(', ')}`)
+        .join('; ');
+        
+    return { message: message || "Input tidak valid. Silakan periksa kembali." };
   }
   
   const data = validatedFields.data;
@@ -246,3 +261,4 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
+
