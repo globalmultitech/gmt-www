@@ -94,9 +94,13 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
           <div className="lg:col-span-4">
               <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Subscribe</h3>
               <p className="text-primary-foreground/80 mb-4">Subscribe to our newsletter to get the latest updates.</p>
-              <form className="flex gap-2">
-                <Input type="email" placeholder="Enter your email" className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/60 focus:bg-background focus:text-foreground h-12"/>
-                <Button type="submit" size="lg" variant="secondary">
+              <form className="flex">
+                <Input 
+                  type="email" 
+                  placeholder="Enter your email" 
+                  className="bg-transparent border-primary-foreground/50 text-primary-foreground placeholder:text-primary-foreground/70 focus:bg-primary-foreground/10 focus:ring-primary-foreground h-14 rounded-r-none border-r-0"
+                />
+                <Button type="submit" size="lg" variant="secondary" className="rounded-l-none h-14 !-translate-y-0">
                     <ArrowRight className="h-5 w-5"/>
                 </Button>
               </form>
