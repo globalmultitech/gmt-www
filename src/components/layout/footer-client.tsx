@@ -100,7 +100,7 @@ export function FooterClient({ settings }: FooterClientProps) {
               <ul className="space-y-3">
                 {contactInfo.map((info) => (
                   <li key={info.label} className="flex items-start">
-                    <span className="font-semibold w-24 shrink-0">{info.label}</span>
+                    <span className="font-semibold w-28 shrink-0">{info.label}</span>
                     {info.href ? (
                       <Link href={info.href} className="text-primary-foreground/80 hover:text-white">
                         {info.value}
