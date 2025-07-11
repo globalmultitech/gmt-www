@@ -69,7 +69,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     for (const item of newsItemsFromClient) {
         const sanitizedData = {
             title: item.title,
-            date: new Date(), // Set to current date, as it's required by the schema
             category: item.category,
             image: item.image,
             content: item.content
