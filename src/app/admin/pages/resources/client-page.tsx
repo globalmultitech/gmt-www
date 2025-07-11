@@ -151,7 +151,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                               <div className="space-y-1"><Label className="text-xs">Judul</Label><Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} /></div>
                               <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
                               <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input value={item.date} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
-                              <div className="space-y-1"><Label className="text-xs">AI Hint</Label><Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
+                              <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
                           </div>
                       </div>
                       <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
