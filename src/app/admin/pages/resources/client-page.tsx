@@ -29,21 +29,6 @@ type ResourcesPageClientProps = {
   initialNewsItems: NewsItem[];
 };
 
-const formatDateForInput = (date: string | Date | null | undefined): string => {
-  if (!date) return '';
-  try {
-    const d = new Date(date);
-    if (isNaN(d.getTime())) {
-      return '';
-    }
-    return d.toISOString().split('T')[0];
-  } catch (error) {
-    console.error("Invalid date value:", date);
-    return '';
-  }
-};
-
-
 export default function ResourcesPageClientPage({ settings, initialNewsItems }: ResourcesPageClientProps) {
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateResourcesPageSettings, undefined);
@@ -84,7 +69,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
 
   const addItem = () => {
     // @ts-ignore
-    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', date: new Date(), image: '', content: '' }]}));
+    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', image: '', content: '' }]}));
   };
 
   const removeItem = (index: number) => {
