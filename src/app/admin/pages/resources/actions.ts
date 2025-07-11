@@ -13,6 +13,7 @@ const NewsItemSchema = z.object({
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
+    aiHint: z.string().nullable().default(''),
 });
 
 const ResourcesPageSettingsSchema = z.object({
@@ -71,7 +72,8 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             title: item.title,
             category: item.category,
             image: item.image,
-            content: item.content
+            content: item.content,
+            aiHint: item.aiHint
         };
         
         if (!item.title && !item.category) {

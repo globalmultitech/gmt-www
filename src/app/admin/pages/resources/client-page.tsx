@@ -69,7 +69,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
 
   const addItem = () => {
     // @ts-ignore
-    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', image: '', content: '' }]}));
+    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', image: '', content: '', aiHint: '' }]}));
   };
 
   const removeItem = (index: number) => {
@@ -188,6 +188,10 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                                       {generatingStates[item.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-primary" />}
                                   </Button>
                                 </div>
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs">AI Hint (u/ gambar)</Label>
+                                <Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} />
                             </div>
                         </div>
                         <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>

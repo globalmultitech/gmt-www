@@ -1,3 +1,4 @@
+
 import { getSettings } from '@/lib/settings';
 import ResourcesPageClientPage from './client-page';
 import { redirect } from 'next/navigation';
@@ -9,7 +10,7 @@ export default async function ResourcesSettingsPage() {
   const settings = await getSettings();
   const newsItems = await prisma.newsItem.findMany({
     orderBy: {
-      date: 'desc'
+      id: 'desc'
     }
   });
 

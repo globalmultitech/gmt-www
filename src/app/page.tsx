@@ -25,7 +25,7 @@ async function getHomePageData() {
 
   const newsItems = await prisma.newsItem.findMany({
     take: 3,
-    orderBy: { date: 'desc' },
+    orderBy: { id: 'desc' },
   });
 
   return { products, settings, professionalServices, newsItems };
@@ -33,7 +33,7 @@ async function getHomePageData() {
 
 export default async function Home() {
   const { products, settings, professionalServices, newsItems } = await getHomePageData();
-
+  
   return (
     <HomeClientPage 
       products={products} 
