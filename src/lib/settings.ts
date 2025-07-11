@@ -116,24 +116,25 @@ export async function getSettings(): Promise<WebSettings> {
         }
 
         const parseJson = (jsonField: any, fallback: any) => {
-           // If the field from DB is null or undefined, return the fallback immediately.
-           if (jsonField === null || jsonField === undefined) {
-              return fallback;
-           }
-           // If it's already a parsed object (from Prisma JSON type), return it.
-           if (typeof jsonField === 'object') {
-              return jsonField;
-           }
-           // If it's a string, try to parse it.
-            if (typeof jsonField === 'string' && jsonField.trim() !== '') {
-              try {
-                return JSON.parse(jsonField);
-              } catch (e) {
-                console.warn('Failed to parse JSON string field, returning fallback:', e);
-                return fallback;
-              }
+            if (jsonField === null || jsonField === undefined) {
+               return fallback;
             }
-            // If it's none of the above (e.g., empty string), return fallback.
+            if (typeof jsonField === 'object' && !Array.isArray(jsonField)) {
+                // It's likely already a parsed object from Prisma JSON type
+                return jsonField;
+            }
+            if (typeof jsonField === 'string' && jsonField.trim().startsWith('{') || jsonField.trim().startsWith('[')) {
+               try {
+                 return JSON.parse(jsonField);
+               } catch (e) {
+                 console.warn('Failed to parse JSON string field, returning fallback:', e);
+                 return fallback;
+               }
+            }
+            // If it's an array, assume it's already parsed
+             if (Array.isArray(jsonField)) {
+                return jsonField;
+            }
             return fallback;
         };
         
