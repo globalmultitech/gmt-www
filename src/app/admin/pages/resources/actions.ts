@@ -10,7 +10,7 @@ import { generateBlogPost } from '@/ai/flows/generate-blog-post';
 const NewsItemSchema = z.object({
     id: z.number(), // Use a temporary ID from the client for existing items
     title: z.string().default(''),
-    date: z.string().default(''),
+    date: z.union([z.string(), z.date()]).default(''),
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
@@ -70,8 +70,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     for (const item of newsItemsFromClient) {
         const sanitizedData = {
             title: item.title,
-            // @ts-ignore
-            date: new Date(item.date),
+            date: new Date(item.date), // Ensure it's a valid Date object before saving
             category: item.category,
             image: item.image,
             content: item.content
