@@ -15,15 +15,6 @@ import Image from 'next/image';
 import type { NewsItem } from '@prisma/client';
 import { Textarea } from '@/components/ui/textarea';
 
-const toSlug = (name: string) => {
-  if (!name) return '';
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-};
-
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
   return (
@@ -42,27 +33,37 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateResourcesPageSettings, undefined);
 
-  const [formState, setFormState] = useState({
+  const getInitialFormState = () => ({
     resourcesPageTitle: settings.resourcesPageTitle ?? '',
     resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
     newsItems: initialNewsItems,
   });
+
+  const [formState, setFormState] = useState(getInitialFormState());
   
   const [uploadingStates, setUploadingStates] = useState<{ [id: number]: boolean }>({});
   const [generatingStates, setGeneratingStates] = useState<{ [id: number]: boolean }>({});
   const [isDirty, setIsDirty] = useState(false);
 
-  const initialFormState = {
-    resourcesPageTitle: settings.resourcesPageTitle ?? '',
-    resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
-    newsItems: initialNewsItems,
-  };
+  useEffect(() => {
+    setFormState(getInitialFormState());
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings, initialNewsItems]);
   
   useEffect(() => {
-    setIsDirty(JSON.stringify(formState) !== JSON.stringify(initialFormState));
+    setIsDirty(JSON.stringify(formState) !== JSON.stringify(getInitialFormState()));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formState]);
   
+  const toSlug = (name: string) => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
+
   const handleFieldChange = (field: keyof typeof formState, value: any) => {
     setFormState(prev => ({ ...prev, [field]: value }));
   };
@@ -86,7 +87,6 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     });
   }
 
-
   const addItem = () => {
     const newItem: NewsItem = {
       id: Date.now(), // Temporary ID
@@ -101,7 +101,6 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     };
     setFormState(prev => ({...prev, newsItems: [newItem, ...prev.newsItems]}));
   };
-
 
   const removeItem = (index: number) => {
     setFormState(prev => ({...prev, newsItems: prev.newsItems.filter((_, i) => i !== index)}));

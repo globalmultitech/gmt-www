@@ -17,7 +17,7 @@ const toSlug = (name: string) => {
 const NewsItemSchema = z.object({
     id: z.number(), 
     title: z.string().default(''),
-    slug: z.string(), // Can be empty string initially, but will be generated
+    slug: z.string(), // We will validate this manually below
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
@@ -76,17 +76,19 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     }
 
     for (const item of newsItemsFromClient) {
-        const finalSlug = item.slug || toSlug(item.title);
-        if (!item.title && !item.category) {
+        // Filter out completely empty new items before processing
+        if (item.id > Date.now() && !item.title && !item.category && !item.content) {
             continue;
         }
-         if (!finalSlug) {
-            return { message: `Judul tidak boleh kosong untuk artikel baru.` };
+        
+        // Manual validation for slug based on title
+        if (item.title && !item.slug) {
+            return { message: `Gagal menyimpan: Judul "${item.title}" tidak memiliki slug. Coba ketik ulang judul.` };
         }
 
         const sanitizedData = {
             title: item.title,
-            slug: finalSlug,
+            slug: item.slug,
             category: item.category,
             image: item.image,
             content: item.content,
