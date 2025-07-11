@@ -6,6 +6,8 @@ import { ArrowRight, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import prisma from '@/lib/db';
+import { format } from 'date-fns';
+import { id } from 'date-fns/locale';
 
 export default async function ResourcesPage() {
   const settings = await getSettings();
@@ -27,8 +29,8 @@ export default async function ResourcesPage() {
       {/* News Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary mb-2">Berita Terbaru</h2>
-          <p className="text-lg text-muted-foreground mb-12">Ikuti perkembangan dan pencapaian terbaru dari Global Multi Technology.</p>
+          <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary mb-2">Berita & Wawasan Terbaru</h2>
+          <p className="text-lg text-muted-foreground mb-12">Ikuti perkembangan, studi kasus, dan analisis mendalam dari Global Multi Technology.</p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {newsItems.map((item, index) => (
               <Card key={index} className="flex flex-col overflow-hidden transform transition-transform duration-300 hover:-translate-y-2 hover:shadow-xl">
@@ -38,7 +40,7 @@ export default async function ResourcesPage() {
                     alt={item.title}
                     fill
                     className="object-cover"
-                    data-ai-hint={item.aiHint || ''}
+                    data-ai-hint="technology news"
                   />
                 </div>
                 <CardHeader>
@@ -46,10 +48,13 @@ export default async function ResourcesPage() {
                   <CardTitle className="font-headline text-xl h-16">{item.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                   <div className="flex items-center text-sm text-muted-foreground">
-                        <Calendar className="h-4 w-4 mr-2" />
-                        <span>{item.date}</span>
-                    </div>
+                  <div className="flex items-center text-sm text-muted-foreground">
+                    <Calendar className="h-4 w-4 mr-2" />
+                    <span>{format(new Date(item.date), "d MMMM yyyy", { locale: id })}</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground mt-4 line-clamp-3">
+                    {item.content}
+                  </p>
                 </CardContent>
                 <CardFooter>
                     <Link href="#" className="font-semibold text-primary hover:text-sky-blue flex items-center">
@@ -62,7 +67,8 @@ export default async function ResourcesPage() {
         </div>
       </section>
       
-      {/* Blog Section */}
+      {/* Deprecated AI Section */}
+      {/* 
       <section className="py-16 md:py-24 bg-secondary">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary mb-2">Wawasan dari Blog Kami</h2>
@@ -70,6 +76,7 @@ export default async function ResourcesPage() {
           <BlogSection />
         </div>
       </section>
+      */}
     </>
   );
 }

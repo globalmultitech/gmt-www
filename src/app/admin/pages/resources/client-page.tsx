@@ -6,13 +6,14 @@ import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
+import { Loader2, Image as ImageIcon, PlusCircle, Trash2, Wand2 } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
-import { updateResourcesPageSettings } from './actions';
+import { updateResourcesPageSettings, generateBlogPostContent } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import type { NewsItem } from '@prisma/client';
+import { Textarea } from '@/components/ui/textarea';
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
@@ -38,7 +39,8 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     newsItems: initialNewsItems,
   });
   
-  const [isUploading, setIsUploading] = useState(false);
+  const [uploadingStates, setUploadingStates] = useState<{ [id: number]: boolean }>({});
+  const [generatingStates, setGeneratingStates] = useState<{ [id: number]: boolean }>({});
   const [isDirty, setIsDirty] = useState(false);
 
   const initialFormState = {
@@ -67,17 +69,17 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
 
   const addItem = () => {
     // @ts-ignore
-    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', date: '', image: '', aiHint: '', createdAt: new Date(), updatedAt: new Date() }]}));
+    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', date: (new Date()).toISOString().split('T')[0], image: '', content: '' }]}));
   };
 
   const removeItem = (index: number) => {
     setFormState(prev => ({...prev, newsItems: prev.newsItems.filter((_, i) => i !== index)}));
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, itemId: number) => {
       const file = event.target.files?.[0];
       if (!file) return;
-      setIsUploading(true);
+      setUploadingStates(prev => ({...prev, [itemId]: true}));
       const formData = new FormData();
       formData.append("file", file);
       
@@ -92,15 +94,41 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
         }
         
         const { publicUrl } = await res.json();
-        handleItemChange(index, 'image', publicUrl);
+        const itemIndex = formState.newsItems.findIndex(item => item.id === itemId);
+        handleItemChange(itemIndex, 'image', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
         toast({ title: 'Upload Gagal', variant: 'destructive' });
       } finally {
-        setIsUploading(false);
+        setUploadingStates(prev => ({...prev, [itemId]: false}));
         event.target.value = '';
       }
   }
+
+  const handleGenerateContent = async (itemId: number) => {
+    const itemIndex = formState.newsItems.findIndex(item => item.id === itemId);
+    const currentItem = formState.newsItems[itemIndex];
+
+    if (!currentItem.title) {
+        toast({ title: 'Judul Kosong', description: 'Silakan isi judul terlebih dahulu.', variant: 'destructive'});
+        return;
+    }
+
+    setGeneratingStates(prev => ({...prev, [itemId]: true}));
+
+    try {
+        const result = await generateBlogPostContent(currentItem.title);
+        if (result.error) {
+            throw new Error(result.error);
+        }
+        handleItemChange(itemIndex, 'content', result.content as string);
+        toast({ title: 'Konten Dihasilkan', description: 'Draf konten berhasil dibuat oleh AI.' });
+    } catch (error: any) {
+        toast({ title: 'Generasi Gagal', description: error.message, variant: 'destructive' });
+    } finally {
+        setGeneratingStates(prev => ({...prev, [itemId]: false}));
+    }
+  };
 
   useEffect(() => {
     if (state?.message) {
@@ -139,22 +167,35 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
           </CardHeader>
           <CardContent className="space-y-4">
               {formState.newsItems.map((item, index) => (
-                  <div key={item.id} className="flex items-start gap-4 p-4 border rounded-md">
-                      <div className="flex-shrink-0 space-y-2">
-                        <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
-                          {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
-                        </div>
-                        <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading} className="w-40" />
-                      </div>
-                      <div className="flex-grow space-y-2">
-                          <div className="grid grid-cols-2 gap-2">
-                              <div className="space-y-1"><Label className="text-xs">Judul</Label><Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} /></div>
-                              <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
-                              <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input value={item.date} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
-                              <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
+                  <div key={item.id} className="space-y-4 p-4 border rounded-md">
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0 space-y-2">
+                          <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
+                            {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
                           </div>
+                          <Input type="file" onChange={(e) => handleImageUpload(e, item.id)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[item.id]} className="w-40" />
+                        </div>
+                        <div className="flex-grow grid grid-cols-1 gap-2">
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input type="date" value={item.date ? new Date(item.date).toISOString().split('T')[0] : ''} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
+                            </div>
+                             <div className="space-y-1">
+                                <Label className="text-xs">Judul</Label>
+                                <div className="flex gap-2">
+                                  <Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} />
+                                  <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateContent(item.id)} disabled={generatingStates[item.id]}>
+                                      {generatingStates[item.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-primary" />}
+                                  </Button>
+                                </div>
+                            </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
                       </div>
-                      <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                      <div className="space-y-1">
+                        <Label className="text-xs">Konten</Label>
+                        <Textarea value={item.content || ''} onChange={e => handleItemChange(index, 'content', e.target.value)} rows={8}/>
+                      </div>
                   </div>
               ))}
               <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Artikel</Button>

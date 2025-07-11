@@ -4,7 +4,7 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
-import type { NewsItem } from '@prisma/client';
+import { generateBlogPost } from '@/ai/flows/generate-blog-post';
 
 // Schema for a single news item from the client
 const NewsItemSchema = z.object({
@@ -13,7 +13,7 @@ const NewsItemSchema = z.object({
     date: z.string().default(''),
     category: z.string().default(''),
     image: z.string().nullable().default(''),
-    aiHint: z.string().nullable().default(''),
+    content: z.string().nullable().default(''),
 });
 
 const ResourcesPageSettingsSchema = z.object({
@@ -70,10 +70,11 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     for (const item of newsItemsFromClient) {
         const sanitizedData = {
             title: item.title,
-            date: item.date,
+            // @ts-ignore
+            date: new Date(item.date),
             category: item.category,
             image: item.image,
-            aiHint: item.aiHint
+            content: item.content
         };
         
         if (!item.title && !item.category && !item.date) {
@@ -99,4 +100,19 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     console.error('Update Resources Page settings error:', error);
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
+}
+
+
+export async function generateBlogPostContent(title: string) {
+    if (!title) {
+        return { error: 'Judul tidak boleh kosong.' };
+    }
+
+    try {
+        const result = await generateBlogPost({ blogPostTitle: title });
+        return { content: result.blogPostContent };
+    } catch (error) {
+        console.error('Error generating blog post content:', error);
+        return { error: 'Gagal menghasilkan konten dari AI. Silakan coba lagi nanti.' };
+    }
 }
