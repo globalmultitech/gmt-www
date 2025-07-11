@@ -93,7 +93,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     revalidatePath('/', 'layout');
     revalidatePath('/resources');
     revalidatePath('/admin/pages/resources');
-    return { message: 'Pengaturan Halaman Resources berhasil diperbarui.' };
+    return { message: 'Pengaturan Halaman Blog berhasil diperbarui.' };
 
   } catch (error) {
     console.error('Update Resources Page settings error:', error);

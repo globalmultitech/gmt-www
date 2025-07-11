@@ -118,8 +118,8 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="resourcesData" value={JSON.stringify(formState)} />
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Pengaturan Halaman Resources</h1>
-        <p className="text-muted-foreground">Kelola berita dan artikel yang tampil di halaman Resources.</p>
+        <h1 className="text-3xl font-bold">Pengaturan Halaman Blog</h1>
+        <p className="text-muted-foreground">Kelola berita dan artikel yang tampil di halaman Blog.</p>
       </div>
 
       <Card>
@@ -134,8 +134,8 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
 
       <Card>
           <CardHeader>
-              <CardTitle>Berita Terbaru</CardTitle>
-              <CardDescription>Kelola daftar berita yang ditampilkan di halaman Resources.</CardDescription>
+              <CardTitle>Daftar Artikel/Berita</CardTitle>
+              <CardDescription>Kelola daftar artikel yang ditampilkan di halaman Blog.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
               {formState.newsItems.map((item, index) => (
@@ -157,7 +157,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                       <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                   </div>
               ))}
-              <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Berita</Button>
+              <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Artikel</Button>
           </CardContent>
       </Card>
       

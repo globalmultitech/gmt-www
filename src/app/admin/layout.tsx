@@ -54,7 +54,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { href: '/admin/pages/layanan', label: 'Layanan', icon: <FileText /> },
     { href: '/admin/pages/solusi', label: 'Solusi', icon: <Handshake /> },
     { href: '/admin/pages/tentang-kami', label: 'Tentang Kami', icon: <Building2 /> },
-    { href: '/admin/pages/resources', label: 'Resources', icon: <Newspaper /> },
+    { href: '/admin/pages/resources', label: 'Blog', icon: <Newspaper /> },
   ];
 
   const settingsNavItems = [

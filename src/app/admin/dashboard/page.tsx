@@ -89,10 +89,10 @@ export default function AdminDashboardPage() {
                          <Card>
                             <CardHeader>
                                 <Newspaper className="h-8 w-8 text-primary mb-2" />
-                                <CardTitle>Halaman Resources</CardTitle>
+                                <CardTitle>Halaman Blog</CardTitle>
                             </CardHeader>
                             <CardContent>
-                                <p className="text-muted-foreground text-sm mb-4">Kelola berita dan artikel yang ada di halaman Resources.</p>
+                                <p className="text-muted-foreground text-sm mb-4">Kelola berita dan artikel yang ada di halaman Blog.</p>
                                 <Button asChild>
                                     <Link href="/admin/pages/resources">Buka Modul</Link>
                                 </Button>
