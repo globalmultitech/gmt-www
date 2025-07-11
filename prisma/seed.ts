@@ -37,6 +37,10 @@ async function main() {
       companyName: 'Global Multi Technology',
       whatsappSales: '+6281234567890',
       footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',
+      address: '139 Baker St, E1 7PT, London',
+      contactEmail: 'contacts@example.com',
+      contactPhone: '(02) 123 333 444',
+      openingHours: '8am-5pm Mon - Fri',
       socialMedia: {
         twitter: '#',
         facebook: '#',

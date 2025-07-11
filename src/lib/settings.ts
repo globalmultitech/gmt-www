@@ -49,6 +49,10 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
+  address: string | null;
+  contactEmail: string | null;
+  contactPhone: string | null;
+  openingHours: string | null;
   heroHeadline: string | null;
   heroDescription: string | null;
   heroImageUrl: string | null;
@@ -83,6 +87,10 @@ const defaultSettings: WebSettings = {
   companyName: 'Daltech',
   whatsappSales: '+6281234567890',
   footerText: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses succeed.',
+  address: '139 Baker St, E1 7PT, London',
+  contactEmail: 'contacts@example.com',
+  contactPhone: '(02) 123 333 444',
+  openingHours: '8am-5pm Mon - Fri',
   socialMedia: {
     twitter: '#',
     facebook: '#',
@@ -239,7 +247,8 @@ export async function getSettings(): Promise<WebSettings> {
         }
 
         return {
-            ...settingsFromDb,
+            ...defaultSettings, // Start with defaults
+            ...settingsFromDb, // Override with DB values
             socialMedia: (settingsFromDb.socialMedia as SocialMediaLinks) ?? defaultSettings.socialMedia,
             menuItems: (settingsFromDb.menuItems as MenuItem[]) ?? defaultSettings.menuItems,
             featureCards: (settingsFromDb.featureCards as FeatureCard[]) ?? defaultSettings.featureCards,

@@ -10,6 +10,10 @@ const SettingsSchema = z.object({
   companyName: z.string().min(1, 'Nama perusahaan tidak boleh kosong'),
   whatsappSales: z.string().min(1, 'Nomor WhatsApp tidak boleh kosong'),
   footerText: z.string().min(1, 'Teks footer tidak boleh kosong'),
+  address: z.string().optional(),
+  contactEmail: z.string().optional(),
+  contactPhone: z.string().optional(),
+  openingHours: z.string().optional(),
   socialMedia: z.string().transform((str, ctx) => {
     try {
       return JSON.parse(str);
@@ -113,6 +117,10 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     companyName: formData.get('companyName'),
     whatsappSales: formData.get('whatsappSales'),
     footerText: formData.get('footerText'),
+    address: formData.get('address'),
+    contactEmail: formData.get('contactEmail'),
+    contactPhone: formData.get('contactPhone'),
+    openingHours: formData.get('openingHours'),
     socialMedia: formData.get('socialMedia'),
     menuItems: formData.get('menuItems'),
     heroHeadline: formData.get('heroHeadline'),

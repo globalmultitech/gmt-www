@@ -211,6 +211,29 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
             </div>
           </CardContent>
         </Card>
+
+        {/* Card: Informasi Kontak Footer */}
+        <Card>
+            <CardHeader><CardTitle>Informasi Kontak Footer</CardTitle></CardHeader>
+            <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 space-y-1">
+                    <Label htmlFor="address">Alamat</Label>
+                    <Input id="address" name="address" defaultValue={settings.address ?? ''} placeholder="139 Baker St, E1 7PT, London" />
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="contactEmail">Email Kontak</Label>
+                    <Input id="contactEmail" name="contactEmail" type="email" defaultValue={settings.contactEmail ?? ''} placeholder="contacts@example.com" />
+                </div>
+                 <div className="space-y-1">
+                    <Label htmlFor="contactPhone">Telepon Kontak</Label>
+                    <Input id="contactPhone" name="contactPhone" defaultValue={settings.contactPhone ?? ''} placeholder="(02) 123 333 444" />
+                </div>
+                <div className="md:col-span-2 space-y-1">
+                    <Label htmlFor="openingHours">Jam Buka</Label>
+                    <Input id="openingHours" name="openingHours" defaultValue={settings.openingHours ?? ''} placeholder="8am-5pm Mon - Fri" />
+                </div>
+            </CardContent>
+        </Card>
         
         {/* Social Media Links */}
         <Card>
