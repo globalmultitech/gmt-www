@@ -98,8 +98,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: 'Produk Tidak Ditemukan',
     };
   }
-  
-  const mainImageUrl = (product.images as string[])?.[0] ?? undefined;
+
+  let mainImageUrl: string | undefined;
+  if (typeof product.images === 'string') {
+    try {
+      const parsedImages = JSON.parse(product.images);
+      if (Array.isArray(parsedImages) && parsedImages.length > 0) {
+        mainImageUrl = parsedImages[0];
+      }
+    } catch (e) {
+      // Ignore parse error
+    }
+  } else if (Array.isArray(product.images) && product.images.length > 0) {
+    mainImageUrl = product.images[0];
+  }
 
   return {
     title: product.metaTitle || product.title,
@@ -133,12 +145,21 @@ export default async function ProductDetailPage({ params }: Props) {
   
   const randomProducts = await getRandomProducts(product.id);
 
+  const parseJsonField = (field: any, fallback: any[] = []) => {
+    if (typeof field === 'string') {
+        try {
+            return JSON.parse(field);
+        } catch (e) {
+            return fallback;
+        }
+    }
+    return Array.isArray(field) ? field : fallback;
+  };
+
+  const imagesList = parseJsonField(product.images);
+  const featuresList = parseJsonField(product.features);
   const specifications = (product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)) 
     ? Object.entries(product.specifications) 
-    : [];
-
-  const featuresList = (product.features && Array.isArray(product.features))
-    ? product.features
     : [];
 
   return (
@@ -151,7 +172,7 @@ export default async function ProductDetailPage({ params }: Props) {
           
           <div className="pb-12 md:pb-16 grid md:grid-cols-2 gap-8 md:gap-12">
             
-            <ProductImageGallery images={product.images as string[]} productTitle={product.title} />
+            <ProductImageGallery images={imagesList} productTitle={product.title} />
 
             <div className="flex flex-col">
               <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
