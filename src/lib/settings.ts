@@ -115,25 +115,23 @@ export async function getSettings(): Promise<WebSettings> {
             return defaultSettings;
         }
 
-        const parseJson = (jsonField: any, fallback: any) => {
-           // If the field from DB is null or undefined, return the fallback immediately.
-           if (jsonField === null || jsonField === undefined) {
-              return fallback;
-           }
-           // If it's already a parsed object (from Prisma JSON type), return it.
-           if (typeof jsonField === 'object') {
-              return jsonField;
-           }
-           // If it's a string, try to parse it.
-            if (typeof jsonField === 'string' && jsonField.trim() !== '') {
-              try {
-                return JSON.parse(jsonField);
-              } catch (e) {
-                console.warn('Failed to parse JSON string field, returning fallback:', e);
+        // Helper function to safely parse JSON fields
+        const parseJson = (jsonField: string | null | undefined, fallback: any[] = []) => {
+            if (jsonField === null || jsonField === undefined) {
                 return fallback;
-              }
             }
-            // If it's none of the above (e.g., empty string), return fallback.
+            // Prisma's JSON type might already return a parsed object
+            if (typeof jsonField === 'object') {
+                return jsonField;
+            }
+            if (typeof jsonField === 'string' && jsonField.trim()) {
+                try {
+                    return JSON.parse(jsonField);
+                } catch (e) {
+                    console.error('Failed to parse JSON string, returning fallback:', jsonField, e);
+                    return fallback;
+                }
+            }
             return fallback;
         };
         
@@ -141,12 +139,12 @@ export async function getSettings(): Promise<WebSettings> {
         return {
             ...defaultSettings,
             ...settingsFromDb,
-            socialMedia: parseJson(settingsFromDb.socialMedia, defaultSettings.socialMedia),
-            menuItems: parseJson(settingsFromDb.menuItems, defaultSettings.menuItems),
-            featureCards: parseJson(settingsFromDb.featureCards, defaultSettings.featureCards),
-            aboutUsChecklist: parseJson(settingsFromDb.aboutUsChecklist, defaultSettings.aboutUsChecklist),
-            trustedByLogos: parseJson(settingsFromDb.trustedByLogos, defaultSettings.trustedByLogos),
-            testimonials: parseJson(settingsFromDb.testimonials, defaultSettings.testimonials),
+            socialMedia: parseJson(settingsFromDb.socialMedia as string | null, defaultSettings.socialMedia),
+            menuItems: parseJson(settingsFromDb.menuItems as string | null, defaultSettings.menuItems),
+            featureCards: parseJson(settingsFromDb.featureCards as string | null, defaultSettings.featureCards),
+            aboutUsChecklist: parseJson(settingsFromDb.aboutUsChecklist as string | null, defaultSettings.aboutUsChecklist),
+            trustedByLogos: parseJson(settingsFromDb.trustedByLogos as string | null, defaultSettings.trustedByLogos),
+            testimonials: parseJson(settingsFromDb.testimonials as string | null, defaultSettings.testimonials),
         };
 
     } catch (error) {
