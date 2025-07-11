@@ -1,14 +1,24 @@
+
 import { Card, CardHeader } from '@/components/ui/card';
 import { Eye, Rocket, Linkedin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
+import prisma from '@/lib/db';
+
+async function getPageData() {
+    const settings = await getSettings();
+    const timeline = await prisma.timelineEvent.findMany({
+        orderBy: { year: 'asc' }
+    });
+    const teamMembers = await prisma.teamMember.findMany({
+        orderBy: { createdAt: 'asc' }
+    });
+    return { settings, timeline, teamMembers };
+}
 
 export default async function TentangKamiPage() {
-  const settings = await getSettings();
-
-  const timeline = settings.timeline ?? [];
-  const teamMembers = settings.teamMembers ?? [];
+  const { settings, timeline, teamMembers } = await getPageData();
 
   return (
     <>
@@ -93,7 +103,7 @@ export default async function TentangKamiPage() {
                 {teamMembers.map((member, index) => (
                     <div key={index} className="text-center group">
                         <div className="relative h-40 w-40 md:h-48 md:w-48 mx-auto rounded-full overflow-hidden shadow-lg mb-4 transform transition-transform duration-300 group-hover:scale-105">
-                           <Image src={member.image || 'https://placehold.co/400x400.png'} alt={member.name} layout="fill" objectFit="cover" data-ai-hint={member.aiHint}/>
+                           <Image src={member.image || 'https://placehold.co/400x400.png'} alt={member.name} layout="fill" objectFit="cover" data-ai-hint={member.aiHint || ''}/>
                         </div>
                         <h3 className="font-headline font-bold text-primary text-xl">{member.name}</h3>
                         <p className="text-sky-blue">{member.role}</p>

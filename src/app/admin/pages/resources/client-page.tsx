@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
-import { updateResourcesPageSettings, updateNewsItems } from './actions';
+import { updateResourcesPageSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
@@ -30,60 +30,48 @@ type ResourcesPageClientProps = {
 
 export default function ResourcesPageClientPage({ settings, initialNewsItems }: ResourcesPageClientProps) {
   const { toast } = useToast();
-  const [headerState, headerFormAction] = useActionState(updateResourcesPageSettings, undefined);
-  const [newsState, newsFormAction] = useActionState(updateNewsItems, undefined);
+  const [state, formAction] = useActionState(updateResourcesPageSettings, undefined);
 
-  const [headerForm, setHeaderForm] = useState({
+  const [formState, setFormState] = useState({
     resourcesPageTitle: settings.resourcesPageTitle ?? '',
     resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
+    newsItems: initialNewsItems,
   });
-
-  const [newsItems, setNewsItems] = useState<NewsItem[]>(initialNewsItems);
-
+  
   const [isUploading, setIsUploading] = useState(false);
-  const [isHeaderDirty, setIsHeaderDirty] = useState(false);
-  const [isNewsDirty, setIsNewsDirty] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
+  const initialFormState = {
+    resourcesPageTitle: settings.resourcesPageTitle ?? '',
+    resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
+    newsItems: initialNewsItems,
+  };
+  
   useEffect(() => {
-    setHeaderForm({
-      resourcesPageTitle: settings.resourcesPageTitle ?? '',
-      resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
-    });
-    setNewsItems(initialNewsItems);
+    setIsDirty(JSON.stringify(formState) !== JSON.stringify(initialFormState));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings, initialNewsItems]);
-
-  useEffect(() => {
-    setIsHeaderDirty(JSON.stringify(headerForm) !== JSON.stringify({
-      resourcesPageTitle: settings.resourcesPageTitle ?? '',
-      resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
-    }));
-  }, [headerForm, settings]);
-
-  useEffect(() => {
-    setIsNewsDirty(JSON.stringify(newsItems) !== JSON.stringify(initialNewsItems));
-  }, [newsItems, initialNewsItems]);
-
-  const handleHeaderChange = (field: keyof typeof headerForm, value: string) => {
-    setHeaderForm(prev => ({ ...prev, [field]: value }));
+  }, [formState]);
+  
+  const handleFieldChange = (field: keyof typeof formState, value: any) => {
+    setFormState(prev => ({ ...prev, [field]: value }));
   };
 
   const handleItemChange = (index: number, field: string, value: string) => {
-    setNewsItems(prev => {
-        const newItems = [...prev];
+    setFormState(prev => {
+        const newItems = [...prev.newsItems];
         // @ts-ignore
         newItems[index] = {...newItems[index], [field]: value};
-        return newItems;
+        return {...prev, newsItems: newItems};
     });
   };
 
   const addItem = () => {
     // @ts-ignore
-    setNewsItems(prev => [...prev, { id: Date.now(), title: '', category: '', date: '', image: '', aiHint: '', createdAt: new Date(), updatedAt: new Date() }]);
+    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', date: '', image: '', aiHint: '', createdAt: new Date(), updatedAt: new Date() }]}));
   };
 
   const removeItem = (index: number) => {
-    setNewsItems(prev => prev.filter((_, i) => i !== index));
+    setFormState(prev => ({...prev, newsItems: prev.newsItems.filter((_, i) => i !== index)}));
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
@@ -115,86 +103,67 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   }
 
   useEffect(() => {
-    if (headerState?.message) {
-      const isSuccess = headerState.message.includes('berhasil');
+    if (state?.message) {
+      const isSuccess = state.message.includes('berhasil');
       toast({
         title: isSuccess ? 'Sukses' : 'Gagal',
-        description: headerState.message,
+        description: state.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
-      if (isSuccess) setIsHeaderDirty(false);
+      if (isSuccess) setIsDirty(false);
     }
-  }, [headerState, toast]);
-
-  useEffect(() => {
-    if (newsState?.message) {
-      const isSuccess = newsState.message.includes('berhasil');
-      toast({
-        title: isSuccess ? 'Sukses' : 'Gagal',
-        description: newsState.message,
-        variant: isSuccess ? 'default' : 'destructive',
-      });
-      if (isSuccess) setIsNewsDirty(false);
-    }
-  }, [newsState, toast]);
+  }, [state, toast]);
 
   return (
-    <div>
+    <form action={formAction} className="space-y-6">
+      <input type="hidden" name="resourcesData" value={JSON.stringify(formState)} />
       <div className="mb-6">
         <h1 className="text-3xl font-bold">Pengaturan Halaman Resources</h1>
         <p className="text-muted-foreground">Kelola berita dan artikel yang tampil di halaman Resources.</p>
       </div>
 
-      <form action={headerFormAction} className="space-y-6 mb-6">
-        <input type="hidden" name="headerData" value={JSON.stringify(headerForm)} />
-        <Card>
-            <CardHeader>
-                <CardTitle>Header Halaman</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="resourcesPageTitle">Judul Halaman</Label><Input id="resourcesPageTitle" value={headerForm.resourcesPageTitle} onChange={e => handleHeaderChange('resourcesPageTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="resourcesPageSubtitle">Subjudul Halaman</Label><Input id="resourcesPageSubtitle" value={headerForm.resourcesPageSubtitle} onChange={e => handleHeaderChange('resourcesPageSubtitle', e.target.value)} /></div>
-                <div className="flex justify-end">
-                    <SubmitButton isDirty={isHeaderDirty}/>
-                </div>
-            </CardContent>
-        </Card>
-      </form>
+      <Card>
+          <CardHeader>
+              <CardTitle>Header Halaman</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              <div className="space-y-2"><Label htmlFor="resourcesPageTitle">Judul Halaman</Label><Input id="resourcesPageTitle" value={formState.resourcesPageTitle} onChange={e => handleFieldChange('resourcesPageTitle', e.target.value)} /></div>
+              <div className="space-y-2"><Label htmlFor="resourcesPageSubtitle">Subjudul Halaman</Label><Input id="resourcesPageSubtitle" value={formState.resourcesPageSubtitle} onChange={e => handleFieldChange('resourcesPageSubtitle', e.target.value)} /></div>
+          </CardContent>
+      </Card>
 
-      <form action={newsFormAction} className="space-y-6">
-        <input type="hidden" name="newsData" value={JSON.stringify(newsItems)} />
-        <Card>
-            <CardHeader>
-                <CardTitle>Berita Terbaru</CardTitle>
-                <CardDescription>Kelola daftar berita yang ditampilkan di halaman Resources.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                {newsItems.map((item, index) => (
-                    <div key={item.id} className="flex items-start gap-4 p-4 border rounded-md">
-                        <div className="flex-shrink-0 space-y-2">
-                          <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
-                            {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
+      <Card>
+          <CardHeader>
+              <CardTitle>Berita Terbaru</CardTitle>
+              <CardDescription>Kelola daftar berita yang ditampilkan di halaman Resources.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+              {formState.newsItems.map((item, index) => (
+                  <div key={item.id} className="flex items-start gap-4 p-4 border rounded-md">
+                      <div className="flex-shrink-0 space-y-2">
+                        <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
+                          {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
+                        </div>
+                        <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading} className="w-40" />
+                      </div>
+                      <div className="flex-grow space-y-2">
+                          <div className="grid grid-cols-2 gap-2">
+                              <div className="space-y-1"><Label className="text-xs">Judul</Label><Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} /></div>
+                              <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
+                              <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input value={item.date} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
+                              <div className="space-y-1"><Label className="text-xs">AI Hint</Label><Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
                           </div>
-                          <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading} className="w-40" />
-                        </div>
-                        <div className="flex-grow space-y-2">
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1"><Label className="text-xs">Judul</Label><Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input value={item.date} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">AI Hint</Label><Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} /></div>
-                            </div>
-                        </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                ))}
-                <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Berita</Button>
-                 <div className="flex justify-end pt-4">
-                  <SubmitButton isDirty={isNewsDirty}/>
-                </div>
-            </CardContent>
-        </Card>
-      </form>
-    </div>
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+              ))}
+              <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Berita</Button>
+          </CardContent>
+      </Card>
+      
+      <div className="flex justify-end pt-4">
+        <SubmitButton isDirty={isDirty}/>
+      </div>
+    </form>
   );
 }
