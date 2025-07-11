@@ -28,13 +28,14 @@ const prompt = ai.definePrompt({
   name: 'generateBlogPostPrompt',
   input: {schema: GenerateBlogPostInputSchema},
   output: {schema: GenerateBlogPostOutputSchema},
-  prompt: `You are a professional content writer for a technology company called "Global Multi Technology" that specializes in banking and financial IT solutions.
-Your task is to write a short, engaging, and SEO-friendly blog post based on the provided title.
-The tone should be professional, informative, and slightly formal.
-The output should be in plain text or simple markdown, consisting of 2-4 paragraphs.
-Do not use complex markdown like tables. Use simple paragraphs, and maybe bullet points if necessary.
+  prompt: `Anda adalah seorang penulis konten profesional untuk sebuah perusahaan teknologi bernama "Global Multi Technology" yang berspesialisasi dalam solusi IT perbankan dan keuangan.
+Tugas Anda adalah menulis postingan blog yang singkat, menarik, dan ramah SEO berdasarkan judul yang diberikan.
+Gaya bahasa harus profesional, informatif, dan sedikit formal.
+**Tulis konten dalam Bahasa Indonesia.**
+Hasilnya harus dalam format teks biasa atau markdown sederhana, terdiri dari 2-4 paragraf.
+Jangan gunakan markdown yang kompleks seperti tabel. Gunakan paragraf sederhana, dan boleh menggunakan poin-poin (bullet points) jika perlu.
 
-Blog Post Title: {{{blogPostTitle}}}
+Judul Postingan Blog: {{{blogPostTitle}}}
 `,
 });
 
