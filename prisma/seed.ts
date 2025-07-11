@@ -1,3 +1,4 @@
+
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 import 'dotenv/config';
@@ -77,7 +78,7 @@ async function main() {
             description: 'Ariento mesfato prodo arte e eli manifesto.',
         },
         {
-            icon: 'User',
+            icon: 'Users',
             title: 'Great experience',
             description: 'Lorem consectetur adipiscing elitsed pro.',
         },
@@ -201,6 +202,57 @@ async function main() {
             author: 'Admin',
             title: 'How to choose the right IT solutions provider',
             href: '/resources'
+        },
+    ],
+    // New Page Content Fields
+    servicesPageTitle: 'Layanan Profesional Kami',
+    servicesPageSubtitle: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.',
+    servicesPageCommitmentTitle: 'Komitmen Kami Pada Keamanan',
+    servicesPageCommitmentText: 'Dalam setiap layanan yang kami berikan, keamanan adalah prioritas utama. Kami menerapkan standar keamanan industri tertinggi untuk melindungi data dan aset berharga Anda, memastikan ketenangan pikiran dalam setiap langkah transformasi digital Anda.',
+    servicesPageHeaderImageUrl: 'https://placehold.co/600x400.png',
+    
+    solutionsPageTitle: 'Solusi Teknologi Kami',
+    solutionsPageSubtitle: 'Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.',
+    solutions: [
+        {
+            icon: 'Briefcase',
+            title: 'Solusi Transformasi Cabang',
+            description: 'Revolusikan cabang konvensional menjadi pusat layanan digital yang efisien dan modern. Kami membantu bank mengurangi biaya operasional sambil meningkatkan kualitas layanan melalui otomatisasi dan self-service.',
+            image: "https://placehold.co/600x400.png",
+            aiHint: "modern bank interior",
+            keyPoints: [
+              'Implementasi Digital Kiosk untuk layanan mandiri.',
+              'Sistem Antrian Cerdas untuk mengurangi waktu tunggu.',
+              'Pengurangan kebutuhan staf untuk tugas-tugas transaksional.',
+              'Peningkatan efisiensi dan produktivitas cabang.',
+            ],
+        },
+    ],
+
+    aboutPageTitle: 'Tentang Kami',
+    aboutPageSubtitle: 'Mendorong Inovasi, Memberdayakan Pertumbuhan.',
+    missionTitle: 'Misi Kami',
+    missionText: 'Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif.',
+    visionTitle: 'Visi Kami',
+    visionText: 'Menjadi mitra teknologi terdepan dan terpercaya di Asia Tenggara, yang dikenal karena inovasi, kualitas, dan komitmen kami terhadap kesuksesan pelanggan.',
+    timeline: [
+        { year: '2010', event: 'Global Multi Technology didirikan dengan fokus pada penyediaan perangkat keras perbankan.' },
+        { year: '2015', event: 'Memperluas layanan ke pengembangan perangkat lunak kustom dan solusi sistem antrian.' },
+    ],
+    teamMembers: [
+        { name: 'Budi Santoso', role: 'Chief Executive Officer', image: 'https://placehold.co/400x400.png', linkedin: '#', aiHint: "professional man portrait" },
+        { name: 'Citra Dewi', role: 'Chief Technology Officer', image: 'https://placehold.co/400x400.png', linkedin: '#', aiHint: "professional woman portrait" },
+    ],
+
+    resourcesPageTitle: 'Resources',
+    resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.',
+    newsItems: [
+        {
+            title: 'GMT Hadiri Pameran Teknologi Finansial Terbesar di Asia',
+            date: '20 Juni 2024',
+            category: 'Acara',
+            image: 'https://placehold.co/600x400.png',
+            aiHint: 'conference technology',
         },
     ],
     },

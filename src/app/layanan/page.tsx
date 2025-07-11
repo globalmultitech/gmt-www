@@ -1,67 +1,23 @@
 
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Handshake, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
-import { Button } from '@/components/ui/button';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import { getSettings } from '@/lib/settings';
 
-const services = [
-  {
-    icon: 'Headphones',
-    title: 'Layanan Purna Jual',
-    description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal. Tim kami siap membantu mengatasi setiap kendala.',
-    details: [
-      'Dukungan teknis on-site dan remote.',
-      'Kontrak pemeliharaan preventif.',
-      'Ketersediaan suku cadang asli.',
-      'Layanan perbaikan perangkat keras.',
-    ],
-  },
-  {
-    icon: 'Layers',
-    title: 'Integrasi Sistem',
-    description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien. Kami ahli dalam mengintegrasikan sistem yang berbeda untuk kelancaran alur kerja.',
-    details: [
-      'Integrasi dengan Core Banking System.',
-      'Penyatuan platform hardware dan software.',
-      'Pengembangan API kustom.',
-      'Sinkronisasi data antar sistem.',
-    ],
-  },
-  {
-    icon: 'Code2',
-    title: 'Pengembangan Perangkat Lunak',
-    description: 'Butuh solusi yang tidak tersedia di pasaran? Tim pengembang kami siap merancang dan membangun perangkat lunak kustom yang sesuai dengan kebutuhan unik bisnis Anda.',
-    details: [
-      'Analisis kebutuhan dan desain sistem.',
-      'Pengembangan aplikasi web dan mobile.',
-      'Jaminan kualitas dan pengujian menyeluruh.',
-      'Dukungan dan pengembangan berkelanjutan.',
-    ],
-  },
-  {
-    icon: 'Bot',
-    title: 'Penyewaan atau Outsourcing',
-    description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Layanan penyewaan dan outsourcing kami memberikan fleksibilitas untuk pertumbuhan bisnis Anda.',
-    details: [
-      'Opsi sewa perangkat keras (kiosk, dll).',
-      'Pengelolaan operasional IT oleh tim kami.',
-      'Skalabilitas sesuai kebutuhan.',
-      'Fokus pada bisnis inti Anda, serahkan IT pada kami.',
-    ],
-  },
-];
+export default async function LayananPage() {
+  const settings = await getSettings();
 
-export default function LayananPage() {
+  const services = settings.professionalServices ?? [];
+
   return (
     <>
       <section className="bg-dark-slate">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Layanan Profesional Kami</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{settings.servicesPageTitle}</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.
+            {settings.servicesPageSubtitle}
           </p>
         </div>
       </section>
@@ -69,21 +25,23 @@ export default function LayananPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
-            {services.map((service) => (
-              <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+            {services.map((service, index) => (
+              <Card key={index} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="flex flex-row items-center gap-4">
                   <div className="bg-primary/10 p-4 rounded-full">
                     <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
                   </div>
                   <div>
                     <CardTitle className="font-headline text-2xl">{service.title}</CardTitle>
-                    <CardDescription className="mt-1">{service.description}</CardDescription>
+                    {service.description && (
+                         <p className="mt-1 text-muted-foreground">{service.description}</p>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 pt-4 border-t">
-                    {service.details.map((detail, index) => (
-                      <li key={index} className="flex items-start gap-3">
+                    {service.details.map((detail, detailIndex) => (
+                      <li key={detailIndex} className="flex items-start gap-3">
                         <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
                         <span className="text-sm text-muted-foreground">{detail}</span>
                       </li>
@@ -99,17 +57,17 @@ export default function LayananPage() {
       <section className="py-16 bg-primary text-primary-foreground">
         <div className="container mx-auto px-4 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-4">
-            <h2 className="text-3xl font-headline font-bold">Komitmen Kami Pada Keamanan</h2>
+            <h2 className="text-3xl font-headline font-bold">{settings.servicesPageCommitmentTitle}</h2>
             <p className="text-primary-foreground/80">
-              Dalam setiap layanan yang kami berikan, keamanan adalah prioritas utama. Kami menerapkan standar keamanan industri tertinggi untuk melindungi data dan aset berharga Anda, memastikan ketenangan pikiran dalam setiap langkah transformasi digital Anda.
+              {settings.servicesPageCommitmentText}
             </p>
             <div className="flex items-center gap-4 pt-4">
-                <ShieldCheck className="h-10 w-10 text-accent"/>
+                <ShieldCheck className="h-10 w-10 text-sky-blue"/>
                 <p className="font-semibold text-lg">Perlindungan Data dan Privasi Terjamin</p>
             </div>
           </div>
           <div className="relative h-64 md:h-80">
-            <Image src="https://placehold.co/600x400.png" alt="Keamanan Siber" fill className="object-cover rounded-lg shadow-md" data-ai-hint="cyber security" />
+            <Image src={settings.servicesPageHeaderImageUrl || "https://placehold.co/600x400.png"} alt="Keamanan Siber" fill className="object-cover rounded-lg shadow-md" data-ai-hint="cyber security" />
           </div>
         </div>
       </section>

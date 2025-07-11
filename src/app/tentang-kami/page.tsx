@@ -1,34 +1,40 @@
+
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Eye, Flag, Rocket, Users, Linkedin } from 'lucide-react';
+import { Card, CardHeader } from '@/components/ui/card';
+import { Eye, Rocket, Linkedin } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-
-const timeline = [
-  { year: '2010', event: 'Global Multi Technology didirikan dengan fokus pada penyediaan perangkat keras perbankan.' },
-  { year: '2015', event: 'Memperluas layanan ke pengembangan perangkat lunak kustom dan solusi sistem antrian.' },
-  { year: '2018', event: 'Meluncurkan produk Digital Kiosk pertama dan memulai transformasi digital untuk klien.' },
-  { year: '2021', event: 'Menjadi mitra strategis bagi 5 bank nasional terbesar di Indonesia.' },
-  { year: '2024', event: 'Meraih penghargaan "Best B2B Tech Solution" dan terus berinovasi.' },
-];
-
-const teamMembers = [
-    { name: 'Budi Santoso', role: 'Chief Executive Officer', image: 'https://placehold.co/400x400.png', aiHint: "professional man portrait" },
-    { name: 'Citra Dewi', role: 'Chief Technology Officer', image: 'https://placehold.co/400x400.png', aiHint: "professional woman portrait" },
-    { name: 'Agus Wijaya', role: 'Head of Sales', image: 'https://placehold.co/400x400.png', aiHint: " smiling man portrait" },
-    { name: 'Rina Kartika', role: 'Head of Product', image: 'https://placehold.co/400x400.png', aiHint: "smiling woman portrait" },
-]
+import { useEffect, useState } from 'react';
+import { getSettings } from '@/lib/settings';
+import type { WebSettings } from '@/lib/settings';
 
 export default function TentangKamiPage() {
+  const [settings, setSettings] = useState<WebSettings | null>(null);
+
+  useEffect(() => {
+    async function fetchSettings() {
+      const fetchedSettings = await getSettings();
+      setSettings(fetchedSettings);
+    }
+    fetchSettings();
+  }, []);
+
+  if (!settings) {
+    // Optional: add a loading skeleton here
+    return <div>Loading...</div>;
+  }
+
+  const timeline = settings.timeline ?? [];
+  const teamMembers = settings.teamMembers ?? [];
+
   return (
     <>
       <section className="bg-dark-slate">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Tentang Kami</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{settings.aboutPageTitle}</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            Mendorong Inovasi, Memberdayakan Pertumbuhan.
+            {settings.aboutPageSubtitle}
           </p>
         </div>
       </section>
@@ -42,10 +48,10 @@ export default function TentangKamiPage() {
                 <div className="bg-primary/10 p-3 rounded-full">
                   <Rocket className="h-8 w-8 text-primary"/>
                 </div>
-                <h2 className="text-3xl font-headline font-bold text-primary">Misi Kami</h2>
+                <h2 className="text-3xl font-headline font-bold text-primary">{settings.missionTitle}</h2>
               </div>
               <p className="text-muted-foreground text-lg">
-                Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif.
+                {settings.missionText}
               </p>
             </div>
             <div className="space-y-4">
@@ -53,10 +59,10 @@ export default function TentangKamiPage() {
                 <div className="bg-primary/10 p-3 rounded-full">
                   <Eye className="h-8 w-8 text-primary"/>
                 </div>
-                <h2 className="text-3xl font-headline font-bold text-primary">Visi Kami</h2>
+                <h2 className="text-3xl font-headline font-bold text-primary">{settings.visionTitle}</h2>
               </div>
               <p className="text-muted-foreground text-lg">
-                Menjadi mitra teknologi terdepan dan terpercaya di Asia Tenggara, yang dikenal karena inovasi, kualitas, dan komitmen kami terhadap kesuksesan pelanggan.
+                {settings.visionText}
               </p>
             </div>
           </div>
@@ -73,7 +79,7 @@ export default function TentangKamiPage() {
           <div className="relative">
             <div className="absolute left-1/2 h-full w-0.5 bg-border -translate-x-1/2 hidden md:block"></div>
             {timeline.map((item, index) => (
-              <div key={item.year} className="relative mb-8 md:mb-0">
+              <div key={index} className="relative mb-8 md:mb-0">
                 <div className="md:flex items-center" style={{ flexDirection: index % 2 === 0 ? 'row' : 'row-reverse' }}>
                   <div className="md:w-5/12"></div>
                   <div className="hidden md:flex justify-center w-2/12">
@@ -82,7 +88,7 @@ export default function TentangKamiPage() {
                   <div className="md:w-5/12">
                      <Card className="shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl">
                         <CardHeader>
-                            <CardTitle className="font-headline text-accent text-2xl">{item.year}</CardTitle>
+                            <h3 className="font-headline text-sky-blue text-2xl">{item.year}</h3>
                             <p className="text-muted-foreground">{item.event}</p>
                         </CardHeader>
                      </Card>
@@ -102,16 +108,18 @@ export default function TentangKamiPage() {
                 <p className="mt-2 text-lg text-muted-foreground">Orang-orang di balik kesuksesan Global Multi Technology.</p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                {teamMembers.map(member => (
-                    <div key={member.name} className="text-center group">
+                {teamMembers.map((member, index) => (
+                    <div key={index} className="text-center group">
                         <div className="relative h-40 w-40 md:h-48 md:w-48 mx-auto rounded-full overflow-hidden shadow-lg mb-4 transform transition-transform duration-300 group-hover:scale-105">
-                           <Image src={member.image} alt={member.name} layout="fill" objectFit="cover" data-ai-hint={member.aiHint}/>
+                           <Image src={member.image || 'https://placehold.co/400x400.png'} alt={member.name} layout="fill" objectFit="cover" data-ai-hint={member.aiHint}/>
                         </div>
                         <h3 className="font-headline font-bold text-primary text-xl">{member.name}</h3>
-                        <p className="text-accent">{member.role}</p>
-                        <Link href="#" className="mt-2 inline-block opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary"/>
-                        </Link>
+                        <p className="text-sky-blue">{member.role}</p>
+                        {member.linkedin && (
+                            <Link href={member.linkedin} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary"/>
+                            </Link>
+                        )}
                     </div>
                 ))}
             </div>

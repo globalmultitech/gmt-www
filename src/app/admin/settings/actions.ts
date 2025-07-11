@@ -54,6 +54,36 @@ const TrustedByLogoSchema = z.object({
   alt: z.string().optional().default(''),
 });
 
+const SolutionSchema = z.object({
+    icon: z.string().optional().default(''),
+    title: z.string().optional().default(''),
+    description: z.string().optional().default(''),
+    image: z.string().optional().default(''),
+    keyPoints: z.array(z.string()).optional().default([]),
+});
+
+const TimelineEventSchema = z.object({
+    year: z.string().optional().default(''),
+    event: z.string().optional().default(''),
+});
+
+const TeamMemberSchema = z.object({
+    name: z.string().optional().default(''),
+    role: z.string().optional().default(''),
+    image: z.string().optional().default(''),
+    linkedin: z.string().optional().default(''),
+    aiHint: z.string().optional().default(''),
+});
+
+const NewsItemSchema = z.object({
+    title: z.string().optional().default(''),
+    date: z.string().optional().default(''),
+    category: z.string().optional().default(''),
+    image: z.string().optional().default(''),
+    aiHint: z.string().optional().default(''),
+});
+
+
 // Main settings schema, all fields are optional
 const SettingsSchema = z.object({
   logoUrl: z.string().optional(),
@@ -92,6 +122,30 @@ const SettingsSchema = z.object({
   trustedByLogos: z.array(TrustedByLogoSchema).optional(),
   testimonials: z.array(TestimonialSchema).optional(),
   blogPosts: z.array(BlogPostSchema).optional(),
+
+  // New Page Content Fields
+  servicesPageTitle: z.string().optional(),
+  servicesPageSubtitle: z.string().optional(),
+  servicesPageCommitmentTitle: z.string().optional(),
+  servicesPageCommitmentText: z.string().optional(),
+  servicesPageHeaderImageUrl: z.string().optional(),
+  
+  solutionsPageTitle: z.string().optional(),
+  solutionsPageSubtitle: z.string().optional(),
+  solutions: z.array(SolutionSchema).optional(),
+
+  aboutPageTitle: z.string().optional(),
+  aboutPageSubtitle: z.string().optional(),
+  missionTitle: z.string().optional(),
+  missionText: z.string().optional(),
+  visionTitle: z.string().optional(),
+  visionText: z.string().optional(),
+  timeline: z.array(TimelineEventSchema).optional(),
+  teamMembers: z.array(TeamMemberSchema).optional(),
+
+  resourcesPageTitle: z.string().optional(),
+  resourcesPageSubtitle: z.string().optional(),
+  newsItems: z.array(NewsItemSchema).optional(),
 });
 
 
@@ -124,13 +178,14 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
                 items[index] = {};
             }
             
-            const detailMatch = field.match(/^details\[(\d+)\]$/);
+            const detailMatch = field.match(/^(details|keyPoints)\[(\d+)\]$/);
             if (detailMatch) {
-                if (!items[index].details) {
-                    items[index].details = [];
+                const arrayField = detailMatch[1];
+                if (!items[index][arrayField]) {
+                    items[index][arrayField] = [];
                 }
-                const detailIndex = parseInt(detailMatch[1], 10);
-                items[index].details[detailIndex] = value;
+                const detailIndex = parseInt(detailMatch[2], 10);
+                items[index][arrayField][detailIndex] = value;
             } else {
                 items[index][field] = value;
             }
@@ -138,15 +193,18 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
     }
     
     return Object.values(items).map(item => {
-        // Clean up nested 'details' array by removing empty strings
+        // Clean up nested arrays by removing empty strings
         if (Array.isArray(item.details)) {
             item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
+        }
+        if (Array.isArray(item.keyPoints)) {
+            item.keyPoints = item.keyPoints.filter(point => typeof point === 'string' && point.trim() !== '');
         }
         return item;
     }).filter(item => {
         // Filter out items that are completely empty
         if (!item || typeof item !== 'object') return false;
-        // Check if any value in the object is a non-empty string.
+        // Check if any value in the object is a non-empty string or a non-empty array.
         return Object.values(item).some(value => {
             if (typeof value === 'string') return value.trim() !== '';
             if (Array.isArray(value)) return value.length > 0;
@@ -212,6 +270,30 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         trustedByLogos: getAsArrayOfObjects(formData, 'trustedByLogos'),
         testimonials: getAsArrayOfObjects(formData, 'testimonials'),
         blogPosts: getAsArrayOfObjects(formData, 'blogPosts'),
+        
+        // New Page Content Fields
+        servicesPageTitle: formData.get('servicesPageTitle'),
+        servicesPageSubtitle: formData.get('servicesPageSubtitle'),
+        servicesPageCommitmentTitle: formData.get('servicesPageCommitmentTitle'),
+        servicesPageCommitmentText: formData.get('servicesPageCommitmentText'),
+        servicesPageHeaderImageUrl: formData.get('servicesPageHeaderImageUrl'),
+
+        solutionsPageTitle: formData.get('solutionsPageTitle'),
+        solutionsPageSubtitle: formData.get('solutionsPageSubtitle'),
+        solutions: getAsArrayOfObjects(formData, 'solutions'),
+
+        aboutPageTitle: formData.get('aboutPageTitle'),
+        aboutPageSubtitle: formData.get('aboutPageSubtitle'),
+        missionTitle: formData.get('missionTitle'),
+        missionText: formData.get('missionText'),
+        visionTitle: formData.get('visionTitle'),
+        visionText: formData.get('visionText'),
+        timeline: getAsArrayOfObjects(formData, 'timeline'),
+        teamMembers: getAsArrayOfObjects(formData, 'teamMembers'),
+
+        resourcesPageTitle: formData.get('resourcesPageTitle'),
+        resourcesPageSubtitle: formData.get('resourcesPageSubtitle'),
+        newsItems: getAsArrayOfObjects(formData, 'newsItems'),
     };
 
     const validatedFields = SettingsSchema.safeParse(dataToValidate);
@@ -243,5 +325,3 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
-
-    
