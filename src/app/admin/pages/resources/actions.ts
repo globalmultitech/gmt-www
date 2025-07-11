@@ -17,7 +17,7 @@ const toSlug = (name: string) => {
 const NewsItemSchema = z.object({
     id: z.number(), 
     title: z.string().default(''),
-    slug: z.string().optional(),
+    slug: z.string().optional(), // Make slug optional at validation
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
@@ -81,11 +81,8 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             continue;
         }
         
-        // Generate slug from title on the server if it's missing
+        // Generate slug from title on the server if it's missing or empty
         const finalSlug = item.slug || toSlug(item.title);
-        if (item.title && !finalSlug) {
-            return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan slug yang valid.` };
-        }
 
         const sanitizedData = {
             title: item.title,
@@ -100,12 +97,14 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             operations.push(prisma.newsItem.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
              if (finalSlug) {
-                // Check if slug already exists for a new item
-                const existingSlug = await prisma.newsItem.findUnique({ where: { slug: finalSlug }});
+                const existingSlug = await prisma.newsItem.findFirst({ where: { slug: finalSlug }});
                 if(existingSlug) {
                     return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan.` };
                 }
-            }
+             } else if (item.title) {
+                 // Prevent saving if title exists but slug can't be generated
+                 return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan slug yang valid.` };
+             }
             operations.push(prisma.newsItem.create({ data: sanitizedData }));
         }
     }
