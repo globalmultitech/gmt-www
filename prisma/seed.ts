@@ -3,6 +3,13 @@ import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 import 'dotenv/config';
 
+const toSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '');
+};
+
 async function main() {
   const email = 'admin@gmt.co.id';
   const plainPassword = 'password123';
@@ -278,8 +285,7 @@ async function main() {
   });
 
   console.log('Seeding News Items...');
-  await prisma.newsItem.createMany({
-    data: [
+  const newsItemsToSeed = [
       {
           title: 'GMT Hadiri Pameran Teknologi Finansial Terbesar di Asia',
           category: 'Acara Perusahaan',
@@ -315,9 +321,14 @@ async function main() {
           aiHint: 'startup partnership handshake',
           content: 'Sebagai komitmen kami untuk mendorong inovasi, Global Multi Technology meluncurkan program kemitraan yang dirancang khusus untuk startup fintech. Program ini menawarkan akses ke teknologi, mentoring dari para ahli, dan potensi investasi bagi startup yang memiliki visi sejalan dengan misi kami untuk mentransformasi lanskap keuangan digital.'
       },
-    ]
-  });
+  ];
 
+  await prisma.newsItem.createMany({
+      data: newsItemsToSeed.map(item => ({
+          ...item,
+          slug: toSlug(item.title)
+      }))
+  });
 
   console.log('Seeding categories and sub-categories...');
   // Clear existing product data

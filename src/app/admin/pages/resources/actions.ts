@@ -6,10 +6,18 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { generateBlogPost } from '@/ai/flows/generate-blog-post';
 
-// Schema for a single news item from the client
+const toSlug = (name: string) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '');
+};
+
 const NewsItemSchema = z.object({
-    id: z.number(), // Use a temporary ID from the client for existing items
+    id: z.number(), 
     title: z.string().default(''),
+    slug: z.string(),
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
@@ -70,6 +78,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     for (const item of newsItemsFromClient) {
         const sanitizedData = {
             title: item.title,
+            slug: item.slug || toSlug(item.title),
             category: item.category,
             image: item.image,
             content: item.content,
@@ -91,7 +100,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
 
 
     revalidatePath('/', 'layout');
-    revalidatePath('/resources');
+    revalidatePath('/resources', 'layout');
     revalidatePath('/admin/pages/resources');
     return { message: 'Pengaturan Halaman Blog berhasil diperbarui.' };
 

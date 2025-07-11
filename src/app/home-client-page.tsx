@@ -248,18 +248,20 @@ export default function HomeClientPage({ products, settings, professionalService
                     <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Latest news & articles</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
-                    {newsItems.map((post, index) => (
-                        <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
+                    {newsItems.map((post) => (
+                        <div key={post.id} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                             <div className="relative overflow-hidden rounded-lg mb-6">
-                              <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint || 'news article'}/>
+                              <Link href={`/resources/${post.slug}`}>
+                                <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint || 'news article'}/>
+                              </Link>
                             </div>
                             <div className="text-sm text-muted-foreground mb-2">
                                 <span>By {post.category}</span>
                             </div>
                             <h3 className="text-xl font-bold font-headline mb-4 group-hover:text-primary transition-colors">
-                                <Link href="/resources">{post.title}</Link>
+                                <Link href={`/resources/${post.slug}`}>{post.title}</Link>
                             </h3>
-                            <Link href="/resources" className="font-semibold text-primary flex items-center gap-2">
+                            <Link href={`/resources/${post.slug}`} className="font-semibold text-primary flex items-center gap-2">
                                 Read More <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>

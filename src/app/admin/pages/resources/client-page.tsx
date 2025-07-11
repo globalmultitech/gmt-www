@@ -15,6 +15,14 @@ import Image from 'next/image';
 import type { NewsItem } from '@prisma/client';
 import { Textarea } from '@/components/ui/textarea';
 
+const toSlug = (name: string) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '');
+};
+
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
   return (
@@ -61,16 +69,35 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   const handleItemChange = (index: number, field: string, value: any) => {
     setFormState(prev => {
         const newItems = [...prev.newsItems];
-        // @ts-ignore
-        newItems[index] = {...newItems[index], [field]: value};
+        const currentItem = newItems[index];
+
+        if (field === 'title') {
+            currentItem.title = value;
+            currentItem.slug = toSlug(value);
+        } else {
+            // @ts-ignore
+            currentItem[field] = value;
+        }
+
         return {...prev, newsItems: newItems};
     });
   };
 
   const addItem = () => {
-    // @ts-ignore
-    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', image: '', content: '', aiHint: '' }]}));
+    const newItem: NewsItem = {
+      id: Date.now(), // Temporary ID
+      title: '',
+      slug: '',
+      category: '',
+      image: '',
+      content: '',
+      aiHint: '',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    setFormState(prev => ({...prev, newsItems: [newItem, ...prev.newsItems]}));
   };
+
 
   const removeItem = (index: number) => {
     setFormState(prev => ({...prev, newsItems: prev.newsItems.filter((_, i) => i !== index)}));
@@ -189,9 +216,15 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                                   </Button>
                                 </div>
                             </div>
-                            <div className="space-y-1">
-                                <Label className="text-xs">AI Hint (u/ gambar)</Label>
-                                <Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} />
+                            <div className="grid grid-cols-2 gap-2">
+                                <div className="space-y-1">
+                                    <Label className="text-xs">AI Hint (u/ gambar)</Label>
+                                    <Input value={item.aiHint || ''} onChange={e => handleItemChange(index, 'aiHint', e.target.value)} />
+                                </div>
+                                 <div className="space-y-1">
+                                    <Label className="text-xs">URL Slug</Label>
+                                    <Input value={item.slug || ''} onChange={e => handleItemChange(index, 'slug', e.target.value)} disabled />
+                                </div>
                             </div>
                         </div>
                         <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
