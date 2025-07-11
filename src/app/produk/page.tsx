@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
 import { ArrowRight, Package } from 'lucide-react';
@@ -66,11 +67,11 @@ export default async function ProdukPage() {
                             </div>
                            )}
                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                           <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-white">{category.name}</h3>
+                           <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-primary">{category.name}</h3>
                         </div>
                         <CardContent className="pt-6 flex-grow flex flex-col">
                             <p className="text-muted-foreground text-sm flex-grow">{category.description}</p>
-                            <div className="mt-4 font-semibold text-primary flex items-center group-hover:text-accent transition-colors">
+                            <div className="mt-4 font-semibold text-sky-blue flex items-center group-hover:text-sky-blue/80 transition-colors">
                                 Lihat Produk <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </div>
                         </CardContent>
