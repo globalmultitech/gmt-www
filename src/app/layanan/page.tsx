@@ -1,12 +1,15 @@
+
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Bot, Code2, Headphones, Layers, Handshake, ShieldCheck } from 'lucide-react';
+import { Handshake, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { DynamicIcon } from '@/components/dynamic-icon';
 
 const services = [
   {
-    icon: <Headphones className="h-10 w-10 text-primary" />,
+    icon: 'Headphones',
     title: 'Layanan Purna Jual',
     description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal. Tim kami siap membantu mengatasi setiap kendala.',
     details: [
@@ -17,7 +20,7 @@ const services = [
     ],
   },
   {
-    icon: <Layers className="h-10 w-10 text-primary" />,
+    icon: 'Layers',
     title: 'Integrasi Sistem',
     description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien. Kami ahli dalam mengintegrasikan sistem yang berbeda untuk kelancaran alur kerja.',
     details: [
@@ -28,7 +31,7 @@ const services = [
     ],
   },
   {
-    icon: <Code2 className="h-10 w-10 text-primary" />,
+    icon: 'Code2',
     title: 'Pengembangan Perangkat Lunak',
     description: 'Butuh solusi yang tidak tersedia di pasaran? Tim pengembang kami siap merancang dan membangun perangkat lunak kustom yang sesuai dengan kebutuhan unik bisnis Anda.',
     details: [
@@ -39,7 +42,7 @@ const services = [
     ],
   },
   {
-    icon: <Bot className="h-10 w-10 text-primary" />,
+    icon: 'Bot',
     title: 'Penyewaan atau Outsourcing',
     description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Layanan penyewaan dan outsourcing kami memberikan fleksibilitas untuk pertumbuhan bisnis Anda.',
     details: [
@@ -54,7 +57,7 @@ const services = [
 export default function LayananPage() {
   return (
     <>
-      <section className="bg-secondary">
+      <section className="bg-dark-slate">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Layanan Profesional Kami</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -69,7 +72,9 @@ export default function LayananPage() {
             {services.map((service) => (
               <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <CardHeader className="flex flex-row items-center gap-4">
-                  <div className="bg-primary/10 p-4 rounded-full">{service.icon}</div>
+                  <div className="bg-primary/10 p-4 rounded-full">
+                    <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
+                  </div>
                   <div>
                     <CardTitle className="font-headline text-2xl">{service.title}</CardTitle>
                     <CardDescription className="mt-1">{service.description}</CardDescription>

@@ -49,10 +49,10 @@ const solutions = [
 export default function SolusiPage() {
   return (
     <>
-      <section className="bg-primary text-primary-foreground">
+      <section className="bg-dark-slate">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold">Solusi Teknologi Kami</h1>
-          <p className="mt-4 text-lg text-primary-foreground/80 max-w-3xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Solusi Teknologi Kami</h1>
+          <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
             Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.
           </p>
         </div>
