@@ -1,9 +1,27 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
+
+const MenuItemSchema = z.object({
+  label: z.string(),
+  href: z.string(),
+});
+
+const SocialMediaLinksSchema = z.object({
+  twitter: z.string().optional(),
+  facebook: z.string().optional(),
+  instagram: z.string().optional(),
+  linkedin: z.string().optional(),
+});
+
+const TrustedByLogoSchema = z.object({
+  src: z.string(),
+  alt: z.string(),
+});
 
 const SettingsSchema = z.object({
   logoUrl: z.string().optional(),
@@ -14,22 +32,8 @@ const SettingsSchema = z.object({
   contactEmail: z.string().optional(),
   contactPhone: z.string().optional(),
   openingHours: z.string().optional(),
-  socialMedia: z.string().transform((str, ctx) => {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk link sosial media tidak valid' });
-      return z.NEVER;
-    }
-  }),
-  menuItems: z.string().transform((str, ctx) => {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk menu tidak valid' });
-      return z.NEVER;
-    }
-  }),
+  socialMedia: SocialMediaLinksSchema.optional(),
+  menuItems: z.array(MenuItemSchema).optional(),
   // Hero section fields
   heroHeadline: z.string().optional(),
   heroDescription: z.string().optional(),
@@ -79,14 +83,7 @@ const SettingsSchema = z.object({
   ctaButtonText: z.string().optional(),
   ctaButtonLink: z.string().optional(),
   trustedByText: z.string().optional(),
-  trustedByLogos: z.string().transform((str, ctx) => {
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk logo mitra tidak valid' });
-      return z.NEVER;
-    }
-  }),
+  trustedByLogos: z.array(TrustedByLogoSchema).optional(),
   // Testimonials
   testimonials: z.string().transform((str, ctx) => {
     try {
@@ -107,11 +104,50 @@ const SettingsSchema = z.object({
   }),
 });
 
+function getAsObject(formData: FormData, key: string) {
+    const obj: { [key: string]: any } = {};
+    for (const [path, value] of formData.entries()) {
+        const match = path.match(new RegExp(`^${key}\\[(.*?)\\]`));
+        if (match) {
+            const field = match[1];
+            if (field) {
+                obj[field] = value;
+            }
+        }
+    }
+    return obj;
+}
+
+
+function getAsArrayOfObjects(formData: FormData, key: string) {
+    const items: { [key: number]: any } = {};
+    const regex = new RegExp(`^${key}\\[(\\d+)\\]\\[(.*?)\\]$`);
+
+    for (const [path, value] of formData.entries()) {
+        const match = path.match(regex);
+        if (match) {
+            const index = parseInt(match[1], 10);
+            const field = match[2];
+            if (!items[index]) {
+                items[index] = {};
+            }
+            items[index][field] = value;
+        }
+    }
+    return Object.values(items).filter(item => (item.label && item.label.trim() !== '') || (item.alt && item.alt.trim() !== ''));
+}
+
+
 export async function getWebSettings() {
     return getSettings();
 }
 
 export async function updateWebSettings(prevState: { message: string } | undefined, formData: FormData) {
+  
+  const menuItems = getAsArrayOfObjects(formData, 'menuItems');
+  const socialMedia = getAsObject(formData, 'socialMedia');
+  const trustedByLogos = getAsArrayOfObjects(formData, 'trustedByLogos');
+
   const validatedFields = SettingsSchema.safeParse({
     logoUrl: formData.get('logoUrl'),
     companyName: formData.get('companyName'),
@@ -121,8 +157,8 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     contactEmail: formData.get('contactEmail'),
     contactPhone: formData.get('contactPhone'),
     openingHours: formData.get('openingHours'),
-    socialMedia: formData.get('socialMedia'),
-    menuItems: formData.get('menuItems'),
+    socialMedia: socialMedia,
+    menuItems: menuItems,
     heroHeadline: formData.get('heroHeadline'),
     heroDescription: formData.get('heroDescription'),
     heroImageUrl: formData.get('heroImageUrl'),
@@ -146,13 +182,14 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     ctaButtonText: formData.get('ctaButtonText'),
     ctaButtonLink: formData.get('ctaButtonLink'),
     trustedByText: formData.get('trustedByText'),
-    trustedByLogos: formData.get('trustedByLogos'),
+    trustedByLogos: trustedByLogos,
     testimonials: formData.get('testimonials'),
     blogPosts: formData.get('blogPosts'),
   });
 
   if (!validatedFields.success) {
     const error = validatedFields.error.flatten().fieldErrors;
+    console.log(error);
     const message = Object.values(error).flat()[0] || "Input tidak valid";
     return { message };
   }
@@ -176,3 +213,5 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
+
+    

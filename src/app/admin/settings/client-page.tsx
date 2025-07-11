@@ -80,11 +80,11 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     ctaImageUrl: settings.ctaImageUrl ?? '',
   });
 
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? []);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? [{ label: '', href: '' }]);
   const [socialLinks, setSocialLinks] = useState<SocialMediaLinks>(settings.socialMedia ?? {});
-  const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? []);
+  const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? [{ src: '', alt: ''}]);
 
-  // State for complex JSON fields
+  // State for complex JSON fields - keep them as they were, we are only changing the UI for some
   const [featureCards, setFeatureCards] = useState<FeatureCard[]>(settings.featureCards ?? []);
   const [aboutUsChecklist, setAboutUsChecklist] = useState<string[]>(settings.aboutUsChecklist ?? []);
   const [professionalServices, setProfessionalServices] = useState<ProfessionalService[]>(settings.professionalServices ?? []);
@@ -126,7 +126,10 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     setIsUploading(true);
     try {
       const checksum = await computeSHA256(file);
-      const { publicUrl } = await getSignedURL(file.type, file.size, checksum);
+      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
+      
+      await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+      
       handleTrustedLogoChange(index, 'src', publicUrl);
     } catch (error) {
        console.error("Upload error:", error);
@@ -189,21 +192,19 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
       </div>
 
       <form action={formAction} className="space-y-6">
-        {/* Hidden inputs untuk menyimpan URL gambar & data JSON */}
+        {/* Hidden inputs to store image URLs */}
         <input type="hidden" name="logoUrl" value={imageUrls.logoUrl} />
         <input type="hidden" name="heroImageUrl" value={imageUrls.heroImageUrl} />
         <input type="hidden" name="aboutUsImageUrl" value={imageUrls.aboutUsImageUrl} />
         <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
-        <input type="hidden" name="menuItems" value={JSON.stringify(menuItems)} />
-        <input type="hidden" name="socialMedia" value={JSON.stringify(socialLinks)} />
-        <input type="hidden" name="trustedByLogos" value={JSON.stringify(trustedByLogos)} />
-
-        {/* These will be replaced with proper forms in the future */}
+        
+        {/* These complex fields will be kept as hidden inputs and are not editable in this simplified UI */}
         <input type="hidden" name="featureCards" value={JSON.stringify(featureCards)} />
         <input type="hidden" name="aboutUsChecklist" value={JSON.stringify(aboutUsChecklist)} />
         <input type="hidden" name="professionalServices" value={JSON.stringify(professionalServices)} />
         <input type="hidden" name="testimonials" value={JSON.stringify(testimonials)} />
         <input type="hidden" name="blogPosts" value={JSON.stringify(blogPosts)} />
+
 
         {/* Card: Informasi Umum */}
         <Card>
@@ -250,8 +251,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <Label htmlFor={`social-${platform}`} className="capitalize">{platform}</Label>
                         <Input
                             id={`social-${platform}`}
-                            value={socialLinks[platform] || ''}
-                            onChange={(e) => handleSocialChange(platform, e.target.value)}
+                            name={`socialMedia[${platform}]`}
+                            defaultValue={socialLinks[platform] || ''}
                             placeholder={`https://${platform}.com/nama_akun`}
                         />
                     </div>
@@ -271,11 +272,11 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <div className="grid grid-cols-2 gap-2 flex-grow">
                             <div className="space-y-1">
                                 <Label htmlFor={`menu-label-${index}`} className="text-xs">Label</Label>
-                                <Input id={`menu-label-${index}`} value={item.label} onChange={(e) => handleMenuChange(index, 'label', e.target.value)} placeholder="Beranda" />
+                                <Input id={`menu-label-${index}`} name={`menuItems[${index}][label]`} value={item.label} onChange={(e) => handleMenuChange(index, 'label', e.target.value)} placeholder="Beranda" />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor={`menu-href-${index}`} className="text-xs">Tautan (Href)</Label>
-                                <Input id={`menu-href-${index}`} value={item.href} onChange={(e) => handleMenuChange(index, 'href', e.target.value)} placeholder="/" />
+                                <Input id={`menu-href-${index}`} name={`menuItems[${index}][href]`} value={item.href} onChange={(e) => handleMenuChange(index, 'href', e.target.value)} placeholder="/" />
                             </div>
                         </div>
                         <Button type="button" variant="ghost" size="icon" onClick={() => removeMenuItem(index)} className="text-destructive h-9 w-9">
@@ -362,22 +363,23 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <div className="space-y-4">
                     {trustedByLogos.map((logo, index) => (
                         <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
-                           <div className="relative w-16 h-16 rounded-md bg-muted overflow-hidden border">
-                             {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
-                           </div>
-                           <div className="grid grid-cols-1 gap-2 flex-grow">
-                               <div className="space-y-1">
-                                   <Label htmlFor={`logo-src-${index}`} className="text-xs">File Gambar Logo</Label>
-                                   <Input id={`logo-src-${index}`} type="file" onChange={(e) => handleLogoImageChange(e, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
-                               </div>
-                               <div className="space-y-1">
-                                   <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
-                                   <Input id={`logo-alt-${index}`} value={logo.alt} onChange={(e) => handleTrustedLogoChange(index, 'alt', e.target.value)} placeholder="Nama Klien" />
-                               </div>
-                           </div>
-                           <Button type="button" variant="ghost" size="icon" onClick={() => removeTrustedLogo(index)} className="text-destructive h-9 w-9">
-                               <Trash2 className="h-4 w-4" />
-                           </Button>
+                            <input type="hidden" name={`trustedByLogos[${index}][src]`} value={logo.src} />
+                            <div className="relative w-16 h-16 rounded-md bg-muted overflow-hidden border">
+                                {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                            </div>
+                            <div className="grid grid-cols-1 gap-2 flex-grow">
+                                <div className="space-y-1">
+                                    <Label htmlFor={`logo-file-${index}`} className="text-xs">File Gambar Logo</Label>
+                                    <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleLogoImageChange(e, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
+                                    <Input id={`logo-alt-${index}`} name={`trustedByLogos[${index}][alt]`} value={logo.alt} onChange={(e) => handleTrustedLogoChange(index, 'alt', e.target.value)} placeholder="Nama Klien" />
+                                </div>
+                            </div>
+                            <Button type="button" variant="ghost" size="icon" onClick={() => removeTrustedLogo(index)} className="text-destructive h-9 w-9">
+                                <Trash2 className="h-4 w-4" />
+                            </Button>
                         </div>
                     ))}
                 </div>
@@ -394,3 +396,5 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     </div>
   );
 }
+
+    

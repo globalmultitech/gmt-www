@@ -23,7 +23,7 @@ export function FooterClient({ settings }: FooterClientProps) {
   const socialLinks = Object.entries(socialLinksData)
     .map(([key, href]) => {
         const platform = key as keyof typeof socialIcons;
-        if (socialIcons[platform] && href) {
+        if (socialIcons[platform] && typeof href === 'string' && href) {
             return { icon: socialIcons[platform], href, platform };
         }
         return null;
@@ -126,3 +126,5 @@ export function FooterClient({ settings }: FooterClientProps) {
     </footer>
   );
 }
+
+    
