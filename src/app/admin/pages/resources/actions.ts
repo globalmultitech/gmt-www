@@ -20,6 +20,7 @@ const NewsItemSchema = z.object({
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
+    slug: z.string().optional(), // Make slug optional here, we'll enforce it in logic
 });
 
 const ResourcesPageSettingsSchema = z.object({
@@ -61,33 +62,30 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     const newsItemsFromClient = data.newsItems ?? [];
     const newsItemsInDb = await prisma.newsItem.findMany({ select: { id: true } });
     const dbItemIds = new Set(newsItemsInDb.map(s => s.id));
-    const clientItemIds = new Set(newsItemsFromClient.map(s => s.id).filter(id => id < Date.now()));
+    
+    // Filter out client items that are just empty shells for adding a new item
+    const validClientItems = newsItemsFromClient.filter(item => item.title || item.category || item.content);
+    const validClientItemIds = new Set(validClientItems.map(s => s.id).filter(id => id < Date.now()));
 
     const operations = [];
 
-    const idsToDelete = [...dbItemIds].filter(id => !clientItemIds.has(id));
+    const idsToDelete = [...dbItemIds].filter(id => !validClientItemIds.has(id));
     if (idsToDelete.length > 0) {
         operations.push(prisma.newsItem.deleteMany({ where: { id: { in: idsToDelete } } }));
     }
 
-    for (const item of newsItemsFromClient) {
-        // Skip empty new items
-        if (!item.title && !item.category && !item.content) {
-            continue;
+    for (const item of validClientItems) {
+        // Server-side slug generation if it's missing but title is present
+        let finalSlug = item.slug || toSlug(item.title);
+        if (!finalSlug && item.title) {
+            finalSlug = toSlug(item.title);
         }
 
-        const finalSlug = toSlug(item.title);
-        
-        // If there's a title but slug generation fails, something is wrong with the title.
+        // If after all that, there's a title but no slug, something is wrong.
         if (item.title && !finalSlug) {
             return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan URL yang valid.` };
         }
         
-        // Don't process items without a title
-        if (!item.title) {
-            continue;
-        }
-
         const sanitizedData = {
             title: item.title,
             slug: finalSlug,
