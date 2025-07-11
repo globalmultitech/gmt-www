@@ -19,8 +19,9 @@ const toSlug = (name: string) => {
   if (!name) return '';
   return name
     .toLowerCase()
-    .replace(/ /g, '-')
-    .replace(/[^\w-]+/g, '');
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 };
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
@@ -69,19 +70,22 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   const handleItemChange = (index: number, field: string, value: any) => {
     setFormState(prev => {
         const newItems = [...prev.newsItems];
-        const currentItem = newItems[index];
-
-        if (field === 'title') {
-            currentItem.title = value;
-            currentItem.slug = toSlug(value);
-        } else {
-            // @ts-ignore
-            currentItem[field] = value;
-        }
-
+        // @ts-ignore
+        newItems[index] = { ...newItems[index], [field]: value };
         return {...prev, newsItems: newItems};
     });
   };
+
+  const handleTitleChange = (index: number, newTitle: string) => {
+    setFormState(prev => {
+      const newItems = [...prev.newsItems];
+      const currentItem = newItems[index];
+      currentItem.title = newTitle;
+      currentItem.slug = toSlug(newTitle);
+      return {...prev, newsItems: newItems};
+    });
+  }
+
 
   const addItem = () => {
     const newItem: NewsItem = {
@@ -210,7 +214,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                              <div className="space-y-1">
                                 <Label className="text-xs">Judul</Label>
                                 <div className="flex gap-2">
-                                  <Input value={item.title} onChange={e => handleItemChange(index, 'title', e.target.value)} />
+                                  <Input value={item.title} onChange={e => handleTitleChange(index, e.target.value)} />
                                   <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateContent(item.id)} disabled={generatingStates[item.id]}>
                                       {generatingStates[item.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-primary" />}
                                   </Button>
