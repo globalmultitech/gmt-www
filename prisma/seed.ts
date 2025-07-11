@@ -50,11 +50,8 @@ async function main() {
       menuItems: [
         { label: 'Beranda', href: '/' },
         { label: 'Produk', href: '/produk' },
-        { label: 'Solusi', href: '/solusi' },
         { label: 'Layanan', href: '/layanan' },
-        { label: 'Resources', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
-        { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ],
       heroHeadline: 'Creative solutions to improve your business',
       heroDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.',
