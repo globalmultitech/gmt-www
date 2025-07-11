@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo } from '@/lib/settings';
+import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard, ProfessionalService, Testimonial, BlogPost } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -83,6 +83,14 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? []);
   const [socialLinks, setSocialLinks] = useState<SocialMediaLinks>(settings.socialMedia ?? {});
   const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? []);
+
+  // State for complex JSON fields
+  const [featureCards, setFeatureCards] = useState<FeatureCard[]>(settings.featureCards ?? []);
+  const [aboutUsChecklist, setAboutUsChecklist] = useState<string[]>(settings.aboutUsChecklist ?? []);
+  const [professionalServices, setProfessionalServices] = useState<ProfessionalService[]>(settings.professionalServices ?? []);
+  const [testimonials, setTestimonials] = useState<Testimonial[]>(settings.testimonials ?? []);
+  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(settings.blogPosts ?? []);
+
 
   const handleMenuChange = (index: number, field: 'label' | 'href', value: string) => {
     const newMenuItems = [...menuItems];
@@ -173,8 +181,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     }
   }, [state, toast]);
 
-  const getJsonString = (data: any, defaultData: any) => JSON.stringify(data ?? defaultData, null, 2);
-
   return (
     <div>
       <div className="mb-6">
@@ -192,12 +198,12 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <input type="hidden" name="socialMedia" value={JSON.stringify(socialLinks)} />
         <input type="hidden" name="trustedByLogos" value={JSON.stringify(trustedByLogos)} />
 
-        {/* These textareas will be replaced with proper forms in the future */}
-        <textarea name="featureCards" defaultValue={getJsonString(settings.featureCards, [])} className="hidden" />
-        <textarea name="aboutUsChecklist" defaultValue={getJsonString(settings.aboutUsChecklist, [])} className="hidden" />
-        <textarea name="professionalServices" defaultValue={getJsonString(settings.professionalServices, [])} className="hidden" />
-        <textarea name="testimonials" defaultValue={getJsonString(settings.testimonials, [])} className="hidden" />
-        <textarea name="blogPosts" defaultValue={getJsonString(settings.blogPosts, [])} className="hidden" />
+        {/* These will be replaced with proper forms in the future */}
+        <input type="hidden" name="featureCards" value={JSON.stringify(featureCards)} />
+        <input type="hidden" name="aboutUsChecklist" value={JSON.stringify(aboutUsChecklist)} />
+        <input type="hidden" name="professionalServices" value={JSON.stringify(professionalServices)} />
+        <input type="hidden" name="testimonials" value={JSON.stringify(testimonials)} />
+        <input type="hidden" name="blogPosts" value={JSON.stringify(blogPosts)} />
 
         {/* Card: Informasi Umum */}
         <Card>
