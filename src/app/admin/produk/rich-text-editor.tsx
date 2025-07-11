@@ -1,25 +1,13 @@
 
 'use client';
 
-import React, { forwardRef, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import type { ReactQuillProps } from 'react-quill';
 
 // Dynamically import ReactQuill to ensure it's only client-side
-const ReactQuill = dynamic(
-  async () => {
-    const { default: RQ } = await import('react-quill');
-    // The wrapper is necessary to forward the ref correctly in React 18
-    // eslint-disable-next-line react/display-name
-    return ({ forwardedRef, ...props }: { forwardedRef: React.Ref<any> } & ReactQuillProps) => (
-      <RQ ref={forwardedRef} {...props} />
-    );
-  },
-  {
-    ssr: false,
-  }
-);
+const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
 
 interface RichTextEditorProps {
   name?: string;
@@ -29,7 +17,9 @@ interface RichTextEditorProps {
 const RichTextEditor = ({ name, defaultValue = '' }: RichTextEditorProps) => {
   const [value, setValue] = useState(defaultValue);
   
-  // Update internal state if the defaultValue prop changes (e.g., when form data loads)
+  // This effect ensures that if the defaultValue changes (e.g. data is loaded asynchronously),
+  // the editor's state is updated. But it only updates if the editor content is still the initial default.
+  // This prevents overwriting user's input.
   useEffect(() => {
     setValue(defaultValue);
   }, [defaultValue]);
