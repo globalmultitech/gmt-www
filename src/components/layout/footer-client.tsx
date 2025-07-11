@@ -53,7 +53,7 @@ export function FooterClient({ companyName, footerText, socialLinksData, logoUrl
         {/* Top Footer Section */}
         <div className="py-20 grid lg:grid-cols-12 gap-10">
           <div className="lg:col-span-4">
-            <Logo companyName={companyName} logoUrl={logoUrl} />
+            <Logo companyName={companyName} logoUrl={logoUrl} variant="footer" />
             <p className="text-primary-foreground/80 mt-6 text-base">
               {footerText}
             </p>
