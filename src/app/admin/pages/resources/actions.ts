@@ -81,6 +81,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             continue;
         }
         
+        // Generate slug from title on the server if it's missing
         const finalSlug = item.slug || toSlug(item.title);
         if (item.title && !finalSlug) {
             return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan slug yang valid.` };
@@ -98,6 +99,13 @@ export async function updateResourcesPageSettings(prevState: { message: string }
         if (dbItemIds.has(item.id)) {
             operations.push(prisma.newsItem.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
+             if (finalSlug) {
+                // Check if slug already exists for a new item
+                const existingSlug = await prisma.newsItem.findUnique({ where: { slug: finalSlug }});
+                if(existingSlug) {
+                    return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan.` };
+                }
+            }
             operations.push(prisma.newsItem.create({ data: sanitizedData }));
         }
     }
