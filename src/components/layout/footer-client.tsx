@@ -1,3 +1,4 @@
+
 'use client';
 
 import { Logo } from '@/components/logo';
@@ -100,7 +101,6 @@ export function FooterClient({ settings }: FooterClientProps) {
                 {contactInfo.map((info) => (
                   <li key={info.label} className="flex items-start">
                     <span className="font-semibold w-28 shrink-0">{info.label}</span>
-                    <span className="text-primary-foreground/80 flex-1 border-b border-dotted border-primary-foreground/50 mx-2 -translate-y-2"></span>
                     {info.href ? (
                       <Link href={info.href} className="text-primary-foreground/80 hover:text-white">
                         {info.value}
