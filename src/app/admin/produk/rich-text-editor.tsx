@@ -1,7 +1,7 @@
 
 'use client';
 
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useEffect, useRef, useState } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
 import type { ReactQuillProps } from 'react-quill';
@@ -10,17 +10,30 @@ import type { ReactQuillProps } from 'react-quill';
 const ReactQuill = dynamic(
   async () => {
     const { default: RQ } = await import('react-quill');
+    // The wrapper is necessary to forward the ref correctly in React 18
     // eslint-disable-next-line react/display-name
-    return ({ forwardedRef, ...props }: { forwardedRef: React.Ref<any> } & ReactQuillProps) => <RQ ref={forwardedRef} {...props} />;
+    return ({ forwardedRef, ...props }: { forwardedRef: React.Ref<any> } & ReactQuillProps) => (
+      <RQ ref={forwardedRef} {...props} />
+    );
   },
-  { ssr: false }
+  {
+    ssr: false,
+  }
 );
 
-interface RichTextEditorProps extends ReactQuillProps {
+interface RichTextEditorProps {
   name?: string;
+  defaultValue?: string;
 }
 
-const RichTextEditor = forwardRef<any, RichTextEditorProps>((props, ref) => {
+const RichTextEditor = ({ name, defaultValue = '' }: RichTextEditorProps) => {
+  const [value, setValue] = useState(defaultValue);
+  
+  // Update internal state if the defaultValue prop changes (e.g., when form data loads)
+  useEffect(() => {
+    setValue(defaultValue);
+  }, [defaultValue]);
+
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
@@ -40,18 +53,19 @@ const RichTextEditor = forwardRef<any, RichTextEditorProps>((props, ref) => {
 
   return (
     <div className="bg-background relative">
-       <input type="hidden" name={props.name} value={props.value as string} />
+       {/* Hidden input to store the HTML content for form submission */}
+       <input type="hidden" name={name} value={value} />
        <ReactQuill
-        forwardedRef={ref}
         theme="snow"
+        value={value}
+        onChange={setValue}
         modules={modules}
         formats={formats}
         style={{ height: '300px', marginBottom: '40px' }}
-        {...props}
       />
     </div>
   );
-});
+};
 
 RichTextEditor.displayName = 'RichTextEditor';
 
