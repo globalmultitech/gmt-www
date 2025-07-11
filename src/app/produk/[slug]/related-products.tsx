@@ -107,7 +107,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
-                        <Button asChild className="w-full" variant="outline" size="sm">
+                        <Button asChild className="w-full" variant="default" size="sm">
                           <Link href={`/produk/${product.slug}`}>
                             Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
                           </Link>
