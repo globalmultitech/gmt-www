@@ -6,8 +6,6 @@ import { ArrowRight, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import prisma from '@/lib/db';
-import { format } from 'date-fns';
-import { id } from 'date-fns/locale';
 
 export default async function ResourcesPage() {
   const settings = await getSettings();
@@ -48,10 +46,6 @@ export default async function ResourcesPage() {
                   <CardTitle className="font-headline text-xl h-16">{item.title}</CardTitle>
                 </CardHeader>
                 <CardContent className="flex-grow">
-                  <div className="flex items-center text-sm text-muted-foreground">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <span>{format(new Date(item.date), "d MMMM yyyy", { locale: id })}</span>
-                  </div>
                   <p className="text-sm text-muted-foreground mt-4 line-clamp-3">
                     {item.content}
                   </p>

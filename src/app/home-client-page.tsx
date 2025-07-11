@@ -254,7 +254,7 @@ export default function HomeClientPage({ products, settings, professionalService
                               <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint || 'news article'}/>
                             </div>
                             <div className="text-sm text-muted-foreground mb-2">
-                                <span>{post.date}</span> / <span>By {post.category}</span>
+                                <span>By {post.category}</span>
                             </div>
                             <h3 className="text-xl font-bold font-headline mb-4 group-hover:text-primary transition-colors">
                                 <Link href="/resources">{post.title}</Link>

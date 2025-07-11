@@ -32,14 +32,10 @@ type ResourcesPageClientProps = {
 const formatDateForInput = (date: string | Date | null | undefined): string => {
   if (!date) return '';
   try {
-    // Tambahkan 'T00:00:00' untuk menghindari masalah zona waktu saat parsing
     const d = new Date(date);
-    // Periksa apakah tanggalnya valid
     if (isNaN(d.getTime())) {
       return '';
     }
-    // `toISOString()` akan menghasilkan format UTC 'YYYY-MM-DDTHH:mm:ss.sssZ'
-    // `split('T')[0]` akan mengambil 'YYYY-MM-DD'
     return d.toISOString().split('T')[0];
   } catch (error) {
     console.error("Invalid date value:", date);
@@ -77,7 +73,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     setFormState(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleItemChange = (index: number, field: string, value: string) => {
+  const handleItemChange = (index: number, field: string, value: any) => {
     setFormState(prev => {
         const newItems = [...prev.newsItems];
         // @ts-ignore
@@ -88,7 +84,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
 
   const addItem = () => {
     // @ts-ignore
-    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', date: (new Date()).toISOString().split('T')[0], image: '', content: '' }]}));
+    setFormState(prev => ({...prev, newsItems: [...prev.newsItems, { id: Date.now(), title: '', category: '', date: new Date(), image: '', content: '' }]}));
   };
 
   const removeItem = (index: number) => {
@@ -195,10 +191,10 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                           <Input type="file" onChange={(e) => handleImageUpload(e, item.id)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[item.id]} className="w-40" />
                         </div>
                         <div className="flex-grow grid grid-cols-1 gap-2">
-                            <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1"><Label className="text-xs">Kategori</Label><Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Tanggal</Label><Input type="date" value={formatDateForInput(item.date)} onChange={e => handleItemChange(index, 'date', e.target.value)} /></div>
-                            </div>
+                             <div className="space-y-1">
+                                <Label className="text-xs">Kategori</Label>
+                                <Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} />
+                             </div>
                              <div className="space-y-1">
                                 <Label className="text-xs">Judul</Label>
                                 <div className="flex gap-2">
