@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 
 const services = [
   {
-    icon: <Headphones className="h-8 w-8 text-primary" />,
+    icon: <Headphones className="h-10 w-10 text-primary" />,
     title: 'Layanan Purna Jual',
     description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal. Tim kami siap membantu mengatasi setiap kendala.',
     details: [
@@ -17,7 +17,7 @@ const services = [
     ],
   },
   {
-    icon: <Layers className="h-8 w-8 text-primary" />,
+    icon: <Layers className="h-10 w-10 text-primary" />,
     title: 'Integrasi Sistem',
     description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien. Kami ahli dalam mengintegrasikan sistem yang berbeda untuk kelancaran alur kerja.',
     details: [
@@ -28,7 +28,7 @@ const services = [
     ],
   },
   {
-    icon: <Code2 className="h-8 w-8 text-primary" />,
+    icon: <Code2 className="h-10 w-10 text-primary" />,
     title: 'Pengembangan Perangkat Lunak',
     description: 'Butuh solusi yang tidak tersedia di pasaran? Tim pengembang kami siap merancang dan membangun perangkat lunak kustom yang sesuai dengan kebutuhan unik bisnis Anda.',
     details: [
@@ -39,7 +39,7 @@ const services = [
     ],
   },
   {
-    icon: <Bot className="h-8 w-8 text-primary" />,
+    icon: <Bot className="h-10 w-10 text-primary" />,
     title: 'Penyewaan atau Outsourcing',
     description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Layanan penyewaan dan outsourcing kami memberikan fleksibilitas untuk pertumbuhan bisnis Anda.',
     details: [

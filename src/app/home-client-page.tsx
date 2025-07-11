@@ -124,7 +124,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
               <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                 <div className="flex flex-row items-center gap-4 p-6">
                   <div className="bg-primary/10 p-4 rounded-full">
-                    <DynamicIcon name={service.icon} className="h-8 w-8 text-primary" />
+                    <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
                   </div>
                   <div>
                     <h3 className="font-headline text-2xl font-bold">{service.title}</h3>
