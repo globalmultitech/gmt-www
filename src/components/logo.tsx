@@ -18,7 +18,7 @@ export function Logo({
   variant = 'default',
 }: LogoProps) {
   const imageSizeClasses = {
-    default: 'h-10 w-10 md:h-12 md:w-12',
+    default: 'h-12 w-12 md:h-14 md:w-14',
     footer: 'h-14 w-14 md:h-20 md:w-20',
   };
 
