@@ -6,6 +6,7 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { getSettings } from '@/lib/settings';
 
+// Define schemas for nested objects first, making all fields optional
 const MenuItemSchema = z.object({
   label: z.string().optional().default(''),
   href: z.string().optional().default(''),
@@ -53,6 +54,7 @@ const TrustedByLogoSchema = z.object({
   alt: z.string().optional().default(''),
 });
 
+// Main settings schema, all fields are optional
 const SettingsSchema = z.object({
   logoUrl: z.string().optional(),
   companyName: z.string().optional(),
@@ -92,6 +94,8 @@ const SettingsSchema = z.object({
   blogPosts: z.array(BlogPostSchema).optional(),
 });
 
+
+// Helper function to extract a simple object (like socialMedia)
 function getAsObject(formData: FormData, key: string) {
     const obj: { [key: string]: any } = {};
     for (const [path, value] of formData.entries()) {
@@ -106,6 +110,7 @@ function getAsObject(formData: FormData, key: string) {
     return obj;
 }
 
+// Helper function to extract an array of objects
 function getAsArrayOfObjects(formData: FormData, key: string) {
     const items: { [key: number]: any } = {};
     const regex = new RegExp(`^${key}\\[(\\d+)\\]\\[(.*?)\\]$`);
@@ -118,36 +123,41 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
             if (!items[index]) {
                 items[index] = {};
             }
+            
+            // Handle nested arrays like 'details' in 'professionalServices'
             const detailMatch = field.match(/^details\[(\d+)\]$/);
             if (detailMatch) {
                 if (!items[index].details) {
                     items[index].details = [];
                 }
-                items[index].details[parseInt(detailMatch[1], 10)] = value;
+                const detailIndex = parseInt(detailMatch[1], 10);
+                // Ensure array is large enough
+                while (items[index].details.length <= detailIndex) {
+                    items[index].details.push('');
+                }
+                items[index].details[detailIndex] = value;
             } else {
                 items[index][field] = value;
             }
         }
     }
     
-    // Filter out completely empty objects and clean up details arrays
     return Object.values(items).map(item => {
-        if (typeof item !== 'object' || item === null) return null;
+        // Clean up nested 'details' array by removing empty strings
         if (Array.isArray(item.details)) {
             item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
         }
         return item;
     }).filter(item => {
-        if (!item) return false;
-        // An item is considered non-empty if at least one of its values is a non-empty string or a non-empty array
+        // Filter out items that are completely empty
+        if (!item || typeof item !== 'object') return false;
         return Object.values(item).some(value => {
-            if (Array.isArray(value)) {
-                return value.length > 0;
-            }
+            if (Array.isArray(value)) return value.length > 0;
             return typeof value === 'string' && value.trim() !== '';
         });
     });
 }
+
 
 function getAsArrayOfStrings(formData: FormData, key: string) {
     const items: string[] = [];
@@ -168,15 +178,6 @@ export async function getWebSettings() {
 
 export async function updateWebSettings(prevState: { message: string } | undefined, formData: FormData) {
   try {
-    const menuItems = getAsArrayOfObjects(formData, 'menuItems');
-    const socialMedia = getAsObject(formData, 'socialMedia');
-    const trustedByLogos = getAsArrayOfObjects(formData, 'trustedByLogos');
-    const featureCards = getAsArrayOfObjects(formData, 'featureCards');
-    const aboutUsChecklist = getAsArrayOfStrings(formData, 'aboutUsChecklist');
-    const professionalServices = getAsArrayOfObjects(formData, 'professionalServices');
-    const testimonials = getAsArrayOfObjects(formData, 'testimonials');
-    const blogPosts = getAsArrayOfObjects(formData, 'blogPosts');
-
     const dataToValidate = {
         logoUrl: formData.get('logoUrl'),
         companyName: formData.get('companyName'),
@@ -186,8 +187,8 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         contactEmail: formData.get('contactEmail'),
         contactPhone: formData.get('contactPhone'),
         openingHours: formData.get('openingHours'),
-        socialMedia,
-        menuItems,
+        socialMedia: getAsObject(formData, 'socialMedia'),
+        menuItems: getAsArrayOfObjects(formData, 'menuItems'),
         heroHeadline: formData.get('heroHeadline'),
         heroDescription: formData.get('heroDescription'),
         heroImageUrl: formData.get('heroImageUrl'),
@@ -195,31 +196,31 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         heroButton1Link: formData.get('heroButton1Link'),
         heroButton2Text: formData.get('heroButton2Text'),
         heroButton2Link: formData.get('heroButton2Link'),
-        featureCards,
+        featureCards: getAsArrayOfObjects(formData, 'featureCards'),
         aboutUsSubtitle: formData.get('aboutUsSubtitle'),
         aboutUsTitle: formData.get('aboutUsTitle'),
         aboutUsDescription: formData.get('aboutUsDescription'),
         aboutUsImageUrl: formData.get('aboutUsImageUrl'),
-        aboutUsChecklist,
+        aboutUsChecklist: getAsArrayOfStrings(formData, 'aboutUsChecklist'),
         servicesSubtitle: formData.get('servicesSubtitle'),
         servicesTitle: formData.get('servicesTitle'),
         servicesDescription: formData.get('servicesDescription'),
-        professionalServices,
+        professionalServices: getAsArrayOfObjects(formData, 'professionalServices'),
         ctaHeadline: formData.get('ctaHeadline'),
         ctaDescription: formData.get('ctaDescription'),
         ctaImageUrl: formData.get('ctaImageUrl'),
         ctaButtonText: formData.get('ctaButtonText'),
         ctaButtonLink: formData.get('ctaButtonLink'),
         trustedByText: formData.get('trustedByText'),
-        trustedByLogos,
-        testimonials,
-        blogPosts,
+        trustedByLogos: getAsArrayOfObjects(formData, 'trustedByLogos'),
+        testimonials: getAsArrayOfObjects(formData, 'testimonials'),
+        blogPosts: getAsArrayOfObjects(formData, 'blogPosts'),
     };
 
     const validatedFields = SettingsSchema.safeParse(dataToValidate);
 
     if (!validatedFields.success) {
-      console.error('Validation error in settings:', JSON.stringify(validatedFields.error.flatten(), null, 2));
+      console.error('Validation Error:', JSON.stringify(validatedFields.error.flatten(), null, 2));
       const errorMessages = validatedFields.error.flatten().fieldErrors;
       const message = Object.entries(errorMessages)
           .map(([key, value]) => `${key}: ${value.join(', ')}`)
@@ -245,5 +246,3 @@ export async function updateWebSettings(prevState: { message: string } | undefin
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
-
-    

@@ -77,7 +77,7 @@ async function main() {
             description: 'Ariento mesfato prodo arte e eli manifesto.',
         },
         {
-            icon: 'User',
+            icon: 'Users',
             title: 'Great experience',
             description: 'Lorem consectetur adipiscing elitsed pro.',
         },

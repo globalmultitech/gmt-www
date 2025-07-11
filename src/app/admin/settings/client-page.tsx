@@ -374,7 +374,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         </Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({icon: 'ShieldCheck', title: '', description: ''}, featureCards, setFeatureCards)}>
+                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({icon: 'Activity', title: '', description: ''}, featureCards, setFeatureCards)}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Tambah Kartu Fitur
                 </Button>
             </CardContent>
@@ -473,7 +473,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             </div>
                         </div>
                     ))}
-                    <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ icon: 'ShieldCheck', title: '', description: '', details: []}, professionalServices, setProfessionalServices)}>
+                    <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ icon: 'Activity', title: '', description: '', details: []}, professionalServices, setProfessionalServices)}>
                         <PlusCircle className="mr-2 h-4 w-4" /> Tambah Layanan
                     </Button>
                 </div>
