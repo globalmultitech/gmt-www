@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -5,16 +6,16 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 
 const TimelineEventSchema = z.object({
-    year: z.string().optional().default(''),
-    event: z.string().optional().default(''),
+    year: z.string().default(''),
+    event: z.string().default(''),
 });
 
 const TeamMemberSchema = z.object({
-    name: z.string().optional().default(''),
-    role: z.string().optional().default(''),
-    image: z.string().optional().default(''),
-    linkedin: z.string().optional().default(''),
-    aiHint: z.string().optional().default(''),
+    name: z.string().default(''),
+    role: z.string().default(''),
+    image: z.string().default(''),
+    linkedin: z.string().default(''),
+    aiHint: z.string().default(''),
 });
 
 const TentangKamiPageSettingsSchema = z.object({
@@ -29,44 +30,13 @@ const TentangKamiPageSettingsSchema = z.object({
 });
 
 
-function getAsArrayOfObjects(formData: FormData, key: string) {
-    const items: { [key: number]: any } = {};
-    const regex = new RegExp(`^${key}\\[(\\d+)\\]\\[(.*?)\\]$`);
-
-    for (const [path, value] of formData.entries()) {
-        const match = path.match(regex);
-        if (match) {
-            const index = parseInt(match[1], 10);
-            const field = match[2];
-            if (!items[index]) {
-                items[index] = {};
-            }
-            items[index][field] = value;
-        }
-    }
-    
-    return Object.values(items).filter(item => {
-        if (!item || typeof item !== 'object') return false;
-        return Object.values(item).some(value => {
-            if (typeof value === 'string') return value.trim() !== '';
-            return false;
-        });
-    });
-}
-
-
 export async function updateTentangKamiPageSettings(prevState: { message: string } | undefined, formData: FormData) {
   try {
-    const dataToValidate = {
-        aboutPageTitle: formData.get('aboutPageTitle'),
-        aboutPageSubtitle: formData.get('aboutPageSubtitle'),
-        missionTitle: formData.get('missionTitle'),
-        missionText: formData.get('missionText'),
-        visionTitle: formData.get('visionTitle'),
-        visionText: formData.get('visionText'),
-        timeline: getAsArrayOfObjects(formData, 'timeline'),
-        teamMembers: getAsArrayOfObjects(formData, 'teamMembers'),
-    };
+    const jsonString = formData.get('tentangKamiData') as string;
+    if (!jsonString) {
+      return { message: 'Data formulir tidak ditemukan.' };
+    }
+    const dataToValidate = JSON.parse(jsonString);
 
     const validatedFields = TentangKamiPageSettingsSchema.safeParse(dataToValidate);
 
@@ -82,6 +52,9 @@ export async function updateTentangKamiPageSettings(prevState: { message: string
     
     const data = validatedFields.data;
 
+    const sanitizedTimeline = data.timeline?.filter(item => item.year || item.event) ?? [];
+    const sanitizedTeamMembers = data.teamMembers?.filter(item => item.name || item.role) ?? [];
+
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
@@ -91,12 +64,14 @@ export async function updateTentangKamiPageSettings(prevState: { message: string
             missionText: data.missionText,
             visionTitle: data.visionTitle,
             visionText: data.visionText,
-            timeline: data.timeline,
-            teamMembers: data.teamMembers,
+            timeline: sanitizedTimeline,
+            teamMembers: sanitizedTeamMembers,
         }
     });
 
     revalidatePath('/', 'layout');
+    revalidatePath('/tentang-kami');
+    revalidatePath('/admin/pages/tentang-kami');
     return { message: 'Pengaturan Halaman Tentang Kami berhasil diperbarui.' };
 
   } catch (error) {

@@ -4,46 +4,45 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
-import { getSettings } from '@/lib/settings';
 
 const MenuItemSchema = z.object({
-  label: z.string().optional().default(''),
-  href: z.string().optional().default(''),
+  label: z.string().default(''),
+  href: z.string().default(''),
 });
 
 const SocialMediaLinksSchema = z.object({
-  twitter: z.string().optional().default(''),
-  facebook: z.string().optional().default(''),
-  instagram: z.string().optional().default(''),
-  linkedin: z.string().optional().default(''),
+  twitter: z.string().default(''),
+  facebook: z.string().default(''),
+  instagram: z.string().default(''),
+  linkedin: z.string().default(''),
 });
 
 const FeatureCardSchema = z.object({
-    icon: z.string().optional().default(''),
-    title: z.string().optional().default(''),
-    description: z.string().optional().default(''),
+    icon: z.string().default(''),
+    title: z.string().default(''),
+    description: z.string().default(''),
 });
 
 const TestimonialSchema = z.object({
-    quote: z.string().optional().default(''),
-    name: z.string().optional().default(''),
-    role: z.string().optional().default(''),
-    image: z.string().optional().default(''),
-    aiHint: z.string().optional().default(''),
+    quote: z.string().default(''),
+    name: z.string().default(''),
+    role: z.string().default(''),
+    image: z.string().default(''),
+    aiHint: z.string().default(''),
 });
 
 const BlogPostSchema = z.object({
-    image: z.string().optional().default(''),
-    aiHint: z.string().optional().default(''),
-    date: z.string().optional().default(''),
-    author: z.string().optional().default(''),
-    title: z.string().optional().default(''),
-    href: z.string().optional().default(''),
+    image: z.string().default(''),
+    aiHint: z.string().default(''),
+    date: z.string().default(''),
+    author: z.string().default(''),
+    title: z.string().default(''),
+    href: z.string().default(''),
 });
 
 const TrustedByLogoSchema = z.object({
-  src: z.string().optional().default(''),
-  alt: z.string().optional().default(''),
+  src: z.string().default(''),
+  alt: z.string().default(''),
 });
 
 const SettingsSchema = z.object({
@@ -85,103 +84,13 @@ const SettingsSchema = z.object({
 });
 
 
-function getAsObject(formData: FormData, key: string) {
-    const obj: { [key: string]: any } = {};
-    for (const [path, value] of formData.entries()) {
-        const match = path.match(new RegExp(`^${key}\\[(.*?)\\]`));
-        if (match) {
-            const field = match[1];
-            if (field) {
-                obj[field] = value;
-            }
-        }
-    }
-    return obj;
-}
-
-function getAsArrayOfObjects(formData: FormData, key: string) {
-    const items: { [key: number]: any } = {};
-    const regex = new RegExp(`^${key}\\[(\\d+)\\]\\[(.*?)\\]$`);
-
-    for (const [path, value] of formData.entries()) {
-        const match = path.match(regex);
-        if (match) {
-            const index = parseInt(match[1], 10);
-            const field = match[2];
-            if (!items[index]) {
-                items[index] = {};
-            }
-            items[index][field] = value;
-        }
-    }
-    
-    return Object.values(items).filter(item => {
-        if (!item || typeof item !== 'object') return false;
-        return Object.values(item).some(value => {
-            if (typeof value === 'string') return value.trim() !== '';
-            if (Array.isArray(value)) return value.length > 0;
-            return false;
-        });
-    });
-}
-
-
-function getAsArrayOfStrings(formData: FormData, key: string) {
-    const items: string[] = [];
-    const regex = new RegExp(`^${key}\\[(\\d+)\\]$`);
-    for (const [path, value] of formData.entries()) {
-        if (path.match(regex)) {
-            if (typeof value === 'string' && value.trim() !== '') {
-                items.push(value.trim());
-            }
-        }
-    }
-    return items;
-}
-
-export async function getWebSettings() {
-    return getSettings();
-}
-
 export async function updateWebSettings(prevState: { message: string } | undefined, formData: FormData) {
   try {
-    const dataToValidate = {
-        logoUrl: formData.get('logoUrl'),
-        companyName: formData.get('companyName'),
-        whatsappSales: formData.get('whatsappSales'),
-        footerText: formData.get('footerText'),
-        address: formData.get('address'),
-        contactEmail: formData.get('contactEmail'),
-        contactPhone: formData.get('contactPhone'),
-        openingHours: formData.get('openingHours'),
-        socialMedia: getAsObject(formData, 'socialMedia'),
-        menuItems: getAsArrayOfObjects(formData, 'menuItems'),
-        heroHeadline: formData.get('heroHeadline'),
-        heroDescription: formData.get('heroDescription'),
-        heroImageUrl: formData.get('heroImageUrl'),
-        heroButton1Text: formData.get('heroButton1Text'),
-        heroButton1Link: formData.get('heroButton1Link'),
-        heroButton2Text: formData.get('heroButton2Text'),
-        heroButton2Link: formData.get('heroButton2Link'),
-        featureCards: getAsArrayOfObjects(formData, 'featureCards'),
-        aboutUsSubtitle: formData.get('aboutUsSubtitle'),
-        aboutUsTitle: formData.get('aboutUsTitle'),
-        aboutUsDescription: formData.get('aboutUsDescription'),
-        aboutUsImageUrl: formData.get('aboutUsImageUrl'),
-        aboutUsChecklist: getAsArrayOfStrings(formData, 'aboutUsChecklist'),
-        servicesSubtitle: formData.get('servicesSubtitle'),
-        servicesTitle: formData.get('servicesTitle'),
-        servicesDescription: formData.get('servicesDescription'),
-        ctaHeadline: formData.get('ctaHeadline'),
-        ctaDescription: formData.get('ctaDescription'),
-        ctaImageUrl: formData.get('ctaImageUrl'),
-        ctaButtonText: formData.get('ctaButtonText'),
-        ctaButtonLink: formData.get('ctaButtonLink'),
-        trustedByText: formData.get('trustedByText'),
-        trustedByLogos: getAsArrayOfObjects(formData, 'trustedByLogos'),
-        testimonials: getAsArrayOfObjects(formData, 'testimonials'),
-        blogPosts: getAsArrayOfObjects(formData, 'blogPosts'),
-    };
+    const jsonString = formData.get('settingsData') as string;
+    if (!jsonString) {
+      return { message: 'Data formulir tidak ditemukan.' };
+    }
+    const dataToValidate = JSON.parse(jsonString);
 
     const validatedFields = SettingsSchema.safeParse(dataToValidate);
 
@@ -195,50 +104,28 @@ export async function updateWebSettings(prevState: { message: string } | undefin
       return { message: message || "Input tidak valid. Silakan periksa kembali." };
     }
     
-    const { ...data } = validatedFields.data;
+    const data = validatedFields.data;
+
+    const sanitizedData = {
+      ...data,
+      featureCards: data.featureCards?.filter(card => card.title || card.description) ?? [],
+      menuItems: data.menuItems?.filter(item => item.label || item.href) ?? [],
+      aboutUsChecklist: data.aboutUsChecklist?.filter(item => item) ?? [],
+      trustedByLogos: data.trustedByLogos?.filter(logo => logo.src || logo.alt) ?? [],
+      testimonials: data.testimonials?.filter(item => item.name || item.quote) ?? [],
+      blogPosts: data.blogPosts?.filter(item => item.title) ?? [],
+    };
 
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
-          logoUrl: data.logoUrl,
-          companyName: data.companyName,
-          whatsappSales: data.whatsappSales,
-          footerText: data.footerText,
-          address: data.address,
-          contactEmail: data.contactEmail,
-          contactPhone: data.contactPhone,
-          openingHours: data.openingHours,
-          socialMedia: data.socialMedia,
-          menuItems: data.menuItems,
-          heroHeadline: data.heroHeadline,
-          heroDescription: data.heroDescription,
-          heroImageUrl: data.heroImageUrl,
-          heroButton1Text: data.heroButton1Text,
-          heroButton1Link: data.heroButton1Link,
-          heroButton2Text: data.heroButton2Text,
-          heroButton2Link: data.heroButton2Link,
-          featureCards: data.featureCards,
-          aboutUsSubtitle: data.aboutUsSubtitle,
-          aboutUsTitle: data.aboutUsTitle,
-          aboutUsDescription: data.aboutUsDescription,
-          aboutUsImageUrl: data.aboutUsImageUrl,
-          aboutUsChecklist: data.aboutUsChecklist,
-          servicesSubtitle: data.servicesSubtitle,
-          servicesTitle: data.servicesTitle,
-          servicesDescription: data.servicesDescription,
-          ctaHeadline: data.ctaHeadline,
-          ctaDescription: data.ctaDescription,
-          ctaImageUrl: data.ctaImageUrl,
-          ctaButtonText: data.ctaButtonText,
-          ctaButtonLink: data.ctaButtonLink,
-          trustedByText: data.trustedByText,
-          trustedByLogos: data.trustedByLogos,
-          testimonials: data.testimonials,
-          blogPosts: data.blogPosts,
+          ...sanitizedData,
+          socialMedia: sanitizedData.socialMedia ?? {},
         }
     });
 
     revalidatePath('/', 'layout');
+    revalidatePath('/admin/settings');
     return { message: 'Pengaturan berhasil diperbarui.' };
 
   } catch (error) {

@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useActionState, useEffect, useState } from 'react';
@@ -7,17 +8,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, TimelineEvent, TeamMember } from '@/lib/settings';
+import type { WebSettings } from '@/lib/settings';
 import { updateTentangKamiPageSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignedURL } from '../../actions';
 import Image from 'next/image';
 
-function SubmitButton() {
+function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="w-48 sticky bottom-8 shadow-2xl">
+    <Button type="submit" disabled={pending || !isDirty} className="w-48 sticky bottom-8 shadow-2xl">
       {pending ? <Loader2 className="animate-spin" /> : 'Simpan Perubahan'}
     </Button>
   );
@@ -27,17 +28,57 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateTentangKamiPageSettings, undefined);
   
-  const [isUploading, setIsUploading] = useState(false);
-  const [timeline, setTimeline] = useState<TimelineEvent[]>(settings.timeline ?? []);
-  const [teamMembers, setTeamMembers] = useState<TeamMember[]>(settings.teamMembers ?? []);
-
-  const handleArrayOfObjectsChange = <T,>(index: number, field: keyof T, value: string | string[], state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => {
-      const newState = [...state];
-      newState[index] = { ...newState[index], [field]: value };
-      setState(newState);
+  const initialFormState = {
+    aboutPageTitle: settings.aboutPageTitle ?? '',
+    aboutPageSubtitle: settings.aboutPageSubtitle ?? '',
+    missionTitle: settings.missionTitle ?? '',
+    missionText: settings.missionText ?? '',
+    visionTitle: settings.visionTitle ?? '',
+    visionText: settings.visionText ?? '',
+    timeline: settings.timeline ?? [],
+    teamMembers: settings.teamMembers ?? [],
   };
-  const addArrayOfObjectsItem = <T,>(newItem: T, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState([...state, newItem]);
-  const removeArrayOfObjectsItem = <T,>(index: number, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState(state.filter((_, i) => i !== index));
+
+  const [formState, setFormState] = useState(initialFormState);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+
+  useEffect(() => {
+    setFormState(initialFormState);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+
+  useEffect(() => {
+    setIsDirty(JSON.stringify(formState) !== JSON.stringify(initialFormState));
+  }, [formState, initialFormState]);
+
+  const handleFieldChange = (field: keyof typeof initialFormState, value: any) => {
+    setFormState(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleArrayChange = (field: 'timeline' | 'teamMembers', index: number, subField: string, value: string) => {
+    setFormState(prev => {
+      const newArray = [...prev[field]];
+      // @ts-ignore
+      newArray[index] = { ...newArray[index], [subField]: value };
+      return { ...prev, [field]: newArray };
+    });
+  };
+
+  const addItemToArray = (field: 'timeline' | 'teamMembers') => {
+    if (field === 'timeline') {
+      setFormState(prev => ({...prev, timeline: [...prev.timeline, { year: '', event: ''}]}));
+    } else {
+      setFormState(prev => ({...prev, teamMembers: [...prev.teamMembers, { name: '', role: '', image: '', linkedin: '', aiHint: ''}]}));
+    }
+  };
+
+  const removeItemFromArray = (field: 'timeline' | 'teamMembers', index: number) => {
+    setFormState(prev => {
+      const newArray = prev[field].filter((_, i) => i !== index);
+      return { ...prev, [field]: newArray };
+    });
+  };
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -46,7 +87,7 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
     return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   };
 
-  const handleDynamicImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number, field: 'image' | 'src', state: any[], setState: React.Dispatch<React.SetStateAction<any[]>>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
       const file = event.target.files?.[0];
       if (!file) return;
       setIsUploading(true);
@@ -54,7 +95,7 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
         const checksum = await computeSHA256(file);
         const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
         await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-        handleArrayOfObjectsChange(index, field, publicUrl, state, setState);
+        handleArrayChange('teamMembers', index, 'image', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
         toast({ title: 'Upload Gagal', variant: 'destructive' });
@@ -72,6 +113,9 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
         description: state.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
+      if (isSuccess) {
+        setIsDirty(false);
+      }
     }
   }, [state, toast]);
 
@@ -83,13 +127,14 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
       </div>
 
       <form action={formAction} className="space-y-6">
+        <input type="hidden" name="tentangKamiData" value={JSON.stringify(formState)} />
         <Card>
             <CardHeader>
                 <CardTitle>Header Halaman</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="aboutPageTitle">Judul Halaman</Label><Input id="aboutPageTitle" name="aboutPageTitle" defaultValue={settings.aboutPageTitle ?? ''} /></div>
-                <div className="space-y-2"><Label htmlFor="aboutPageSubtitle">Subjudul Halaman</Label><Input id="aboutPageSubtitle" name="aboutPageSubtitle" defaultValue={settings.aboutPageSubtitle ?? ''} /></div>
+                <div className="space-y-2"><Label htmlFor="aboutPageTitle">Judul Halaman</Label><Input id="aboutPageTitle" value={formState.aboutPageTitle} onChange={e => handleFieldChange('aboutPageTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="aboutPageSubtitle">Subjudul Halaman</Label><Input id="aboutPageSubtitle" value={formState.aboutPageSubtitle} onChange={e => handleFieldChange('aboutPageSubtitle', e.target.value)} /></div>
             </CardContent>
         </Card>
 
@@ -98,10 +143,10 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
                 <CardTitle>Misi & Visi</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2"><Label htmlFor="missionTitle">Judul Misi</Label><Input id="missionTitle" name="missionTitle" defaultValue={settings.missionTitle ?? ''} /></div>
-                <div className="space-y-2"><Label htmlFor="missionText">Teks Misi</Label><Textarea id="missionText" name="missionText" defaultValue={settings.missionText ?? ''} /></div>
-                <div className="space-y-2"><Label htmlFor="visionTitle">Judul Visi</Label><Input id="visionTitle" name="visionTitle" defaultValue={settings.visionTitle ?? ''} /></div>
-                <div className="space-y-2"><Label htmlFor="visionText">Teks Visi</Label><Textarea id="visionText" name="visionText" defaultValue={settings.visionText ?? ''} /></div>
+                <div className="space-y-2"><Label htmlFor="missionTitle">Judul Misi</Label><Input id="missionTitle" value={formState.missionTitle} onChange={e => handleFieldChange('missionTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="missionText">Teks Misi</Label><Textarea id="missionText" value={formState.missionText} onChange={e => handleFieldChange('missionText', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="visionTitle">Judul Visi</Label><Input id="visionTitle" value={formState.visionTitle} onChange={e => handleFieldChange('visionTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="visionText">Teks Visi</Label><Textarea id="visionText" value={formState.visionText} onChange={e => handleFieldChange('visionText', e.target.value)} /></div>
             </CardContent>
         </Card>
 
@@ -110,16 +155,16 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
                 <CardTitle>Sejarah Perusahaan (Timeline)</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {timeline.map((item, index) => (
+                {formState.timeline.map((item, index) => (
                     <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
-                            <div className="space-y-1"><Label className="text-xs">Tahun</Label><Input name={`timeline[${index}][year]`} value={item.year} onChange={e => handleArrayOfObjectsChange(index, 'year', e.target.value, timeline, setTimeline)} /></div>
-                            <div className="space-y-1"><Label className="text-xs">Kejadian</Label><Input name={`timeline[${index}][event]`} value={item.event} onChange={e => handleArrayOfObjectsChange(index, 'event', e.target.value, timeline, setTimeline)} /></div>
+                            <div className="space-y-1"><Label className="text-xs">Tahun</Label><Input value={item.year} onChange={e => handleArrayChange('timeline', index, 'year', e.target.value)} /></div>
+                            <div className="space-y-1"><Label className="text-xs">Kejadian</Label><Input value={item.event} onChange={e => handleArrayChange('timeline', index, 'event', e.target.value)} /></div>
                         </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, timeline, setTimeline)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('timeline', index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ year: '', event: ''}, timeline, setTimeline)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Sejarah</Button>
+                <Button type="button" variant="outline" onClick={() => addItemToArray('timeline')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Sejarah</Button>
             </CardContent>
         </Card>
 
@@ -128,27 +173,26 @@ export default function TentangKamiPageClientPage({ settings }: { settings: WebS
                 <CardTitle>Tim Kami</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-                {teamMembers.map((member, index) => (
+                {formState.teamMembers.map((member, index) => (
                     <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                        <input type="hidden" name={`teamMembers[${index}][image]`} value={member.image} />
-                        <div className="flex-shrink-0 space-y-2"><div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden border">{member.image ? ( <Image src={member.image} alt={member.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}</div><Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', teamMembers, setTeamMembers)} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/></div>
+                        <div className="flex-shrink-0 space-y-2"><div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden border">{member.image ? ( <Image src={member.image} alt={member.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}</div><Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/></div>
                         <div className="flex-grow space-y-2">
                             <div className="grid grid-cols-2 gap-2">
-                                <div className="space-y-1"><Label className="text-xs">Nama</Label><Input name={`teamMembers[${index}][name]`} value={member.name} onChange={e => handleArrayOfObjectsChange(index, 'name', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Jabatan</Label><Input name={`teamMembers[${index}][role]`} value={member.role} onChange={e => handleArrayOfObjectsChange(index, 'role', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input name={`teamMembers[${index}][linkedin]`} value={member.linkedin} onChange={e => handleArrayOfObjectsChange(index, 'linkedin', e.target.value, teamMembers, setTeamMembers)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input name={`teamMembers[${index}][aiHint]`} value={member.aiHint} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, teamMembers, setTeamMembers)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Nama</Label><Input value={member.name} onChange={e => handleArrayChange('teamMembers', index, 'name', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Jabatan</Label><Input value={member.role} onChange={e => handleArrayChange('teamMembers', index, 'role', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input value={member.linkedin} onChange={e => handleArrayChange('teamMembers', index, 'linkedin', e.target.value)} /></div>
+                                <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input value={member.aiHint} onChange={e => handleArrayChange('teamMembers', index, 'aiHint', e.target.value)} /></div>
                             </div>
                         </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, teamMembers, setTeamMembers)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('teamMembers', index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ name: '', role: '', image: '', linkedin: '', aiHint: ''}, teamMembers, setTeamMembers)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Anggota Tim</Button>
+                <Button type="button" variant="outline" onClick={() => addItemToArray('teamMembers')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Anggota Tim</Button>
             </CardContent>
         </Card>
 
         <div className="mt-8 flex justify-end">
-          <SubmitButton />
+          <SubmitButton isDirty={isDirty}/>
         </div>
       </form>
     </div>

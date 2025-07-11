@@ -42,99 +42,62 @@ const availableIcons = [
     'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap'
 ].sort();
 
-
-function SubmitButton() {
+function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="w-48 sticky bottom-8 shadow-2xl">
+    <Button type="submit" disabled={pending || !isDirty} className="w-48 sticky bottom-8 shadow-2xl">
       {pending ? <Loader2 className="animate-spin" /> : 'Simpan Perubahan'}
     </Button>
-  );
-}
-
-type ImageUrls = {
-  logoUrl: string;
-  heroImageUrl: string;
-  aboutUsImageUrl: string;
-  ctaImageUrl: string;
-};
-
-type ImageUploaderProps = {
-  fieldId: string;
-  fieldName: keyof ImageUrls;
-  label: string;
-  imageUrl: string;
-  altText: string;
-  isUploading: boolean;
-  onFileChange: (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof ImageUrls) => void;
-};
-
-function ImageUploader({ fieldId, fieldName, label, imageUrl, altText, isUploading, onFileChange }: ImageUploaderProps) {
-  return (
-    <div className="space-y-2">
-      <Label htmlFor={fieldId}>{label}</Label>
-      <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
-        {imageUrl ? (
-          <Image src={imageUrl} alt={altText} fill className="object-cover" />
-        ) : (
-          <div className="flex items-center justify-center h-full w-full">
-            <ImageIcon className="w-10 h-10 text-muted-foreground" />
-          </div>
-        )}
-      </div>
-      <div className="flex items-center gap-4">
-        <Input
-          id={fieldId}
-          type="file"
-          onChange={(e) => onFileChange(e, fieldName)}
-          accept="image/png, image/jpeg, image/webp, image/svg+xml"
-          disabled={isUploading}
-        />
-        {isUploading && <Loader2 className="animate-spin" />}
-      </div>
-    </div>
   );
 }
 
 export default function SettingsClientPage({ settings }: { settings: WebSettings }) {
   const { toast } = useToast();
   const [state, formAction] = useActionState(updateWebSettings, undefined);
-  
+
+  const [formState, setFormState] = useState(settings);
   const [isUploading, setIsUploading] = useState(false);
-  
-  const [imageUrls, setImageUrls] = useState<ImageUrls>({
-    logoUrl: settings.logoUrl ?? '',
-    heroImageUrl: settings.heroImageUrl ?? '',
-    aboutUsImageUrl: settings.aboutUsImageUrl ?? '',
-    ctaImageUrl: settings.ctaImageUrl ?? '',
-  });
+  const [isDirty, setIsDirty] = useState(false);
 
-  const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? [{ label: '', href: '' }]);
-  const [socialLinks, setSocialLinks] = useState<SocialMediaLinks>(settings.socialMedia ?? {});
-  const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? [{ src: '', alt: ''}]);
-  const [featureCards, setFeatureCards] = useState<FeatureCard[]>(settings.featureCards ?? []);
-  const [aboutUsChecklist, setAboutUsChecklist] = useState<string[]>(settings.aboutUsChecklist ?? ['']);
-  const [testimonials, setTestimonials] = useState<Testimonial[]>(settings.testimonials ?? []);
-  const [blogPosts, setBlogPosts] = useState<BlogPost[]>(settings.blogPosts ?? []);
+  useEffect(() => {
+    setFormState(settings);
+  }, [settings]);
 
+  useEffect(() => {
+    setIsDirty(JSON.stringify(formState) !== JSON.stringify(settings));
+  }, [formState, settings]);
 
-  const handleArrayOfObjectsChange = <T,>(index: number, field: keyof T, value: string | string[], state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => {
-      const newState = [...state];
-      newState[index] = { ...newState[index], [field]: value };
-      setState(newState);
+  const handleFieldChange = (field: keyof WebSettings, value: any) => {
+    setFormState(prev => ({...prev, [field]: value}));
   };
-  const addArrayOfObjectsItem = <T,>(newItem: T, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState([...state, newItem]);
-  const removeArrayOfObjectsItem = <T,>(index: number, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState(state.filter((_, i) => i !== index));
 
-  const handleArrayOfStringsChange = (index: number, value: string, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => {
-      const newState = [...state];
-      newState[index] = value;
-      setState(newState);
-  }
-  const addArrayOfStringsItem = (state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState([...state, '']);
-  const removeArrayOfStringsItem = (index: number, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState(state.filter((_, i) => i !== index));
+  const handleArrayChange = (field: keyof WebSettings, index: number, subField: string, value: any) => {
+    setFormState(prev => {
+        const newArray = [...(prev[field] as any[])];
+        newArray[index] = {...newArray[index], [subField]: value};
+        return {...prev, [field]: newArray};
+    });
+  };
+  
+  const handleStringArrayChange = (field: keyof WebSettings, index: number, value: any) => {
+     setFormState(prev => {
+        const newArray = [...(prev[field] as any[])];
+        newArray[index] = value;
+        return {...prev, [field]: newArray};
+    });
+  };
 
-  const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => setSocialLinks(prev => ({ ...prev, [platform]: value }));
+  const addItemToArray = (field: keyof WebSettings, newItem: any) => {
+    setFormState(prev => ({...prev, [field]: [...(prev[field] as any[]), newItem]}));
+  };
+
+  const removeItemFromArray = (field: keyof WebSettings, index: number) => {
+    setFormState(prev => ({...prev, [field]: (prev[field] as any[]).filter((_, i) => i !== index)}));
+  };
+
+  const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => {
+    setFormState(prev => ({...prev, socialMedia: {...prev.socialMedia, [platform]: value}}));
+  };
   
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -143,7 +106,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     return hashArray.map((b) => b.toString(16).padStart(2, "0")).join("");
   };
   
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof ImageUrls) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof WebSettings) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
@@ -153,7 +116,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
       const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
       
       await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-      setImageUrls(prev => ({ ...prev, [fieldName]: publicUrl }));
+      handleFieldChange(fieldName, publicUrl);
 
     } catch (error) {
       console.error("Upload error:", error);
@@ -164,7 +127,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     }
   };
 
-  const handleDynamicImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number, field: 'image' | 'src', state: any[], setState: React.Dispatch<React.SetStateAction<any[]>>) => {
+  const handleDynamicImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, field: keyof WebSettings, index: number, subField: 'image' | 'src') => {
       const file = event.target.files?.[0];
       if (!file) return;
       setIsUploading(true);
@@ -172,7 +135,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         const checksum = await computeSHA256(file);
         const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
         await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-        handleArrayOfObjectsChange(index, field, publicUrl, state, setState);
+        handleArrayChange(field, index, subField, publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
         toast({ title: 'Upload Gagal', variant: 'destructive' });
@@ -190,6 +153,9 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         description: state.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
+      if (isSuccess) {
+        setIsDirty(false);
+      }
     }
   }, [state, toast]);
 
@@ -201,10 +167,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
       </div>
 
       <form action={formAction} className="space-y-6">
-        <input type="hidden" name="logoUrl" value={imageUrls.logoUrl} />
-        <input type="hidden" name="heroImageUrl" value={imageUrls.heroImageUrl} />
-        <input type="hidden" name="aboutUsImageUrl" value={imageUrls.aboutUsImageUrl} />
-        <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
+        <input type="hidden" name="settingsData" value={JSON.stringify(formState)} />
 
         <Accordion type="multiple" className="w-full space-y-4" defaultValue={['item-1']}>
             <AccordionItem value="item-1">
@@ -212,11 +175,20 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                     <Card>
                         <CardContent className="grid md:grid-cols-2 gap-6 pt-6">
-                            <ImageUploader fieldId="logo-upload" fieldName="logoUrl" label="Logo Perusahaan" imageUrl={imageUrls.logoUrl} altText="Logo Preview" isUploading={isUploading} onFileChange={handleFileChange} />
+                            <div className="space-y-2">
+                                <Label htmlFor={'logo-upload'}>Logo Perusahaan</Label>
+                                <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
+                                    {formState.logoUrl ? ( <Image src={formState.logoUrl} alt="Logo Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Input id={'logo-upload'} type="file" onChange={(e) => handleImageUpload(e, 'logoUrl')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
+                                    {isUploading && <Loader2 className="animate-spin" />}
+                                </div>
+                            </div>
                             <div className="space-y-4">
-                            <div className="space-y-2"><Label htmlFor="companyName">Nama Perusahaan</Label><Input id="companyName" name="companyName" defaultValue={settings.companyName} /></div>
-                            <div className="space-y-2"><Label htmlFor="whatsappSales">Nomor WhatsApp Sales</Label><Input id="whatsappSales" name="whatsappSales" defaultValue={settings.whatsappSales} placeholder="+6281234567890" /></div>
-                            <div className="space-y-2"><Label htmlFor="footerText">Teks di Footer</Label><Textarea id="footerText" name="footerText" defaultValue={settings.footerText} /></div>
+                            <div className="space-y-2"><Label htmlFor="companyName">Nama Perusahaan</Label><Input id="companyName" value={formState.companyName} onChange={e => handleFieldChange('companyName', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="whatsappSales">Nomor WhatsApp Sales</Label><Input id="whatsappSales" value={formState.whatsappSales} onChange={e => handleFieldChange('whatsappSales', e.target.value)} placeholder="+6281234567890" /></div>
+                            <div className="space-y-2"><Label htmlFor="footerText">Teks di Footer</Label><Textarea id="footerText" value={formState.footerText} onChange={e => handleFieldChange('footerText', e.target.value)} /></div>
                             </div>
                         </CardContent>
                     </Card>
@@ -230,19 +202,19 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-6">
                             <div className="md:col-span-2 space-y-1">
                                 <Label htmlFor="address">Alamat</Label>
-                                <Input id="address" name="address" defaultValue={settings.address ?? ''} placeholder="139 Baker St, E1 7PT, London" />
+                                <Input id="address" value={formState.address ?? ''} onChange={e => handleFieldChange('address', e.target.value)} placeholder="139 Baker St, E1 7PT, London" />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="contactEmail">Email Kontak</Label>
-                                <Input id="contactEmail" name="contactEmail" type="email" defaultValue={settings.contactEmail ?? ''} placeholder="contacts@example.com" />
+                                <Input id="contactEmail" type="email" value={formState.contactEmail ?? ''} onChange={e => handleFieldChange('contactEmail', e.target.value)} placeholder="contacts@example.com" />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor="contactPhone">Telepon Kontak</Label>
-                                <Input id="contactPhone" name="contactPhone" defaultValue={settings.contactPhone ?? ''} placeholder="(02) 123 333 444" />
+                                <Input id="contactPhone" value={formState.contactPhone ?? ''} onChange={e => handleFieldChange('contactPhone', e.target.value)} placeholder="(02) 123 333 444" />
                             </div>
                             <div className="md:col-span-2 space-y-1">
                                 <Label htmlFor="openingHours">Jam Buka</Label>
-                                <Input id="openingHours" name="openingHours" defaultValue={settings.openingHours ?? ''} placeholder="8am-5pm Mon - Fri" />
+                                <Input id="openingHours" value={formState.openingHours ?? ''} onChange={e => handleFieldChange('openingHours', e.target.value)} placeholder="8am-5pm Mon - Fri" />
                             </div>
                         </CardContent>
                     </Card>
@@ -257,13 +229,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             {(['twitter', 'facebook', 'instagram', 'linkedin'] as const).map(platform => (
                                 <div className="space-y-1" key={platform}>
                                     <Label htmlFor={`social-${platform}`} className="capitalize">{platform}</Label>
-                                    <Input
-                                        id={`social-${platform}`}
-                                        name={`socialMedia[${platform}]`}
-                                        value={socialLinks[platform] || ''}
-                                        onChange={(e) => handleSocialChange(platform, e.target.value)}
-                                        placeholder={`https://www.${platform}.com/nama_akun`}
-                                    />
+                                    <Input id={`social-${platform}`} value={formState.socialMedia?.[platform] || ''} onChange={(e) => handleSocialChange(platform, e.target.value)} placeholder={`https://www.${platform}.com/nama_akun`} />
                                 </div>
                             ))}
                         </CardContent>
@@ -279,24 +245,24 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             <CardDescription>Atur item yang muncul di menu navigasi utama.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {menuItems.map((item, index) => (
+                            {formState.menuItems.map((item, index) => (
                                 <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                                     <div className="grid grid-cols-2 gap-2 flex-grow">
                                         <div className="space-y-1">
                                             <Label htmlFor={`menu-label-${index}`} className="text-xs">Label</Label>
-                                            <Input id={`menu-label-${index}`} name={`menuItems[${index}][label]`} value={item.label} onChange={(e) => handleArrayOfObjectsChange(index, 'label', e.target.value, menuItems, setMenuItems)} placeholder="Beranda" />
+                                            <Input id={`menu-label-${index}`} value={item.label} onChange={(e) => handleArrayChange('menuItems', index, 'label', e.target.value)} placeholder="Beranda" />
                                         </div>
                                         <div className="space-y-1">
                                             <Label htmlFor={`menu-href-${index}`} className="text-xs">Tautan (Href)</Label>
-                                            <Input id={`menu-href-${index}`} name={`menuItems[${index}][href]`} value={item.href} onChange={(e) => handleArrayOfObjectsChange(index, 'href', e.target.value, menuItems, setMenuItems)} placeholder="/" />
+                                            <Input id={`menu-href-${index}`} value={item.href} onChange={(e) => handleArrayChange('menuItems', index, 'href', e.target.value)} placeholder="/" />
                                         </div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, menuItems, setMenuItems)} className="text-destructive h-9 w-9">
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('menuItems', index)} className="text-destructive h-9 w-9">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({label: '', href: ''}, menuItems, setMenuItems)}>
+                            <Button type="button" variant="outline" onClick={() => addItemToArray('menuItems', {label: '', href: ''})}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Tambah Item Menu
                             </Button>
                         </CardContent>
@@ -309,17 +275,26 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                     <Card>
                         <CardContent className="grid md:grid-cols-2 gap-6 pt-6">
-                            <ImageUploader fieldId="hero-image-upload" fieldName="heroImageUrl" label="Gambar Latar Hero" imageUrl={imageUrls.heroImageUrl} altText="Hero Preview" isUploading={isUploading} onFileChange={handleFileChange} />
+                            <div className="space-y-2">
+                                <Label htmlFor={'hero-image-upload'}>Gambar Latar Hero</Label>
+                                <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
+                                    {formState.heroImageUrl ? ( <Image src={formState.heroImageUrl} alt="Hero Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Input id={'hero-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'heroImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
+                                    {isUploading && <Loader2 className="animate-spin" />}
+                                </div>
+                            </div>
                             <div className="space-y-4">
-                            <div className="space-y-2"><Label htmlFor="heroHeadline">Judul Utama (Headline)</Label><Input id="heroHeadline" name="heroHeadline" defaultValue={settings.heroHeadline ?? ''} /></div>
-                            <div className="space-y-2"><Label htmlFor="heroDescription">Deskripsi</Label><Textarea id="heroDescription" name="heroDescription" defaultValue={settings.heroDescription ?? ''} /></div>
+                            <div className="space-y-2"><Label htmlFor="heroHeadline">Judul Utama (Headline)</Label><Input id="heroHeadline" value={formState.heroHeadline ?? ''} onChange={e => handleFieldChange('heroHeadline', e.target.value)} /></div>
+                            <div className="space-y-2"><Label htmlFor="heroDescription">Deskripsi</Label><Textarea id="heroDescription" value={formState.heroDescription ?? ''} onChange={e => handleFieldChange('heroDescription', e.target.value)} /></div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2"><Label htmlFor="heroButton1Text">Teks Tombol 1</Label><Input id="heroButton1Text" name="heroButton1Text" defaultValue={settings.heroButton1Text ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="heroButton1Link">Link Tombol 1</Label><Input id="heroButton1Link" name="heroButton1Link" defaultValue={settings.heroButton1Link ?? ''} /></div>
+                                <div className="space-y-2"><Label htmlFor="heroButton1Text">Teks Tombol 1</Label><Input id="heroButton1Text" value={formState.heroButton1Text ?? ''} onChange={e => handleFieldChange('heroButton1Text', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="heroButton1Link">Link Tombol 1</Label><Input id="heroButton1Link" value={formState.heroButton1Link ?? ''} onChange={e => handleFieldChange('heroButton1Link', e.target.value)} /></div>
                             </div>
                             <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2"><Label htmlFor="heroButton2Text">Teks Tombol 2</Label><Input id="heroButton2Text" name="heroButton2Text" defaultValue={settings.heroButton2Text ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="heroButton2Link">Link Tombol 2</Label><Input id="heroButton2Link" name="heroButton2Link" defaultValue={settings.heroButton2Link ?? ''} /></div>
+                                <div className="space-y-2"><Label htmlFor="heroButton2Text">Teks Tombol 2</Label><Input id="heroButton2Text" value={formState.heroButton2Text ?? ''} onChange={e => handleFieldChange('heroButton2Text', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="heroButton2Link">Link Tombol 2</Label><Input id="heroButton2Link" value={formState.heroButton2Link ?? ''} onChange={e => handleFieldChange('heroButton2Link', e.target.value)} /></div>
                             </div>
                             </div>
                         </CardContent>
@@ -332,16 +307,12 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                      <Card>
                         <CardContent className="space-y-4 pt-6">
-                            {featureCards.map((card, index) => (
+                            {formState.featureCards.map((card, index) => (
                                 <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                                     <div className="grid grid-cols-3 gap-2 flex-grow">
                                         <div className="space-y-1">
                                             <Label htmlFor={`fc-icon-${index}`} className="text-xs">Ikon (Lucide)</Label>
-                                            <Select
-                                                name={`featureCards[${index}][icon]`}
-                                                value={card.icon}
-                                                onValueChange={(value) => handleArrayOfObjectsChange(index, 'icon', value, featureCards, setFeatureCards)}
-                                            >
+                                            <Select value={card.icon} onValueChange={(value) => handleArrayChange('featureCards', index, 'icon', value)}>
                                                 <SelectTrigger>
                                                     <SelectValue placeholder="Pilih ikon..." />
                                                 </SelectTrigger>
@@ -359,19 +330,19 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                         </div>
                                         <div className="space-y-1">
                                             <Label htmlFor={`fc-title-${index}`} className="text-xs">Judul</Label>
-                                            <Input id={`fc-title-${index}`} name={`featureCards[${index}][title]`} value={card.title} onChange={(e) => handleArrayOfObjectsChange(index, 'title', e.target.value, featureCards, setFeatureCards)} />
+                                            <Input id={`fc-title-${index}`} value={card.title} onChange={(e) => handleArrayChange('featureCards', index, 'title', e.target.value)} />
                                         </div>
                                         <div className="space-y-1">
                                             <Label htmlFor={`fc-desc-${index}`} className="text-xs">Deskripsi</Label>
-                                            <Input id={`fc-desc-${index}`} name={`featureCards[${index}][description]`} value={card.description} onChange={(e) => handleArrayOfObjectsChange(index, 'description', e.target.value, featureCards, setFeatureCards)} />
+                                            <Input id={`fc-desc-${index}`} value={card.description} onChange={(e) => handleArrayChange('featureCards', index, 'description', e.target.value)} />
                                         </div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, featureCards, setFeatureCards)} className="text-destructive h-9 w-9">
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('featureCards', index)} className="text-destructive h-9 w-9">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({icon: 'Activity', title: '', description: ''}, featureCards, setFeatureCards)}>
+                            <Button type="button" variant="outline" onClick={() => addItemToArray('featureCards', {icon: 'Activity', title: '', description: ''})}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Tambah Kartu Fitur
                             </Button>
                         </CardContent>
@@ -384,22 +355,31 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                     <Card>
                         <CardContent className="grid md:grid-cols-2 gap-6 pt-6">
-                            <ImageUploader fieldId="about-us-image-upload" fieldName="aboutUsImageUrl" label="Gambar About Us" imageUrl={imageUrls.aboutUsImageUrl} altText="About Us Preview" isUploading={isUploading} onFileChange={handleFileChange} />
+                            <div className="space-y-2">
+                                <Label htmlFor={'about-us-image-upload'}>Gambar About Us</Label>
+                                <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
+                                    {formState.aboutUsImageUrl ? ( <Image src={formState.aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Input id={'about-us-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'aboutUsImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
+                                    {isUploading && <Loader2 className="animate-spin" />}
+                                </div>
+                            </div>
                             <div className="space-y-4">
-                                <div className="space-y-2"><Label htmlFor="aboutUsSubtitle">Subjudul</Label><Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="aboutUsTitle">Judul</Label><Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="aboutUsDescription">Deskripsi</Label><Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} /></div>
+                                <div className="space-y-2"><Label htmlFor="aboutUsSubtitle">Subjudul</Label><Input id="aboutUsSubtitle" value={formState.aboutUsSubtitle ?? ''} onChange={e => handleFieldChange('aboutUsSubtitle', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="aboutUsTitle">Judul</Label><Input id="aboutUsTitle" value={formState.aboutUsTitle ?? ''} onChange={e => handleFieldChange('aboutUsTitle', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="aboutUsDescription">Deskripsi</Label><Textarea id="aboutUsDescription" value={formState.aboutUsDescription ?? ''} onChange={e => handleFieldChange('aboutUsDescription', e.target.value)} /></div>
                                 <div className="space-y-2">
                                     <Label>Checklist Items</Label>
-                                    {aboutUsChecklist.map((item, index) => (
+                                    {formState.aboutUsChecklist.map((item, index) => (
                                         <div key={index} className="flex items-center gap-2">
-                                            <Input name={`aboutUsChecklist[${index}]`} value={item} onChange={(e) => handleArrayOfStringsChange(index, e.target.value, aboutUsChecklist, setAboutUsChecklist)} />
-                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfStringsItem(index, aboutUsChecklist, setAboutUsChecklist)} className="text-destructive h-9 w-9">
+                                            <Input value={item} onChange={(e) => handleStringArrayChange('aboutUsChecklist', index, e.target.value)} />
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('aboutUsChecklist', index)} className="text-destructive h-9 w-9">
                                                 <Trash2 className="h-4 w-4" />
                                             </Button>
                                         </div>
                                     ))}
-                                    <Button type="button" variant="outline" size="sm" onClick={() => addArrayOfStringsItem(aboutUsChecklist, setAboutUsChecklist)}>
+                                    <Button type="button" variant="outline" size="sm" onClick={() => addItemToArray('aboutUsChecklist', '')}>
                                         <PlusCircle className="mr-2 h-4 w-4" /> Tambah Checklist
                                     </Button>
                                 </div>
@@ -419,9 +399,9 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Input id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} /></div>
+                                <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" value={formState.servicesSubtitle ?? ''} onChange={e => handleFieldChange('servicesSubtitle', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" value={formState.servicesTitle ?? ''} onChange={e => handleFieldChange('servicesTitle', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Input id="servicesDescription" value={formState.servicesDescription ?? ''} onChange={e => handleFieldChange('servicesDescription', e.target.value)} /></div>
                             </div>
                         </CardContent>
                     </Card>
@@ -433,13 +413,22 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                     <Card>
                         <CardContent className="grid md:grid-cols-2 gap-6 pt-6">
-                            <ImageUploader fieldId="cta-image-upload" fieldName="ctaImageUrl" label="Gambar CTA" imageUrl={imageUrls.ctaImageUrl} altText="CTA Preview" isUploading={isUploading} onFileChange={handleFileChange} />
+                            <div className="space-y-2">
+                                <Label htmlFor={'cta-image-upload'}>Gambar CTA</Label>
+                                <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
+                                    {formState.ctaImageUrl ? ( <Image src={formState.ctaImageUrl} alt="CTA Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                </div>
+                                <div className="flex items-center gap-4">
+                                    <Input id={'cta-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'ctaImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
+                                    {isUploading && <Loader2 className="animate-spin" />}
+                                </div>
+                            </div>
                             <div className="space-y-4">
-                                <div className="space-y-2"><Label htmlFor="ctaHeadline">Headline</Label><Input id="ctaHeadline" name="ctaHeadline" defaultValue={settings.ctaHeadline ?? ''} /></div>
-                                <div className="space-y-2"><Label htmlFor="ctaDescription">Deskripsi</Label><Textarea id="ctaDescription" name="ctaDescription" defaultValue={settings.ctaDescription ?? ''} /></div>
+                                <div className="space-y-2"><Label htmlFor="ctaHeadline">Headline</Label><Input id="ctaHeadline" value={formState.ctaHeadline ?? ''} onChange={e => handleFieldChange('ctaHeadline', e.target.value)} /></div>
+                                <div className="space-y-2"><Label htmlFor="ctaDescription">Deskripsi</Label><Textarea id="ctaDescription" value={formState.ctaDescription ?? ''} onChange={e => handleFieldChange('ctaDescription', e.target.value)} /></div>
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="space-y-2"><Label htmlFor="ctaButtonText">Teks Tombol</Label><Input id="ctaButtonText" name="ctaButtonText" defaultValue={settings.ctaButtonText ?? ''} /></div>
-                                    <div className="space-y-2"><Label htmlFor="ctaButtonLink">Link Tombol</Label><Input id="ctaButtonLink" name="ctaButtonLink" defaultValue={settings.ctaButtonLink ?? ''} /></div>
+                                    <div className="space-y-2"><Label htmlFor="ctaButtonText">Teks Tombol</Label><Input id="ctaButtonText" value={formState.ctaButtonText ?? ''} onChange={e => handleFieldChange('ctaButtonText', e.target.value)} /></div>
+                                    <div className="space-y-2"><Label htmlFor="ctaButtonLink">Link Tombol</Label><Input id="ctaButtonLink" value={formState.ctaButtonLink ?? ''} onChange={e => handleFieldChange('ctaButtonLink', e.target.value)} /></div>
                                 </div>
                             </div>
                         </CardContent>
@@ -457,32 +446,31 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
                                 <Label htmlFor="trustedByText">Teks Judul</Label>
-                                <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} placeholder="Contoh: Trusted by the world's leading companies" />
+                                <Input id="trustedByText" value={formState.trustedByText ?? ''} onChange={e => handleFieldChange('trustedByText', e.target.value)} placeholder="Contoh: Trusted by the world's leading companies" />
                             </div>
                             <div className="space-y-4">
-                                {trustedByLogos.map((logo, index) => (
+                                {formState.trustedByLogos.map((logo, index) => (
                                     <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
-                                        <input type="hidden" name={`trustedByLogos[${index}][src]`} value={logo.src} />
                                         <div className="relative w-24 h-16 rounded-md bg-muted overflow-hidden border">
                                             {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain p-1" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                                         </div>
                                         <div className="grid grid-cols-1 gap-2 flex-grow">
                                             <div className="space-y-1">
                                                 <Label htmlFor={`logo-file-${index}`} className="text-xs">File Gambar Logo</Label>
-                                                <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'src', trustedByLogos, setTrustedByLogos)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
+                                                <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleDynamicImageUpload(e, 'trustedByLogos', index, 'src')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
-                                                <Input id={`logo-alt-${index}`} name={`trustedByLogos[${index}][alt]`} value={logo.alt} onChange={(e) => handleArrayOfObjectsChange(index, 'alt', e.target.value, trustedByLogos, setTrustedByLogos)} placeholder="Nama Klien" />
+                                                <Input id={`logo-alt-${index}`} value={logo.alt} onChange={(e) => handleArrayChange('trustedByLogos', index, 'alt', e.target.value)} placeholder="Nama Klien" />
                                             </div>
                                         </div>
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, trustedByLogos, setTrustedByLogos)} className="text-destructive h-9 w-9">
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('trustedByLogos', index)} className="text-destructive h-9 w-9">
                                             <Trash2 className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 ))}
                             </div>
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({src: '', alt: ''}, trustedByLogos, setTrustedByLogos)}>
+                            <Button type="button" variant="outline" onClick={() => addItemToArray('trustedByLogos', {src: '', alt: ''})}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo
                             </Button>
                         </CardContent>
@@ -495,41 +483,40 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                     <Card>
                         <CardContent className="space-y-4 pt-6">
-                            {testimonials.map((item, index) => (
+                            {formState.testimonials.map((item, index) => (
                                 <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                                    <input type="hidden" name={`testimonials[${index}][image]`} value={item.image} />
                                     <div className="flex-shrink-0 space-y-2">
                                         <div className="relative w-24 h-24 rounded-md bg-muted overflow-hidden border">
                                             {item.image ? ( <Image src={item.image} alt={item.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                                         </div>
-                                        <Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', testimonials, setTestimonials)} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/>
+                                        <Input type="file" onChange={(e) => handleDynamicImageUpload(e, 'testimonials', index, 'image')} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/>
                                     </div>
                                     <div className="flex-grow space-y-2">
                                     <div className="space-y-1">
                                             <Label className="text-xs">Kutipan</Label>
-                                            <Textarea name={`testimonials[${index}][quote]`} value={item.quote} onChange={e => handleArrayOfObjectsChange(index, 'quote', e.target.value, testimonials, setTestimonials)} />
+                                            <Textarea value={item.quote} onChange={e => handleArrayChange('testimonials', index, 'quote', e.target.value)} />
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
                                                 <Label className="text-xs">Nama</Label>
-                                                <Input name={`testimonials[${index}][name]`} value={item.name} onChange={e => handleArrayOfObjectsChange(index, 'name', e.target.value, testimonials, setTestimonials)} />
+                                                <Input value={item.name} onChange={e => handleArrayChange('testimonials', index, 'name', e.target.value)} />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Jabatan</Label>
-                                                <Input name={`testimonials[${index}][role]`} value={item.role} onChange={e => handleArrayOfObjectsChange(index, 'role', e.target.value, testimonials, setTestimonials)} />
+                                                <Input value={item.role} onChange={e => handleArrayChange('testimonials', index, 'role', e.target.value)} />
                                             </div>
                                     </div>
                                     <div className="space-y-1">
                                             <Label className="text-xs">AI Hint (untuk gambar)</Label>
-                                            <Input name={`testimonials[${index}][aiHint]`} value={item.aiHint || ''} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, testimonials, setTestimonials)} />
+                                            <Input value={item.aiHint || ''} onChange={e => handleArrayChange('testimonials', index, 'aiHint', e.target.value)} />
                                         </div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, testimonials, setTestimonials)} className="text-destructive h-9 w-9">
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('testimonials', index)} className="text-destructive h-9 w-9">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ quote: '', name: '', role: '', image: '', aiHint: ''}, testimonials, setTestimonials)}>
+                            <Button type="button" variant="outline" onClick={() => addItemToArray('testimonials', { quote: '', name: '', role: '', image: '', aiHint: ''})}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Tambah Testimonial
                             </Button>
                         </CardContent>
@@ -546,47 +533,46 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             <CardDescription>Konten ini akan tampil di Halaman Utama. Daftar postingan blognya sendiri diambil dari konten statis di halaman Resources.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
-                            {blogPosts.map((item, index) => (
+                            {formState.blogPosts.map((item, index) => (
                                 <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                                    <input type="hidden" name={`blogPosts[${index}][image]`} value={item.image} />
                                     <div className="flex-shrink-0 space-y-2">
                                         <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
                                             {item.image ? ( <Image src={item.image} alt={item.title} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                                         </div>
-                                        <Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', blogPosts, setBlogPosts)} accept="image/png, image/jpeg" disabled={isUploading} className="w-40"/>
+                                        <Input type="file" onChange={(e) => handleDynamicImageUpload(e, 'blogPosts', index, 'image')} accept="image/png, image/jpeg" disabled={isUploading} className="w-40"/>
                                     </div>
                                     <div className="flex-grow space-y-2">
                                         <div className="space-y-1">
                                             <Label className="text-xs">Judul</Label>
-                                            <Input name={`blogPosts[${index}][title]`} value={item.title} onChange={e => handleArrayOfObjectsChange(index, 'title', e.target.value, blogPosts, setBlogPosts)} />
+                                            <Input value={item.title} onChange={e => handleArrayChange('blogPosts', index, 'title', e.target.value)} />
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
                                                 <Label className="text-xs">Tanggal</Label>
-                                                <Input name={`blogPosts[${index}][date]`} value={item.date} onChange={e => handleArrayOfObjectsChange(index, 'date', e.target.value, blogPosts, setBlogPosts)} />
+                                                <Input value={item.date} onChange={e => handleArrayChange('blogPosts', index, 'date', e.target.value)} />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">Penulis</Label>
-                                                <Input name={`blogPosts[${index}][author]`} value={item.author} onChange={e => handleArrayOfObjectsChange(index, 'author', e.target.value, blogPosts, setBlogPosts)} />
+                                                <Input value={item.author} onChange={e => handleArrayChange('blogPosts', index, 'author', e.target.value)} />
                                             </div>
                                     </div>
                                     <div className="grid grid-cols-2 gap-2">
                                         <div className="space-y-1">
                                                 <Label className="text-xs">Tautan (Href)</Label>
-                                                <Input name={`blogPosts[${index}][href]`} value={item.href} onChange={e => handleArrayOfObjectsChange(index, 'href', e.target.value, blogPosts, setBlogPosts)} />
+                                                <Input value={item.href} onChange={e => handleArrayChange('blogPosts', index, 'href', e.target.value)} />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label className="text-xs">AI Hint (untuk gambar)</Label>
-                                                <Input name={`blogPosts[${index}][aiHint]`} value={item.aiHint ?? ''} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, blogPosts, setBlogPosts)} />
+                                                <Input value={item.aiHint ?? ''} onChange={e => handleArrayChange('blogPosts', index, 'aiHint', e.target.value)} />
                                             </div>
                                     </div>
                                     </div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, blogPosts, setBlogPosts)} className="text-destructive h-9 w-9">
+                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('blogPosts', index)} className="text-destructive h-9 w-9">
                                         <Trash2 className="h-4 w-4" />
                                     </Button>
                                 </div>
                             ))}
-                            <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ image: '', aiHint: '', date: '', author: 'Admin', title: '', href: '/resources' }, blogPosts, setBlogPosts)}>
+                            <Button type="button" variant="outline" onClick={() => addItemToArray('blogPosts', { image: '', aiHint: '', date: '', author: 'Admin', title: '', href: '/resources' })}>
                                 <PlusCircle className="mr-2 h-4 w-4" /> Tambah Postingan Blog
                             </Button>
                         </CardContent>
@@ -596,7 +582,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         </Accordion>
 
         <div className="mt-8 flex justify-end">
-          <SubmitButton />
+          <SubmitButton isDirty={isDirty}/>
         </div>
       </form>
     </div>
