@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -16,7 +17,7 @@ export default async function HubungiKamiPage() {
 
   return (
     <>
-      <section className="bg-secondary">
+      <section className="bg-dark-slate">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Hubungi Kami</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
