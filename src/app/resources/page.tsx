@@ -31,7 +31,7 @@ const newsItems = [
 export default function ResourcesPage() {
   return (
     <>
-      <section className="bg-secondary">
+      <section className="bg-dark-slate">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Resources</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
