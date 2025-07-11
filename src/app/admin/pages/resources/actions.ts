@@ -17,7 +17,7 @@ const toSlug = (name: string) => {
 const NewsItemSchema = z.object({
     id: z.number(), 
     title: z.string().default(''),
-    slug: z.string(),
+    slug: z.string(), // Can be empty string initially, but will be generated
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
@@ -76,19 +76,23 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     }
 
     for (const item of newsItemsFromClient) {
+        const finalSlug = item.slug || toSlug(item.title);
+        if (!item.title && !item.category) {
+            continue;
+        }
+         if (!finalSlug) {
+            return { message: `Judul tidak boleh kosong untuk artikel baru.` };
+        }
+
         const sanitizedData = {
             title: item.title,
-            slug: item.slug || toSlug(item.title),
+            slug: finalSlug,
             category: item.category,
             image: item.image,
             content: item.content,
             aiHint: item.aiHint
         };
         
-        if (!item.title && !item.category) {
-            continue;
-        }
-
         if (dbItemIds.has(item.id)) {
             operations.push(prisma.newsItem.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
