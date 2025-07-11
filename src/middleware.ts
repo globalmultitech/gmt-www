@@ -3,6 +3,13 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
  
 export function middleware(request: NextRequest) {
+  // --- AUTHENTICATION DISABLED FOR TESTING ---
+  // The original logic is commented out below.
+  // This will allow all requests to /admin/* and /login to proceed without checking for a cookie.
+  return NextResponse.next();
+
+
+  /* --- ORIGINAL AUTHENTICATION LOGIC ---
   const sessionCookie = request.cookies.get('auth_session');
  
   const { pathname } = request.nextUrl;
@@ -20,6 +27,7 @@ export function middleware(request: NextRequest) {
   }
  
   return NextResponse.next()
+  */
 }
  
 export const config = {
