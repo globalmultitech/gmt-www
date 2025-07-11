@@ -192,9 +192,9 @@ const defaultSettings: WebSettings = {
   ctaButtonLink: '/hubungi-kami',
   trustedByText: "Trusted by the world's leading companies",
   trustedByLogos: [
-    { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
-    { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
-    { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
+    { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 1' },
+    { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 2' },
+    { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 3' },
   ],
   testimonials: [
     {

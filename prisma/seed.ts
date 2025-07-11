@@ -146,12 +146,12 @@ async function main() {
       ctaButtonLink: '/hubungi-kami',
       trustedByText: "Trusted by the world's leading companies",
       trustedByLogos: [
-          { src: '/logo-placeholder-1.svg', alt: 'Client Logo 1' },
-          { src: '/logo-placeholder-2.svg', alt: 'Client Logo 2' },
-          { src: '/logo-placeholder-3.svg', alt: 'Client Logo 3' },
-          { src: '/logo-placeholder-4.svg', alt: 'Client Logo 4' },
-          { src: '/logo-placeholder-5.svg', alt: 'Client Logo 5' },
-          { src: '/logo-placeholder-6.svg', alt: 'Client Logo 6' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 1' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 2' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 3' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 4' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 5' },
+          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 6' },
       ],
       testimonials: [
         {
@@ -175,7 +175,33 @@ async function main() {
             image: 'https://placehold.co/100x100.png',
             aiHint: 'smiling man portrait',
         },
-      ]
+      ],
+      blogPosts: [
+        {
+            image: 'https://placehold.co/600x400.png',
+            aiHint: 'server room',
+            date: 'July 10, 2024',
+            author: 'Admin',
+            title: 'Technology that is powering the digital world',
+            href: '/resources'
+        },
+        {
+            image: 'https://placehold.co/600x400.png',
+            aiHint: 'cyber security lock',
+            date: 'July 11, 2024',
+            author: 'Admin',
+            title: 'The role of AI in transforming industries',
+            href: '/resources'
+        },
+        {
+            image: 'https://placehold.co/600x400.png',
+            aiHint: 'team collaboration meeting',
+            date: 'July 12, 2024',
+            author: 'Admin',
+            title: 'How to choose the right IT solutions provider',
+            href: '/resources'
+        },
+    ],
     },
   });
   console.log('Web settings seeded.');

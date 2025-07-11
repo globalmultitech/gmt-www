@@ -168,13 +168,13 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
           {Array.isArray(settings.trustedByLogos) && settings.trustedByLogos.length > 0 && (
               <div className="mt-12 border-t border-primary-foreground/20 pt-8">
                 {settings.trustedByText && <h3 className="text-center font-semibold uppercase tracking-widest mb-6">{settings.trustedByText}</h3>}
-                <div className="flex flex-wrap justify-center items-center gap-x-8 gap-y-4">
+                <div className="flex flex-wrap justify-center items-center gap-x-12 gap-y-6">
                     {(settings.trustedByLogos as TrustedByLogo[]).map((logo, index) => (
-                      <div key={index} className="relative h-9 w-32 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
-                          {logo.src.endsWith('.svg') ? (
+                      <div key={index} className="relative h-10 w-36 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
+                          {logo.src ? (
                               <Image src={logo.src} alt={logo.alt} fill className="object-contain" />
-                          ) : (
-                              <svg className="w-full h-full text-white" fill="currentColor" viewBox="0 0 100 30"><text x="50" y="20" fontSize="12" textAnchor="middle">LOGO</text></svg>
+                          ): (
+                             <div className="w-full h-full bg-white/20 rounded flex items-center justify-center text-sm">{logo.alt}</div>
                           )}
                       </div>
                     ))}

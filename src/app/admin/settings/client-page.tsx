@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, MenuItem, SocialMediaLinks } from '@/lib/settings';
+import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -82,6 +82,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
 
   const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? []);
   const [socialLinks, setSocialLinks] = useState<SocialMediaLinks>(settings.socialMedia ?? {});
+  const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? []);
 
   const handleMenuChange = (index: number, field: 'label' | 'href', value: string) => {
     const newMenuItems = [...menuItems];
@@ -94,6 +95,38 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   
   const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => {
     setSocialLinks(prev => ({ ...prev, [platform]: value }));
+  };
+  
+  const handleTrustedLogoChange = (index: number, field: keyof TrustedByLogo, value: string) => {
+    const newLogos = [...trustedByLogos];
+    newLogos[index] = { ...newLogos[index], [field]: value };
+    setTrustedByLogos(newLogos);
+  }
+
+  const addTrustedLogo = () => {
+    setTrustedByLogos([...trustedByLogos, { src: '', alt: '' }]);
+  }
+
+  const removeTrustedLogo = (index: number) => {
+    setTrustedByLogos(trustedByLogos.filter((_, i) => i !== index));
+  }
+  
+  const handleLogoImageChange = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const checksum = await computeSHA256(file);
+      const { publicUrl } = await getSignedURL(file.type, file.size, checksum);
+      handleTrustedLogoChange(index, 'src', publicUrl);
+    } catch (error) {
+       console.error("Upload error:", error);
+       toast({ title: 'Upload Gagal', variant: 'destructive' });
+    } finally {
+      setIsUploading(false);
+      event.target.value = '';
+    }
   };
 
 
@@ -157,12 +190,12 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
         <input type="hidden" name="menuItems" value={JSON.stringify(menuItems)} />
         <input type="hidden" name="socialMedia" value={JSON.stringify(socialLinks)} />
+        <input type="hidden" name="trustedByLogos" value={JSON.stringify(trustedByLogos)} />
 
         {/* These textareas will be replaced with proper forms in the future */}
         <textarea name="featureCards" defaultValue={getJsonString(settings.featureCards, [])} className="hidden" />
         <textarea name="aboutUsChecklist" defaultValue={getJsonString(settings.aboutUsChecklist, [])} className="hidden" />
         <textarea name="professionalServices" defaultValue={getJsonString(settings.professionalServices, [])} className="hidden" />
-        <textarea name="trustedByLogos" defaultValue={getJsonString(settings.trustedByLogos, [])} className="hidden" />
         <textarea name="testimonials" defaultValue={getJsonString(settings.testimonials, [])} className="hidden" />
         <textarea name="blogPosts" defaultValue={getJsonString(settings.blogPosts, [])} className="hidden" />
 
@@ -288,13 +321,40 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
 
         {/* Trusted By Section */}
          <Card>
-            <CardHeader><CardTitle>Trusted By Section</CardTitle></CardHeader>
-            <CardContent>
+            <CardHeader>
+                <CardTitle>Logo Mitra (Trusted By)</CardTitle>
+                <CardDescription>Kelola logo perusahaan yang ditampilkan di bagian "Trusted by".</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
                 <div className="space-y-2">
-                    <Label htmlFor="trustedByText">Teks</Label>
-                    <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} />
-                    <p className="text-xs text-muted-foreground pt-2">Untuk logo, silakan edit melalui Textarea JSON di paling bawah halaman ini (sementara).</p>
+                    <Label htmlFor="trustedByText">Teks Judul</Label>
+                    <Input id="trustedByText" name="trustedByText" defaultValue={settings.trustedByText ?? ''} placeholder="Contoh: Trusted by the world's leading companies" />
                 </div>
+                <div className="space-y-4">
+                    {trustedByLogos.map((logo, index) => (
+                        <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
+                           <div className="relative w-16 h-16 rounded-md bg-muted overflow-hidden border">
+                             {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                           </div>
+                           <div className="grid grid-cols-1 gap-2 flex-grow">
+                               <div className="space-y-1">
+                                   <Label htmlFor={`logo-src-${index}`} className="text-xs">File Gambar Logo</Label>
+                                   <Input id={`logo-src-${index}`} type="file" onChange={(e) => handleLogoImageChange(e, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
+                               </div>
+                               <div className="space-y-1">
+                                   <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
+                                   <Input id={`logo-alt-${index}`} value={logo.alt} onChange={(e) => handleTrustedLogoChange(index, 'alt', e.target.value)} placeholder="Nama Klien" />
+                               </div>
+                           </div>
+                           <Button type="button" variant="ghost" size="icon" onClick={() => removeTrustedLogo(index)} className="text-destructive h-9 w-9">
+                               <Trash2 className="h-4 w-4" />
+                           </Button>
+                        </div>
+                    ))}
+                </div>
+                <Button type="button" variant="outline" onClick={addTrustedLogo}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo
+                </Button>
             </CardContent>
         </Card>
 
