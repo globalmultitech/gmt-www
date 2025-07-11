@@ -135,7 +135,6 @@ async function main() {
             aiHint: 'smiling man portrait',
         },
       ],
-    // New Page Content Fields
     servicesPageTitle: 'Layanan Profesional Kami',
     servicesPageSubtitle: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.',
     servicesPageCommitmentTitle: 'Komitmen Kami Pada Keamanan',
@@ -211,6 +210,30 @@ async function main() {
               'Sesuai dengan regulasi OJK.',
             ],
         },
+        {
+            icon: 'ShieldCheck',
+            title: 'Deteksi Penipuan Berbasis AI',
+            description: 'Lindungi aset dan nasabah Anda dengan sistem deteksi anomali dan penipuan secara real-time yang didukung oleh kecerdasan buatan canggih.',
+            image: "https://placehold.co/600x400.png",
+            aiHint: "security data analysis",
+            keyPoints: [
+              'Analisis transaksi mencurigakan secara otomatis.',
+              'Mengurangi risiko kerugian akibat fraud.',
+              'Model machine learning yang terus belajar.',
+            ],
+        },
+        {
+            icon: 'Gem',
+            title: 'Platform Wealth Management',
+            description: 'Sediakan platform digital yang intuitif bagi nasabah prioritas untuk mengelola investasi dan portofolio mereka dengan mudah dan transparan.',
+            image: "https://placehold.co/600x400.png",
+            aiHint: "financial dashboard charts",
+            keyPoints: [
+              'Dasbor portofolio yang komprehensif.',
+              'Fitur robo-advisory untuk rekomendasi investasi.',
+              'Laporan performa investasi yang mudah dipahami.',
+            ],
+        }
     ],
 
     aboutPageTitle: 'Tentang Global Multi Technology',
@@ -255,6 +278,20 @@ async function main() {
             category: 'Analisis Industri',
             image: 'https://placehold.co/600x400.png',
             aiHint: 'futuristic technology interface',
+        },
+         {
+            title: 'Webinar: Memanfaatkan AI untuk Mencegah Penipuan Finansial',
+            date: '28 Mei 2024',
+            category: 'Webinar',
+            image: 'https://placehold.co/600x400.png',
+            aiHint: 'webinar online presentation',
+        },
+        {
+            title: 'GMT Meluncurkan Program Kemitraan untuk Startup Fintech',
+            date: '10 Mei 2024',
+            category: 'Siaran Pers',
+            image: 'https://placehold.co/600x400.png',
+            aiHint: 'startup team collaboration',
         },
     ],
     },
@@ -305,6 +342,19 @@ async function main() {
     update: {},
     create: { name: 'Display Informasi', categoryId: hardwareCategory.id },
   });
+  
+  const cardPrinterSubCategory = await prisma.productSubCategory.upsert({
+    where: { name_categoryId: { name: 'Card Printer', categoryId: hardwareCategory.id } },
+    update: {},
+    create: { name: 'Card Printer', categoryId: hardwareCategory.id },
+  });
+
+  const ekycSubCategory = await prisma.productSubCategory.upsert({
+    where: { name_categoryId: { name: 'Solusi e-KYC', categoryId: softwareCategory.id } },
+    update: {},
+    create: { name: 'Solusi e-KYC', categoryId: softwareCategory.id },
+  });
+
   console.log('Categories seeded.');
 
 
@@ -385,7 +435,55 @@ async function main() {
       tokopediaUrl: '#',
       shopeeUrl: '',
       subCategoryId: displaySubCategory.id,
-    }
+    },
+    {
+      title: 'KYC-Flow Engine',
+      slug: 'kyc-flow-engine',
+      description: 'Platform perangkat lunak untuk otomasi proses Know Your Customer (e-KYC) yang aman dan sesuai regulasi.',
+      longDescription: 'KYC-Flow Engine adalah solusi perangkat lunak end-to-end yang memungkinkan lembaga keuangan melakukan proses verifikasi identitas nasabah secara digital. Dengan teknologi pengenalan wajah (face recognition), liveness detection, dan koneksi ke database kependudukan, platform ini memastikan proses onboarding yang cepat, akurat, dan aman, mengurangi risiko penipuan serta mematuhi peraturan yang berlaku.',
+      images: ['https://placehold.co/800x800.png'],
+      features: [
+        "Liveness detection untuk mencegah spoofing",
+        "Verifikasi KTP dan pengenalan wajah (biometrik)",
+        "Dapat diintegrasikan dengan aplikasi mobile atau web",
+        "Dasbor monitoring dan audit trail lengkap"
+      ],
+      specifications: {
+        "Tipe": "Perangkat Lunak (SaaS/On-premise)",
+        "Modul Utama": "Face Recognition, OCR, Liveness Detection",
+        "SDK Tersedia": "Android, iOS, Web (JavaScript)",
+        "Keamanan": "Enkripsi AES-256"
+      },
+      metaTitle: 'KYC-Flow Engine | Platform e-KYC Otomatis',
+      metaDescription: 'Otomatiskan proses e-KYC Anda dengan KYC-Flow Engine. Solusi perangkat lunak yang aman, cepat, dan terintegrasi.',
+      tokopediaUrl: '',
+      shopeeUrl: '#',
+      subCategoryId: ekycSubCategory.id,
+    },
+    {
+      title: 'InstantCard Printer P-200',
+      slug: 'instantcard-printer-p-200',
+      description: 'Cetak kartu ATM, debit, atau kredit secara instan di cabang dengan printer kartu yang andal dan cepat.',
+      longDescription: 'InstantCard Printer P-200 memungkinkan bank untuk memberikan kartu kepada nasabah secara langsung saat pembukaan rekening atau penggantian kartu. Ini menghilangkan waktu tunggu pengiriman kartu dan meningkatkan kepuasan nasabah. Dengan kemampuan cetak warna, embossing, dan encoding magnetic stripe/chip, P-200 adalah solusi lengkap untuk penerbitan kartu instan.',
+      images: ['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png'],
+      features: [
+        "Cetak satu sisi atau dua sisi (full color/monochrome)",
+        "Kemampuan encoding magnetic stripe dan smart chip",
+        "Kecepatan cetak tinggi (hingga 180 kartu/jam)",
+        "Desain ringkas cocok untuk meja teller"
+      ],
+      specifications: {
+        "Resolusi Cetak": "300 dpi",
+        "Kapasitas Hopper": "100 kartu",
+        "Konektivitas": "USB, Ethernet",
+        "Tipe Kartu": "PVC, PET, Composite PVC, 30-40 mil"
+      },
+      metaTitle: 'InstantCard Printer P-200 | Mesin Cetak Kartu Instan',
+      metaDescription: 'Cetak kartu debit, kredit, atau member secara instan di cabang Anda dengan InstantCard Printer P-200. Cepat, aman, dan andal.',
+      tokopediaUrl: '#',
+      shopeeUrl: '#',
+      subCategoryId: cardPrinterSubCategory.id,
+    },
   ];
 
   for (const productData of productsToSeed) {
