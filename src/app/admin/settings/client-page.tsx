@@ -14,11 +14,12 @@ import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignedURL } from '../actions';
 import Image from 'next/image';
+import { DynamicIcon } from '@/components/dynamic-icon';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" disabled={pending} className="w-48 sticky bottom-8">
+    <Button type="submit" disabled={pending} className="w-48 sticky bottom-8 shadow-2xl">
       {pending ? <Loader2 className="animate-spin" /> : 'Simpan Perubahan'}
     </Button>
   );
@@ -73,6 +74,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [state, formAction] = useActionState(updateWebSettings, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
+  
+  // States for all dynamic fields
   const [imageUrls, setImageUrls] = useState<ImageUrls>({
     logoUrl: settings.logoUrl ?? '',
     heroImageUrl: settings.heroImageUrl ?? '',
@@ -83,63 +86,48 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   const [menuItems, setMenuItems] = useState<MenuItem[]>(settings.menuItems ?? [{ label: '', href: '' }]);
   const [socialLinks, setSocialLinks] = useState<SocialMediaLinks>(settings.socialMedia ?? {});
   const [trustedByLogos, setTrustedByLogos] = useState<TrustedByLogo[]>(settings.trustedByLogos ?? [{ src: '', alt: ''}]);
-
-  // State for complex JSON fields - keep them as they were, we are only changing the UI for some
   const [featureCards, setFeatureCards] = useState<FeatureCard[]>(settings.featureCards ?? []);
-  const [aboutUsChecklist, setAboutUsChecklist] = useState<string[]>(settings.aboutUsChecklist ?? []);
+  const [aboutUsChecklist, setAboutUsChecklist] = useState<string[]>(settings.aboutUsChecklist ?? ['']);
   const [professionalServices, setProfessionalServices] = useState<ProfessionalService[]>(settings.professionalServices ?? []);
   const [testimonials, setTestimonials] = useState<Testimonial[]>(settings.testimonials ?? []);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>(settings.blogPosts ?? []);
 
 
-  const handleMenuChange = (index: number, field: 'label' | 'href', value: string) => {
-    const newMenuItems = [...menuItems];
-    newMenuItems[index][field] = value;
-    setMenuItems(newMenuItems);
+  // Generic handlers for arrays of objects
+  const handleArrayOfObjectsChange = <T,>(index: number, field: keyof T, value: string, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => {
+      const newState = [...state];
+      newState[index] = { ...newState[index], [field]: value };
+      setState(newState);
   };
+  const addArrayOfObjectsItem = <T,>(newItem: T, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState([...state, newItem]);
+  const removeArrayOfObjectsItem = <T,>(index: number, state: T[], setState: React.Dispatch<React.SetStateAction<T[]>>) => setState(state.filter((_, i) => i !== index));
 
-  const addMenuItem = () => setMenuItems([...menuItems, { label: '', href: '' }]);
-  const removeMenuItem = (index: number) => setMenuItems(menuItems.filter((_, i) => i !== index));
-  
-  const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => {
-    setSocialLinks(prev => ({ ...prev, [platform]: value }));
-  };
-  
-  const handleTrustedLogoChange = (index: number, field: keyof TrustedByLogo, value: string) => {
-    const newLogos = [...trustedByLogos];
-    newLogos[index] = { ...newLogos[index], [field]: value };
-    setTrustedByLogos(newLogos);
+  // Generic handlers for arrays of strings
+  const handleArrayOfStringsChange = (index: number, value: string, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => {
+      const newState = [...state];
+      newState[index] = value;
+      setState(newState);
   }
+  const addArrayOfStringsItem = (state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState([...state, '']);
+  const removeArrayOfStringsItem = (index: number, state: string[], setState: React.Dispatch<React.SetStateAction<string[]>>) => setState(state.filter((_, i) => i !== index));
 
-  const addTrustedLogo = () => {
-    setTrustedByLogos([...trustedByLogos, { src: '', alt: '' }]);
+  // Specific handlers
+  const handleSocialChange = (platform: keyof SocialMediaLinks, value: string) => setSocialLinks(prev => ({ ...prev, [platform]: value }));
+  const handleServiceDetailChange = (serviceIndex: number, detailIndex: number, value: string) => {
+    const newServices = [...professionalServices];
+    newServices[serviceIndex].details[detailIndex] = value;
+    setProfessionalServices(newServices);
   }
-
-  const removeTrustedLogo = (index: number) => {
-    setTrustedByLogos(trustedByLogos.filter((_, i) => i !== index));
+  const addServiceDetail = (serviceIndex: number) => {
+    const newServices = [...professionalServices];
+    newServices[serviceIndex].details.push('');
+    setProfessionalServices(newServices);
   }
-  
-  const handleLogoImageChange = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    try {
-      const checksum = await computeSHA256(file);
-      const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
-      
-      await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-      
-      handleTrustedLogoChange(index, 'src', publicUrl);
-    } catch (error) {
-       console.error("Upload error:", error);
-       toast({ title: 'Upload Gagal', variant: 'destructive' });
-    } finally {
-      setIsUploading(false);
-      event.target.value = '';
-    }
-  };
-
+  const removeServiceDetail = (serviceIndex: number, detailIndex: number) => {
+    const newServices = [...professionalServices];
+    newServices[serviceIndex].details = newServices[serviceIndex].details.filter((_, i) => i !== detailIndex);
+    setProfessionalServices(newServices);
+  }
 
   const computeSHA256 = async (file: File) => {
     const buffer = await file.arrayBuffer();
@@ -162,16 +150,30 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
 
     } catch (error) {
       console.error("Upload error:", error);
-      toast({
-        title: 'Upload Gagal',
-        description: 'Gagal mengunggah gambar. Silakan coba lagi.',
-        variant: 'destructive',
-      });
+      toast({ title: 'Upload Gagal', variant: 'destructive' });
     } finally {
       setIsUploading(false);
       event.target.value = '';
     }
   };
+
+  const handleDynamicImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number, field: 'image' | 'src', state: any[], setState: React.Dispatch<React.SetStateAction<any[]>>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      setIsUploading(true);
+      try {
+        const checksum = await computeSHA256(file);
+        const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
+        await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
+        handleArrayOfObjectsChange(index, field, publicUrl, state, setState);
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast({ title: 'Upload Gagal', variant: 'destructive' });
+      } finally {
+        setIsUploading(false);
+        event.target.value = '';
+      }
+  }
 
   useEffect(() => {
     if (state?.message) {
@@ -197,14 +199,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <input type="hidden" name="heroImageUrl" value={imageUrls.heroImageUrl} />
         <input type="hidden" name="aboutUsImageUrl" value={imageUrls.aboutUsImageUrl} />
         <input type="hidden" name="ctaImageUrl" value={imageUrls.ctaImageUrl} />
-        
-        {/* These complex fields will be kept as hidden inputs and are not editable in this simplified UI */}
-        <input type="hidden" name="featureCards" value={JSON.stringify(featureCards)} />
-        <input type="hidden" name="aboutUsChecklist" value={JSON.stringify(aboutUsChecklist)} />
-        <input type="hidden" name="professionalServices" value={JSON.stringify(professionalServices)} />
-        <input type="hidden" name="testimonials" value={JSON.stringify(testimonials)} />
-        <input type="hidden" name="blogPosts" value={JSON.stringify(blogPosts)} />
-
 
         {/* Card: Informasi Umum */}
         <Card>
@@ -252,7 +246,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <Input
                             id={`social-${platform}`}
                             name={`socialMedia[${platform}]`}
-                            defaultValue={socialLinks[platform] || ''}
+                            value={socialLinks[platform] || ''}
+                            onChange={(e) => handleSocialChange(platform, e.target.value)}
                             placeholder={`https://${platform}.com/nama_akun`}
                         />
                     </div>
@@ -272,19 +267,19 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                         <div className="grid grid-cols-2 gap-2 flex-grow">
                             <div className="space-y-1">
                                 <Label htmlFor={`menu-label-${index}`} className="text-xs">Label</Label>
-                                <Input id={`menu-label-${index}`} name={`menuItems[${index}][label]`} value={item.label} onChange={(e) => handleMenuChange(index, 'label', e.target.value)} placeholder="Beranda" />
+                                <Input id={`menu-label-${index}`} name={`menuItems[${index}][label]`} value={item.label} onChange={(e) => handleArrayOfObjectsChange(index, 'label', e.target.value, menuItems, setMenuItems)} placeholder="Beranda" />
                             </div>
                             <div className="space-y-1">
                                 <Label htmlFor={`menu-href-${index}`} className="text-xs">Tautan (Href)</Label>
-                                <Input id={`menu-href-${index}`} name={`menuItems[${index}][href]`} value={item.href} onChange={(e) => handleMenuChange(index, 'href', e.target.value)} placeholder="/" />
+                                <Input id={`menu-href-${index}`} name={`menuItems[${index}][href]`} value={item.href} onChange={(e) => handleArrayOfObjectsChange(index, 'href', e.target.value, menuItems, setMenuItems)} placeholder="/" />
                             </div>
                         </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeMenuItem(index)} className="text-destructive h-9 w-9">
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, menuItems, setMenuItems)} className="text-destructive h-9 w-9">
                             <Trash2 className="h-4 w-4" />
                         </Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={addMenuItem}>
+                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({label: '', href: ''}, menuItems, setMenuItems)}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Tambah Item Menu
                 </Button>
             </CardContent>
@@ -310,6 +305,37 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
           </CardContent>
         </Card>
 
+        {/* Feature Cards Section */}
+        <Card>
+            <CardHeader><CardTitle>Kartu Fitur</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                {featureCards.map((card, index) => (
+                    <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
+                        <div className="grid grid-cols-3 gap-2 flex-grow">
+                            <div className="space-y-1">
+                                <Label htmlFor={`fc-icon-${index}`} className="text-xs">Ikon (Lucide)</Label>
+                                <Input id={`fc-icon-${index}`} name={`featureCards[${index}][icon]`} value={card.icon} onChange={(e) => handleArrayOfObjectsChange(index, 'icon', e.target.value, featureCards, setFeatureCards)} />
+                            </div>
+                            <div className="space-y-1">
+                                <Label htmlFor={`fc-title-${index}`} className="text-xs">Judul</Label>
+                                <Input id={`fc-title-${index}`} name={`featureCards[${index}][title]`} value={card.title} onChange={(e) => handleArrayOfObjectsChange(index, 'title', e.target.value, featureCards, setFeatureCards)} />
+                            </div>
+                             <div className="space-y-1">
+                                <Label htmlFor={`fc-desc-${index}`} className="text-xs">Deskripsi</Label>
+                                <Input id={`fc-desc-${index}`} name={`featureCards[${index}][description]`} value={card.description} onChange={(e) => handleArrayOfObjectsChange(index, 'description', e.target.value, featureCards, setFeatureCards)} />
+                            </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, featureCards, setFeatureCards)} className="text-destructive h-9 w-9">
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ))}
+                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({icon: 'ShieldCheck', title: '', description: ''}, featureCards, setFeatureCards)}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Kartu Fitur
+                </Button>
+            </CardContent>
+        </Card>
+
         {/* About Us Section */}
         <Card>
             <CardHeader><CardTitle>About Us Section</CardTitle></CardHeader>
@@ -319,6 +345,20 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                     <div className="space-y-2"><Label htmlFor="aboutUsSubtitle">Subjudul</Label><Input id="aboutUsSubtitle" name="aboutUsSubtitle" defaultValue={settings.aboutUsSubtitle ?? ''} /></div>
                     <div className="space-y-2"><Label htmlFor="aboutUsTitle">Judul</Label><Input id="aboutUsTitle" name="aboutUsTitle" defaultValue={settings.aboutUsTitle ?? ''} /></div>
                     <div className="space-y-2"><Label htmlFor="aboutUsDescription">Deskripsi</Label><Textarea id="aboutUsDescription" name="aboutUsDescription" defaultValue={settings.aboutUsDescription ?? ''} /></div>
+                    <div className="space-y-2">
+                        <Label>Checklist Items</Label>
+                        {aboutUsChecklist.map((item, index) => (
+                             <div key={index} className="flex items-center gap-2">
+                                <Input name={`aboutUsChecklist[${index}]`} value={item} onChange={(e) => handleArrayOfStringsChange(index, e.target.value, aboutUsChecklist, setAboutUsChecklist)} />
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfStringsItem(index, aboutUsChecklist, setAboutUsChecklist)} className="text-destructive h-9 w-9">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        ))}
+                        <Button type="button" variant="outline" size="sm" onClick={() => addArrayOfStringsItem(aboutUsChecklist, setAboutUsChecklist)}>
+                            <PlusCircle className="mr-2 h-4 w-4" /> Tambah Checklist
+                        </Button>
+                    </div>
                 </div>
             </CardContent>
         </Card>
@@ -327,9 +367,54 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
         <Card>
             <CardHeader><CardTitle>Services Section</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} /></div>
-                <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} /></div>
-                <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Textarea id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} /></div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" name="servicesSubtitle" defaultValue={settings.servicesSubtitle ?? ''} /></div>
+                    <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" name="servicesTitle" defaultValue={settings.servicesTitle ?? ''} /></div>
+                    <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Input id="servicesDescription" name="servicesDescription" defaultValue={settings.servicesDescription ?? ''} /></div>
+                </div>
+                <div className="pt-4 border-t">
+                    <h3 className="font-semibold mb-2">Layanan Profesional</h3>
+                    {professionalServices.map((service, serviceIndex) => (
+                        <div key={serviceIndex} className="space-y-2 p-4 border rounded-md mb-4">
+                             <div className="flex items-end gap-2">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-2 flex-grow">
+                                    <div className="space-y-1">
+                                        <Label className="text-xs">Ikon</Label>
+                                        <Input name={`professionalServices[${serviceIndex}][icon]`} value={service.icon} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'icon', e.target.value, professionalServices, setProfessionalServices)} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs">Judul</Label>
+                                        <Input name={`professionalServices[${serviceIndex}][title]`} value={service.title} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'title', e.target.value, professionalServices, setProfessionalServices)} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs">Deskripsi</Label>
+                                        <Input name={`professionalServices[${serviceIndex}][description]`} value={service.description} onChange={e => handleArrayOfObjectsChange(serviceIndex, 'description', e.target.value, professionalServices, setProfessionalServices)} />
+                                    </div>
+                                </div>
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(serviceIndex, professionalServices, setProfessionalServices)} className="text-destructive h-9 w-9">
+                                    <Trash2 className="h-4 w-4" />
+                                </Button>
+                            </div>
+                            <div className="pl-4 ml-4 border-l space-y-2">
+                                <Label className="text-xs font-semibold">Detail Layanan</Label>
+                                {service.details.map((detail, detailIndex) => (
+                                    <div key={detailIndex} className="flex items-center gap-2">
+                                        <Input name={`professionalServices[${serviceIndex}][details][${detailIndex}]`} value={detail} onChange={e => handleServiceDetailChange(serviceIndex, detailIndex, e.target.value)} />
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeServiceDetail(serviceIndex, detailIndex)} className="text-destructive h-8 w-8">
+                                            <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                    </div>
+                                ))}
+                                 <Button type="button" variant="outline" size="sm" onClick={() => addServiceDetail(serviceIndex)}>
+                                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Detail
+                                </Button>
+                            </div>
+                        </div>
+                    ))}
+                    <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ icon: 'ShieldCheck', title: '', description: '', details: []}, professionalServices, setProfessionalServices)}>
+                        <PlusCircle className="mr-2 h-4 w-4" /> Tambah Layanan
+                    </Button>
+                </div>
             </CardContent>
         </Card>
 
@@ -364,27 +449,121 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                     {trustedByLogos.map((logo, index) => (
                         <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                             <input type="hidden" name={`trustedByLogos[${index}][src]`} value={logo.src} />
-                            <div className="relative w-16 h-16 rounded-md bg-muted overflow-hidden border">
-                                {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                            <div className="relative w-24 h-16 rounded-md bg-muted overflow-hidden border">
+                                {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain p-1" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                             </div>
                             <div className="grid grid-cols-1 gap-2 flex-grow">
                                 <div className="space-y-1">
                                     <Label htmlFor={`logo-file-${index}`} className="text-xs">File Gambar Logo</Label>
-                                    <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleLogoImageChange(e, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
+                                    <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'src', trustedByLogos, setTrustedByLogos)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={isUploading} />
                                 </div>
                                 <div className="space-y-1">
                                     <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
-                                    <Input id={`logo-alt-${index}`} name={`trustedByLogos[${index}][alt]`} value={logo.alt} onChange={(e) => handleTrustedLogoChange(index, 'alt', e.target.value)} placeholder="Nama Klien" />
+                                    <Input id={`logo-alt-${index}`} name={`trustedByLogos[${index}][alt]`} value={logo.alt} onChange={(e) => handleArrayOfObjectsChange(index, 'alt', e.target.value, trustedByLogos, setTrustedByLogos)} placeholder="Nama Klien" />
                                 </div>
                             </div>
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeTrustedLogo(index)} className="text-destructive h-9 w-9">
+                            <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, trustedByLogos, setTrustedByLogos)} className="text-destructive h-9 w-9">
                                 <Trash2 className="h-4 w-4" />
                             </Button>
                         </div>
                     ))}
                 </div>
-                <Button type="button" variant="outline" onClick={addTrustedLogo}>
+                <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({src: '', alt: ''}, trustedByLogos, setTrustedByLogos)}>
                     <PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo
+                </Button>
+            </CardContent>
+        </Card>
+        
+        {/* Testimonials */}
+        <Card>
+            <CardHeader><CardTitle>Testimonial</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                {testimonials.map((item, index) => (
+                    <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
+                        <input type="hidden" name={`testimonials[${index}][image]`} value={item.image} />
+                        <div className="flex-shrink-0 space-y-2">
+                             <div className="relative w-24 h-24 rounded-md bg-muted overflow-hidden border">
+                                {item.image ? ( <Image src={item.image} alt={item.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                            </div>
+                            <Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', testimonials, setTestimonials)} accept="image/png, image/jpeg" disabled={isUploading} className="w-24"/>
+                        </div>
+                        <div className="flex-grow space-y-2">
+                           <div className="space-y-1">
+                                <Label className="text-xs">Kutipan</Label>
+                                <Textarea name={`testimonials[${index}][quote]`} value={item.quote} onChange={e => handleArrayOfObjectsChange(index, 'quote', e.target.value, testimonials, setTestimonials)} />
+                           </div>
+                           <div className="grid grid-cols-2 gap-2">
+                               <div className="space-y-1">
+                                    <Label className="text-xs">Nama</Label>
+                                    <Input name={`testimonials[${index}][name]`} value={item.name} onChange={e => handleArrayOfObjectsChange(index, 'name', e.target.value, testimonials, setTestimonials)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs">Jabatan</Label>
+                                    <Input name={`testimonials[${index}][role]`} value={item.role} onChange={e => handleArrayOfObjectsChange(index, 'role', e.target.value, testimonials, setTestimonials)} />
+                                </div>
+                           </div>
+                           <div className="space-y-1">
+                                <Label className="text-xs">AI Hint (untuk gambar)</Label>
+                                <Input name={`testimonials[${index}][aiHint]`} value={item.aiHint || ''} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, testimonials, setTestimonials)} />
+                            </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, testimonials, setTestimonials)} className="text-destructive h-9 w-9">
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                ))}
+                 <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ quote: '', name: '', role: '', image: '', aiHint: ''}, testimonials, setTestimonials)}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Testimonial
+                </Button>
+            </CardContent>
+        </Card>
+        
+        {/* Blog Posts */}
+        <Card>
+            <CardHeader><CardTitle>Postingan Blog</CardTitle></CardHeader>
+            <CardContent className="space-y-4">
+                 {blogPosts.map((item, index) => (
+                    <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
+                        <input type="hidden" name={`blogPosts[${index}][image]`} value={item.image} />
+                        <div className="flex-shrink-0 space-y-2">
+                             <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
+                                {item.image ? ( <Image src={item.image} alt={item.title} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                            </div>
+                            <Input type="file" onChange={(e) => handleDynamicImageUpload(e, index, 'image', blogPosts, setBlogPosts)} accept="image/png, image/jpeg" disabled={isUploading} className="w-40"/>
+                        </div>
+                        <div className="flex-grow space-y-2">
+                            <div className="space-y-1">
+                                <Label className="text-xs">Judul</Label>
+                                <Input name={`blogPosts[${index}][title]`} value={item.title} onChange={e => handleArrayOfObjectsChange(index, 'title', e.target.value, blogPosts, setBlogPosts)} />
+                           </div>
+                           <div className="grid grid-cols-2 gap-2">
+                               <div className="space-y-1">
+                                    <Label className="text-xs">Tanggal</Label>
+                                    <Input name={`blogPosts[${index}][date]`} value={item.date} onChange={e => handleArrayOfObjectsChange(index, 'date', e.target.value, blogPosts, setBlogPosts)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs">Penulis</Label>
+                                    <Input name={`blogPosts[${index}][author]`} value={item.author} onChange={e => handleArrayOfObjectsChange(index, 'author', e.target.value, blogPosts, setBlogPosts)} />
+                                </div>
+                           </div>
+                           <div className="grid grid-cols-2 gap-2">
+                               <div className="space-y-1">
+                                    <Label className="text-xs">Tautan (Href)</Label>
+                                    <Input name={`blogPosts[${index}][href]`} value={item.href} onChange={e => handleArrayOfObjectsChange(index, 'href', e.target.value, blogPosts, setBlogPosts)} />
+                                </div>
+                                <div className="space-y-1">
+                                    <Label className="text-xs">AI Hint (untuk gambar)</Label>
+                                    <Input name={`blogPosts[${index}][aiHint]`} value={item.aiHint} onChange={e => handleArrayOfObjectsChange(index, 'aiHint', e.target.value, blogPosts, setBlogPosts)} />
+                                </div>
+                           </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayOfObjectsItem(index, blogPosts, setBlogPosts)} className="text-destructive h-9 w-9">
+                            <Trash2 className="h-4 w-4" />
+                        </Button>
+                    </div>
+                 ))}
+                 <Button type="button" variant="outline" onClick={() => addArrayOfObjectsItem({ image: '', aiHint: '', date: '', author: 'Admin', title: '', href: '/resources' }, blogPosts, setBlogPosts)}>
+                    <PlusCircle className="mr-2 h-4 w-4" /> Tambah Postingan Blog
                 </Button>
             </CardContent>
         </Card>
@@ -396,5 +575,3 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
     </div>
   );
 }
-
-    
