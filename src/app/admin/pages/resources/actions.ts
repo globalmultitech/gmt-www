@@ -17,11 +17,10 @@ const toSlug = (name: string) => {
 const NewsItemSchema = z.object({
     id: z.number(), 
     title: z.string().default(''),
-    slug: z.string().optional(), // Make slug optional at validation
+    slug: z.string().optional(),
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
-    aiHint: z.string().nullable().default(''),
 });
 
 const ResourcesPageSettingsSchema = z.object({
@@ -52,7 +51,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     
     const data = validatedFields.data;
 
-    // --- Page Settings Update ---
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
@@ -61,7 +59,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
         }
     });
 
-    // --- News Items Synchronization ---
     const newsItemsFromClient = data.newsItems ?? [];
     const newsItemsInDb = await prisma.newsItem.findMany({ select: { id: true } });
     const dbItemIds = new Set(newsItemsInDb.map(s => s.id));
@@ -69,19 +66,16 @@ export async function updateResourcesPageSettings(prevState: { message: string }
 
     const operations = [];
 
-    // 1. Delete items that are in DB but not in client form
     const idsToDelete = [...dbItemIds].filter(id => !clientItemIds.has(id));
     if (idsToDelete.length > 0) {
         operations.push(prisma.newsItem.deleteMany({ where: { id: { in: idsToDelete } } }));
     }
 
     for (const item of newsItemsFromClient) {
-        // Filter out completely empty new items before processing
         if (item.id > Date.now() && !item.title && !item.category && !item.content) {
             continue;
         }
         
-        // Generate slug from title on the server if it's missing or empty
         const finalSlug = item.slug || toSlug(item.title);
 
         const sanitizedData = {
@@ -90,10 +84,15 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             category: item.category,
             image: item.image,
             content: item.content,
-            aiHint: item.aiHint
         };
         
         if (dbItemIds.has(item.id)) {
+            if (finalSlug) {
+                const existingSlug = await prisma.newsItem.findFirst({ where: { slug: finalSlug, id: { not: item.id } }});
+                if(existingSlug) {
+                    return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan.` };
+                }
+            }
             operations.push(prisma.newsItem.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
              if (finalSlug) {
@@ -102,7 +101,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
                     return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan.` };
                 }
              } else if (item.title) {
-                 // Prevent saving if title exists but slug can't be generated
                  return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan slug yang valid.` };
              }
             operations.push(prisma.newsItem.create({ data: sanitizedData }));
@@ -110,7 +108,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     }
 
     await prisma.$transaction(operations);
-
 
     revalidatePath('/', 'layout');
     revalidatePath('/resources', 'layout');

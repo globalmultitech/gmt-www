@@ -96,9 +96,8 @@ export default async function BlogPostPage({ params }: Props) {
                     <Image
                         src={post.image}
                         alt={post.title}
-                        layout="fill"
-                        objectFit="cover"
-                        className="transition-transform duration-300 ease-in-out group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                     />
                 </div>
             )}

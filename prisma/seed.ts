@@ -290,35 +290,30 @@ async function main() {
           title: 'GMT Hadiri Pameran Teknologi Finansial Terbesar di Asia',
           category: 'Acara Perusahaan',
           image: 'https://placehold.co/600x400.png',
-          aiHint: 'conference technology',
           content: 'Tim Global Multi Technology dengan bangga berpartisipasi dalam pameran teknologi finansial terbesar di Asia, menampilkan inovasi terbaru kami dalam solusi perbankan digital dan keamanan siber. Acara ini menjadi platform penting bagi kami untuk berinteraksi dengan para pemimpin industri dan calon mitra strategis.'
       },
       {
           title: 'Studi Kasus: Bank XYZ Meningkatkan Efisiensi Cabang 40% dengan Kiosk GMT',
           category: 'Studi Kasus',
           image: 'https://placehold.co/600x400.png',
-          aiHint: 'bank kiosk customer',
           content: 'Implementasi 50 unit Digital Kiosk GMT-K1 di seluruh cabang Bank XYZ berhasil meningkatkan efisiensi operasional hingga 40%. Waktu antrian nasabah berkurang secara drastis, dan staf cabang dapat lebih fokus pada layanan konsultatif yang bernilai tambah tinggi. Baca selengkapnya tentang keberhasilan transformasi ini.'
       },
       {
           title: 'Prediksi Tren Teknologi Perbankan di Tahun 2025',
           category: 'Analisis Industri',
           image: 'https://placehold.co/600x400.png',
-          aiHint: 'futuristic banking',
           content: 'Tahun 2025 akan menjadi era hiper-personalisasi dan perbankan proaktif. Kecerdasan buatan akan memainkan peran sentral dalam menganalisis data nasabah untuk menawarkan produk yang relevan secara real-time. Selain itu, adopsi teknologi blockchain untuk keamanan transaksi diperkirakan akan semakin meluas. Simak analisis lengkap dari para ahli kami.'
       },
        {
           title: 'Webinar: Memanfaatkan AI untuk Mencegah Penipuan Finansial',
           category: 'Webinar',
           image: 'https://placehold.co/600x400.png',
-          aiHint: 'AI security analysis',
           content: 'Dalam webinar eksklusif ini, kami membahas bagaimana solusi deteksi penipuan berbasis AI dari GMT dapat membantu lembaga keuangan mengurangi risiko kerugian akibat fraud. Kami mendemonstrasikan kemampuan sistem dalam menganalisis jutaan transaksi secara real-time untuk mendeteksi pola anomali yang mencurigakan.'
       },
       {
           title: 'GMT Meluncurkan Program Kemitraan untuk Startup Fintech',
           category: 'Siaran Pers',
           image: 'https://placehold.co/600x400.png',
-          aiHint: 'startup partnership handshake',
           content: 'Sebagai komitmen kami untuk mendorong inovasi, Global Multi Technology meluncurkan program kemitraan yang dirancang khusus untuk startup fintech. Program ini menawarkan akses ke teknologi, mentoring dari para ahli, dan potensi investasi bagi startup yang memiliki visi sejalan dengan misi kami untuk mentransformasi lanskap keuangan digital.'
       },
   ];
