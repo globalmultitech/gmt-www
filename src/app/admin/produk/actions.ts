@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -24,21 +25,28 @@ const ProductSchema = z.object({
   }),
   features: z.string().transform((str, ctx) => {
     try {
-      return JSON.parse(str);
+      const parsed = JSON.parse(str);
+       if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+        return parsed as string[];
+      }
+      throw new Error();
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk fitur tidak valid' });
       return z.NEVER;
     }
   }),
   specifications: z.string().transform((str, ctx) => {
-    if (!str || str.trim() === '') return null;
     try {
-      return JSON.parse(str);
+      const parsed = JSON.parse(str);
+      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+        return parsed;
+      }
+      throw new Error();
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi tidak valid' });
       return z.NEVER;
     }
-  }).optional(),
+  }),
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
   tokopediaUrl: z.string().optional(),

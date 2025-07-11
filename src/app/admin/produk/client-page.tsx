@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useActionState, useEffect, useTransition } from 'react';
@@ -125,6 +126,9 @@ export default function ProductManagementClientPage({ products, categories }: { 
   const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [productTitle, setProductTitle] = useState('');
   const [slug, setSlug] = useState('');
+  const [features, setFeatures] = useState<string[]>(['']);
+  const [specifications, setSpecifications] = useState<{ key: string, value: string }[]>([{ key: '', value: '' }]);
+
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -180,11 +184,18 @@ export default function ProductManagementClientPage({ products, categories }: { 
     if (product) {
       setProductTitle(product.title);
       setSlug(product.slug);
-      setImageUrls(product.images as string[] ?? []);
+      setImageUrls((product.images as string[]) ?? []);
+      setFeatures(Array.isArray(product.features) ? product.features : ['']);
+      const specs = product.specifications && typeof product.specifications === 'object' 
+        ? Object.entries(product.specifications).map(([key, value]) => ({ key: String(key), value: String(value) }))
+        : [{ key: '', value: '' }];
+      setSpecifications(specs.length > 0 ? specs : [{key: '', value: ''}]);
     } else {
       setProductTitle('');
       setSlug('');
       setImageUrls([]);
+      setFeatures(['']);
+      setSpecifications([{ key: '', value: '' }]);
     }
     setDialogOpen(true);
   }
@@ -204,14 +215,22 @@ export default function ProductManagementClientPage({ products, categories }: { 
       }
     }
   }, [createState, updateState, editingProduct, toast]);
-  
-  const getJsonString = (data: any, defaultData: any) => {
-    const valueToConvert = data ?? defaultData;
-    return JSON.stringify(valueToConvert, null, 2);
-  };
 
-  const featuresDefaultValue = getJsonString(editingProduct?.features, ['Fitur A', 'Fitur B', 'Fitur C']);
-  const specificationsDefaultValue = getJsonString(editingProduct?.specifications, {});
+  const handleFeatureChange = (index: number, value: string) => {
+    const newFeatures = [...features];
+    newFeatures[index] = value;
+    setFeatures(newFeatures);
+  };
+  const addFeature = () => setFeatures([...features, '']);
+  const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
+
+  const handleSpecificationChange = (index: number, field: 'key' | 'value', value: string) => {
+    const newSpecifications = [...specifications];
+    newSpecifications[index][field] = value;
+    setSpecifications(newSpecifications);
+  };
+  const addSpecification = () => setSpecifications([...specifications, { key: '', value: '' }]);
+  const removeSpecification = (index: number) => setSpecifications(specifications.filter((_, i) => i !== index));
 
   return (
     <div>
@@ -224,7 +243,7 @@ export default function ProductManagementClientPage({ products, categories }: { 
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={(open) => { if(!open) { setEditingProduct(null); }; setDialogOpen(open); }}>
-          <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{editingProduct ? 'Edit Produk' : 'Tambah Produk Baru'}</DialogTitle>
               <DialogDescription>
@@ -234,6 +253,11 @@ export default function ProductManagementClientPage({ products, categories }: { 
             <form action={editingProduct ? updateFormAction : createFormAction} className="space-y-4">
               {editingProduct && <input type="hidden" name="id" value={editingProduct.id} />}
               <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
+              <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f.trim() !== ''))} />
+              <input type="hidden" name="specifications" value={JSON.stringify(
+                Object.fromEntries(specifications.filter(s => s.key.trim() !== '').map(s => [s.key, s.value]))
+              )} />
+
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
@@ -311,14 +335,55 @@ export default function ProductManagementClientPage({ products, categories }: { 
                 </div>
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="features">Fitur Utama (Format JSON)</Label>
-                <Textarea id="features" name="features" required rows={5} placeholder='[\n  "Fitur A",\n  "Fitur B"\n]' defaultValue={featuresDefaultValue}/>
+              <div className="space-y-2">
+                <Label>Fitur Utama</Label>
+                <div className="space-y-2">
+                  {features.map((feature, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={feature}
+                        onChange={(e) => handleFeatureChange(index, e.target.value)}
+                        placeholder={`Fitur ${index + 1}`}
+                      />
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-9 w-9">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addFeature}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Tambah Fitur
+                </Button>
               </div>
-              <div className="space-y-1">
-                <Label htmlFor="specifications">Spesifikasi (Format JSON)</Label>
-                <Textarea id="specifications" name="specifications" rows={8} placeholder='{\n  "Ukuran": "21 inci",\n  "Resolusi": "1920x1080"\n}' defaultValue={specificationsDefaultValue}/>
+
+              <div className="space-y-2">
+                <Label>Spesifikasi</Label>
+                <div className="space-y-2">
+                  {specifications.map((spec, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <Input
+                        value={spec.key}
+                        onChange={(e) => handleSpecificationChange(index, 'key', e.target.value)}
+                        placeholder="Label (e.g. Ukuran)"
+                        className="w-1/3"
+                      />
+                      <Input
+                        value={spec.value}
+                        onChange={(e) => handleSpecificationChange(index, 'value', e.target.value)}
+                        placeholder="Nilai (e.g. 21.5 inci)"
+                      />
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecification(index)} className="text-destructive h-9 w-9">
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+                <Button type="button" variant="outline" size="sm" onClick={addSpecification}>
+                  <PlusCircle className="mr-2 h-4 w-4" /> Tambah Spesifikasi
+                </Button>
               </div>
+
+
               <div className="space-y-1">
                 <Label htmlFor="metaTitle">Meta Title (SEO)</Label>
                 <Input id="metaTitle" name="metaTitle" defaultValue={editingProduct?.metaTitle ?? ''} />
