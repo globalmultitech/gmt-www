@@ -29,6 +29,22 @@ type Props = {
   params: { slug: string };
 };
 
+const parseJsonField = (field: any, fallback: any[] | {} = []) => {
+    if (typeof field === 'string') {
+        try {
+            return JSON.parse(field);
+        } catch (e) {
+            return fallback;
+        }
+    }
+    // Handle cases where Prisma might already parse it
+    if (typeof field === 'object' && field !== null) {
+        return field;
+    }
+    return fallback;
+};
+
+
 // Fungsi ini memberitahu Next.js halaman dinamis mana yang harus dibuat saat build
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({
@@ -42,7 +58,7 @@ export async function generateStaticParams() {
 
 
 async function getProductBySlug(slug: string) {
-  const product = await prisma.product.findUnique({
+  const productRaw = await prisma.product.findUnique({
     where: { slug },
     include: {
       subCategory: {
@@ -52,40 +68,40 @@ async function getProductBySlug(slug: string) {
       },
     },
   });
-  return product;
+
+  if (!productRaw) {
+    return null;
+  }
+  
+  // Parse all JSON fields here
+  return {
+    ...productRaw,
+    images: parseJsonField(productRaw.images, []),
+    features: parseJsonField(productRaw.features, []),
+    specifications: parseJsonField(productRaw.specifications, {}),
+  }
 }
 
 async function getRandomProducts(currentProductId: number) {
-    // 1. Get all product IDs except the current one
     const allProductIds = await prisma.product.findMany({
-        where: {
-            id: {
-                not: currentProductId,
-            },
-        },
-        select: {
-            id: true,
-        },
+        where: { id: { not: currentProductId } },
+        select: { id: true },
     });
 
-    if (allProductIds.length === 0) {
-        return [];
-    }
+    if (allProductIds.length === 0) return [];
 
-    // 2. Shuffle the IDs
     const shuffledIds = allProductIds.sort(() => 0.5 - Math.random());
-
-    // 3. Take the first 4 (or fewer if not enough products)
     const randomIdsToFetch = shuffledIds.slice(0, 4).map(p => p.id);
 
-    // 4. Fetch the full product data for the selected IDs
-    return prisma.product.findMany({
-        where: {
-            id: {
-                in: randomIdsToFetch,
-            },
-        },
+    const rawProducts = await prisma.product.findMany({
+        where: { id: { in: randomIdsToFetch } },
     });
+
+    // Parse the images field for each product
+    return rawProducts.map(product => ({
+        ...product,
+        images: parseJsonField(product.images, []),
+    }));
 }
 
 
@@ -98,20 +114,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: 'Produk Tidak Ditemukan',
     };
   }
-
-  let mainImageUrl: string | undefined;
-  if (typeof product.images === 'string') {
-    try {
-      const parsedImages = JSON.parse(product.images);
-      if (Array.isArray(parsedImages) && parsedImages.length > 0) {
-        mainImageUrl = parsedImages[0];
-      }
-    } catch (e) {
-      // Ignore parse error
-    }
-  } else if (Array.isArray(product.images) && product.images.length > 0) {
-    mainImageUrl = product.images[0];
-  }
+  
+  const mainImageUrl = (product.images as string[])?.[0];
 
   return {
     title: product.metaTitle || product.title,
@@ -144,23 +148,9 @@ export default async function ProductDetailPage({ params }: Props) {
   }
   
   const randomProducts = await getRandomProducts(product.id);
-
-  const parseJsonField = (field: any, fallback: any[] = []) => {
-    if (typeof field === 'string') {
-        try {
-            return JSON.parse(field);
-        } catch (e) {
-            return fallback;
-        }
-    }
-    return Array.isArray(field) ? field : fallback;
-  };
-
-  const imagesList = parseJsonField(product.images);
-  const featuresList = parseJsonField(product.features);
-  const specifications = (product.specifications && typeof product.specifications === 'object' && !Array.isArray(product.specifications)) 
-    ? Object.entries(product.specifications) 
-    : [];
+  
+  const featuresList = product.features as string[];
+  const specifications = Object.entries(product.specifications);
 
   return (
     <>
@@ -172,7 +162,7 @@ export default async function ProductDetailPage({ params }: Props) {
           
           <div className="pb-12 md:pb-16 grid md:grid-cols-2 gap-8 md:gap-12">
             
-            <ProductImageGallery images={imagesList} productTitle={product.title} />
+            <ProductImageGallery images={product.images as string[]} productTitle={product.title} />
 
             <div className="flex flex-col">
               <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
