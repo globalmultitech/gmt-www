@@ -12,7 +12,7 @@ async function getPageData() {
         orderBy: { year: 'asc' }
     });
     const teamMembers = await prisma.teamMember.findMany({
-        orderBy: { createdAt: 'asc' }
+        orderBy: { id: 'asc' }
     });
     return { settings, timeline, teamMembers };
 }
