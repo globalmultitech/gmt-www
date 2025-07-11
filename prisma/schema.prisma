@@ -19,94 +19,6 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-model WebSettings {
-  id                          Int      @id @default(1)
-  logoUrl                     String?
-  companyName                 String?
-  whatsappSales               String?
-  footerText                  String?
-  address                     String?
-  contactEmail                String?
-  contactPhone                String?
-  openingHours                String?
-  socialMedia                 Json?
-  menuItems                   Json?
-  heroHeadline                String?
-  heroDescription             String?
-  heroImageUrl                String?
-  heroButton1Text             String?
-  heroButton1Link             String?
-  heroButton2Text             String?
-  heroButton2Link             String?
-  featureCards                Json?
-  aboutUsSubtitle             String?
-  aboutUsTitle                String?
-  aboutUsDescription          String?
-  aboutUsImageUrl             String?
-  aboutUsChecklist            Json?
-  servicesSubtitle            String?
-  servicesTitle               String?
-  servicesDescription         String?
-  ctaHeadline                 String?
-  ctaDescription              String?
-  ctaImageUrl                 String?
-  ctaButtonText               String?
-  ctaButtonLink               String?
-  trustedByText               String?
-  trustedByLogos              Json?
-  testimonials                Json?
-  
-  // Page-specific content
-  servicesPageTitle           String?
-  servicesPageSubtitle        String?
-  servicesPageCommitmentTitle String?
-  servicesPageCommitmentText  String?
-  servicesPageHeaderImageUrl  String?
-  professionalServices        Json?
-
-  solutionsPageTitle          String?
-  solutionsPageSubtitle       String?
-  solutions                   Json?
-
-  aboutPageTitle              String?
-  aboutPageSubtitle           String?
-  missionTitle                String?
-  missionText                 String?
-  visionTitle                 String?
-  visionText                  String?
-  timeline                    Json?
-  teamMembers                 Json?
-
-  resourcesPageTitle          String?
-  resourcesPageSubtitle       String?
-  newsItems                   Json?
-
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
-}
-
-
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  description   String?              @db.Text
-  imageUrl      String?
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
-  name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId Int
-  products   Product[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-
-  @@unique([name, categoryId])
-}
 
 model Product {
   id              Int                @id @default(autoincrement())
@@ -118,11 +30,100 @@ model Product {
   features        Json?
   specifications  Json?
   metaTitle       String?
-  metaDescription String?            @db.Text
+  metaDescription String?
   tokopediaUrl    String?
   shopeeUrl       String?
-  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  subCategoryId   Int
   createdAt       DateTime           @default(now())
   updatedAt       DateTime           @updatedAt
+  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId   Int
+}
+
+model ProductCategory {
+  id            Int                  @id @default(autoincrement())
+  name          String               @unique
+  description   String?              @db.Text
+  imageUrl      String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  subCategories ProductSubCategory[]
+}
+
+model ProductSubCategory {
+  id         Int             @id @default(autoincrement())
+  name       String
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+  products   Product[]
+
+  @@unique([name, categoryId])
+}
+
+
+model WebSettings {
+  id               Int     @id @default(autoincrement())
+  logoUrl          String?
+  companyName      String
+  whatsappSales    String
+  footerText       String
+  address          String
+  contactEmail     String
+  contactPhone     String
+  openingHours     String
+  socialMedia      Json
+  menuItems        Json
+  heroHeadline     String
+  heroDescription  String
+  heroImageUrl     String
+  heroButton1Text  String
+  heroButton1Link  String
+  heroButton2Text  String
+  heroButton2Link  String
+  featureCards     Json
+  aboutUsSubtitle  String
+  aboutUsTitle     String
+  aboutUsDescription String
+  aboutUsImageUrl  String
+  aboutUsChecklist Json
+  servicesSubtitle String
+  servicesTitle    String
+  servicesDescription String
+  ctaHeadline      String
+  ctaDescription   String
+  ctaImageUrl      String
+  ctaButtonText    String
+  ctaButtonLink    String
+  trustedByText    String
+  trustedByLogos   Json
+  testimonials     Json
+
+  // New Page Content Fields
+  servicesPageTitle         String?
+  servicesPageSubtitle      String?
+  servicesPageCommitmentTitle String?
+  servicesPageCommitmentText  String?
+  servicesPageHeaderImageUrl  String?
+  professionalServices      Json?
+
+  solutionsPageTitle        String?
+  solutionsPageSubtitle     String?
+  solutions                 Json?
+
+  aboutPageTitle            String?
+  aboutPageSubtitle         String?
+  missionTitle              String?
+  missionText               String?
+  visionTitle               String?
+  visionText                String?
+  timeline                  Json?
+  teamMembers               Json?
+  
+  resourcesPageTitle        String?
+  resourcesPageSubtitle     String?
+  newsItems                 Json?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
