@@ -24,8 +24,6 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
   const [isScrolled, setIsScrolled] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
   
-  const isProductPage = pathname.startsWith('/produk/') && pathname.length > '/produk/'.length;
-
   useEffect(() => {
     setHasMounted(true);
 
@@ -42,21 +40,23 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
     };
   }, []);
 
-  const headerClasses = {
-    'bg-secondary shadow-sm': isProductPage,
-    'bg-primary/90 backdrop-blur-sm shadow-md': hasMounted && isScrolled && !isProductPage,
-    'bg-transparent': !isProductPage && (!hasMounted || !isScrolled),
-  };
-  
-  const logoScrolled = hasMounted && isScrolled && !isProductPage;
+  const headerIsScrolled = hasMounted && isScrolled;
 
+  const headerClasses = cn(
+    "fixed top-0 z-50 w-full transition-all duration-300",
+    {
+      'bg-primary/90 backdrop-blur-sm shadow-md': headerIsScrolled,
+      'bg-transparent': !headerIsScrolled,
+    }
+  );
+  
   return (
-    <header className={cn("fixed top-0 z-50 w-full transition-all duration-300", headerClasses)}>
+    <header className={headerClasses}>
         <div className="container mx-auto px-4">
             <div className="flex items-center justify-between h-20">
             
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} scrolled={logoScrolled} isProductPage={isProductPage} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} scrolled={headerIsScrolled} />
             </div>
 
             <div className="hidden lg:flex justify-center flex-1">
@@ -67,7 +67,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
                       href={item.href}
                       className={cn(
                         'relative transition-colors duration-300',
-                        isProductPage ? 'text-primary' : (logoScrolled ? 'text-primary-foreground' : 'text-primary'),
+                        headerIsScrolled ? 'text-primary-foreground' : 'text-primary',
                         'after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-current after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100',
                         pathname === item.href ? 'after:scale-x-100' : ''
                       )}
@@ -79,8 +79,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             </div>
 
             <div className="hidden lg:flex items-center space-x-4">
-                <Button asChild variant={isScrolled || isProductPage ? 'default' : 'default'} className={cn(
-                  (logoScrolled) && 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
+                <Button asChild className={cn(
+                  headerIsScrolled && 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
                 )}>
                     <Link href="/hubungi-kami">Get a Quote</Link>
                 </Button>
@@ -89,7 +89,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="lg:hidden flex items-center">
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', (isScrolled || isProductPage) ? 'text-primary' : 'text-primary')}>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', headerIsScrolled ? 'text-primary-foreground hover:text-primary-foreground' : 'text-primary')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>

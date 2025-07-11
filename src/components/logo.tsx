@@ -8,7 +8,6 @@ type LogoProps = {
   logoUrl?: string | null;
   scrolled?: boolean;
   variant?: 'default' | 'footer';
-  isProductPage?: boolean;
 };
 
 export function Logo({
@@ -17,7 +16,6 @@ export function Logo({
   logoUrl,
   scrolled,
   variant = 'default',
-  isProductPage,
 }: LogoProps) {
   const imageSizeClasses = {
     default: 'h-16 w-16 md:h-20 md:w-20',
@@ -30,7 +28,7 @@ export function Logo({
   };
   
   const textColorClasses = {
-    default: isProductPage ? 'text-primary' : (scrolled ? 'text-primary-foreground' : 'text-primary'),
+    default: scrolled ? 'text-primary-foreground' : 'text-primary',
     footer: 'text-primary-foreground',
   };
 
