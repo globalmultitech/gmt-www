@@ -4,6 +4,7 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
+import { redirect } from 'next/navigation';
 
 const ProductSchema = z.object({
   title: z.string().min(1, 'Judul tidak boleh kosong'),
@@ -58,7 +59,7 @@ const UpdateProductSchema = ProductSchema.extend({
 });
 
 
-export async function createProduct(prevState: { message: string } | undefined, formData: FormData) {
+export async function createProduct(prevState: { message: string, success?: boolean } | undefined, formData: FormData) {
   const validatedFields = ProductSchema.safeParse({
     title: formData.get('title'),
     slug: formData.get('slug'),
@@ -77,7 +78,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
   if (!validatedFields.success) {
     const error = validatedFields.error.flatten().fieldErrors;
     const message = Object.values(error).flat()[0] || "Input tidak valid";
-    return { message };
+    return { message, success: false };
   }
   
   const { ...rest } = validatedFields.data;
@@ -85,7 +86,7 @@ export async function createProduct(prevState: { message: string } | undefined, 
   try {
     const existingSlug = await prisma.product.findUnique({ where: { slug: rest.slug } });
     if(existingSlug) {
-      return { message: 'Slug sudah digunakan oleh produk lain.'}
+      return { message: 'Slug sudah digunakan oleh produk lain.', success: false }
     }
 
     await prisma.product.create({
@@ -94,17 +95,18 @@ export async function createProduct(prevState: { message: string } | undefined, 
       },
     });
 
-    revalidatePath('/admin/produk');
-    revalidatePath('/produk');
-    revalidatePath(`/produk/${rest.slug}`);
-    return { message: 'Produk berhasil dibuat.' };
   } catch (error) {
     console.error('Create product error:', error);
-    return { message: 'Gagal membuat produk karena kesalahan server.' };
+    return { message: 'Gagal membuat produk karena kesalahan server.', success: false };
   }
+  
+  revalidatePath('/admin/produk');
+  revalidatePath('/produk');
+  revalidatePath(`/produk/${rest.slug}`);
+  redirect('/admin/produk');
 }
 
-export async function updateProduct(prevState: { message: string } | undefined, formData: FormData) {
+export async function updateProduct(prevState: { message: string, success?: boolean } | undefined, formData: FormData) {
     const validatedFields = UpdateProductSchema.safeParse({
         id: formData.get('id'),
         title: formData.get('title'),
@@ -124,7 +126,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
     if (!validatedFields.success) {
         const error = validatedFields.error.flatten().fieldErrors;
         const message = Object.values(error).flat()[0] || "Input tidak valid";
-        return { message };
+        return { message, success: false };
     }
 
     const { id, ...rest } = validatedFields.data;
@@ -132,7 +134,7 @@ export async function updateProduct(prevState: { message: string } | undefined, 
     try {
         const existingSlug = await prisma.product.findFirst({ where: { slug: rest.slug, id: { not: id } } });
         if(existingSlug) {
-            return { message: 'Slug sudah digunakan oleh produk lain.'}
+            return { message: 'Slug sudah digunakan oleh produk lain.', success: false }
         }
         
         await prisma.product.update({
@@ -142,14 +144,15 @@ export async function updateProduct(prevState: { message: string } | undefined, 
             },
         });
 
-        revalidatePath('/admin/produk');
-        revalidatePath('/produk');
-        revalidatePath(`/produk/${rest.slug}`);
-        return { message: 'Produk berhasil diperbarui.' };
     } catch (error) {
         console.error('Update product error:', error);
-        return { message: 'Gagal memperbarui produk.' };
+        return { message: 'Gagal memperbarui produk.', success: false };
     }
+
+    revalidatePath('/admin/produk');
+    revalidatePath('/produk');
+    revalidatePath(`/produk/${rest.slug}`);
+    redirect('/admin/produk');
 }
 
 export async function deleteProduct(productId: number) {
