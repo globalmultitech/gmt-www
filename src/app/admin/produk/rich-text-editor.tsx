@@ -1,18 +1,26 @@
 
 'use client';
 
+import React, { forwardRef } from 'react';
 import dynamic from 'next/dynamic';
 import 'react-quill/dist/quill.snow.css';
+import type { ReactQuillProps } from 'react-quill';
 
 // Dynamically import ReactQuill to ensure it's only client-side
-const ReactQuill = dynamic(() => import('react-quill'), { ssr: false });
+const ReactQuill = dynamic(
+  async () => {
+    const { default: RQ } = await import('react-quill');
+    // eslint-disable-next-line react/display-name
+    return ({ forwardedRef, ...props }: { forwardedRef: React.Ref<any> } & ReactQuillProps) => <RQ ref={forwardedRef} {...props} />;
+  },
+  { ssr: false }
+);
 
-type RichTextEditorProps = {
-  value: string;
-  onChange: (value: string) => void;
-};
+interface RichTextEditorProps extends ReactQuillProps {
+  name?: string;
+}
 
-export default function RichTextEditor({ value, onChange }: RichTextEditorProps) {
+const RichTextEditor = forwardRef<any, RichTextEditorProps>((props, ref) => {
   const modules = {
     toolbar: [
       [{ 'header': [1, 2, 3, false] }],
@@ -31,15 +39,20 @@ export default function RichTextEditor({ value, onChange }: RichTextEditorProps)
   ];
 
   return (
-    <div className="bg-background">
+    <div className="bg-background relative">
+       <input type="hidden" name={props.name} value={props.value as string} />
        <ReactQuill
+        forwardedRef={ref}
         theme="snow"
-        value={value}
-        onChange={onChange}
         modules={modules}
         formats={formats}
         style={{ height: '300px', marginBottom: '40px' }}
+        {...props}
       />
     </div>
   );
-}
+});
+
+RichTextEditor.displayName = 'RichTextEditor';
+
+export default RichTextEditor;
