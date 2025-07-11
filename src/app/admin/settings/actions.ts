@@ -31,15 +31,6 @@ const TestimonialSchema = z.object({
     aiHint: z.string().default(''),
 });
 
-const BlogPostSchema = z.object({
-    image: z.string().default(''),
-    aiHint: z.string().default(''),
-    date: z.string().default(''),
-    author: z.string().default(''),
-    title: z.string().default(''),
-    href: z.string().default(''),
-});
-
 const TrustedByLogoSchema = z.object({
   src: z.string().default(''),
   alt: z.string().default(''),
@@ -80,7 +71,6 @@ const SettingsSchema = z.object({
   trustedByText: z.string().optional(),
   trustedByLogos: z.array(TrustedByLogoSchema).optional(),
   testimonials: z.array(TestimonialSchema).optional(),
-  blogPosts: z.array(BlogPostSchema).optional(),
 });
 
 
@@ -113,21 +103,13 @@ export async function updateWebSettings(prevState: { message: string } | undefin
       aboutUsChecklist: data.aboutUsChecklist?.filter(item => item) ?? [],
       trustedByLogos: data.trustedByLogos?.filter(logo => logo.src || logo.alt) ?? [],
       testimonials: data.testimonials?.filter(item => item.name || item.quote) ?? [],
-      blogPosts: data.blogPosts?.filter(item => item.title) ?? [],
     };
     
-    // Omit professionalServices from this update action, as it's managed separately
-    const { 
-        // professionalServices, // This field is managed elsewhere
-        ...dataToUpdate 
-    } = sanitizedData;
-
-
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
-          ...dataToUpdate,
-          socialMedia: dataToUpdate.socialMedia ?? {},
+          ...sanitizedData,
+          socialMedia: sanitizedData.socialMedia ?? {},
         }
     });
 

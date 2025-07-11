@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard, Testimonial, BlogPost } from '@/lib/settings';
+import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard, Testimonial } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -388,27 +388,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                     </Card>
                 </AccordionContent>
             </AccordionItem>
-            
+
             <AccordionItem value="item-8">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Services Section</AccordionTrigger>
-                <AccordionContent>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Konten Section Layanan</CardTitle>
-                            <CardDescription>Konten ini (judul, subjudul) akan tampil di Halaman Utama. Daftar layanannya sendiri diambil dari pengaturan di halaman Layanan.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                <div className="space-y-2"><Label htmlFor="servicesSubtitle">Subjudul</Label><Input id="servicesSubtitle" value={formState.servicesSubtitle ?? ''} onChange={e => handleFieldChange('servicesSubtitle', e.target.value)} /></div>
-                                <div className="space-y-2"><Label htmlFor="servicesTitle">Judul</Label><Input id="servicesTitle" value={formState.servicesTitle ?? ''} onChange={e => handleFieldChange('servicesTitle', e.target.value)} /></div>
-                                <div className="space-y-2"><Label htmlFor="servicesDescription">Deskripsi</Label><Input id="servicesDescription" value={formState.servicesDescription ?? ''} onChange={e => handleFieldChange('servicesDescription', e.target.value)} /></div>
-                            </div>
-                        </CardContent>
-                    </Card>
-                </AccordionContent>
-            </AccordionItem>
-            
-            <AccordionItem value="item-9">
                 <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: CTA Section</AccordionTrigger>
                 <AccordionContent>
                     <Card>
@@ -436,7 +417,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-10">
+            <AccordionItem value="item-9">
                 <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Logo Mitra (Trusted By)</AccordionTrigger>
                 <AccordionContent>
                     <Card>
@@ -478,7 +459,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-11">
+            <AccordionItem value="item-10">
                 <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Testimonial</AccordionTrigger>
                 <AccordionContent>
                     <Card>
@@ -524,61 +505,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 </AccordionContent>
             </AccordionItem>
             
-            <AccordionItem value="item-12">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Postingan Blog</AccordionTrigger>
-                 <AccordionContent>
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Konten Section Blog</CardTitle>
-                            <CardDescription>Konten ini akan tampil di Halaman Utama. Daftar postingan blognya sendiri diambil dari konten statis di halaman Resources.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            {formState.blogPosts.map((item, index) => (
-                                <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                                    <div className="flex-shrink-0 space-y-2">
-                                        <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
-                                            {item.image ? ( <Image src={item.image} alt={item.title} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
-                                        </div>
-                                        <Input type="file" onChange={(e) => handleDynamicImageUpload(e, 'blogPosts', index, 'image')} accept="image/png, image/jpeg" disabled={isUploading} className="w-40"/>
-                                    </div>
-                                    <div className="flex-grow space-y-2">
-                                        <div className="space-y-1">
-                                            <Label className="text-xs">Judul</Label>
-                                            <Input value={item.title} onChange={e => handleArrayChange('blogPosts', index, 'title', e.target.value)} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="space-y-1">
-                                                <Label className="text-xs">Tanggal</Label>
-                                                <Input value={item.date} onChange={e => handleArrayChange('blogPosts', index, 'date', e.target.value)} />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">Penulis</Label>
-                                                <Input value={item.author} onChange={e => handleArrayChange('blogPosts', index, 'author', e.target.value)} />
-                                            </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="space-y-1">
-                                                <Label className="text-xs">Tautan (Href)</Label>
-                                                <Input value={item.href} onChange={e => handleArrayChange('blogPosts', index, 'href', e.target.value)} />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">AI Hint (untuk gambar)</Label>
-                                                <Input value={item.aiHint ?? ''} onChange={e => handleArrayChange('blogPosts', index, 'aiHint', e.target.value)} />
-                                            </div>
-                                    </div>
-                                    </div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('blogPosts', index)} className="text-destructive h-9 w-9">
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ))}
-                            <Button type="button" variant="outline" onClick={() => addItemToArray('blogPosts', { image: '', aiHint: '', date: '', author: 'Admin', title: '', href: '/resources' })}>
-                                <PlusCircle className="mr-2 h-4 w-4" /> Tambah Postingan Blog
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </AccordionContent>
-            </AccordionItem>
         </Accordion>
 
         <div className="mt-8 flex justify-end">

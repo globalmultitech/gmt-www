@@ -36,15 +36,6 @@ export type Testimonial = {
     aiHint?: string;
 };
 
-export type BlogPost = {
-  image: string;
-  aiHint: string;
-  date: string;
-  author: string;
-  title: string;
-  href: string;
-};
-
 export type Solution = {
   icon: string;
   title: string;
@@ -79,7 +70,7 @@ export type NewsItem = {
 export interface FullWebSettings extends PrismaWebSettings {}
 
 // Interface for client-side usage, with JSON fields properly typed
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos' | 'testimonials' | 'blogPosts' | 'solutions' | 'timeline' | 'teamMembers' | 'newsItems'> {
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos' | 'testimonials' | 'solutions' | 'timeline' | 'teamMembers' | 'newsItems'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
@@ -88,7 +79,6 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   professionalServices: ProfessionalService[];
   trustedByLogos: TrustedByLogo[];
   testimonials: Testimonial[];
-  blogPosts: BlogPost[];
   solutions: Solution[];
   timeline: TimelineEvent[];
   teamMembers: TeamMember[];
@@ -131,7 +121,6 @@ const defaultSettings: WebSettings = {
   trustedByText: "Trusted by the world's leading companies",
   trustedByLogos: [],
   testimonials: [],
-  blogPosts: [],
   
   servicesPageTitle: 'Layanan Profesional Kami',
   servicesPageSubtitle: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda.',
@@ -198,7 +187,6 @@ export async function getSettings(): Promise<WebSettings> {
             professionalServices: parseJson(settingsFromDb.professionalServices, defaultSettings.professionalServices),
             trustedByLogos: parseJson(settingsFromDb.trustedByLogos, defaultSettings.trustedByLogos),
             testimonials: parseJson(settingsFromDb.testimonials, defaultSettings.testimonials),
-            blogPosts: parseJson(settingsFromDb.blogPosts, defaultSettings.blogPosts),
             solutions: parseJson(settingsFromDb.solutions, defaultSettings.solutions),
             timeline: parseJson(settingsFromDb.timeline, defaultSettings.timeline),
             teamMembers: parseJson(settingsFromDb.teamMembers, defaultSettings.teamMembers),

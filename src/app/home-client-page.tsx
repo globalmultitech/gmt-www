@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
@@ -9,8 +8,9 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent } from '@/components/ui/card';
-import type { WebSettings, FeatureCard, ProfessionalService, TrustedByLogo, BlogPost } from '@/lib/settings';
+import type { WebSettings, FeatureCard, ProfessionalService, TrustedByLogo, NewsItem } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import BlogSection from '@/components/blog-section';
 
 type EnrichedProduct = Product & {
   subCategory: ProductSubCategory & {
@@ -236,7 +236,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
        {/* Blog Section */}
-      {settings.blogPosts && settings.blogPosts.length > 0 && (
+      {settings.newsItems && settings.newsItems.length > 0 && (
         <section className="py-20 md:py-28 bg-background">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-16">
@@ -244,18 +244,18 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
                     <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Latest news & articles</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
-                    {(settings.blogPosts as BlogPost[]).map((post, index) => (
+                    {(settings.newsItems as NewsItem[]).map((post, index) => (
                         <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                             <div className="relative overflow-hidden rounded-lg mb-6">
                               <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
                             </div>
                             <div className="text-sm text-muted-foreground mb-2">
-                                <span>{post.date}</span> / <span>By {post.author}</span>
+                                <span>{post.date}</span> / <span>By {post.category}</span>
                             </div>
                             <h3 className="text-xl font-bold font-headline mb-4 group-hover:text-primary transition-colors">
-                                <Link href={post.href}>{post.title}</Link>
+                                <Link href="/resources">{post.title}</Link>
                             </h3>
-                            <Link href={post.href} className="font-semibold text-primary flex items-center gap-2">
+                            <Link href="/resources" className="font-semibold text-primary flex items-center gap-2">
                                 Read More <ArrowRight className="h-4 w-4" />
                             </Link>
                         </div>
@@ -264,6 +264,19 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
             </div>
         </section>
       )}
+      
+      {/* AI Blog Summarizer Section */}
+      <section className="py-20 md:py-28 bg-secondary">
+        <div className="container mx-auto px-4">
+            <div className="text-center max-w-3xl mx-auto mb-12">
+                <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">AI-Powered Insights</p>
+                <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Wawasan dari Blog Kami</h2>
+                <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">Jelajahi artikel, studi kasus, dan analisis mendalam dari tim ahli kami, diringkas oleh AI.</p>
+            </div>
+            <BlogSection />
+        </div>
+      </section>
+
     </div>
   );
 }
