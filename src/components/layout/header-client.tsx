@@ -45,7 +45,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             <div className="flex items-center justify-between h-20">
             
             <div className="flex-shrink-0">
-                 <Logo companyName={companyName} logoUrl={logoUrl} />
+                 <Logo companyName={companyName} logoUrl={logoUrl} scrolled={isScrolled} />
             </div>
 
             <div className="hidden lg:flex justify-center flex-1">
