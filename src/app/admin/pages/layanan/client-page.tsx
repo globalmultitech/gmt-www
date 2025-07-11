@@ -9,13 +9,14 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
 import type { WebSettings } from '@/lib/settings';
-import { updateLayananPageSettings } from './actions';
+import { updateLayananPageSettings, updateProfessionalServices } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSignedURL } from '../../actions';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import type { ProfessionalService } from '@prisma/client';
 
 const availableIcons = [
     'Activity', 'Airplay', 'AlarmClock', 'AlertCircle', 'Archive', 'ArrowDownCircle', 'ArrowUpCircle',
@@ -41,6 +42,11 @@ const availableIcons = [
     'Wifi', 'Wind', 'X', 'XCircle', 'Youtube', 'Zap'
 ].sort();
 
+type LayananPageClientProps = {
+  settings: WebSettings;
+  initialServices: ProfessionalService[];
+};
+
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
   return (
@@ -50,75 +56,103 @@ function SubmitButton({ isDirty }: { isDirty: boolean }) {
   );
 }
 
-export default function LayananPageClientPage({ settings }: { settings: WebSettings }) {
+export default function LayananPageClientPage({ settings, initialServices }: LayananPageClientProps) {
   const { toast } = useToast();
-  const [state, formAction] = useActionState(updateLayananPageSettings, undefined);
+  const [headerState, headerFormAction] = useActionState(updateLayananPageSettings, undefined);
+  const [servicesState, servicesFormAction] = useActionState(updateProfessionalServices, undefined);
 
-  const initialFormState = {
+  const [headerForm, setHeaderForm] = useState({
     servicesPageTitle: settings.servicesPageTitle ?? '',
     servicesPageSubtitle: settings.servicesPageSubtitle ?? '',
     servicesPageCommitmentTitle: settings.servicesPageCommitmentTitle ?? '',
     servicesPageCommitmentText: settings.servicesPageCommitmentText ?? '',
     servicesPageHeaderImageUrl: settings.servicesPageHeaderImageUrl ?? '',
-    professionalServices: settings.professionalServices ?? [],
-  };
+  });
+  
+  const [services, setServices] = useState(initialServices.map(s => ({
+    ...s,
+    details: Array.isArray(s.details) ? s.details : []
+  })));
 
-  const [formState, setFormState] = useState(initialFormState);
+  const [isHeaderDirty, setIsHeaderDirty] = useState(false);
+  const [isServicesDirty, setIsServicesDirty] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-  const [isDirty, setIsDirty] = useState(false);
+  
+  useEffect(() => {
+    setHeaderForm({
+      servicesPageTitle: settings.servicesPageTitle ?? '',
+      servicesPageSubtitle: settings.servicesPageSubtitle ?? '',
+      servicesPageCommitmentTitle: settings.servicesPageCommitmentTitle ?? '',
+      servicesPageCommitmentText: settings.servicesPageCommitmentText ?? '',
+      servicesPageHeaderImageUrl: settings.servicesPageHeaderImageUrl ?? '',
+    });
+    setServices(initialServices.map(s => ({...s, details: Array.isArray(s.details) ? s.details : []})));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings, initialServices]);
 
   useEffect(() => {
-    setFormState(initialFormState);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings]);
+    setIsHeaderDirty(JSON.stringify(headerForm) !== JSON.stringify({
+      servicesPageTitle: settings.servicesPageTitle ?? '',
+      servicesPageSubtitle: settings.servicesPageSubtitle ?? '',
+      servicesPageCommitmentTitle: settings.servicesPageCommitmentTitle ?? '',
+      servicesPageCommitmentText: settings.servicesPageCommitmentText ?? '',
+      servicesPageHeaderImageUrl: settings.servicesPageHeaderImageUrl ?? '',
+    }));
+  }, [headerForm, settings]);
 
   useEffect(() => {
-    setIsDirty(JSON.stringify(formState) !== JSON.stringify(initialFormState));
-  }, [formState, initialFormState]);
+    const initialServicesFormatted = initialServices.map(s => ({...s, details: Array.isArray(s.details) ? s.details : []}));
+    setIsServicesDirty(JSON.stringify(services) !== JSON.stringify(initialServicesFormatted));
+  }, [services, initialServices]);
 
-  const handleFieldChange = (field: keyof typeof initialFormState, value: any) => {
-    setFormState(prev => ({...prev, [field]: value}));
+
+  const handleHeaderChange = (field: keyof typeof headerForm, value: any) => {
+    setHeaderForm(prev => ({...prev, [field]: value}));
   };
   
   const handleServiceChange = (index: number, field: string, value: any) => {
-    setFormState(prev => {
-        const newServices = [...prev.professionalServices];
+    setServices(prev => {
+        const newServices = [...prev];
         newServices[index] = {...newServices[index], [field]: value};
-        return {...prev, professionalServices: newServices};
+        return newServices;
     });
   };
 
   const handleDetailChange = (serviceIndex: number, detailIndex: number, value: string) => {
-    setFormState(prev => {
-        const newServices = [...prev.professionalServices];
+    setServices(prev => {
+        const newServices = [...prev];
+        // @ts-ignore
         const newDetails = [...newServices[serviceIndex].details];
         newDetails[detailIndex] = value;
         newServices[serviceIndex] = {...newServices[serviceIndex], details: newDetails};
-        return {...prev, professionalServices: newServices};
+        return newServices;
     });
   };
 
   const addService = () => {
-    setFormState(prev => ({...prev, professionalServices: [...prev.professionalServices, { icon: 'Activity', title: '', description: '', details: []}]}));
+    // @ts-ignore
+    setServices(prev => [...prev, { id: Date.now(), icon: 'Activity', title: '', description: '', details: [], createdAt: new Date(), updatedAt: new Date()}]);
   };
   const removeService = (index: number) => {
-    setFormState(prev => ({...prev, professionalServices: prev.professionalServices.filter((_, i) => i !== index)}));
+    setServices(prev => prev.filter((_, i) => i !== index));
   };
 
   const addDetail = (serviceIndex: number) => {
-    setFormState(prev => {
-        const newServices = [...prev.professionalServices];
+    setServices(prev => {
+        const newServices = [...prev];
+        // @ts-ignore
         const newDetails = [...(newServices[serviceIndex].details || []), ''];
         newServices[serviceIndex] = {...newServices[serviceIndex], details: newDetails};
-        return {...prev, professionalServices: newServices};
+        return newServices;
     });
   };
   const removeDetail = (serviceIndex: number, detailIndex: number) => {
-    setFormState(prev => {
-        const newServices = [...prev.professionalServices];
+    setServices(prev => {
+        const newServices = [...prev];
+        // @ts-ignore
         const newDetails = newServices[serviceIndex].details.filter((_, i) => i !== detailIndex);
         newServices[serviceIndex] = {...newServices[serviceIndex], details: newDetails};
-        return {...prev, professionalServices: newServices};
+        return newServices;
     });
   };
 
@@ -139,7 +173,7 @@ export default function LayananPageClientPage({ settings }: { settings: WebSetti
       const { signedUrl, publicUrl } = await getSignedURL(file.type, file.size, checksum);
       
       await fetch(signedUrl, { method: 'PUT', body: file, headers: { 'Content-Type': file.type } });
-      handleFieldChange('servicesPageHeaderImageUrl', publicUrl);
+      handleHeaderChange('servicesPageHeaderImageUrl', publicUrl);
 
     } catch (error) {
       console.error("Upload error:", error);
@@ -151,18 +185,30 @@ export default function LayananPageClientPage({ settings }: { settings: WebSetti
   };
 
   useEffect(() => {
-    if (state?.message) {
-      const isSuccess = state.message.includes('berhasil');
+    if (headerState?.message) {
+      const isSuccess = headerState.message.includes('berhasil');
       toast({
         title: isSuccess ? 'Sukses' : 'Gagal',
-        description: state.message,
+        description: headerState.message,
         variant: isSuccess ? 'default' : 'destructive',
       });
-      if (isSuccess) {
-        setIsDirty(false);
-      }
+      if (isSuccess) setIsHeaderDirty(false);
     }
-  }, [state, toast]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [headerState]);
+
+  useEffect(() => {
+    if (servicesState?.message) {
+      const isSuccess = servicesState.message.includes('berhasil');
+      toast({
+        title: isSuccess ? 'Sukses' : 'Gagal',
+        description: servicesState.message,
+        variant: isSuccess ? 'default' : 'destructive',
+      });
+      if (isSuccess) setIsServicesDirty(false);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [servicesState]);
 
   return (
     <div>
@@ -171,27 +217,47 @@ export default function LayananPageClientPage({ settings }: { settings: WebSetti
         <p className="text-muted-foreground">Kelola konten yang tampil di halaman Layanan.</p>
       </div>
 
-      <form action={formAction} className="space-y-6">
-        <input type="hidden" name="layananData" value={JSON.stringify(formState)} />
+      <form action={headerFormAction} className="space-y-6 mb-6">
+        <input type="hidden" name="layananData" value={JSON.stringify(headerForm)} />
         
         <Card>
-            <CardHeader>
-                <CardTitle>Header Halaman</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>Header & Komitmen</CardTitle></CardHeader>
             <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="servicesPageTitle">Judul Halaman</Label><Input id="servicesPageTitle" value={formState.servicesPageTitle} onChange={e => handleFieldChange('servicesPageTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="servicesPageSubtitle">Subjudul Halaman</Label><Input id="servicesPageSubtitle" value={formState.servicesPageSubtitle} onChange={e => handleFieldChange('servicesPageSubtitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="servicesPageTitle">Judul Halaman</Label><Input id="servicesPageTitle" value={headerForm.servicesPageTitle} onChange={e => handleHeaderChange('servicesPageTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="servicesPageSubtitle">Subjudul Halaman</Label><Input id="servicesPageSubtitle" value={headerForm.servicesPageSubtitle} onChange={e => handleHeaderChange('servicesPageSubtitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="servicesPageCommitmentTitle">Judul Komitmen</Label><Input id="servicesPageCommitmentTitle" value={headerForm.servicesPageCommitmentTitle} onChange={e => handleHeaderChange('servicesPageCommitmentTitle', e.target.value)} /></div>
+                <div className="space-y-2"><Label htmlFor="servicesPageCommitmentText">Teks Komitmen</Label><Textarea id="servicesPageCommitmentText" value={headerForm.servicesPageCommitmentText} onChange={e => handleHeaderChange('servicesPageCommitmentText', e.target.value)} /></div>
+                <div className="space-y-2">
+                    <Label htmlFor="header-image-upload">Gambar Komitmen</Label>
+                    <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
+                        {headerForm.servicesPageHeaderImageUrl ? (
+                        <Image src={headerForm.servicesPageHeaderImageUrl} alt="Header Preview" fill className="object-cover" />
+                        ) : (
+                        <div className="flex items-center justify-center h-full w-full">
+                            <ImageIcon className="w-10 h-10 text-muted-foreground" />
+                        </div>
+                        )}
+                    </div>
+                    <div className="flex items-center gap-4">
+                        <Input id="header-image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
+                        {isUploading && <Loader2 className="animate-spin" />}
+                    </div>
+                </div>
+                 <div className="flex justify-end"><SubmitButton isDirty={isHeaderDirty} /></div>
             </CardContent>
         </Card>
+      </form>
 
+      <form action={servicesFormAction} className="space-y-6">
+        <input type="hidden" name="servicesData" value={JSON.stringify(services)} />
         <Card>
             <CardHeader>
                 <CardTitle>Daftar Layanan</CardTitle>
                 <CardDescription>Atur layanan yang ditampilkan di halaman ini dan halaman utama.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-                {formState.professionalServices.map((service, serviceIndex) => (
-                    <div key={serviceIndex} className="space-y-2 p-4 border rounded-md">
+                {services.map((service, serviceIndex) => (
+                    <div key={service.id} className="space-y-2 p-4 border rounded-md">
                         <div className="flex items-end gap-2">
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-2 flex-grow">
                                 <div className="space-y-1">
@@ -208,44 +274,18 @@ export default function LayananPageClientPage({ settings }: { settings: WebSetti
                         </div>
                         <div className="pl-4 ml-4 border-l space-y-2">
                             <Label className="text-xs font-semibold">Detail Layanan</Label>
+                            {/* @ts-ignore */}
                             {(service.details || []).map((detail, detailIndex) => (<div key={detailIndex} className="flex items-center gap-2"><Input value={detail} onChange={e => handleDetailChange(serviceIndex, detailIndex, e.target.value)} /><Button type="button" variant="ghost" size="icon" onClick={() => removeDetail(serviceIndex, detailIndex)} className="text-destructive h-8 w-8"><Trash2 className="h-4 w-4" /></Button></div>))}
                             <Button type="button" variant="outline" size="sm" onClick={() => addDetail(serviceIndex)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Detail</Button>
                         </div>
                     </div>
                 ))}
                 <Button type="button" variant="outline" onClick={addService}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Layanan</Button>
-            </CardContent>
-        </Card>
-
-        <Card>
-            <CardHeader>
-                <CardTitle>Bagian Komitmen Keamanan</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-                <div className="space-y-2"><Label htmlFor="servicesPageCommitmentTitle">Judul Komitmen</Label><Input id="servicesPageCommitmentTitle" value={formState.servicesPageCommitmentTitle} onChange={e => handleFieldChange('servicesPageCommitmentTitle', e.target.value)} /></div>
-                <div className="space-y-2"><Label htmlFor="servicesPageCommitmentText">Teks Komitmen</Label><Textarea id="servicesPageCommitmentText" value={formState.servicesPageCommitmentText} onChange={e => handleFieldChange('servicesPageCommitmentText', e.target.value)} /></div>
-                <div className="space-y-2">
-                    <Label htmlFor="header-image-upload">Gambar Komitmen</Label>
-                    <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
-                        {formState.servicesPageHeaderImageUrl ? (
-                        <Image src={formState.servicesPageHeaderImageUrl} alt="Header Preview" fill className="object-cover" />
-                        ) : (
-                        <div className="flex items-center justify-center h-full w-full">
-                            <ImageIcon className="w-10 h-10 text-muted-foreground" />
-                        </div>
-                        )}
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <Input id="header-image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading} />
-                        {isUploading && <Loader2 className="animate-spin" />}
-                    </div>
+                <div className="flex justify-end pt-4">
+                  <SubmitButton isDirty={isServicesDirty}/>
                 </div>
             </CardContent>
         </Card>
-
-        <div className="mt-8 flex justify-end">
-          <SubmitButton isDirty={isDirty}/>
-        </div>
       </form>
     </div>
   );

@@ -1,83 +1,21 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
 
 generator client {
   provider = "prisma-client-js"
 }
 
-datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
-}
-
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String
   password  String
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-model WebSettings {
-  id                          Int      @id @default(1)
-  logoUrl                     String?
-  companyName                 String   @default("Global Multi Technology")
-  whatsappSales               String   @default("+6281234567890")
-  footerText                  String   @default("Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.") @db.Text
-  address                     String   @default("139 Baker St, E1 7PT, London")
-  contactEmail                String   @default("contacts@example.com")
-  contactPhone                String   @default("(02) 123 333 444")
-  openingHours                String   @default("8am-5pm Mon - Fri")
-  socialMedia                 Json?    @default("{}")
-  menuItems                   Json?    @default("[]")
-  heroHeadline                String   @default("Creative solutions to improve your business")
-  heroDescription             String   @default("We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.") @db.Text
-  heroImageUrl                String   @default("https://placehold.co/1920x1080.png")
-  heroButton1Text             String   @default("Our services")
-  heroButton1Link             String   @default("/layanan")
-  heroButton2Text             String   @default("Contact us")
-  heroButton2Link             String   @default("/hubungi-kami")
-  featureCards                Json?    @default("[]")
-  aboutUsSubtitle             String   @default("ABOUT US")
-  aboutUsTitle                String   @default("We are the best IT solution")
-  aboutUsDescription          String   @default("We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world. We believe that technology can be a powerful tool for good, and we are dedicated to using our skills and expertise to make a positive impact.") @db.Text
-  aboutUsImageUrl             String   @default("https://placehold.co/600x600.png")
-  aboutUsChecklist            Json?    @default("[]")
-  servicesSubtitle            String   @default("WHAT WE DO")
-  servicesTitle               String   @default("Layanan Profesional Kami")
-  servicesDescription         String   @default("Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.") @db.Text
-  ctaHeadline                 String   @default("Ready to take your business to the next level?")
-  ctaDescription              String   @default("Let's discuss how our IT solutions can help you achieve your goals.") @db.Text
-  ctaImageUrl                 String   @default("https://placehold.co/1920x1080.png")
-  ctaButtonText               String   @default("Get a Quote")
-  ctaButtonLink               String   @default("/hubungi-kami")
-  trustedByText               String   @default("Trusted by the world's leading companies")
-  trustedByLogos              Json?    @default("[]")
-  testimonials                Json?    @default("[]")
-  // Page Specific Settings
-  servicesPageTitle           String   @default("Layanan Profesional Kami")
-  servicesPageSubtitle        String   @default("Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.")
-  servicesPageCommitmentTitle String   @default("Komitmen Kami Pada Keamanan")
-  servicesPageCommitmentText  String   @default("Dalam setiap layanan yang kami berikan, keamanan adalah prioritas utama. Kami menerapkan standar keamanan industri tertinggi untuk melindungi data dan aset berharga Anda, memastikan ketenangan pikiran dalam setiap langkah transformasi digital Anda.") @db.Text
-  servicesPageHeaderImageUrl  String   @default("https://placehold.co/600x400.png")
-  professionalServices        Json?    @default("[]")
-  solutionsPageTitle          String   @default("Solusi Teknologi Unggulan")
-  solutionsPageSubtitle       String   @default("Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.")
-  solutions                   Json?    @default("[]")
-  aboutPageTitle              String   @default("Tentang Global Multi Technology")
-  aboutPageSubtitle           String   @default("Mendorong Inovasi, Memberdayakan Pertumbuhan Bisnis Anda.")
-  missionTitle                String   @default("Misi Kami")
-  missionText                 String   @default("Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif di era modern.") @db.Text
-  visionTitle                 String   @default("Visi Kami")
-  visionText                  String   @default("Menjadi mitra teknologi terdepan dan terpercaya di Asia Tenggara, yang dikenal karena inovasi, kualitas layanan, dan komitmen kami terhadap kesuksesan setiap pelanggan.") @db.Text
-  timeline                    Json?    @default("[]")
-  teamMembers                 Json?    @default("[]")
-  resourcesPageTitle          String   @default("Wawasan & Berita")
-  resourcesPageSubtitle       String   @default("Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.")
-  newsItems                   Json?    @default("[]")
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
 }
 
 model ProductCategory {
@@ -93,30 +31,145 @@ model ProductCategory {
 model ProductSubCategory {
   id         Int             @id @default(autoincrement())
   name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
   createdAt  DateTime        @default(now())
   updatedAt  DateTime        @updatedAt
 
   @@unique([name, categoryId])
+  @@index([categoryId])
 }
 
 model Product {
-  id              Int                @id @default(autoincrement())
-  title           String
-  slug            String             @unique
-  description     String             @db.Text
-  longDescription String?            @db.Text
-  images          Json?
-  features        Json?
-  specifications  Json?
-  metaTitle       String?
-  metaDescription String?            @db.Text
-  tokopediaUrl    String?
-  shopeeUrl       String?
-  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId   Int
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
+  id               Int                @id @default(autoincrement())
+  title            String
+  slug             String             @unique
+  description      String             @db.Text
+  longDescription  String?            @db.Text
+  images           Json               @default("[]")
+  features         Json               @default("[]")
+  specifications   Json               @default("{}")
+  metaTitle        String?
+  metaDescription  String?
+  tokopediaUrl     String?
+  shopeeUrl        String?
+  subCategoryId    Int
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@index([subCategoryId])
+}
+
+// New model for Professional Services
+model ProfessionalService {
+  id          Int      @id @default(autoincrement())
+  icon        String
+  title       String
+  description String   @db.Text
+  details     Json // Storing details as a JSON array of strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// New model for Solutions
+model Solution {
+  id          Int      @id @default(autoincrement())
+  icon        String
+  title       String
+  description String   @db.Text
+  image       String?
+  aiHint      String?
+  keyPoints   Json // Storing key points as a JSON array of strings
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// New model for Timeline Events
+model TimelineEvent {
+  id    Int    @id @default(autoincrement())
+  year  String
+  event String
+}
+
+// New model for Team Members
+model TeamMember {
+  id       Int     @id @default(autoincrement())
+  name     String
+  role     String
+  image    String?
+  linkedin String?
+  aiHint   String?
+}
+
+// New model for News Items
+model NewsItem {
+  id       Int     @id @default(autoincrement())
+  title    String
+  date     String?
+  category String?
+  image    String?
+  aiHint   String?
+}
+
+
+model WebSettings {
+  id                Int      @id @default(1)
+  logoUrl           String?
+  companyName       String   @default("Global Multi Technology")
+  whatsappSales     String   @default("+6281234567890")
+  footerText        String   @db.Text
+  address           String
+  contactEmail      String
+  contactPhone      String
+  openingHours      String
+  socialMedia       Json     @default("{}")
+  menuItems         Json     @default("[]")
+  heroHeadline      String
+  heroDescription   String   @db.Text
+  heroImageUrl      String?
+  heroButton1Text   String
+  heroButton1Link   String
+  heroButton2Text   String
+  heroButton2Link   String
+  featureCards      Json     @default("[]")
+  aboutUsSubtitle   String
+  aboutUsTitle      String
+  aboutUsDescription String  @db.Text
+  aboutUsImageUrl   String?
+  aboutUsChecklist  Json     @default("[]")
+  servicesSubtitle  String
+  servicesTitle     String
+  servicesDescription String @db.Text
+  ctaHeadline       String
+  ctaDescription    String   @db.Text
+  ctaImageUrl       String?
+  ctaButtonText     String
+  ctaButtonLink     String
+  trustedByText     String
+  trustedByLogos    Json     @default("[]")
+  testimonials      Json     @default("[]")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Page-specific headers
+  servicesPageTitle           String @default("Layanan Profesional Kami")
+  servicesPageSubtitle        String @default("Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda.")
+  servicesPageCommitmentTitle String @default("Komitmen Kami Pada Keamanan")
+  servicesPageCommitmentText  String @db.Text
+  servicesPageHeaderImageUrl  String @default("https://placehold.co/600x400.png")
+
+  solutionsPageTitle          String @default("Solusi Teknologi Unggulan")
+  solutionsPageSubtitle       String @default("Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik industri.")
+
+  aboutPageTitle              String @default("Tentang Kami")
+  aboutPageSubtitle           String @default("Mendorong Inovasi, Memberdayakan Pertumbuhan.")
+  missionTitle                String @default("Misi Kami")
+  missionText                 String @db.Text
+  visionTitle                 String @default("Visi Kami")
+  visionText                  String @db.Text
+  
+  resourcesPageTitle          String @default("Wawasan & Berita")
+  resourcesPageSubtitle       String @default("Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.")
 }

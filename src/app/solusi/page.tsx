@@ -1,17 +1,23 @@
 
-
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Briefcase, Handshake, MessageSquareHeart } from 'lucide-react';
+import { ArrowRight, Handshake } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { getSettings } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import prisma from '@/lib/db';
+import type { Solution } from '@prisma/client';
 
+async function getPageData() {
+    const settings = await getSettings();
+    const solutions = await prisma.solution.findMany({
+        orderBy: { createdAt: 'asc' }
+    });
+    return { settings, solutions };
+}
 
 export default async function SolusiPage() {
-  const settings = await getSettings();
-  const solutions = settings.solutions ?? [];
+  const { settings, solutions } = await getPageData();
 
   return (
     <>
@@ -28,14 +34,14 @@ export default async function SolusiPage() {
         <div className="container mx-auto px-4">
           <div className="space-y-16">
             {solutions.map((solution, index) => (
-              <div key={index} className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+              <div key={solution.id} className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
                 <div className={`relative h-80 rounded-lg overflow-hidden shadow-lg ${index % 2 === 1 ? 'md:order-last' : ''}`}>
                     <Image
                         src={solution.image || "https://placehold.co/600x400.png"}
                         alt={solution.title}
                         fill
                         className="object-cover"
-                        data-ai-hint={solution.aiHint}
+                        data-ai-hint={solution.aiHint || 'technology solution'}
                     />
                 </div>
                 <div className="space-y-4">
@@ -47,7 +53,8 @@ export default async function SolusiPage() {
                   </div>
                   <p className="text-muted-foreground">{solution.description}</p>
                   <ul className="space-y-2 pt-2">
-                    {solution.keyPoints.map((point, i) => (
+                    {/* @ts-ignore */}
+                    {(Array.isArray(solution.keyPoints) ? solution.keyPoints : []).map((point, i) => (
                       <li key={i} className="flex items-start gap-3">
                         <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
                         <span className="text-muted-foreground">{point}</span>

@@ -16,13 +16,6 @@ export type FeatureCard = {
   description: string;
 };
 
-export type ProfessionalService = {
-  icon: string;
-  title: string;
-  description: string;
-  details: string[];
-};
-
 export type TrustedByLogo = {
   src: string;
   alt: string;
@@ -36,53 +29,18 @@ export type Testimonial = {
     aiHint?: string;
 };
 
-export type Solution = {
-  icon: string;
-  title: string;
-  description: string;
-  image: string;
-  aiHint: string;
-  keyPoints: string[];
-};
-
-export type TimelineEvent = {
-  year: string;
-  event: string;
-};
-
-export type TeamMember = {
-  name: string;
-  role: string;
-  image: string;
-  linkedin: string;
-  aiHint: string;
-};
-
-export type NewsItem = {
-    title: string;
-    date: string;
-    category: string;
-    image: string;
-    aiHint: string;
-};
-
 // Interface for database reads, ensuring all fields from prisma are present
 export interface FullWebSettings extends PrismaWebSettings {}
 
 // Interface for client-side usage, with JSON fields properly typed
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'professionalServices' | 'trustedByLogos' | 'testimonials' | 'solutions' | 'timeline' | 'teamMembers' | 'newsItems'> {
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'trustedByLogos' | 'testimonials'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
   featureCards: FeatureCard[];
   aboutUsChecklist: string[];
-  professionalServices: ProfessionalService[];
   trustedByLogos: TrustedByLogo[];
   testimonials: Testimonial[];
-  solutions: Solution[];
-  timeline: TimelineEvent[];
-  teamMembers: TeamMember[];
-  newsItems: NewsItem[];
 }
 
 const defaultSettings: WebSettings = {
@@ -127,11 +85,9 @@ const defaultSettings: WebSettings = {
   servicesPageCommitmentTitle: 'Komitmen Kami Pada Keamanan',
   servicesPageCommitmentText: 'Dalam setiap layanan yang kami berikan, keamanan adalah prioritas utama.',
   servicesPageHeaderImageUrl: 'https://placehold.co/600x400.png',
-  professionalServices: [],
 
   solutionsPageTitle: 'Solusi Teknologi Kami',
   solutionsPageSubtitle: 'Kami menyediakan solusi end-to-end.',
-  solutions: [],
 
   aboutPageTitle: 'Tentang Kami',
   aboutPageSubtitle: 'Mendorong Inovasi, Memberdayakan Pertumbuhan.',
@@ -139,12 +95,9 @@ const defaultSettings: WebSettings = {
   missionText: 'Menyediakan solusi teknologi inovatif.',
   visionTitle: 'Visi Kami',
   visionText: 'Menjadi mitra teknologi terdepan.',
-  timeline: [],
-  teamMembers: [],
 
   resourcesPageTitle: 'Resources',
   resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri.',
-  newsItems: [],
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -191,13 +144,8 @@ export async function getSettings(): Promise<WebSettings> {
             menuItems: parseJson(settingsFromDb.menuItems, defaultSettings.menuItems),
             featureCards: parseJson(settingsFromDb.featureCards, defaultSettings.featureCards),
             aboutUsChecklist: parseJson(settingsFromDb.aboutUsChecklist, defaultSettings.aboutUsChecklist),
-            professionalServices: parseJson(settingsFromDb.professionalServices, defaultSettings.professionalServices),
             trustedByLogos: parseJson(settingsFromDb.trustedByLogos, defaultSettings.trustedByLogos),
             testimonials: parseJson(settingsFromDb.testimonials, defaultSettings.testimonials),
-            solutions: parseJson(settingsFromDb.solutions, defaultSettings.solutions),
-            timeline: parseJson(settingsFromDb.timeline, defaultSettings.timeline),
-            teamMembers: parseJson(settingsFromDb.teamMembers, defaultSettings.teamMembers),
-            newsItems: parseJson(settingsFromDb.newsItems, defaultSettings.newsItems),
         };
 
     } catch (error) {

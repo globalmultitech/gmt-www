@@ -1,14 +1,14 @@
 
 'use client';
 
-import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
+import type { Product, ProductSubCategory, ProductCategory, ProfessionalService, NewsItem } from '@prisma/client';
 import { ArrowRight, CheckCircle, Handshake } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent } from '@/components/ui/card';
-import type { WebSettings, FeatureCard, ProfessionalService, TrustedByLogo, NewsItem } from '@/lib/settings';
+import type { WebSettings, FeatureCard, TrustedByLogo } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import BlogSection from '@/components/blog-section';
 
@@ -21,9 +21,11 @@ type EnrichedProduct = Product & {
 type HomePageProps = {
   products: EnrichedProduct[];
   settings: WebSettings;
+  professionalServices: ProfessionalService[];
+  newsItems: NewsItem[];
 }
 
-export default function HomeClientPage({ products, settings }: HomePageProps) {
+export default function HomeClientPage({ products, settings, professionalServices, newsItems }: HomePageProps) {
   return (
     <div className="flex flex-col bg-background text-foreground">
       {/* Hero Section */}
@@ -60,7 +62,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
       {/* Feature Cards Section */}
-      {settings.featureCards && settings.featureCards.length > 0 && (
+      {settings.featureCards && (settings.featureCards as FeatureCard[]).length > 0 && (
         <section className="bg-dark-slate">
             <div className="container mx-auto px-4 relative z-10 -mt-20">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
@@ -115,7 +117,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
        {/* Services Section */}
-       {settings.professionalServices && settings.professionalServices.length > 0 && (
+       {professionalServices && professionalServices.length > 0 && (
           <section className="py-20 md:py-28 bg-background">
             <div className="container mx-auto px-4">
               <div className="text-center max-w-3xl mx-auto mb-16">
@@ -124,8 +126,8 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
                 {settings.servicesDescription && <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">{settings.servicesDescription}</p>}
               </div>
               <div className="grid md:grid-cols-2 gap-8">
-                {(settings.professionalServices as ProfessionalService[]).map((service) => (
-                  <Card key={service.title} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
+                {professionalServices.map((service) => (
+                  <Card key={service.id} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
                     <div className="flex flex-row items-center gap-4 p-6">
                       <div className="bg-primary/10 p-4 rounded-full">
                         <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
@@ -136,7 +138,9 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
                       </div>
                     </div>
                     <CardContent>
+                      {/* @ts-ignore */}
                       <ul className="space-y-3 pt-4 border-t">
+                        {/* @ts-ignore */}
                         {service.details.map((detail, index) => (
                           <li key={index} className="flex items-start gap-3">
                             <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
@@ -189,10 +193,10 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
       
       {/* Testimonial Section */}
-      {settings.testimonials && settings.testimonials.length > 0 && (
+      {settings.testimonials && (settings.testimonials as any[]).length > 0 && (
         <section className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4">
-            <TestimonialCarousel testimonials={settings.testimonials} />
+            <TestimonialCarousel testimonials={settings.testimonials as any[]} />
           </div>
         </section>
       )}
@@ -236,7 +240,7 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
       </section>
 
        {/* Blog Section */}
-      {settings.newsItems && settings.newsItems.length > 0 && (
+      {newsItems && newsItems.length > 0 && (
         <section className="py-20 md:py-28 bg-background">
             <div className="container mx-auto px-4">
                 <div className="text-center max-w-3xl mx-auto mb-16">
@@ -244,10 +248,10 @@ export default function HomeClientPage({ products, settings }: HomePageProps) {
                     <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Latest news & articles</h2>
                 </div>
                 <div className="grid md:grid-cols-3 gap-8">
-                    {(settings.newsItems as NewsItem[]).map((post, index) => (
+                    {newsItems.map((post, index) => (
                         <div key={index} className="group bg-card p-6 rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 transform hover:-translate-y-2">
                             <div className="relative overflow-hidden rounded-lg mb-6">
-                              <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint}/>
+                              <Image src={post.image || 'https://placehold.co/600x400.png'} alt={post.title} width={400} height={250} className="w-full object-cover transition-transform duration-500 group-hover:scale-110" data-ai-hint={post.aiHint || 'news article'}/>
                             </div>
                             <div className="text-sm text-muted-foreground mb-2">
                                 <span>{post.date}</span> / <span>By {post.category}</span>

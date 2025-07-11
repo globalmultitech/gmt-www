@@ -1,15 +1,21 @@
 
-
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Handshake, ShieldCheck } from 'lucide-react';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { getSettings } from '@/lib/settings';
+import prisma from '@/lib/db';
+
+async function getPageData() {
+    const settings = await getSettings();
+    const services = await prisma.professionalService.findMany({
+        orderBy: { createdAt: 'asc' }
+    });
+    return { settings, services };
+}
 
 export default async function LayananPage() {
-  const settings = await getSettings();
-
-  const services = settings.professionalServices ?? [];
+  const { settings, services } = await getPageData();
 
   return (
     <>
@@ -40,7 +46,8 @@ export default async function LayananPage() {
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-3 pt-4 border-t">
-                    {service.details.map((detail, detailIndex) => (
+                    {/* @ts-ignore */}
+                    {(Array.isArray(service.details) ? service.details : []).map((detail, detailIndex) => (
                       <li key={detailIndex} className="flex items-start gap-3">
                         <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
                         <span className="text-sm text-muted-foreground">{detail}</span>
