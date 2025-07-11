@@ -5,14 +5,17 @@ import { getSettings } from '@/lib/settings';
 import { ArrowRight, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import prisma from '@/lib/db';
 
 export default async function ResourcesPage() {
   const settings = await getSettings();
-  const newsItems = settings.newsItems ?? [];
+  const newsItems = await prisma.newsItem.findMany({
+    orderBy: { date: 'desc' }
+  });
 
   return (
     <>
-      <section className="bg-dark-slate">
+      <section className="bg-dark-slate pt-20">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{settings.resourcesPageTitle}</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
@@ -35,7 +38,7 @@ export default async function ResourcesPage() {
                     alt={item.title}
                     fill
                     className="object-cover"
-                    data-ai-hint={item.aiHint}
+                    data-ai-hint={item.aiHint || ''}
                   />
                 </div>
                 <CardHeader>

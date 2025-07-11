@@ -41,7 +41,7 @@ export default async function ProdukPage() {
   return (
     <>
       {/* Page Header */}
-      <section className="bg-dark-slate text-primary">
+      <section className="bg-dark-slate text-primary pt-20">
         <div className="container mx-auto px-4 py-16 text-center">
           <h1 className="text-4xl md:text-5xl font-headline font-bold">Kategori Produk</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
