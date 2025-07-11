@@ -167,25 +167,36 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                 <Accordion type="multiple" className="w-full">
                     {categories.map((category) => (
                         <AccordionItem value={`category-${category.id}`} key={category.id}>
-                            <AccordionTrigger className="font-semibold text-lg hover:no-underline">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative w-16 h-10 rounded-md bg-muted overflow-hidden">
-                                      {category.imageUrl ? (
-                                        <Image src={category.imageUrl} alt={category.name} fill className="object-cover" />
-                                      ) : (
-                                        <div className="flex items-center justify-center h-full w-full">
-                                          <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                            <div className="flex justify-between items-center pr-4">
+                                <AccordionTrigger className="font-semibold text-lg hover:no-underline flex-grow">
+                                    <div className="flex items-center gap-4">
+                                        <div className="relative w-16 h-10 rounded-md bg-muted overflow-hidden">
+                                        {category.imageUrl ? (
+                                            <Image src={category.imageUrl} alt={category.name} fill className="object-cover" />
+                                        ) : (
+                                            <div className="flex items-center justify-center h-full w-full">
+                                            <ImageIcon className="w-5 h-5 text-muted-foreground" />
+                                            </div>
+                                        )}
                                         </div>
-                                      )}
+                                        <span>{category.name}</span>
                                     </div>
-                                    <span>{category.name}</span>
-                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => { e.stopPropagation(); openEditDialog(category); }}><Pencil className="h-4 w-4" /></Button>
-                                    <AlertDialog onOpenChange={(open) => open && e.stopPropagation()}>
+                                </AccordionTrigger>
+                                <div className="flex items-center gap-1 pl-2">
+                                    <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEditDialog(category)}>
+                                        <Pencil className="h-4 w-4" />
+                                    </Button>
+                                    <AlertDialog>
                                         <AlertDialogTrigger asChild>
-                                            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={(e) => e.stopPropagation()}><Trash2 className="h-4 w-4 text-destructive" /></Button>
+                                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive">
+                                                <Trash2 className="h-4 w-4" />
+                                            </Button>
                                         </AlertDialogTrigger>
                                         <AlertDialogContent>
-                                            <AlertDialogHeader><AlertDialogTitle>Hapus Kategori?</AlertDialogTitle><AlertDialogDescription>Ini akan menghapus kategori dan semua sub-kategorinya.</AlertDialogDescription></AlertDialogHeader>
+                                            <AlertDialogHeader>
+                                                <AlertDialogTitle>Hapus Kategori?</AlertDialogTitle>
+                                                <AlertDialogDescription>Ini akan menghapus kategori dan semua sub-kategorinya.</AlertDialogDescription>
+                                            </AlertDialogHeader>
                                             <AlertDialogFooter>
                                                 <AlertDialogCancel>Batal</AlertDialogCancel>
                                                 <AlertDialogAction onClick={() => handleDelete(deleteCategory, category.id, 'kategori')}>Hapus</AlertDialogAction>
@@ -193,7 +204,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                                         </AlertDialogContent>
                                     </AlertDialog>
                                 </div>
-                            </AccordionTrigger>
+                            </div>
                             <AccordionContent>
                                 <div className="pl-4 space-y-2">
                                     {category.subCategories.length === 0 && <p className="text-sm text-muted-foreground">Belum ada sub-kategori.</p>}
