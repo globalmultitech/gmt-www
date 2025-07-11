@@ -1,11 +1,11 @@
-import { getWebSettings } from './actions';
+import { getSettings } from '@/lib/settings';
 import SettingsClientPage from './client-page';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
 export default async function SettingsPage() {
-  const settings = await getWebSettings();
+  const settings = await getSettings();
 
   if (!settings) {
     // This should not happen if seed is run, but as a fallback

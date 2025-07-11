@@ -115,12 +115,19 @@ export async function updateWebSettings(prevState: { message: string } | undefin
       testimonials: data.testimonials?.filter(item => item.name || item.quote) ?? [],
       blogPosts: data.blogPosts?.filter(item => item.title) ?? [],
     };
+    
+    // Omit professionalServices from this update action, as it's managed separately
+    const { 
+        // professionalServices, // This field is managed elsewhere
+        ...dataToUpdate 
+    } = sanitizedData;
+
 
     await prisma.webSettings.update({
         where: { id: 1 },
         data: {
-          ...sanitizedData,
-          socialMedia: sanitizedData.socialMedia ?? {},
+          ...dataToUpdate,
+          socialMedia: dataToUpdate.socialMedia ?? {},
         }
     });
 
