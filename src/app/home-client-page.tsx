@@ -270,21 +270,7 @@ export default function HomeClientPage({ products, settings, professionalService
             </div>
         </section>
       )}
-      
-      {/* AI Blog Summarizer Section */}
-      <section className="py-20 md:py-28 bg-secondary">
-        <div className="container mx-auto px-4">
-            <div className="text-center max-w-3xl mx-auto mb-12">
-                <p className="font-semibold text-sky-blue uppercase tracking-widest mb-2">AI-Powered Insights</p>
-                <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Wawasan dari Blog Kami</h2>
-                <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">Jelajahi artikel, studi kasus, dan analisis mendalam dari tim ahli kami, diringkas oleh AI.</p>
-            </div>
-            <BlogSection />
-        </div>
-      </section>
 
     </div>
   );
 }
-
-    
