@@ -270,10 +270,10 @@ async function main() {
   console.log('Seeding Team Members...');
   await prisma.teamMember.createMany({
     data: [
-      { name: 'Budi Santoso', role: 'Chief Executive Officer', image: 'https://placehold.co/400x400.png', linkedin: '#', aiHint: "professional man portrait" },
-      { name: 'Citra Dewi', role: 'Chief Technology Officer', image: 'https://placehold.co/400x400.png', linkedin: '#', aiHint: "professional woman portrait" },
-      { name: 'Agus Setiawan', role: 'Head of Sales', image: 'https://placehold.co/400x400.png', linkedin: '#', aiHint: "smiling man portrait" },
-      { name: 'Rina Kartika', role: 'Head of Operations', image: 'https://placehold.co/400x400.png', linkedin: '#', aiHint: "smiling woman portrait" },
+      { name: 'Budi Santoso', role: 'Chief Executive Officer', image: 'https://placehold.co/400x400.png', linkedin: '#' },
+      { name: 'Citra Dewi', role: 'Chief Technology Officer', image: 'https://placehold.co/400x400.png', linkedin: '#' },
+      { name: 'Agus Setiawan', role: 'Head of Sales', image: 'https://placehold.co/400x400.png', linkedin: '#' },
+      { name: 'Rina Kartika', role: 'Head of Operations', image: 'https://placehold.co/400x400.png', linkedin: '#' },
     ]
   });
 

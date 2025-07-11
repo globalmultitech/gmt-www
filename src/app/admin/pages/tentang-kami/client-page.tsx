@@ -83,7 +83,7 @@ export default function TentangKamiPageClientPage({ settings, initialTimeline, i
       setFormState(prev => ({...prev, timeline: [...prev.timeline, { id: Date.now(), year: '', event: '', createdAt: new Date(), updatedAt: new Date() }]}));
     } else {
       // @ts-ignore
-      setFormState(prev => ({...prev, teamMembers: [...prev.teamMembers, { id: Date.now(), name: '', role: '', image: '', linkedin: '#', aiHint: '', createdAt: new Date(), updatedAt: new Date() }]}));
+      setFormState(prev => ({...prev, teamMembers: [...prev.teamMembers, { id: Date.now(), name: '', role: '', image: '', linkedin: '#', createdAt: new Date(), updatedAt: new Date() }]}));
     }
   };
 
@@ -197,8 +197,7 @@ export default function TentangKamiPageClientPage({ settings, initialTimeline, i
                             <div className="grid grid-cols-2 gap-2">
                                 <div className="space-y-1"><Label className="text-xs">Nama</Label><Input value={member.name} onChange={e => handleItemChange('teamMembers', index, 'name', e.target.value)} /></div>
                                 <div className="space-y-1"><Label className="text-xs">Jabatan</Label><Input value={member.role} onChange={e => handleItemChange('teamMembers', index, 'role', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input value={member.linkedin || ''} onChange={e => handleItemChange('teamMembers', index, 'linkedin', e.target.value)} /></div>
-                                <div className="space-y-1"><Label className="text-xs">AI Hint (u/ gambar)</Label><Input value={member.aiHint || ''} onChange={e => handleItemChange('teamMembers', index, 'aiHint', e.target.value)} /></div>
+                                <div className="md:col-span-2 space-y-1"><Label className="text-xs">Link LinkedIn (Opsional)</Label><Input value={member.linkedin || ''} onChange={e => handleItemChange('teamMembers', index, 'linkedin', e.target.value)} /></div>
                             </div>
                         </div>
                         <Button type="button" variant="ghost" size="icon" onClick={() => removeItem('teamMembers', index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>

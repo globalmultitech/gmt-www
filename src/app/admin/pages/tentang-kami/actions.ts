@@ -17,7 +17,6 @@ const TeamMemberSchema = z.object({
     role: z.string().default(''),
     image: z.string().default(''),
     linkedin: z.string().default(''),
-    aiHint: z.string().default(''),
 });
 
 const TentangKamiPageSettingsSchema = z.object({
@@ -100,7 +99,7 @@ export async function updateTentangKamiPageSettings(prevState: { message: string
         teamMemberOps.push(prisma.teamMember.deleteMany({ where: { id: { in: teamMemberIdsToDelete } } }));
     }
     for (const item of teamMembersFromClient) {
-        const sanitizedData = { name: item.name, role: item.role, image: item.image, linkedin: item.linkedin, aiHint: item.aiHint };
+        const sanitizedData = { name: item.name, role: item.role, image: item.image, linkedin: item.linkedin };
         if (!item.name && !item.role) continue;
         if (dbTeamMemberIds.has(item.id)) {
             teamMemberOps.push(prisma.teamMember.update({ where: { id: item.id }, data: sanitizedData }));
