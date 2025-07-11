@@ -24,13 +24,11 @@ const FeatureCardSchema = z.object({
     description: z.string().optional(),
 });
 
-const ProfessionalServiceDetailSchema = z.string();
-
 const ProfessionalServiceSchema = z.object({
     icon: z.string().optional(),
     title: z.string().optional(),
     description: z.string().optional(),
-    details: z.array(ProfessionalServiceDetailSchema).optional(),
+    details: z.array(z.string()).optional(),
 });
 
 const TestimonialSchema = z.object({
@@ -50,7 +48,6 @@ const BlogPostSchema = z.object({
     href: z.string().optional(),
 });
 
-
 const TrustedByLogoSchema = z.object({
   src: z.string().optional(),
   alt: z.string().optional(),
@@ -67,7 +64,6 @@ const SettingsSchema = z.object({
   openingHours: z.string().optional(),
   socialMedia: SocialMediaLinksSchema.optional(),
   menuItems: z.array(MenuItemSchema).optional(),
-  // Hero section fields
   heroHeadline: z.string().optional(),
   heroDescription: z.string().optional(),
   heroImageUrl: z.string().optional(),
@@ -75,20 +71,16 @@ const SettingsSchema = z.object({
   heroButton1Link: z.string().optional(),
   heroButton2Text: z.string().optional(),
   heroButton2Link: z.string().optional(),
-  // Feature cards
   featureCards: z.array(FeatureCardSchema).optional(),
-  // About Us section fields
   aboutUsSubtitle: z.string().optional(),
   aboutUsTitle: z.string().optional(),
   aboutUsDescription: z.string().optional(),
   aboutUsImageUrl: z.string().optional(),
   aboutUsChecklist: z.array(z.string()).optional(),
-  // Services section fields
   servicesSubtitle: z.string().optional(),
   servicesTitle: z.string().optional(),
   servicesDescription: z.string().optional(),
   professionalServices: z.array(ProfessionalServiceSchema).optional(),
-  // CTA Section fields
   ctaHeadline: z.string().optional(),
   ctaDescription: z.string().optional(),
   ctaImageUrl: z.string().optional(),
@@ -96,9 +88,7 @@ const SettingsSchema = z.object({
   ctaButtonLink: z.string().optional(),
   trustedByText: z.string().optional(),
   trustedByLogos: z.array(TrustedByLogoSchema).optional(),
-  // Testimonials
   testimonials: z.array(TestimonialSchema).optional(),
-  // Blog Posts
   blogPosts: z.array(BlogPostSchema).optional(),
 });
 
@@ -128,7 +118,6 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
             if (!items[index]) {
                 items[index] = {};
             }
-            // Handle nested arrays, like 'details' in 'professionalServices'
             const detailMatch = field.match(/^details\[(\d+)\]$/);
             if (detailMatch) {
                 if (!items[index].details) {
@@ -141,18 +130,13 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
         }
     }
     
-    // Convert to array and filter out potentially empty objects,
-    // keeping only those where at least one key has a non-empty string value.
     return Object.values(items).filter(item => {
         if (typeof item !== 'object' || item === null) return false;
         
-        // Clean up nested details array first
         if (Array.isArray(item.details)) {
             item.details = item.details.filter(detail => typeof detail === 'string' && detail.trim() !== '');
         }
 
-        // Check if any of the main properties of the item has a value.
-        // This will now correctly filter out items where all fields are empty strings.
         return Object.values(item).some(value => {
             if (Array.isArray(value)) {
                 return value.length > 0;
@@ -161,7 +145,6 @@ function getAsArrayOfObjects(formData: FormData, key: string) {
         });
     });
 }
-
 
 function getAsArrayOfStrings(formData: FormData, key: string) {
     const items: string[] = [];
@@ -233,8 +216,6 @@ export async function updateWebSettings(prevState: { message: string } | undefin
   if (!validatedFields.success) {
     const errorMessages = validatedFields.error.flatten().fieldErrors;
     console.log(JSON.stringify(errorMessages, null, 2));
-
-    // Combine error messages for a more informative toast
     const message = Object.entries(errorMessages)
         .map(([key, value]) => `${key}: ${value.join(', ')}`)
         .join('; ');
@@ -251,13 +232,12 @@ export async function updateWebSettings(prevState: { message: string } | undefin
             ...data
         }
     });
-
-    // Revalidate all pages that might use this data
     revalidatePath('/', 'layout');
-
     return { message: 'Pengaturan berhasil diperbarui.' };
   } catch (error) {
     console.error('Update settings error:', error);
     return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
   }
 }
+
+    
