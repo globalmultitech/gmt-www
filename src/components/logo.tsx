@@ -1,6 +1,7 @@
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSidebar } from './ui/sidebar';
 
 type LogoProps = {
   className?: string;
@@ -14,12 +15,15 @@ export function Logo({
   className,
   companyName = 'Global Multi Technology',
   logoUrl,
-  scrolled, // kept for prop compatibility, but not used for sizing
+  scrolled,
   variant = 'default',
 }: LogoProps) {
+  
+  const sidebar = useSidebar();
+  
   const imageSizeClasses = {
-    default: 'h-16 w-16 md:h-20 md:w-20',
-    footer: 'h-14 w-14 md:h-20 md:w-20',
+    default: 'h-16 w-auto',
+    footer: 'h-14 w-auto',
   };
 
   const textSizeClasses = {
@@ -31,6 +35,33 @@ export function Logo({
     default: scrolled ? 'text-primary-foreground' : 'text-primary',
     footer: 'text-primary-foreground',
   };
+
+  if (sidebar) {
+     const isCollapsed = sidebar.state === 'collapsed';
+     return (
+        <Link href="/" className={cn('flex items-center gap-2', className)}>
+            {logoUrl ? (
+                <Image
+                    src={logoUrl}
+                    alt={`Logo ${companyName}`}
+                    width={80}
+                    height={80}
+                    className={cn('object-contain h-8 w-8', isCollapsed && 'h-10 w-10')}
+                    priority
+                />
+            ) : null}
+             <span
+                className={cn(
+                'font-headline font-extrabold tracking-wide transition-all',
+                'text-lg text-foreground',
+                isCollapsed && 'opacity-0 w-0'
+                )}
+            >
+                {companyName}
+            </span>
+        </Link>
+     )
+  }
 
   return (
     <Link href="/" className={cn('flex items-center gap-3', className)}>
