@@ -36,7 +36,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   const getInitialFormState = () => ({
     resourcesPageTitle: settings.resourcesPageTitle ?? '',
     resourcesPageSubtitle: settings.resourcesPageSubtitle ?? '',
-    newsItems: initialNewsItems,
+    newsItems: initialNewsItems.map(item => ({ ...item, slug: item.slug || '' })),
   });
 
   const [formState, setFormState] = useState(getInitialFormState());
@@ -78,11 +78,12 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   };
 
   const handleTitleChange = (index: number, newTitle: string) => {
+    const newSlug = toSlug(newTitle);
     setFormState(prev => {
       const newItems = [...prev.newsItems];
       const currentItem = newItems[index];
       currentItem.title = newTitle;
-      currentItem.slug = toSlug(newTitle);
+      currentItem.slug = newSlug;
       return {...prev, newsItems: newItems};
     });
   }
