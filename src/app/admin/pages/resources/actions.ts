@@ -22,7 +22,7 @@ const NewsItemSchema = z.object({
     category: z.string().default(''),
     image: z.string().nullable().default(''),
     content: z.string().nullable().default(''),
-    slug: z.string().optional(),
+    // slug is handled server-side
 });
 
 const ResourcesPageSettingsSchema = z.object({
@@ -62,7 +62,7 @@ export async function updateResourcesPageSettings(prevState: { message: string }
     const newsItemsInDb = await prisma.newsItem.findMany({ select: { id: true } });
     const dbItemIds = new Set(newsItemsInDb.map(s => s.id));
     
-    // Filter out client items that are just empty shells
+    // Filter out client items that are just empty shells (no title)
     const validClientItems = newsItemsFromClient.filter(item => item.title.trim());
     const validClientItemIds = new Set(validClientItems.map(s => s.id));
 
@@ -80,9 +80,23 @@ export async function updateResourcesPageSettings(prevState: { message: string }
         const finalSlug = toSlug(item.title);
         
         if (!finalSlug) {
-            return { message: `Gagal menyimpan: Judul "${item.title}" tidak dapat menghasilkan URL yang valid.` };
+            // This case should be prevented by the filter above, but as a safeguard.
+            continue;
         }
         
+        // Check for slug uniqueness before committing
+        const existingSlugItem = await prisma.newsItem.findFirst({ 
+            where: { 
+                slug: finalSlug, 
+                // Exclude the current item from the check if it's an update
+                id: { not: dbItemIds.has(item.id) ? item.id : -1 } 
+            }
+        });
+        
+        if (existingSlugItem) {
+            return { message: `Gagal menyimpan: Judul "${item.title}" menghasilkan URL (slug) yang sudah digunakan oleh artikel lain.` };
+        }
+
         const sanitizedData = {
             title: item.title,
             slug: finalSlug,
@@ -90,18 +104,6 @@ export async function updateResourcesPageSettings(prevState: { message: string }
             image: item.image,
             content: item.content,
         };
-        
-        // Check for slug uniqueness before committing
-        const existingSlugItem = await prisma.newsItem.findFirst({ 
-            where: { 
-                slug: finalSlug, 
-                id: { not: dbItemIds.has(item.id) ? item.id : -1 }
-            }
-        });
-        
-        if (existingSlugItem) {
-            return { message: `Gagal menyimpan: URL slug "${finalSlug}" sudah digunakan oleh artikel lain.` };
-        }
 
         // Use the presence of the ID in the database's list to determine if it's an update or create
         if (dbItemIds.has(item.id)) {
