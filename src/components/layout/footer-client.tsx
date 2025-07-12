@@ -115,16 +115,19 @@ export function FooterClient({ settings }: FooterClientProps) {
         </div>
 
         {/* Bottom Footer Section */}
-        <div className="py-6 flex flex-wrap justify-between items-center gap-4 border-t border-primary-foreground/20">
-          <p className="text-sm text-primary-foreground/80">&copy; {new Date().getFullYear()} {settings.companyName}. All Rights Reserved.</p>
-          <div className="flex space-x-6 text-sm text-primary-foreground/80">
-             <Link href="#" className="hover:text-primary-foreground">Terms & Conditions</Link>
-             <Link href="#" className="hover:text-primary-foreground">Privacy Policy</Link>
-          </div>
+        <div className="py-6 border-t border-primary-foreground/20 text-sm text-primary-foreground/80">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+                <p>&copy; {new Date().getFullYear()} {settings.companyName}. All Rights Reserved.</p>
+                <div className="flex space-x-6">
+                    <Link href="#" className="hover:text-primary-foreground">Terms & Conditions</Link>
+                    <Link href="#" className="hover:text-primary-foreground">Privacy Policy</Link>
+                </div>
+            </div>
+            <div className="text-center mt-4">
+                Crafted by <a href="https://c-ss.co.id" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-primary-foreground underline">Creative Software Solution</a>
+            </div>
         </div>
       </div>
     </footer>
   );
 }
-
-    

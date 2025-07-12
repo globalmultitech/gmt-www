@@ -142,6 +142,9 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                     </SidebarMenuButton>
                 </form>
             </SidebarMenuItem>
+            <div className="text-center text-xs text-muted-foreground p-2 group-data-[collapsible=icon]:hidden">
+                Crafted by <a href="https://c-ss.co.id" target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-foreground underline">Creative Software Solution</a>
+            </div>
           </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
