@@ -1,9 +1,5 @@
-
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -11,72 +7,112 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db"
+  url      = env("DATABASE_URL")
 }
-
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  name      String?
   password  String
-  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
-  id                        Int      @id @default(1)
-  logoUrl                   String?
-  companyName               String?
-  whatsappSales             String?
-  footerText                String?
-  address                   String?
-  contactEmail              String?
-  contactPhone              String?
-  openingHours              String?
-  socialMedia               Json?
-  menuItems                 Json?
-  heroHeadline              String?
-  heroDescription           String?
-  heroImageUrl              String?
-  heroButton1Text           String?
-  heroButton1Link           String?
-  heroButton2Text           String?
-  heroButton2Link           String?
-  featureCards              Json?
-  aboutUsSubtitle           String?
-  aboutUsTitle              String?
-  aboutUsDescription        String?
-  aboutUsImageUrl           String?
-  aboutUsChecklist          Json?
-  servicesSubtitle          String?
-  servicesTitle             String?
-  servicesDescription       String?
-  ctaHeadline               String?
-  ctaDescription            String?
-  ctaImageUrl               String?
-  ctaButtonText             String?
-  ctaButtonLink             String?
-  trustedByText             String?
-  trustedByLogos            Json?
-  testimonials              Json?
-  servicesPageTitle         String?
-  servicesPageSubtitle      String?
+  id                          Int      @id @default(1)
+  logoUrl                     String?
+  companyName                 String?
+  whatsappSales               String?
+  footerText                  String?
+  address                     String?
+  contactEmail                String?
+  contactPhone                String?
+  openingHours                String?
+  socialMedia                 Json?
+  menuItems                   Json?
+  heroHeadline                String?
+  heroDescription             String?
+  heroImageUrl                String?
+  heroButton1Text             String?
+  heroButton1Link             String?
+  heroButton2Text             String?
+  heroButton2Link             String?
+  featureCards                Json?
+  aboutUsSubtitle             String?
+  aboutUsTitle                String?
+  aboutUsDescription          String?
+  aboutUsImageUrl             String?
+  aboutUsChecklist            Json?
+  servicesSubtitle            String?
+  servicesTitle               String?
+  servicesDescription         String?
+  ctaHeadline                 String?
+  ctaDescription              String?
+  ctaImageUrl                 String?
+  ctaButtonText               String?
+  ctaButtonLink               String?
+  trustedByText               String?
+  trustedByLogos              Json?
+  testimonials                Json?
+  servicesPageTitle           String?
+  servicesPageSubtitle        String?
   servicesPageCommitmentTitle String?
-  servicesPageCommitmentText String?
-  servicesPageHeaderImageUrl String?
-  solutionsPageTitle        String?
-  solutionsPageSubtitle     String?
-  aboutPageTitle            String?
-  aboutPageSubtitle         String?
-  missionTitle              String?
-  missionText               String?
-  visionTitle               String?
-  visionText                String?
-  resourcesPageTitle        String?
-  resourcesPageSubtitle     String?
-  createdAt                 DateTime @default(now())
-  updatedAt                 DateTime @updatedAt
+  servicesPageCommitmentText  String?
+  servicesPageHeaderImageUrl  String?
+  solutionsPageTitle          String?
+  solutionsPageSubtitle       String?
+  aboutPageTitle              String?
+  aboutPageSubtitle           String?
+  missionTitle                String?
+  missionText                 String?
+  visionTitle                 String?
+  visionText                  String?
+  resourcesPageTitle          String?
+  resourcesPageSubtitle       String?
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model ProductCategory {
+  id            Int                  @id @default(autoincrement())
+  name          String               @unique
+  description   String?
+  imageUrl      String?
+  subCategories ProductSubCategory[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+}
+
+model ProductSubCategory {
+  id         Int       @id @default(autoincrement())
+  name       String
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+  products   Product[]
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([name, categoryId])
+}
+
+model Product {
+  id               Int                @id @default(autoincrement())
+  title            String
+  slug             String             @unique
+  description      String
+  longDescription  String?
+  images           Json?
+  features         Json?
+  specifications   Json?
+  tokopediaUrl     String?
+  shopeeUrl        String?
+  metaTitle        String?
+  metaDescription  String?
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId    Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
 }
 
 model ProfessionalService {
@@ -128,67 +164,4 @@ model NewsItem {
   content   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-}
-
-
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  description   String?
-  imageUrl      String?
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
-  name       String
-  categoryId Int
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  products   Product[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
-
-  @@unique([name, categoryId])
-}
-
-model Product {
-  id               Int                @id @default(autoincrement())
-  title            String
-  slug             String             @unique
-  description      String
-  longDescription  String?
-  images           Json?
-  features         Json?
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?
-  tokopediaUrl     String?
-  shopeeUrl        String?
-  subCategoryId    Int
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
-}
-
-model ChatSession {
-  id        String   @id
-  guestName String?
-  status    String   @default("open") // open, closed
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  messages ChatMessage[]
-}
-
-model ChatMessage {
-  id          Int      @id @default(autoincrement())
-  sessionId   String
-  content     String
-  sender      String // "user" or "admin"
-  isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  
-  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }
