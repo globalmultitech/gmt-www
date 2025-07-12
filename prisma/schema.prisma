@@ -1,14 +1,19 @@
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
+
 
 model User {
   id        Int      @id @default(autoincrement())
@@ -20,65 +25,65 @@ model User {
 }
 
 model WebSettings {
-  id                       Int    @id @default(1)
-  logoUrl                  String? @db.Text
-  companyName              String
-  whatsappSales            String
-  footerText               String @db.Text
-  address                  String?
-  contactEmail             String?
-  contactPhone             String?
-  openingHours             String?
-  socialMedia              Json?
-  menuItems                Json?
-  heroHeadline             String @db.Text
-  heroDescription          String @db.Text
-  heroImageUrl             String @db.Text
-  heroButton1Text          String?
-  heroButton1Link          String?
-  heroButton2Text          String?
-  heroButton2Link          String?
-  featureCards             Json?
-  aboutUsSubtitle          String?
-  aboutUsTitle             String? @db.Text
-  aboutUsDescription       String? @db.Text
-  aboutUsImageUrl          String? @db.Text
-  aboutUsChecklist         Json?
-  servicesSubtitle         String?
-  servicesTitle            String?
-  servicesDescription      String? @db.Text
-  ctaHeadline              String? @db.Text
-  ctaDescription           String? @db.Text
-  ctaImageUrl              String? @db.Text
-  ctaButtonText            String?
-  ctaButtonLink            String?
-  trustedByText            String?
-  trustedByLogos           Json?
-  testimonials             Json?
-  servicesPageTitle        String?
-  servicesPageSubtitle     String?
+  id                        Int      @id @default(1)
+  logoUrl                   String?
+  companyName               String?
+  whatsappSales             String?
+  footerText                String?
+  address                   String?
+  contactEmail              String?
+  contactPhone              String?
+  openingHours              String?
+  socialMedia               Json?
+  menuItems                 Json?
+  heroHeadline              String?
+  heroDescription           String?
+  heroImageUrl              String?
+  heroButton1Text           String?
+  heroButton1Link           String?
+  heroButton2Text           String?
+  heroButton2Link           String?
+  featureCards              Json?
+  aboutUsSubtitle           String?
+  aboutUsTitle              String?
+  aboutUsDescription        String?
+  aboutUsImageUrl           String?
+  aboutUsChecklist          Json?
+  servicesSubtitle          String?
+  servicesTitle             String?
+  servicesDescription       String?
+  ctaHeadline               String?
+  ctaDescription            String?
+  ctaImageUrl               String?
+  ctaButtonText             String?
+  ctaButtonLink             String?
+  trustedByText             String?
+  trustedByLogos            Json?
+  testimonials              Json?
+  servicesPageTitle         String?
+  servicesPageSubtitle      String?
   servicesPageCommitmentTitle String?
-  servicesPageCommitmentText  String? @db.Text
-  servicesPageHeaderImageUrl String? @db.Text
-  solutionsPageTitle       String?
-  solutionsPageSubtitle    String?
-  aboutPageTitle           String?
-  aboutPageSubtitle        String?
-  missionTitle             String?
-  missionText              String? @db.Text
-  visionTitle              String?
-  visionText               String? @db.Text
-  resourcesPageTitle       String?
-  resourcesPageSubtitle    String?
-  createdAt                DateTime @default(now())
-  updatedAt                DateTime @updatedAt
+  servicesPageCommitmentText String?
+  servicesPageHeaderImageUrl String?
+  solutionsPageTitle        String?
+  solutionsPageSubtitle     String?
+  aboutPageTitle            String?
+  aboutPageSubtitle         String?
+  missionTitle              String?
+  missionText               String?
+  visionTitle               String?
+  visionText                String?
+  resourcesPageTitle        String?
+  resourcesPageSubtitle     String?
+  createdAt                 DateTime @default(now())
+  updatedAt                 DateTime @updatedAt
 }
 
 model ProfessionalService {
   id          Int      @id @default(autoincrement())
   icon        String
   title       String
-  description String   @db.Text
+  description String
   details     Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -88,8 +93,8 @@ model Solution {
   id          Int      @id @default(autoincrement())
   icon        String
   title       String
-  description String   @db.Text
-  image       String?  @db.Text
+  description String
+  image       String?
   aiHint      String?
   keyPoints   Json
   createdAt   DateTime @default(now())
@@ -97,72 +102,93 @@ model Solution {
 }
 
 model TimelineEvent {
-  id      Int    @id @default(autoincrement())
-  year    String
-  event   String @db.Text
+  id        Int      @id @default(autoincrement())
+  year      String
+  event     String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model TeamMember {
-  id      Int    @id @default(autoincrement())
-  name    String
-  role    String
-  image   String? @db.Text
-  linkedin String?
+  id        Int      @id @default(autoincrement())
+  name      String
+  role      String
+  image     String?
+  linkedin  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model NewsItem {
-  id       Int     @id @default(autoincrement())
-  title    String
-  slug     String  @unique
-  category String
-  image    String? @db.Text
-  content  String? @db.Text
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  category  String
+  image     String?
+  content   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 
 model ProductCategory {
-  id          Int                  @id @default(autoincrement())
-  name        String               @unique
-  description String?              @db.Text
-  imageUrl    String?              @db.Text
+  id            Int                  @id @default(autoincrement())
+  name          String               @unique
+  description   String?
+  imageUrl      String?
   subCategories ProductSubCategory[]
-  createdAt   DateTime             @default(now())
-  updatedAt   DateTime             @updatedAt
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 }
 
 model ProductSubCategory {
-  id         Int        @id @default(autoincrement())
+  id         Int             @id @default(autoincrement())
   name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products   Product[]
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 
   @@unique([name, categoryId])
 }
 
 model Product {
-  id              Int       @id @default(autoincrement())
-  title           String
-  slug            String    @unique
-  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId   Int
-  description     String    @db.Text
-  longDescription String?   @db.Text
-  images          Json      // Menyimpan array URL gambar
-  features        Json      // Menyimpan array string fitur
-  specifications  Json      // Menyimpan objek spesifikasi
-  metaTitle       String?
-  metaDescription String?   @db.Text
-  tokopediaUrl    String?   @db.Text
-  shopeeUrl       String?   @db.Text
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id               Int                @id @default(autoincrement())
+  title            String
+  slug             String             @unique
+  description      String
+  longDescription  String?
+  images           Json?
+  features         Json?
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?
+  tokopediaUrl     String?
+  shopeeUrl        String?
+  subCategoryId    Int
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+model ChatSession {
+  id        String   @id
+  guestName String?
+  status    String   @default("open") // open, closed
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages ChatMessage[]
+}
+
+model ChatMessage {
+  id          Int      @id @default(autoincrement())
+  sessionId   String
+  content     String
+  sender      String // "user" or "admin"
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  
+  session   ChatSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 }

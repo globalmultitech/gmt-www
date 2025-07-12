@@ -30,6 +30,7 @@ import {
   Building2,
   Newspaper,
   ChevronDown,
+  MessageSquare,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logout } from '@/app/login/actions';
@@ -46,6 +47,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
 
   const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard /> },
+    { href: '/admin/chat', label: 'Live Chat', icon: <MessageSquare /> },
     { href: '/admin/produk', label: 'Produk', icon: <Package /> },
     { href: '/admin/kategori', label: 'Kategori', icon: <Shapes /> },
   ];

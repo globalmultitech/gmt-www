@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { AppShell } from '@/components/layout/app-shell';
+import ChatWidget from '@/components/chat-widget';
 
 export const metadata: Metadata = {
   title: 'Global Multi Technology',
@@ -31,6 +32,7 @@ export default function RootLayout({
           <AppShell header={<Header />} footer={<Footer />}>
             {children}
           </AppShell>
+          <ChatWidget />
           <Toaster />
       </body>
     </html>

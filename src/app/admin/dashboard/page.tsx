@@ -1,7 +1,8 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { Users, Settings, Package, Shapes, Newspaper, FileText, Building2, Handshake } from "lucide-react";
+import { Users, Settings, Package, Shapes, Newspaper, FileText, Building2, Handshake, MessageSquare } from "lucide-react";
 
 export default function AdminDashboardPage() {
     return (
@@ -14,6 +15,18 @@ export default function AdminDashboardPage() {
                 </CardHeader>
                 <CardContent>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <Card>
+                            <CardHeader>
+                                <MessageSquare className="h-8 w-8 text-primary mb-2" />
+                                <CardTitle>Live Chat</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-muted-foreground text-sm mb-4">Lihat dan balas pesan dari pengunjung website.</p>
+                                <Button asChild>
+                                    <Link href="/admin/chat">Buka Inbox</Link>
+                                </Button>
+                            </CardContent>
+                        </Card>
                         <Card>
                             <CardHeader>
                                 <Package className="h-8 w-8 text-primary mb-2" />
