@@ -1,125 +1,100 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
+  name      String
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
-  id                          Int      @id @default(1)
-  logoUrl                     String?
-  companyName                 String?
-  whatsappSales               String?
-  footerText                  String?
-  address                     String?
-  contactEmail                String?
-  contactPhone                String?
-  openingHours                String?
-  socialMedia                 Json?
-  menuItems                   Json?
-  heroHeadline                String?
-  heroDescription             String?
-  heroImageUrl                String?
-  heroButton1Text             String?
-  heroButton1Link             String?
-  heroButton2Text             String?
-  heroButton2Link             String?
-  featureCards                Json?
-  aboutUsSubtitle             String?
-  aboutUsTitle                String?
-  aboutUsDescription          String?
-  aboutUsImageUrl             String?
-  aboutUsChecklist            Json?
-  servicesSubtitle            String?
-  servicesTitle               String?
-  servicesDescription         String?
-  ctaHeadline                 String?
-  ctaDescription              String?
-  ctaImageUrl                 String?
-  ctaButtonText               String?
-  ctaButtonLink               String?
-  trustedByText               String?
-  trustedByLogos              Json?
-  testimonials                Json?
+  id              Int     @id @default(1)
+  logoUrl         String? @db.Text
+  companyName     String
+  whatsappSales   String?
+  footerText      String? @db.Text
+  address         String?
+  contactEmail    String?
+  contactPhone    String?
+  openingHours    String?
+
+  socialMedia     Json?
+  menuItems       Json?
+
+  heroHeadline    String?
+  heroDescription String? @db.Text
+  heroImageUrl    String? @db.Text
+  heroButton1Text String?
+  heroButton1Link String?
+  heroButton2Text String?
+  heroButton2Link String?
+
+  featureCards    Json?
+
+  aboutUsSubtitle   String?
+  aboutUsTitle      String?
+  aboutUsDescription String? @db.Text
+  aboutUsImageUrl   String? @db.Text
+  aboutUsChecklist  Json?
+
+  servicesSubtitle  String?
+  servicesTitle     String?
+  servicesDescription String? @db.Text
+
+  ctaHeadline     String?
+  ctaDescription  String?
+  ctaImageUrl     String? @db.Text
+  ctaButtonText   String?
+  ctaButtonLink   String?
+  
+  trustedByText   String?
+  trustedByLogos  Json?
+  
+  testimonials    Json?
+
   servicesPageTitle           String?
   servicesPageSubtitle        String?
   servicesPageCommitmentTitle String?
-  servicesPageCommitmentText  String?
-  servicesPageHeaderImageUrl  String?
+  servicesPageCommitmentText  String? @db.Text
+  servicesPageHeaderImageUrl  String? @db.Text
+
   solutionsPageTitle          String?
-  solutionsPageSubtitle       String?
+  solutionsPageSubtitle       String? @db.Text
+
   aboutPageTitle              String?
   aboutPageSubtitle           String?
   missionTitle                String?
-  missionText                 String?
+  missionText                 String? @db.Text
   visionTitle                 String?
-  visionText                  String?
+  visionText                  String? @db.Text
+
   resourcesPageTitle          String?
-  resourcesPageSubtitle       String?
-  createdAt                   DateTime @default(now())
-  updatedAt                   DateTime @updatedAt
-}
+  resourcesPageSubtitle       String? @db.Text
 
-model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  description   String?
-  imageUrl      String?
-  subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
-}
-
-model ProductSubCategory {
-  id         Int       @id @default(autoincrement())
-  name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  categoryId Int
-  products   Product[]
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@unique([name, categoryId])
-}
-
-model Product {
-  id               Int                @id @default(autoincrement())
-  title            String
-  slug             String             @unique
-  description      String
-  longDescription  String?
-  images           Json?
-  features         Json?
-  specifications   Json?
-  tokopediaUrl     String?
-  shopeeUrl        String?
-  metaTitle        String?
-  metaDescription  String?
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  subCategoryId    Int
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProfessionalService {
   id          Int      @id @default(autoincrement())
   icon        String
   title       String
-  description String
+  description String   @db.Text
   details     Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -129,8 +104,8 @@ model Solution {
   id          Int      @id @default(autoincrement())
   icon        String
   title       String
-  description String
-  image       String?
+  description String   @db.Text
+  image       String?  @db.Text
   aiHint      String?
   keyPoints   Json
   createdAt   DateTime @default(now())
@@ -149,7 +124,7 @@ model TeamMember {
   id        Int      @id @default(autoincrement())
   name      String
   role      String
-  image     String?
+  image     String?  @db.Text
   linkedin  String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -160,8 +135,66 @@ model NewsItem {
   title     String
   slug      String   @unique
   category  String
-  image     String?
-  content   String?
+  image     String?  @db.Text
+  content   String?  @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
+
+model ProductCategory {
+  id            Int                  @id @default(autoincrement())
+  name          String               @unique
+  description   String?              @db.Text
+  imageUrl      String?              @db.Text
+  subCategories ProductSubCategory[]
+}
+
+model ProductSubCategory {
+  id         Int             @id @default(autoincrement())
+  name       String
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId Int
+  products   Product[]
+
+  @@unique([name, categoryId])
+}
+
+model Product {
+  id               Int                @id @default(autoincrement())
+  title            String
+  slug             String             @unique
+  description      String             @db.Text
+  longDescription  String?            @db.Text
+  images           Json?
+  features         Json?
+  specifications   Json?
+  tokopediaUrl     String?            @db.Text
+  shopeeUrl        String?            @db.Text
+  metaTitle        String?
+  metaDescription  String?            @db.Text
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId    Int
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+}
+
+// Firebase Chat Widget Schema
+// These models are NOT managed by Prisma migrations as they are for Firestore.
+// They are here for reference.
+
+// model ChatSession {
+//   id        String @id
+//   guestName String?
+//   status    String // "open" | "closed"
+//   createdAt DateTime @default(now())
+//   updatedAt DateTime @updatedAt
+// }
+
+// model ChatMessage {
+//   id          String @id
+//   sessionId   String
+//   sender      String // "user" | "admin"
+//   content     String
+//   createdAt   DateTime @default(now())
+// }
