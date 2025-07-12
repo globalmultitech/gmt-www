@@ -3,6 +3,7 @@
 
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
+import ChatWidget from '@/components/chat-widget';
 
 type AppShellProps = {
   header: ReactNode;
@@ -22,6 +23,7 @@ export function AppShell({ header, footer, children }: AppShellProps) {
       {showHeaderFooter && header}
       <main className="flex-1">{children}</main>
       {showHeaderFooter && footer}
+      {showHeaderFooter && <ChatWidget />}
     </div>
   );
 }
