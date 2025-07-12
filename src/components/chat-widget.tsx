@@ -7,7 +7,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from './ui/card';
 import { Input } from './ui/input';
 import { ScrollArea } from './ui/scroll-area';
-import { MessageSquare, X, Send, User, Bot, Loader2 } from 'lucide-react';
+import { MessageSquare, X, Send, User, Bot, Loader2, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { db } from '@/lib/firebase';
@@ -36,7 +36,6 @@ export default function ChatWidget() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Only run on client
     const storedSessionId = localStorage.getItem('chatSessionId');
     if (storedSessionId) {
         setSessionId(storedSessionId);
@@ -47,7 +46,6 @@ export default function ChatWidget() {
             setCompany(storedCompany);
             setStage('chatting');
         } else {
-            // Has session ID but no user info, force back to form
             setStage('form');
         }
     } else {
@@ -109,18 +107,17 @@ export default function ChatWidget() {
   const handleEndChat = async () => {
     if (!sessionId) return;
     
-    // Mark session as closed in Firestore
     const sessionRef = doc(db, 'chatSessions', sessionId);
     try {
         await updateDoc(sessionRef, {
             status: 'closed',
             updatedAt: serverTimestamp(),
+            lastMessage: '[Sesi Diakhiri oleh Pengguna]'
         });
     } catch (error) {
         console.error("Error closing session:", error);
     }
     
-    // Clear local storage and state
     localStorage.removeItem('chatSessionId');
     localStorage.removeItem('chatUserName');
     localStorage.removeItem('chatUserCompany');
@@ -145,7 +142,6 @@ export default function ChatWidget() {
     
     try {
       await addDoc(collection(sessionRef, 'messages'), messageData);
-      // Also update session metadata
       await updateDoc(sessionRef, {
         updatedAt: serverTimestamp(),
         lastMessage: newMessage,
@@ -214,18 +210,22 @@ export default function ChatWidget() {
                             </div>
                         </ScrollArea>
                     </CardContent>
-                    <CardFooter className="p-4 border-t">
-                    <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
-                        <Input
-                        value={newMessage}
-                        onChange={(e) => setNewMessage(e.target.value)}
-                        placeholder="Ketik pesan..."
-                        autoComplete="off"
-                        />
-                        <Button type="submit" size="icon" disabled={!newMessage.trim()}>
-                        <Send className="h-4 w-4" />
+                    <CardFooter className="p-4 border-t flex-col items-stretch gap-2">
+                        <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
+                            <Input
+                            value={newMessage}
+                            onChange={(e) => setNewMessage(e.target.value)}
+                            placeholder="Ketik pesan..."
+                            autoComplete="off"
+                            />
+                            <Button type="submit" size="icon" disabled={!newMessage.trim()}>
+                            <Send className="h-4 w-4" />
+                            </Button>
+                        </form>
+                        <Button variant="outline" size="sm" onClick={handleEndChat}>
+                            <LogOut className="mr-2 h-4 w-4" />
+                            Akhiri Obrolan
                         </Button>
-                    </form>
                     </CardFooter>
                  </>
             )
@@ -247,12 +247,10 @@ export default function ChatWidget() {
               <Card className="flex flex-col h-full shadow-2xl">
                 <CardHeader className="flex-row items-center justify-between bg-primary text-primary-foreground p-4">
                   <CardTitle className="text-lg">Butuh Bantuan?</CardTitle>
-                  {stage === 'chatting' && (
-                      <Button variant="ghost" size="icon" className="h-6 w-6 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" onClick={handleEndChat}>
-                          <X className="h-4 w-4" />
-                          <span className="sr-only">Tutup Obrolan</span>
-                      </Button>
-                  )}
+                  <Button variant="ghost" size="icon" className="h-6 w-6 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" onClick={() => setIsOpen(false)}>
+                      <X className="h-4 w-4" />
+                      <span className="sr-only">Tutup Jendela</span>
+                  </Button>
                 </CardHeader>
                 {renderContent()}
               </Card>
