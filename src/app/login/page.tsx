@@ -23,10 +23,13 @@ function SubmitButton() {
   );
 }
 
+// This page remains a client component to use useActionState
 export default function LoginPage() {
   const [state, formAction] = useActionState(login, undefined);
   const searchParams = useSearchParams();
-  const error = searchParams.get('error');
+  const errorFromUrl = searchParams.get('error');
+
+  const error = state?.message || errorFromUrl;
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
