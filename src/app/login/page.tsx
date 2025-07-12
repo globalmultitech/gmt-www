@@ -51,11 +51,11 @@ export default function LoginPage() {
           <form action={formAction} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Alamat Email</Label>
-              <Input id="email" name="email" type="email" placeholder="admin@gmt.co.id" required />
+              <Input id="email" name="email" type="email" placeholder="admin@gmt.co.id" required autoComplete="email" />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Kata Sandi</Label>
-              <Input id="password" name="password" type="password" required />
+              <Input id="password" name="password" type="password" required autoComplete="current-password" />
             </div>
             <SubmitButton />
           </form>
