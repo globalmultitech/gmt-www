@@ -92,7 +92,7 @@ export default function ChatAdminClientPage() {
       await addDoc(collection(sessionRef, 'messages'), messageData);
       await updateDoc(sessionRef, {
         updatedAt: serverTimestamp(),
-        lastMessage: newMessage,
+        lastMessage: `[Admin]: ${newMessage}`,
         status: 'open',
       });
       setNewMessage('');
@@ -198,4 +198,3 @@ export default function ChatAdminClientPage() {
     </div>
   );
 }
-
