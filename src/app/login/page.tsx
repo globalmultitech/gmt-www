@@ -1,15 +1,17 @@
+
 'use client';
 
-import { useFormStatus } from 'react-dom';
+import { useFormStatus, useActionState } from 'react-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
 import { login } from './actions';
-import { useEffect, useActionState } from 'react';
-import { useToast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { getSettings } from '@/lib/settings';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle } from 'lucide-react';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -20,31 +22,31 @@ function SubmitButton() {
   );
 }
 
-export default function LoginPage() {
+// This page remains a client component to use useActionState
+export default function LoginPage({ searchParams }: { searchParams: { error?: string }}) {
   const [state, formAction] = useActionState(login, undefined);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    if (state?.message) {
-      toast({
-        variant: 'destructive',
-        title: 'Login Gagal',
-        description: state.message,
-      });
-    }
-  }, [state, toast]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
       <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
-            <Logo />
+             {/* This will not show logo, we will fix this later by making the page a server component */}
+            <Logo companyName={"Admin"} />
           </div>
           <CardTitle className="font-headline text-2xl">Admin Content Management</CardTitle>
           <CardDescription>Silakan masuk untuk mengelola konten website.</CardDescription>
         </CardHeader>
         <CardContent>
+          {searchParams.error && (
+             <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Login Gagal</AlertTitle>
+              <AlertDescription>
+                {searchParams.error}
+              </AlertDescription>
+            </Alert>
+          )}
           <form action={formAction} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Alamat Email</Label>
