@@ -10,9 +10,9 @@ import { Label } from '@/components/ui/label';
 import { Logo } from '@/components/logo';
 import { login } from './actions';
 import { Loader2 } from 'lucide-react';
-import { getSettings } from '@/lib/settings';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -23,28 +23,28 @@ function SubmitButton() {
   );
 }
 
-// This page remains a client component to use useActionState
-export default function LoginPage({ searchParams }: { searchParams: { error?: string }}) {
+export default function LoginPage() {
   const [state, formAction] = useActionState(login, undefined);
+  const searchParams = useSearchParams();
+  const error = searchParams.get('error');
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
       <Card className="w-full max-w-sm shadow-2xl">
         <CardHeader className="text-center">
           <div className="mx-auto mb-4">
-             {/* This will not show logo, we will fix this later by making the page a server component */}
             <Logo companyName={"Admin"} />
           </div>
           <CardTitle className="font-headline text-2xl">Admin Content Management</CardTitle>
           <CardDescription>Silakan masuk untuk mengelola konten website.</CardDescription>
         </CardHeader>
         <CardContent>
-          {searchParams.error && (
+          {error && (
              <Alert variant="destructive" className="mb-4">
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Login Gagal</AlertTitle>
               <AlertDescription>
-                {searchParams.error}
+                {error}
               </AlertDescription>
             </Alert>
           )}
