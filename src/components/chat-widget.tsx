@@ -36,21 +36,22 @@ export default function ChatWidget() {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    let storedSessionId = localStorage.getItem('chatSessionId');
-    if (!storedSessionId) {
-      storedSessionId = uuidv4();
-      localStorage.setItem('chatSessionId', storedSessionId);
-    }
-    setSessionId(storedSessionId);
-
-    const storedName = localStorage.getItem('chatUserName');
-    const storedCompany = localStorage.getItem('chatUserCompany');
-    if (storedName && storedCompany) {
-        setName(storedName);
-        setCompany(storedCompany);
-        setStage('chatting');
+    // Only run on client
+    const storedSessionId = localStorage.getItem('chatSessionId');
+    if (storedSessionId) {
+        setSessionId(storedSessionId);
+        const storedName = localStorage.getItem('chatUserName');
+        const storedCompany = localStorage.getItem('chatUserCompany');
+        if (storedName && storedCompany) {
+            setName(storedName);
+            setCompany(storedCompany);
+            setStage('chatting');
+        } else {
+            // Has session ID but no user info, force back to form
+            setStage('form');
+        }
     } else {
-        setStage('form');
+      setStage('form');
     }
   }, []);
 
@@ -81,12 +82,15 @@ export default function ChatWidget() {
 
   const handleStartChat = async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!name || !company || !sessionId) return;
+      if (!name || !company) return;
 
+      const newSessionId = uuidv4();
+      localStorage.setItem('chatSessionId', newSessionId);
       localStorage.setItem('chatUserName', name);
       localStorage.setItem('chatUserCompany', company);
+      setSessionId(newSessionId);
 
-      const sessionRef = doc(db, 'chatSessions', sessionId);
+      const sessionRef = doc(db, 'chatSessions', newSessionId);
       const guestDisplayName = `${name} dari ${company}`;
 
       try {
@@ -95,11 +99,36 @@ export default function ChatWidget() {
             status: "open",
             createdAt: serverTimestamp(),
             updatedAt: serverTimestamp(),
-        }, { merge: true }); // Use merge to avoid overwriting existing messages array
+        });
         setStage('chatting');
       } catch (error) {
         console.error("Error creating session: ", error);
       }
+  }
+
+  const handleEndChat = async () => {
+    if (!sessionId) return;
+    
+    // Mark session as closed in Firestore
+    const sessionRef = doc(db, 'chatSessions', sessionId);
+    try {
+        await updateDoc(sessionRef, {
+            status: 'closed',
+            updatedAt: serverTimestamp(),
+        });
+    } catch (error) {
+        console.error("Error closing session:", error);
+    }
+    
+    // Clear local storage and state
+    localStorage.removeItem('chatSessionId');
+    localStorage.removeItem('chatUserName');
+    localStorage.removeItem('chatUserCompany');
+    setSessionId(null);
+    setName('');
+    setCompany('');
+    setMessages([]);
+    setStage('form');
   }
 
   const handleSendMessage = async (e: React.FormEvent) => {
@@ -218,6 +247,12 @@ export default function ChatWidget() {
               <Card className="flex flex-col h-full shadow-2xl">
                 <CardHeader className="flex-row items-center justify-between bg-primary text-primary-foreground p-4">
                   <CardTitle className="text-lg">Butuh Bantuan?</CardTitle>
+                  {stage === 'chatting' && (
+                      <Button variant="ghost" size="icon" className="h-6 w-6 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" onClick={handleEndChat}>
+                          <X className="h-4 w-4" />
+                          <span className="sr-only">Tutup Obrolan</span>
+                      </Button>
+                  )}
                 </CardHeader>
                 {renderContent()}
               </Card>

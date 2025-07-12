@@ -10,9 +10,10 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, User, Bot } from 'lucide-react';
+import { Send, User, Bot, Circle } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { Badge } from '@/components/ui/badge';
 
 type ChatSession = {
   id: string;
@@ -44,6 +45,13 @@ export default function ChatAdminClientPage() {
       const sessionsData: ChatSession[] = [];
       querySnapshot.forEach((doc) => {
         sessionsData.push({ id: doc.id, ...doc.data() } as ChatSession);
+      });
+      // Sort sessions to show 'open' ones first
+      sessionsData.sort((a, b) => {
+        if (a.status === 'open' && b.status !== 'open') return -1;
+        if (a.status !== 'open' && b.status === 'open') return 1;
+        // @ts-ignore
+        return (b.updatedAt?.toDate() || 0) - (a.updatedAt?.toDate() || 0);
       });
       setSessions(sessionsData);
     });
@@ -93,7 +101,7 @@ export default function ChatAdminClientPage() {
       await updateDoc(sessionRef, {
         updatedAt: serverTimestamp(),
         lastMessage: `[Admin]: ${newMessage}`,
-        status: 'open',
+        status: 'open', // Re-open chat if admin replies to a closed one
       });
       setNewMessage('');
     } catch (error) {
@@ -124,10 +132,13 @@ export default function ChatAdminClientPage() {
               )}
             >
               <div className="flex justify-between items-center">
-                <p className="font-bold truncate">{session.guestName || `Tamu #${session.id.substring(0, 6)}`}</p>
+                <div className="flex items-center gap-2">
+                   <Circle className={cn("h-2.5 w-2.5", session.status === 'open' ? 'text-green-500 fill-green-500' : 'text-gray-400 fill-gray-400')} />
+                   <p className="font-bold truncate">{session.guestName || `Tamu #${session.id.substring(0, 6)}`}</p>
+                </div>
                 <p className="text-xs text-muted-foreground">{formatRelativeTime(session.updatedAt)}</p>
               </div>
-              <p className="text-sm text-muted-foreground truncate">{session.lastMessage}</p>
+              <p className="text-sm text-muted-foreground truncate pl-5">{session.lastMessage}</p>
             </button>
           ))}
         </ScrollArea>
@@ -137,7 +148,10 @@ export default function ChatAdminClientPage() {
         {activeSession ? (
           <div className="flex flex-col h-full">
             <CardHeader className="flex-row items-center justify-between p-4 border-b">
-              <CardTitle>Obrolan dengan {activeSession.guestName || `Tamu #${activeSession.id.substring(0, 6)}`}</CardTitle>
+               <div className="flex items-center gap-3">
+                <CardTitle>Obrolan dengan {activeSession.guestName || `Tamu #${activeSession.id.substring(0, 6)}`}</CardTitle>
+                <Badge variant={activeSession.status === 'open' ? 'default' : 'secondary'} className={cn(activeSession.status === 'open' && 'bg-green-100 text-green-800')}>{activeSession.status}</Badge>
+               </div>
             </CardHeader>
             <CardContent className="flex-grow p-4 overflow-hidden">
                 <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
