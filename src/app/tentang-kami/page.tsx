@@ -103,7 +103,13 @@ export default async function TentangKamiPage() {
                 {teamMembers.map((member, index) => (
                     <div key={index} className="text-center group">
                         <div className="relative h-40 w-40 md:h-48 md:w-48 mx-auto rounded-full overflow-hidden shadow-lg mb-4 transform transition-transform duration-300 group-hover:scale-105">
-                           <Image src={member.image || 'https://placehold.co/400x400.png'} alt={member.name} layout="fill" objectFit="cover" />
+                           <Image 
+                              src={member.image || 'https://placehold.co/400x400.png'} 
+                              alt={member.name} 
+                              fill
+                              sizes="(max-width: 768px) 50vw, 25vw"
+                              className="object-cover" 
+                            />
                         </div>
                         <h3 className="font-headline font-bold text-primary text-xl">{member.name}</h3>
                         <p className="text-sky-blue">{member.role}</p>

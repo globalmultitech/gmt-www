@@ -89,6 +89,7 @@ export function TestimonialCarousel({ testimonials }: { testimonials: Testimonia
                                 alt={testimonial.name}
                                 width={600}
                                 height={400}
+                                sizes="(max-width: 1024px) 0vw, 50vw"
                                 className="rounded-lg shadow-lg"
                                 data-ai-hint={testimonial.aiHint || 'person'}
                             />

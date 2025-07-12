@@ -186,7 +186,7 @@ export default function TentangKamiPageClientPage({ settings, initialTimeline, i
                     <div key={member.id} className="flex items-start gap-4 p-4 border rounded-md">
                         <div className="flex-shrink-0 space-y-2">
                           <div className="relative w-24 h-24 rounded-full bg-muted overflow-hidden border">
-                            {member.image ? ( <Image src={member.image} alt={member.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                            {member.image ? ( <Image src={member.image} alt={member.name} fill sizes="96px" className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                           </div>
                           <div className="flex items-center gap-2 w-24">
                             <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[index]} className="w-full"/>

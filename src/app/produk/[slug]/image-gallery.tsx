@@ -31,6 +31,7 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
           src={activeImage}
           alt={`${productTitle} - image ${activeIndex + 1}`}
           fill
+          sizes="(max-width: 768px) 100vw, 50vw"
           className="object-contain transition-transform duration-300 ease-in-out group-hover:scale-105"
           priority={true}
         />

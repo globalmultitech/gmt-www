@@ -249,7 +249,7 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
                         <div className="pt-2">
                             <Label className="text-xs">Gambar</Label>
                             <div className="relative w-full h-32 rounded-md bg-muted overflow-hidden border">
-                                {solution.image ? ( <Image src={solution.image} alt={solution.title} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                                {solution.image ? ( <Image src={solution.image} alt={solution.title} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                             </div>
                             <div className="flex items-center gap-2">
                               <Input type="file" onChange={(e) => handleImageUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[index]}/>

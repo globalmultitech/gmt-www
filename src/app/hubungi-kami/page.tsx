@@ -124,6 +124,7 @@ export default async function HubungiKamiPage() {
                   src="https://placehold.co/600x400.png"
                   alt="Lokasi Kantor"
                   fill
+                  sizes="(max-width: 768px) 100vw, 33vw"
                   className="object-cover"
                   data-ai-hint="map"
                 />

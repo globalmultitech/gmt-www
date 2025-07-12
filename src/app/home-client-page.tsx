@@ -108,6 +108,7 @@ export default function HomeClientPage({ products, settings, professionalService
                 alt={settings.aboutUsTitle || "About Us Image"}
                 width={570}
                 height={570}
+                sizes="(max-width: 1024px) 100vw, 570px"
                 className="rounded-lg shadow-lg"
                 data-ai-hint="team work office"
               />
@@ -180,7 +181,7 @@ export default function HomeClientPage({ products, settings, professionalService
                     {(settings.trustedByLogos as TrustedByLogo[]).map((logo, index) => (
                       <div key={index} className="relative h-10 w-36 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
                           {logo.src ? (
-                              <Image src={logo.src} alt={logo.alt} fill className="object-contain" />
+                              <Image src={logo.src} alt={logo.alt} fill sizes="144px" className="object-contain" />
                           ): (
                              <div className="w-full h-full bg-white/20 rounded flex items-center justify-center text-sm">{logo.alt}</div>
                           )}
@@ -217,7 +218,13 @@ export default function HomeClientPage({ products, settings, professionalService
                   {products.map((product) => (
                      <Link key={product.id} href={`/produk/${product.slug}`} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                           <div className="relative h-56">
-                            <Image src={(product.images as string[])?.[0] ?? 'https://placehold.co/600x400.png'} alt={product.title} fill className="object-cover" data-ai-hint="product technology"/>
+                            <Image 
+                                src={(product.images as string[])?.[0] ?? 'https://placehold.co/600x400.png'} 
+                                alt={product.title} 
+                                fill
+                                sizes="(max-width: 768px) 100vw, 33vw" 
+                                className="object-cover" 
+                                data-ai-hint="product technology"/>
                           </div>
                           <div className="p-6">
                             <h3 className="text-xl font-bold font-headline mb-4 text-primary group-hover:text-primary-dark transition-colors">{product.title}</h3>

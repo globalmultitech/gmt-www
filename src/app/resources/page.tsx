@@ -40,6 +40,7 @@ export default async function ResourcesPage() {
                       src={item.image || 'https://placehold.co/600x400.png'}
                       alt={item.title}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                       className="object-cover"
                       data-ai-hint="technology news"
                     />

@@ -232,7 +232,7 @@ export default function LayananPageClientPage({ settings, initialServices }: Lay
                     <Label htmlFor="header-image-upload">Gambar Komitmen</Label>
                     <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
                         {headerForm.servicesPageHeaderImageUrl ? (
-                        <Image src={headerForm.servicesPageHeaderImageUrl} alt="Header Preview" fill className="object-cover" />
+                        <Image src={headerForm.servicesPageHeaderImageUrl} alt="Header Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" />
                         ) : (
                         <div className="flex items-center justify-center h-full w-full">
                             <ImageIcon className="w-10 h-10 text-muted-foreground" />

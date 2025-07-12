@@ -97,6 +97,7 @@ export default async function BlogPostPage({ params }: Props) {
                         src={post.image}
                         alt={post.title}
                         fill
+                        sizes="(max-width: 1024px) 100vw, 1024px"
                         className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                     />
                 </div>

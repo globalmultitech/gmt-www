@@ -60,14 +60,20 @@ export default async function ProdukPage() {
                      <Card className="flex flex-col h-full overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                         <div className="relative h-56 w-full">
                            {category.imageUrl ? (
-                             <Image src={category.imageUrl} alt={category.name} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                             <Image 
+                                src={category.imageUrl} 
+                                alt={category.name} 
+                                fill 
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-cover transition-transform duration-300 group-hover:scale-105" 
+                             />
                            ) : (
                             <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
                                <Package className="h-16 w-16" />
                             </div>
                            )}
                            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                           <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-primary">{category.name}</h3>
+                           <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-primary-foreground">{category.name}</h3>
                         </div>
                         <CardContent className="pt-6 flex-grow flex flex-col">
                             <p className="text-muted-foreground text-sm flex-grow">{category.description}</p>

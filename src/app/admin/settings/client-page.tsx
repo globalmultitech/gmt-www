@@ -166,7 +166,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             <div className="space-y-2">
                                 <Label htmlFor={'logo-upload'}>Logo Perusahaan</Label>
                                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
-                                    {formState.logoUrl ? ( <Image src={formState.logoUrl} alt="Logo Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                    {formState.logoUrl ? ( <Image src={formState.logoUrl} alt="Logo Preview" fill sizes="300px" className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Input id={'logo-upload'} type="file" onChange={(e) => handleImageUpload(e, 'logoUrl')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={!!uploadingStates['logoUrl']} />
@@ -266,7 +266,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             <div className="space-y-2">
                                 <Label htmlFor={'hero-image-upload'}>Gambar Latar Hero</Label>
                                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
-                                    {formState.heroImageUrl ? ( <Image src={formState.heroImageUrl} alt="Hero Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                    {formState.heroImageUrl ? ( <Image src={formState.heroImageUrl} alt="Hero Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Input id={'hero-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'heroImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={!!uploadingStates['heroImageUrl']} />
@@ -346,7 +346,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             <div className="space-y-2">
                                 <Label htmlFor={'about-us-image-upload'}>Gambar About Us</Label>
                                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
-                                    {formState.aboutUsImageUrl ? ( <Image src={formState.aboutUsImageUrl} alt="About Us Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                    {formState.aboutUsImageUrl ? ( <Image src={formState.aboutUsImageUrl} alt="About Us Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Input id={'about-us-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'aboutUsImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={!!uploadingStates['aboutUsImageUrl']} />
@@ -385,7 +385,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                             <div className="space-y-2">
                                 <Label htmlFor={'cta-image-upload'}>Gambar CTA</Label>
                                 <div className="relative w-full h-48 rounded-md bg-muted overflow-hidden border">
-                                    {formState.ctaImageUrl ? ( <Image src={formState.ctaImageUrl} alt="CTA Preview" fill className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
+                                    {formState.ctaImageUrl ? ( <Image src={formState.ctaImageUrl} alt="CTA Preview" fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover" /> ) : ( <ImageIcon className="w-10 h-10 text-muted-foreground m-auto" /> )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <Input id={'cta-image-upload'} type="file" onChange={(e) => handleImageUpload(e, 'ctaImageUrl')} accept="image/png, image/jpeg, image/webp" disabled={!!uploadingStates['ctaImageUrl']} />
@@ -421,7 +421,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                 {formState.trustedByLogos.map((logo, index) => (
                                     <div key={index} className="flex items-end gap-2 p-2 border rounded-md">
                                         <div className="relative w-24 h-16 rounded-md bg-muted overflow-hidden border">
-                                            {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill className="object-contain p-1" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                                            {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill sizes="96px" className="object-contain p-1" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                                         </div>
                                         <div className="grid grid-cols-1 gap-2 flex-grow">
                                             <div className="space-y-1">
@@ -459,7 +459,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                 <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
                                     <div className="flex-shrink-0 space-y-2">
                                         <div className="relative w-24 h-24 rounded-md bg-muted overflow-hidden border">
-                                            {item.image ? ( <Image src={item.image} alt={item.name} fill className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
+                                            {item.image ? ( <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
                                         </div>
                                         <div className="flex items-center gap-2 w-24">
                                             <Input type="file" onChange={(e) => handleImageUpload(e, 'testimonials', index, 'image')} accept="image/png, image/jpeg" disabled={!!(uploadingStates['testimonials'] as any)?.[index]} className="w-full"/>

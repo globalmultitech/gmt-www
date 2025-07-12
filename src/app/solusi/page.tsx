@@ -40,6 +40,7 @@ export default async function SolusiPage() {
                         src={solution.image || "https://placehold.co/600x400.png"}
                         alt={solution.title}
                         fill
+                        sizes="(max-width: 768px) 100vw, 50vw"
                         className="object-cover"
                         data-ai-hint={solution.aiHint || 'technology solution'}
                     />

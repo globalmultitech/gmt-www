@@ -141,6 +141,7 @@ export default async function CategoryProductPage({ params }: Props) {
                             alt={product.title} 
                             fill 
                             className="object-cover transition-transform duration-300 group-hover:scale-110" 
+                            sizes="(max-width: 640px) 100vw, (max-width: 1280px) 50vw, 20vw"
                           />
                         ) : (
                           <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">

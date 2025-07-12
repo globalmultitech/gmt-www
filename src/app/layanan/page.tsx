@@ -74,7 +74,14 @@ export default async function LayananPage() {
             </div>
           </div>
           <div className="relative h-64 md:h-80">
-            <Image src={settings.servicesPageHeaderImageUrl || "https://placehold.co/600x400.png"} alt="Keamanan Siber" fill className="object-cover rounded-lg shadow-md" data-ai-hint="cyber security" />
+            <Image 
+                src={settings.servicesPageHeaderImageUrl || "https://placehold.co/600x400.png"} 
+                alt="Keamanan Siber" 
+                fill 
+                className="object-cover rounded-lg shadow-md" 
+                data-ai-hint="cyber security"
+                sizes="(max-width: 768px) 100vw, 50vw"
+            />
           </div>
         </div>
       </section>
