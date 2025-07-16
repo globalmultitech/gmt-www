@@ -60,6 +60,7 @@ async function main() {
         { label: 'Produk', href: '/produk' },
         { label: 'Solusi', href: '/solusi' },
         { label: 'Layanan', href: '/layanan' },
+        { label: 'Blog', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
         { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ]),
@@ -174,133 +175,177 @@ async function main() {
         title: 'Layanan Purna Jual',
         slug: 'layanan-purna-jual',
         description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal.',
-        details: [
+        details: JSON.stringify([
           'Dukungan teknis on-site dan remote.',
           'Kontrak pemeliharaan preventif.',
           'Ketersediaan suku cadang asli.',
-        ],
+        ]),
         longDescription: 'Dukungan purna jual kami dirancang untuk memberikan ketenangan pikiran. Kami memahami bahwa setiap detik downtime dapat merugikan. Oleh karena itu, tim teknis kami yang berpengalaman selalu siap sedia untuk memberikan solusi cepat dan efektif, baik melalui kunjungan langsung maupun bantuan jarak jauh, memastikan kelangsungan operasional bisnis Anda.',
         imageUrl: 'https://placehold.co/800x600.png',
-        benefits: [
+        benefits: JSON.stringify([
             'Memperpanjang umur perangkat',
             'Mengurangi risiko downtime',
             'Respons cepat dari tim ahli'
-        ]
+        ])
       },
       {
         icon: 'Layers',
         title: 'Integrasi Sistem',
         slug: 'integrasi-sistem',
         description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien untuk kelancaran alur kerja.',
-        details: [
+        details: JSON.stringify([
           'Integrasi dengan Core Banking System.',
           'Penyatuan platform hardware dan software.',
           'Pengembangan API kustom.',
-        ],
+        ]),
         longDescription: 'Di dunia digital yang kompleks, sistem yang terisolasi adalah penghambat utama efisiensi. Layanan integrasi sistem kami menjembatani kesenjangan antara berbagai platform dan aplikasi yang Anda gunakan. Kami merancang arsitektur yang solid untuk memastikan aliran data yang lancar dan otomatisasi proses bisnis yang mulus, memungkinkan Anda mendapatkan gambaran utuh dari operasional perusahaan.',
         imageUrl: 'https://placehold.co/800x600.png',
-        benefits: [
+        benefits: JSON.stringify([
             'Alur kerja yang lebih efisien',
             'Visibilitas data yang lebih baik',
             'Mengurangi pekerjaan manual'
-        ]
+        ])
       },
       {
         icon: 'Code2',
         title: 'Pengembangan Perangkat Lunak',
         slug: 'pengembangan-perangkat-lunak',
         description: 'Butuh solusi yang tidak tersedia di pasaran? Tim kami siap merancang dan membangun perangkat lunak kustom.',
-        details: [
+        details: JSON.stringify([
           'Analisis kebutuhan dan desain sistem.',
           'Pengembangan aplikasi web dan mobile.',
           'Jaminan kualitas dan pengujian menyeluruh.',
-        ],
+        ]),
         longDescription: 'Ketika solusi siap pakai tidak memenuhi kebutuhan unik bisnis Anda, layanan pengembangan perangkat lunak kustom kami adalah jawabannya. Kami bekerja sama dengan Anda mulai dari tahap konsepsi hingga peluncuran untuk membangun aplikasi yang dirancang khusus untuk proses bisnis, tantangan, dan tujuan Anda. Dengan pendekatan agile, kami memastikan produk akhir tidak hanya fungsional tetapi juga skalabel dan mudah digunakan.',
         imageUrl: 'https://placehold.co/800x600.png',
-        benefits: [
+        benefits: JSON.stringify([
             'Solusi yang 100% sesuai kebutuhan',
             'Keunggulan kompetitif',
             'Skalabilitas untuk masa depan'
-        ]
+        ])
       },
       {
         icon: 'Bot',
         title: 'Penyewaan atau Outsourcing',
         slug: 'penyewaan-atau-outsourcing',
         description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Fleksibel untuk pertumbuhan bisnis Anda.',
-        details: [
+        details: JSON.stringify([
           'Opsi sewa perangkat keras (kiosk, dll).',
           'Pengelolaan operasional IT oleh tim kami.',
           'Skalabilitas sesuai kebutuhan.',
-        ],
+        ]),
         longDescription: 'Fokuskan sumber daya Anda pada bisnis inti dan biarkan kami yang mengurus kebutuhan teknologi Anda. Dengan model penyewaan atau outsourcing, Anda dapat mengakses teknologi dan keahlian terkini tanpa harus melakukan investasi modal yang besar. Ini adalah solusi fleksibel yang memungkinkan Anda beradaptasi dengan cepat terhadap perubahan pasar dan kebutuhan bisnis yang dinamis.',
         imageUrl: 'https://placehold.co/800x600.png',
-        benefits: [
+        benefits: JSON.stringify([
             'Menghemat biaya investasi awal (CAPEX)',
             'Akses ke teknologi & keahlian terbaru',
             'Fokus pada bisnis inti'
-        ]
+        ])
       },
     ]
   });
 
   console.log('Seeding Solutions...');
-  const solutionsToSeed = [
+  await prisma.solution.deleteMany({}); // Make sure table is empty before seeding
+  
+  const digitalBankingParent = await prisma.solution.create({
+    data: {
+      icon: 'Building',
+      title: 'Solusi Perbankan Digital',
+      slug: 'solusi-perbankan-digital',
+      description: 'Modernisasi layanan perbankan Anda untuk era digital, meningkatkan efisiensi dan pengalaman nasabah.',
+      image: "https://placehold.co/600x400.png",
+      aiHint: "modern bank interior",
+      keyPoints: JSON.stringify([]),
+    }
+  });
+
+  const securityParent = await prisma.solution.create({
+    data: {
+      icon: 'ShieldCheck',
+      title: 'Solusi Keamanan Siber',
+      slug: 'solusi-keamanan-siber',
+      description: 'Lindungi aset digital dan data nasabah dari ancaman siber dengan teknologi keamanan berlapis.',
+      image: "https://placehold.co/600x400.png",
+      aiHint: "cyber security",
+      keyPoints: JSON.stringify([]),
+    }
+  });
+
+  const subSolutions = [
       {
           icon: 'Briefcase',
-          title: 'Solusi Transformasi Cabang',
-          slug: 'solusi-transformasi-cabang',
-          description: 'Revolusikan cabang konvensional menjadi pusat layanan digital yang efisien dan modern. Kami membantu bank mengurangi biaya operasional sambil meningkatkan kualitas layanan.',
+          title: 'Transformasi Cabang Digital',
+          slug: 'transformasi-cabang-digital',
+          description: 'Revolusikan cabang konvensional menjadi pusat layanan digital yang efisien dan modern.',
           image: "https://placehold.co/600x400.png",
           aiHint: "modern bank interior",
-          keyPoints: [
+          keyPoints: JSON.stringify([
             'Implementasi Digital Kiosk untuk layanan mandiri.',
             'Sistem Antrian Cerdas untuk mengurangi waktu tunggu.',
             'Peningkatan efisiensi dan produktivitas cabang.',
-          ],
+          ]),
+          parentId: digitalBankingParent.id,
       },
       {
           icon: 'Smartphone',
           title: 'Digital Onboarding (e-KYC)',
           slug: 'digital-onboarding-ekyc',
-          description: 'Permudah proses akuisisi nasabah baru dengan solusi pembukaan rekening secara digital, cepat, dan aman, langsung dari smartphone.',
+          description: 'Permudah akuisisi nasabah baru dengan pembukaan rekening digital yang cepat dan aman.',
           image: "https://placehold.co/600x400.png",
           aiHint: "person using phone app",
-          keyPoints: [
+          keyPoints: JSON.stringify([
             'Verifikasi identitas dengan pengenalan wajah.',
             'Proses 100% online, tanpa perlu ke cabang.',
             'Sesuai dengan regulasi OJK.',
-          ],
-      },
-      {
-          icon: 'ShieldCheck',
-          title: 'Deteksi Penipuan Berbasis AI',
-          slug: 'deteksi-penipuan-berbasis-ai',
-          description: 'Lindungi aset dan nasabah Anda dengan sistem deteksi anomali dan penipuan secara real-time yang didukung oleh kecerdasan buatan canggih.',
-          image: "https://placehold.co/600x400.png",
-          aiHint: "security data analysis",
-          keyPoints: [
-            'Analisis transaksi mencurigakan secara otomatis.',
-            'Mengurangi risiko kerugian akibat fraud.',
-            'Model machine learning yang terus belajar.',
-          ],
+          ]),
+          parentId: digitalBankingParent.id,
       },
       {
           icon: 'Gem',
           title: 'Platform Wealth Management',
           slug: 'platform-wealth-management',
-          description: 'Sediakan platform digital yang intuitif bagi nasabah prioritas untuk mengelola investasi dan portofolio mereka dengan mudah dan transparan.',
+          description: 'Sediakan platform intuitif bagi nasabah prioritas untuk mengelola investasi mereka.',
           image: "https://placehold.co/600x400.png",
           aiHint: "financial dashboard charts",
-          keyPoints: [
+          keyPoints: JSON.stringify([
             'Dasbor portofolio yang komprehensif.',
             'Fitur robo-advisory untuk rekomendasi investasi.',
             'Laporan performa investasi yang mudah dipahami.',
-          ],
-      }
+          ]),
+          parentId: digitalBankingParent.id,
+      },
+       {
+          icon: 'Lock',
+          title: 'Deteksi Penipuan Berbasis AI',
+          slug: 'deteksi-penipuan-berbasis-ai',
+          description: 'Sistem deteksi anomali dan penipuan real-time didukung oleh kecerdasan buatan.',
+          image: "https://placehold.co/600x400.png",
+          aiHint: "security data analysis",
+          keyPoints: JSON.stringify([
+            'Analisis transaksi mencurigakan secara otomatis.',
+            'Mengurangi risiko kerugian akibat fraud.',
+            'Model machine learning yang terus belajar.',
+          ]),
+          parentId: securityParent.id,
+      },
+      {
+          icon: 'Key',
+          title: 'Manajemen Akses & Identitas',
+          slug: 'manajemen-akses-identitas',
+          description: 'Pastikan hanya pengguna yang berwenang yang dapat mengakses sistem dan data sensitif.',
+          image: "https://placehold.co/600x400.png",
+          aiHint: "digital identity security",
+          keyPoints: JSON.stringify([
+            'Implementasi Multi-Factor Authentication (MFA).',
+            'Manajemen hak akses berbasis peran (Role-Based Access Control).',
+            'Audit trail untuk semua aktivitas akses.',
+          ]),
+          parentId: securityParent.id,
+      },
   ];
   await prisma.solution.createMany({
-    data: solutionsToSeed
+    data: subSolutions
   });
   
   console.log('Seeding Timeline Events...');
@@ -417,14 +462,14 @@ async function main() {
         slug: 'digital-kiosk-gmt-k1',
         description: 'Solusi layanan mandiri interaktif untuk perbankan modern. Meningkatkan efisiensi dan pengalaman nasabah.',
         longDescription: 'Digital Kiosk GMT-K1 merupakan terobosan dalam layanan perbankan mandiri. Dirancang dengan desain yang elegan dan futuristik, kiosk ini memungkinkan nasabah untuk melakukan berbagai transaksi tanpa perlu antri di teller, mulai dari pembukaan rekening, transfer, hingga pembayaran tagihan. Dibangun dengan material berkualitas tinggi dan sistem keamanan berlapis, GMT-K1 adalah investasi cerdas untuk modernisasi cabang bank Anda.',
-        images: ['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png'],
-        features: [
+        images: JSON.stringify(['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png']),
+        features: JSON.stringify([
           "Layar sentuh 21.5 inci Full HD responsif",
           "Dilengkapi NFC dan QR Code Reader terintegrasi",
           "Desain modular yang kokoh dan mudah perawatannya",
           "Sistem operasi yang aman dan terkunci untuk perbankan"
-        ],
-        specifications: {
+        ]),
+        specifications: JSON.stringify({
           "Ukuran Layar": "21.5 inci",
           "Resolusi": "1920 x 1080 (Full HD)",
           "Tipe Panel": "IPS, 10-point capacitive touch",
@@ -432,7 +477,7 @@ async function main() {
           "Memori": "8GB DDR4 RAM",
           "Penyimpanan": "256GB SSD NVMe",
           "Konektivitas": "Wi-Fi, Ethernet, Bluetooth"
-        },
+        }),
         metaTitle: 'Jual Digital Kiosk GMT-K1 | Solusi Perbankan Modern',
         metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.',
         tokopediaUrl: '#',
@@ -444,19 +489,19 @@ async function main() {
         slug: 'smartq-queue-system',
         description: 'Sistem antrian cerdas yang mengurangi waktu tunggu dan mengoptimalkan alur layanan pelanggan di cabang.',
         longDescription: 'Tinggalkan sistem antrian konvensional dan beralih ke SmartQ. Solusi manajemen antrian kami tidak hanya mengatur alur nasabah, tetapi juga mengumpulkan data berharga untuk analisis performa layanan. Nasabah dapat mengambil nomor antrian dari jarak jauh melalui aplikasi mobile, memantau status antrian secara real-time, dan mendapatkan estimasi waktu tunggu yang akurat. Ini adalah kunci untuk meningkatkan kepuasan dan loyalitas nasabah.',
-        images: ['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png'],
-        features: [
+        images: JSON.stringify(['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png']),
+        features: JSON.stringify([
           "Manajemen antrian multi-layanan dan multi-teller",
           "Tiket antrian virtual via aplikasi mobile atau QR code",
           "Dasbor analitik dan laporan performa layanan real-time",
           "Panggilan suara otomatis dan display digital informatif"
-        ],
-        specifications: {
+        ]),
+        specifications: JSON.stringify({
           "Komponen": "Mesin Tiket, Display Utama, Display Teller, Software Manajemen",
           "Integrasi": "API untuk Aplikasi Mobile, Notifikasi SMS/WhatsApp",
           "Kustomisasi": "Alur layanan, jenis layanan, branding display",
           "Platform": "Berbasis Web, dapat diakses dari mana saja"
-        },
+        }),
         metaTitle: 'SmartQ Queue System | Sistem Antrian Cerdas',
         metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.',
         tokopediaUrl: '#',
@@ -468,20 +513,20 @@ async function main() {
         slug: 'forexrate-display-f-32',
         description: 'Tampilan informasi kurs mata uang asing yang akurat, real-time, dan profesional untuk cabang bank Anda.',
         longDescription: 'Sajikan informasi kurs valuta asing dengan cara yang modern dan dapat diandalkan menggunakan ForexRate Display F-32. Dengan layar 32 inci beresolusi tinggi, informasi kurs menjadi jelas terbaca dari berbagai sudut. Sistem kami terhubung langsung ke sumber data terpercaya untuk memastikan kurs selalu up-to-date secara real-time. Konten tambahan seperti video promosi atau berita juga dapat ditampilkan, menjadikannya alat komunikasi yang efektif di dalam cabang.',
-        images: ['https://placehold.co/800x800.png'],
-        features: [
+        images: JSON.stringify(['https://placehold.co/800x800.png']),
+        features: JSON.stringify([
           "Layar 32 inci profesional dengan kecerahan tinggi",
           "Pembaruan kurs otomatis dan real-time dari sumber terpercaya",
           "Tampilan dapat dikustomisasi sepenuhnya dengan logo bank",
           "Manajemen konten terpusat berbasis web yang mudah digunakan"
-        ],
-         specifications: {
+        ]),
+         specifications: JSON.stringify({
           "Ukuran Layar": "32 inci",
           "Resolusi": "1920 x 1080 (Full HD)",
           "Orientasi": "Potrait / Landscape",
           "Fitur Software": "Manajemen playlist, penjadwalan konten, template kurs",
           "Input Data": "API, XML, atau input manual"
-        },
+        }),
         metaTitle: 'ForexRate Display F-32 | Papan Kurs Digital',
         metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.',
         tokopediaUrl: '#',
@@ -493,19 +538,19 @@ async function main() {
         slug: 'kyc-flow-engine',
         description: 'Platform perangkat lunak untuk otomasi proses Know Your Customer (e-KYC) yang aman dan sesuai regulasi.',
         longDescription: 'KYC-Flow Engine adalah solusi perangkat lunak end-to-end yang memungkinkan lembaga keuangan melakukan proses verifikasi identitas nasabah secara digital. Dengan teknologi pengenalan wajah (face recognition), liveness detection, dan koneksi ke database kependudukan, platform ini memastikan proses onboarding yang cepat, akurat, dan aman, mengurangi risiko penipuan serta mematuhi peraturan yang berlaku.',
-        images: ['https://placehold.co/800x800.png'],
-        features: [
+        images: JSON.stringify(['https://placehold.co/800x800.png']),
+        features: JSON.stringify([
           "Liveness detection untuk mencegah spoofing",
           "Verifikasi KTP dan pengenalan wajah (biometrik)",
           "Dapat diintegrasikan dengan aplikasi mobile atau web",
           "Dasbor monitoring dan audit trail lengkap"
-        ],
-        specifications: {
+        ]),
+        specifications: JSON.stringify({
           "Tipe": "Perangkat Lunak (SaaS/On-premise)",
           "Modul Utama": "Face Recognition, OCR, Liveness Detection",
           "SDK Tersedia": "Android, iOS, Web (JavaScript)",
           "Keamanan": "Enkripsi AES-256"
-        },
+        }),
         metaTitle: 'KYC-Flow Engine | Platform e-KYC Otomatis',
         metaDescription: 'Otomatiskan proses e-KYC Anda dengan KYC-Flow Engine. Solusi perangkat lunak yang aman, cepat, dan terintegrasi.',
         tokopediaUrl: '',
@@ -517,19 +562,19 @@ async function main() {
         slug: 'instantcard-printer-p-200',
         description: 'Cetak kartu ATM, debit, atau kredit secara instan di cabang dengan printer kartu yang andal dan cepat.',
         longDescription: 'InstantCard Printer P-200 memungkinkan bank untuk memberikan kartu kepada nasabah secara langsung saat pembukaan rekening atau penggantian kartu. Ini menghilangkan waktu tunggu pengiriman kartu dan meningkatkan kepuasan nasabah. Dengan kemampuan cetak warna, embossing, dan encoding magnetic stripe/chip, P-200 adalah solusi lengkap untuk penerbitan kartu instan.',
-        images: ['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png'],
-        features: [
+        images: JSON.stringify(['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png']),
+        features: JSON.stringify([
           "Cetak satu sisi atau dua sisi (full color/monochrome)",
           "Kemampuan encoding magnetic stripe dan smart chip",
           "Kecepatan cetak tinggi (hingga 180 kartu/jam)",
           "Desain ringkas cocok untuk meja teller"
-        ],
-        specifications: {
+        ]),
+        specifications: JSON.stringify({
           "Resolusi Cetak": "300 dpi",
           "Kapasitas Hopper": "100 kartu",
           "Konektivitas": "USB, Ethernet",
           "Tipe Kartu": "PVC, PET, Composite PVC, 30-40 mil"
-        },
+        }),
         metaTitle: 'InstantCard Printer P-200 | Mesin Cetak Kartu Instan',
         metaDescription: 'Cetak kartu debit, kredit, atau member secara instan di cabang Anda dengan InstantCard Printer P-200. Cepat, aman, dan andal.',
         tokopediaUrl: '#',
@@ -555,3 +600,5 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+
+    

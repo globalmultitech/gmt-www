@@ -1,3 +1,4 @@
+
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 import 'dotenv/config';
@@ -245,12 +246,38 @@ async function main() {
   });
 
   console.log('Seeding Solutions...');
-  await prisma.solution.createMany({
-    data: [
+  await prisma.solution.deleteMany({}); // Make sure table is empty before seeding
+  
+  const digitalBankingParent = await prisma.solution.create({
+    data: {
+      icon: 'Building',
+      title: 'Solusi Perbankan Digital',
+      slug: 'solusi-perbankan-digital',
+      description: 'Modernisasi layanan perbankan Anda untuk era digital, meningkatkan efisiensi dan pengalaman nasabah.',
+      image: "https://placehold.co/600x400.png",
+      aiHint: "modern bank interior",
+      keyPoints: JSON.stringify([]),
+    }
+  });
+
+  const securityParent = await prisma.solution.create({
+    data: {
+      icon: 'ShieldCheck',
+      title: 'Solusi Keamanan Siber',
+      slug: 'solusi-keamanan-siber',
+      description: 'Lindungi aset digital dan data nasabah dari ancaman siber dengan teknologi keamanan berlapis.',
+      image: "https://placehold.co/600x400.png",
+      aiHint: "cyber security",
+      keyPoints: JSON.stringify([]),
+    }
+  });
+
+  const subSolutions = [
       {
           icon: 'Briefcase',
-          title: 'Solusi Transformasi Cabang',
-          description: 'Revolusikan cabang konvensional menjadi pusat layanan digital yang efisien dan modern. Kami membantu bank mengurangi biaya operasional sambil meningkatkan kualitas layanan.',
+          title: 'Transformasi Cabang Digital',
+          slug: 'transformasi-cabang-digital',
+          description: 'Revolusikan cabang konvensional menjadi pusat layanan digital yang efisien dan modern.',
           image: "https://placehold.co/600x400.png",
           aiHint: "modern bank interior",
           keyPoints: JSON.stringify([
@@ -258,11 +285,13 @@ async function main() {
             'Sistem Antrian Cerdas untuk mengurangi waktu tunggu.',
             'Peningkatan efisiensi dan produktivitas cabang.',
           ]),
+          parentId: digitalBankingParent.id,
       },
       {
           icon: 'Smartphone',
           title: 'Digital Onboarding (e-KYC)',
-          description: 'Permudah proses akuisisi nasabah baru dengan solusi pembukaan rekening secara digital, cepat, dan aman, langsung dari smartphone.',
+          slug: 'digital-onboarding-ekyc',
+          description: 'Permudah akuisisi nasabah baru dengan pembukaan rekening digital yang cepat dan aman.',
           image: "https://placehold.co/600x400.png",
           aiHint: "person using phone app",
           keyPoints: JSON.stringify([
@@ -270,23 +299,13 @@ async function main() {
             'Proses 100% online, tanpa perlu ke cabang.',
             'Sesuai dengan regulasi OJK.',
           ]),
-      },
-      {
-          icon: 'ShieldCheck',
-          title: 'Deteksi Penipuan Berbasis AI',
-          description: 'Lindungi aset dan nasabah Anda dengan sistem deteksi anomali dan penipuan secara real-time yang didukung oleh kecerdasan buatan canggih.',
-          image: "https://placehold.co/600x400.png",
-          aiHint: "security data analysis",
-          keyPoints: JSON.stringify([
-            'Analisis transaksi mencurigakan secara otomatis.',
-            'Mengurangi risiko kerugian akibat fraud.',
-            'Model machine learning yang terus belajar.',
-          ]),
+          parentId: digitalBankingParent.id,
       },
       {
           icon: 'Gem',
           title: 'Platform Wealth Management',
-          description: 'Sediakan platform digital yang intuitif bagi nasabah prioritas untuk mengelola investasi dan portofolio mereka dengan mudah dan transparan.',
+          slug: 'platform-wealth-management',
+          description: 'Sediakan platform intuitif bagi nasabah prioritas untuk mengelola investasi mereka.',
           image: "https://placehold.co/600x400.png",
           aiHint: "financial dashboard charts",
           keyPoints: JSON.stringify([
@@ -294,8 +313,39 @@ async function main() {
             'Fitur robo-advisory untuk rekomendasi investasi.',
             'Laporan performa investasi yang mudah dipahami.',
           ]),
-      }
-    ]
+          parentId: digitalBankingParent.id,
+      },
+       {
+          icon: 'Lock',
+          title: 'Deteksi Penipuan Berbasis AI',
+          slug: 'deteksi-penipuan-berbasis-ai',
+          description: 'Sistem deteksi anomali dan penipuan real-time didukung oleh kecerdasan buatan.',
+          image: "https://placehold.co/600x400.png",
+          aiHint: "security data analysis",
+          keyPoints: JSON.stringify([
+            'Analisis transaksi mencurigakan secara otomatis.',
+            'Mengurangi risiko kerugian akibat fraud.',
+            'Model machine learning yang terus belajar.',
+          ]),
+          parentId: securityParent.id,
+      },
+      {
+          icon: 'Key',
+          title: 'Manajemen Akses & Identitas',
+          slug: 'manajemen-akses-identitas',
+          description: 'Pastikan hanya pengguna yang berwenang yang dapat mengakses sistem dan data sensitif.',
+          image: "https://placehold.co/600x400.png",
+          aiHint: "digital identity security",
+          keyPoints: JSON.stringify([
+            'Implementasi Multi-Factor Authentication (MFA).',
+            'Manajemen hak akses berbasis peran (Role-Based Access Control).',
+            'Audit trail untuk semua aktivitas akses.',
+          ]),
+          parentId: securityParent.id,
+      },
+  ];
+  await prisma.solution.createMany({
+    data: subSolutions
   });
   
   console.log('Seeding Timeline Events...');
@@ -550,3 +600,6 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
+    
+
+    
