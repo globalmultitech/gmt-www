@@ -191,7 +191,7 @@ export default function HomeClientPage({ products, settings, professionalService
       </section>
       
       {/* Testimonial Section */}
-      {settings.testimonials && (settings.testimonials as any[]).length > 0 && (
+      {false && settings.testimonials && (settings.testimonials as any[]).length > 0 && (
         <section className="py-20 md:py-28 bg-background">
           <div className="container mx-auto px-4">
             <TestimonialCarousel testimonials={settings.testimonials as any[]} />

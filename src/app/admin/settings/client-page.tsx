@@ -450,7 +450,7 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-10">
+            <AccordionItem value="item-10" className="hidden">
                 <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Testimonial</AccordionTrigger>
                 <AccordionContent>
                     <Card>
