@@ -99,7 +99,7 @@ export default function AdminDashboardPage() {
                                 </Button>
                             </CardContent>
                         </Card>
-                         <Card>
+                         <Card className="hidden">
                             <CardHeader>
                                 <Newspaper className="h-8 w-8 text-primary mb-2" />
                                 <CardTitle>Halaman Blog</CardTitle>

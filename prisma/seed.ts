@@ -43,12 +43,12 @@ async function main() {
       id: 1,
       logoUrl: '',
       companyName: 'Global Multi Technology',
-      whatsappSales: '+6281234567890',
+      whatsappSales: '+6281220819549',
       footerText: 'Menyediakan solusi dan layanan teknologi terdepan untuk transformasi digital.',
-      address: '139 Baker St, E1 7PT, London',
-      contactEmail: 'contacts@example.com',
-      contactPhone: '(02) 123 333 444',
-      openingHours: '8am-5pm Mon - Fri',
+      address: 'Jl. Cikoneng raya pesona asri no B1. Bandung, Jawa Barat, Indonesia',
+      contactEmail: 'helpdesk@globalmultitechnology.id',
+      contactPhone: '+6281220819549',
+      openingHours: '8:00 AM - 17:00 PM',
       socialMedia: JSON.stringify({
         twitter: '#',
         facebook: '#',
@@ -60,13 +60,12 @@ async function main() {
         { label: 'Produk', href: '/produk' },
         { label: 'Solusi', href: '/solusi' },
         { label: 'Layanan', href: '/layanan' },
-        { label: 'Blog', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
         { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ]),
       heroHeadline: 'Creative solutions to improve your business',
       heroDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world.',
-      heroImageUrl: 'https://placehold.co/1920x1080.png',
+      heroImageUrl: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/0b518d15-d998-4574-af57-aac7224dc01f.jpg',
       heroButton1Text: 'Our services',
       heroButton1Link: '/layanan',
       heroButton2Text: 'Contact us',
@@ -96,7 +95,7 @@ async function main() {
       aboutUsSubtitle: 'ABOUT US',
       aboutUsTitle: 'We are the best IT solution',
       aboutUsDescription: 'We are a passionate team of software engineers, designers, and strategists who are committed to helping businesses of all sizes succeed in the digital world. We believe that technology can be a powerful tool for good, and we are dedicated to using our skills and expertise to make a positive impact.',
-      aboutUsImageUrl: 'https://placehold.co/600x600.png',
+      aboutUsImageUrl: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/39bd11c5-f028-4edb-802d-32ebde954efd.jpg',
       aboutUsChecklist: JSON.stringify([
         "Bespoke software solutions",
         "Human-centered design",
@@ -107,31 +106,31 @@ async function main() {
       servicesDescription: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.',
       ctaHeadline: 'Ready to take your business to the next level?',
       ctaDescription: "Let's discuss how our IT solutions can help you achieve your goals.",
-      ctaImageUrl: 'https://placehold.co/1920x1080.png',
+      ctaImageUrl: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/73620f84-f51b-4b88-915e-1d82fa5925c0.jpg',
       ctaButtonText: 'Get a Quote',
       ctaButtonLink: '/hubungi-kami',
       trustedByText: "Trusted by the world's leading companies",
       trustedByLogos: JSON.stringify([
-          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 1' },
-          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 2' },
-          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 3' },
-          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 4' },
-          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 5' },
-          { src: 'https://placehold.co/200x80.png', alt: 'Client Logo 6' },
+          { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/c119b97e-52ac-4188-b1b7-83e8101c8740.jpeg', alt: 'Client Logo 1' },
+          { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/257ded94-f09a-4d92-a2f1-3054a4cb5a77.jpeg', alt: 'Client Logo 2' },
+          { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/d2834e54-33ee-43ee-bb59-489943bf46d0.jpeg', alt: 'Client Logo 3' },
+          { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/96776f80-bdb8-4886-9d3c-cead98b2ebdb.jpeg', alt: 'Client Logo 4' },
+          { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/797b0afb-03b1-4dad-8dd8-299cd9f151ce.jpeg', alt: 'Client Logo 5' },
+          { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/2143fc3d-dd14-4739-93ea-cd909f06baba.jpeg', alt: 'Client Logo 6' },
       ]),
       testimonials: JSON.stringify([
         {
             quote: "We've been using Daltech for a few years now, and we're very happy with the results. They're a great team to work with, and they're always willing to go the extra mile to help us succeed.",
             name: 'John Doe',
             role: 'CEO, Company',
-            image: 'https://placehold.co/100x100.png',
+            image: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/b29d2c5b-d179-4034-92ee-a936537b5af9.png',
             aiHint: 'professional man portrait',
         },
         {
             quote: "The team at Daltech is incredibly talented and passionate about what they do. They took the time to understand our business and our goals, and they delivered a solution that exceeded our expectations.",
             name: 'Jane Smith',
             role: 'CTO, Another Corp',
-            image: 'https://placehold.co/100x100.png',
+            image: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/ea02196b-878c-43a7-bbd4-b0b847f51338.png',
             aiHint: 'professional woman portrait',
         },
       ]),
@@ -173,42 +172,74 @@ async function main() {
       {
         icon: 'Headphones',
         title: 'Layanan Purna Jual',
+        slug: 'layanan-purna-jual',
         description: 'Kami memastikan investasi teknologi Anda beroperasi secara optimal dengan dukungan teknis yang responsif dan andal.',
         details: JSON.stringify([
           'Dukungan teknis on-site dan remote.',
           'Kontrak pemeliharaan preventif.',
           'Ketersediaan suku cadang asli.',
         ]),
+        longDescription: 'Dukungan purna jual kami dirancang untuk memberikan ketenangan pikiran. Kami memahami bahwa setiap detik downtime dapat merugikan. Oleh karena itu, tim teknis kami yang berpengalaman selalu siap sedia untuk memberikan solusi cepat dan efektif, baik melalui kunjungan langsung maupun bantuan jarak jauh, memastikan kelangsungan operasional bisnis Anda.',
+        imageUrl: 'https://placehold.co/800x600.png',
+        benefits: JSON.stringify([
+            'Memperpanjang umur perangkat',
+            'Mengurangi risiko downtime',
+            'Respons cepat dari tim ahli'
+        ])
       },
       {
         icon: 'Layers',
         title: 'Integrasi Sistem',
+        slug: 'integrasi-sistem',
         description: 'Hubungkan semua komponen teknologi Anda menjadi satu ekosistem yang solid dan efisien untuk kelancaran alur kerja.',
         details: JSON.stringify([
           'Integrasi dengan Core Banking System.',
           'Penyatuan platform hardware dan software.',
           'Pengembangan API kustom.',
         ]),
+        longDescription: 'Di dunia digital yang kompleks, sistem yang terisolasi adalah penghambat utama efisiensi. Layanan integrasi sistem kami menjembatani kesenjangan antara berbagai platform dan aplikasi yang Anda gunakan. Kami merancang arsitektur yang solid untuk memastikan aliran data yang lancar dan otomatisasi proses bisnis yang mulus, memungkinkan Anda mendapatkan gambaran utuh dari operasional perusahaan.',
+        imageUrl: 'https://placehold.co/800x600.png',
+        benefits: JSON.stringify([
+            'Alur kerja yang lebih efisien',
+            'Visibilitas data yang lebih baik',
+            'Mengurangi pekerjaan manual'
+        ])
       },
       {
         icon: 'Code2',
         title: 'Pengembangan Perangkat Lunak',
+        slug: 'pengembangan-perangkat-lunak',
         description: 'Butuh solusi yang tidak tersedia di pasaran? Tim kami siap merancang dan membangun perangkat lunak kustom.',
         details: JSON.stringify([
           'Analisis kebutuhan dan desain sistem.',
           'Pengembangan aplikasi web dan mobile.',
           'Jaminan kualitas dan pengujian menyeluruh.',
         ]),
+        longDescription: 'Ketika solusi siap pakai tidak memenuhi kebutuhan unik bisnis Anda, layanan pengembangan perangkat lunak kustom kami adalah jawabannya. Kami bekerja sama dengan Anda mulai dari tahap konsepsi hingga peluncuran untuk membangun aplikasi yang dirancang khusus untuk proses bisnis, tantangan, dan tujuan Anda. Dengan pendekatan agile, kami memastikan produk akhir tidak hanya fungsional tetapi juga skalabel dan mudah digunakan.',
+        imageUrl: 'https://placehold.co/800x600.png',
+        benefits: JSON.stringify([
+            'Solusi yang 100% sesuai kebutuhan',
+            'Keunggulan kompetitif',
+            'Skalabilitas untuk masa depan'
+        ])
       },
       {
         icon: 'Bot',
         title: 'Penyewaan atau Outsourcing',
+        slug: 'penyewaan-atau-outsourcing',
         description: 'Dapatkan akses ke teknologi terbaru tanpa beban investasi modal yang besar. Fleksibel untuk pertumbuhan bisnis Anda.',
         details: JSON.stringify([
           'Opsi sewa perangkat keras (kiosk, dll).',
           'Pengelolaan operasional IT oleh tim kami.',
           'Skalabilitas sesuai kebutuhan.',
         ]),
+        longDescription: 'Fokuskan sumber daya Anda pada bisnis inti dan biarkan kami yang mengurus kebutuhan teknologi Anda. Dengan model penyewaan atau outsourcing, Anda dapat mengakses teknologi dan keahlian terkini tanpa harus melakukan investasi modal yang besar. Ini adalah solusi fleksibel yang memungkinkan Anda beradaptasi dengan cepat terhadap perubahan pasar dan kebutuhan bisnis yang dinamis.',
+        imageUrl: 'https://placehold.co/800x600.png',
+        benefits: JSON.stringify([
+            'Menghemat biaya investasi awal (CAPEX)',
+            'Akses ke teknologi & keahlian terbaru',
+            'Fokus pada bisnis inti'
+        ])
       },
     ]
   });
@@ -519,5 +550,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-
-    
