@@ -5,29 +5,17 @@ import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
 
-const TimelineEventSchema = z.object({
+const LogoSchema = z.object({
     id: z.number(),
-    year: z.string().default(''),
-    event: z.string().default(''),
-});
-
-const TeamMemberSchema = z.object({
-    id: z.number(),
-    name: z.string().default(''),
-    role: z.string().default(''),
-    image: z.string().default(''),
-    linkedin: z.string().default(''),
+    src: z.string().default(''),
+    alt: z.string().default(''),
 });
 
 const TentangKamiPageSettingsSchema = z.object({
   aboutPageTitle: z.string().optional(),
   aboutPageSubtitle: z.string().optional(),
-  missionTitle: z.string().optional(),
-  missionText: z.string().optional(),
-  visionTitle: z.string().optional(),
-  visionText: z.string().optional(),
-  timeline: z.array(TimelineEventSchema).optional(),
-  teamMembers: z.array(TeamMemberSchema).optional(),
+  partners: z.array(LogoSchema).optional(),
+  customers: z.array(LogoSchema).optional(),
 });
 
 
@@ -43,12 +31,7 @@ export async function updateTentangKamiPageSettings(prevState: { message: string
 
     if (!validatedFields.success) {
       console.error('Validation Error:', JSON.stringify(validatedFields.error.flatten(), null, 2));
-      const errorMessages = validatedFields.error.flatten().fieldErrors;
-      const message = Object.entries(errorMessages)
-          .map(([key, value]) => `${key}: ${value.join(', ')}`)
-          .join('; ');
-          
-      return { message: message || "Input tidak valid. Silakan periksa kembali." };
+      return { message: "Input tidak valid. Silakan periksa kembali." };
     }
     
     const data = validatedFields.data;
@@ -59,58 +42,53 @@ export async function updateTentangKamiPageSettings(prevState: { message: string
         data: {
             aboutPageTitle: data.aboutPageTitle,
             aboutPageSubtitle: data.aboutPageSubtitle,
-            missionTitle: data.missionTitle,
-            missionText: data.missionText,
-            visionTitle: data.visionTitle,
-            visionText: data.visionText,
         }
     });
 
-    // --- Timeline Synchronization ---
-    const timelineFromClient = data.timeline ?? [];
-    const timelineInDb = await prisma.timelineEvent.findMany({ select: { id: true } });
-    const dbTimelineIds = new Set(timelineInDb.map(s => s.id));
-    const clientTimelineIds = new Set(timelineFromClient.map(s => s.id).filter(id => id < Date.now()));
+    // --- Partner Logos Synchronization ---
+    const partnersFromClient = data.partners ?? [];
+    const partnersInDb = await prisma.partnerLogo.findMany({ select: { id: true } });
+    const dbPartnerIds = new Set(partnersInDb.map(p => p.id));
+    const clientPartnerIds = new Set(partnersFromClient.map(p => p.id).filter(id => id < Date.now()));
     
-    const timelineOps = [];
-    const timelineIdsToDelete = [...dbTimelineIds].filter(id => !clientTimelineIds.has(id));
-    if (timelineIdsToDelete.length > 0) {
-        timelineOps.push(prisma.timelineEvent.deleteMany({ where: { id: { in: timelineIdsToDelete } } }));
+    const partnerOps = [];
+    const partnerIdsToDelete = [...dbPartnerIds].filter(id => !clientPartnerIds.has(id));
+    if (partnerIdsToDelete.length > 0) {
+        partnerOps.push(prisma.partnerLogo.deleteMany({ where: { id: { in: partnerIdsToDelete } } }));
     }
-    for (const item of timelineFromClient) {
-        const sanitizedData = { year: item.year, event: item.event };
-        if (!item.year && !item.event) continue;
-        if (dbTimelineIds.has(item.id)) {
-            timelineOps.push(prisma.timelineEvent.update({ where: { id: item.id }, data: sanitizedData }));
+    for (const item of partnersFromClient) {
+        const sanitizedData = { src: item.src, alt: item.alt };
+        if (!item.src && !item.alt) continue;
+        if (dbPartnerIds.has(item.id)) {
+            partnerOps.push(prisma.partnerLogo.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
-            timelineOps.push(prisma.timelineEvent.create({ data: sanitizedData }));
+            partnerOps.push(prisma.partnerLogo.create({ data: sanitizedData }));
         }
     }
     
-    // --- Team Member Synchronization ---
-    const teamMembersFromClient = data.teamMembers ?? [];
-    const teamMembersInDb = await prisma.teamMember.findMany({ select: { id: true } });
-    const dbTeamMemberIds = new Set(teamMembersInDb.map(s => s.id));
-    const clientTeamMemberIds = new Set(teamMembersFromClient.map(s => s.id).filter(id => id < Date.now()));
+    // --- Customer Logos Synchronization ---
+    const customersFromClient = data.customers ?? [];
+    const customersInDb = await prisma.customerLogo.findMany({ select: { id: true } });
+    const dbCustomerIds = new Set(customersInDb.map(c => c.id));
+    const clientCustomerIds = new Set(customersFromClient.map(c => c.id).filter(id => id < Date.now()));
 
-    const teamMemberOps = [];
-    const teamMemberIdsToDelete = [...dbTeamMemberIds].filter(id => !clientTeamMemberIds.has(id));
-     if (teamMemberIdsToDelete.length > 0) {
-        teamMemberOps.push(prisma.teamMember.deleteMany({ where: { id: { in: teamMemberIdsToDelete } } }));
+    const customerOps = [];
+    const customerIdsToDelete = [...dbCustomerIds].filter(id => !clientCustomerIds.has(id));
+     if (customerIdsToDelete.length > 0) {
+        customerOps.push(prisma.customerLogo.deleteMany({ where: { id: { in: customerIdsToDelete } } }));
     }
-    for (const item of teamMembersFromClient) {
-        const sanitizedData = { name: item.name, role: item.role, image: item.image, linkedin: item.linkedin };
-        if (!item.name && !item.role) continue;
-        if (dbTeamMemberIds.has(item.id)) {
-            teamMemberOps.push(prisma.teamMember.update({ where: { id: item.id }, data: sanitizedData }));
+    for (const item of customersFromClient) {
+        const sanitizedData = { src: item.src, alt: item.alt };
+        if (!item.src && !item.alt) continue;
+        if (dbCustomerIds.has(item.id)) {
+            customerOps.push(prisma.customerLogo.update({ where: { id: item.id }, data: sanitizedData }));
         } else {
-            teamMemberOps.push(prisma.teamMember.create({ data: sanitizedData }));
+            customerOps.push(prisma.customerLogo.create({ data: sanitizedData }));
         }
     }
 
-    await prisma.$transaction([...timelineOps, ...teamMemberOps]);
+    await prisma.$transaction([...partnerOps, ...customerOps]);
 
-    revalidatePath('/', 'layout');
     revalidatePath('/tentang-kami');
     revalidatePath('/admin/pages/tentang-kami');
     return { message: 'Pengaturan Halaman Tentang Kami berhasil diperbarui.' };

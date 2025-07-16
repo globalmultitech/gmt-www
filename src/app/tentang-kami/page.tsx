@@ -1,24 +1,22 @@
 
-import { Card, CardHeader } from '@/components/ui/card';
-import { Eye, Rocket, Linkedin } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { getSettings } from '@/lib/settings';
 import prisma from '@/lib/db';
+import { Card, CardContent } from '@/components/ui/card';
 
 async function getPageData() {
     const settings = await getSettings();
-    const timeline = await prisma.timelineEvent.findMany({
-        orderBy: { year: 'asc' }
-    });
-    const teamMembers = await prisma.teamMember.findMany({
+    const partners = await prisma.partnerLogo.findMany({
         orderBy: { id: 'asc' }
     });
-    return { settings, timeline, teamMembers };
+    const customers = await prisma.customerLogo.findMany({
+        orderBy: { id: 'asc' }
+    });
+    return { settings, partners, customers };
 }
 
 export default async function TentangKamiPage() {
-  const { settings, timeline, teamMembers } = await getPageData();
+  const { settings, partners, customers } = await getPageData();
 
   return (
     <>
@@ -31,93 +29,46 @@ export default async function TentangKamiPage() {
         </div>
       </section>
 
-      {/* Mission & Vision Section */}
+      {/* Partners Section */}
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12">
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Rocket className="h-8 w-8 text-primary"/>
-                </div>
-                <h2 className="text-3xl font-headline font-bold text-primary">{settings.missionTitle}</h2>
-              </div>
-              <p className="text-muted-foreground text-lg">
-                {settings.missionText}
-              </p>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="bg-primary/10 p-3 rounded-full">
-                  <Eye className="h-8 w-8 text-primary"/>
-                </div>
-                <h2 className="text-3xl font-headline font-bold text-primary">{settings.visionTitle}</h2>
-              </div>
-              <p className="text-muted-foreground text-lg">
-                {settings.visionText}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* History Timeline Section */}
-      <section className="bg-secondary py-16 md:py-24">
-        <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Perjalanan Kami</h2>
-            <p className="mt-2 text-lg text-muted-foreground">Sejak 2010, kami terus berkembang dan berinovasi.</p>
+            <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Partner Kami</h2>
+            <p className="mt-2 text-lg text-muted-foreground">Kami berkolaborasi dengan pemimpin teknologi global.</p>
           </div>
-          <div className="relative">
-            <div className="absolute left-1/2 h-full w-0.5 bg-border -translate-x-1/2 hidden md:block"></div>
-            {timeline.map((item, index) => (
-              <div key={index} className="relative mb-8 md:mb-0">
-                <div className="md:flex items-center" style={{ flexDirection: index % 2 === 0 ? 'row' : 'row-reverse' }}>
-                  <div className="md:w-5/12"></div>
-                  <div className="hidden md:flex justify-center w-2/12">
-                     <div className="h-4 w-4 rounded-full bg-primary ring-4 ring-secondary"></div>
-                  </div>
-                  <div className="md:w-5/12">
-                     <Card className="shadow-lg transform transition-all hover:-translate-y-1 hover:shadow-xl">
-                        <CardHeader>
-                            <h3 className="font-headline text-sky-blue text-2xl">{item.year}</h3>
-                            <p className="text-muted-foreground">{item.event}</p>
-                        </CardHeader>
-                     </Card>
-                  </div>
+          <div className="flex flex-wrap justify-center items-center gap-8">
+            {partners.map((logo) => (
+                <div key={logo.id} className="relative h-20 w-48 transition-transform duration-300 hover:scale-110">
+                    <Image
+                        src={logo.src}
+                        alt={logo.alt}
+                        fill
+                        sizes="(max-width: 640px) 192px, 192px"
+                        className="object-contain"
+                    />
                 </div>
-              </div>
             ))}
           </div>
         </div>
       </section>
       
-      {/* Team Section */}
-      <section className="py-16 md:py-24">
+      {/* Customers Section */}
+      <section className="bg-secondary py-16 md:py-24">
         <div className="container mx-auto px-4">
             <div className="text-center mb-12">
-                <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Tim Kepemimpinan Kami</h2>
-                <p className="mt-2 text-lg text-muted-foreground">Orang-orang di balik kesuksesan Global Multi Technology.</p>
+                <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary">Dipercaya oleh</h2>
+                <p className="mt-2 text-lg text-muted-foreground">Solusi kami telah diimplementasikan di berbagai institusi terkemuka.</p>
             </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-                {teamMembers.map((member, index) => (
-                    <div key={index} className="text-center group">
-                        <div className="relative h-40 w-40 md:h-48 md:w-48 mx-auto rounded-full overflow-hidden shadow-lg mb-4 transform transition-transform duration-300 group-hover:scale-105">
-                           <Image 
-                              src={member.image || 'https://placehold.co/400x400.png'} 
-                              alt={member.name} 
-                              fill
-                              sizes="(max-width: 768px) 50vw, 25vw"
-                              className="object-cover" 
-                            />
-                        </div>
-                        <h3 className="font-headline font-bold text-primary text-xl">{member.name}</h3>
-                        <p className="text-sky-blue">{member.role}</p>
-                        {member.linkedin && (
-                            <Link href={member.linkedin} target="_blank" rel="noopener noreferrer" className="mt-2 inline-block opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Linkedin className="h-5 w-5 text-muted-foreground hover:text-primary"/>
-                            </Link>
-                        )}
+             <div className="flex flex-wrap justify-center items-center gap-8">
+                {customers.map((logo, index) => (
+                    <div key={logo.id} className="relative h-20 w-48 transition-transform duration-300 hover:scale-110">
+                        <Image
+                            src={logo.src}
+                            alt={logo.alt}
+                            fill
+                            sizes="(max-width: 640px) 192px, 192px"
+                            className="object-contain"
+                        />
                     </div>
                 ))}
             </div>

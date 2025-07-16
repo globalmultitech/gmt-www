@@ -9,22 +9,22 @@ export const dynamic = 'force-dynamic';
 
 async function getTentangKamiData() {
   const settings = await getSettings(); // Still need this for page titles
-  const timeline = await prisma.timelineEvent.findMany({
-    orderBy: { year: 'asc' }
-  });
-  const teamMembers = await prisma.teamMember.findMany({
+  const partners = await prisma.partnerLogo.findMany({
     orderBy: { id: 'asc' }
   });
-  return { settings, timeline, teamMembers };
+  const customers = await prisma.customerLogo.findMany({
+    orderBy: { id: 'asc' }
+  });
+  return { settings, partners, customers };
 }
 
 export default async function TentangKamiSettingsPage() {
-  const { settings, timeline, teamMembers } = await getTentangKamiData();
+  const { settings, partners, customers } = await getTentangKamiData();
 
   if (!settings) {
     console.error("Web settings not found! Please seed the database.");
     redirect('/admin/dashboard?error=settings_not_found');
   }
 
-  return <TentangKamiPageClientPage settings={settings} initialTimeline={timeline} initialTeamMembers={teamMembers} />;
+  return <TentangKamiPageClientPage settings={settings} initialPartners={partners} initialCustomers={customers} />;
 }
