@@ -24,6 +24,7 @@ import { DynamicIcon } from '@/components/dynamic-icon';
 
 type SolusiFormProps = {
   solution?: Solution | null;
+  parentSolutions: Solution[];
 }
 
 const availableIcons = [
@@ -68,7 +69,7 @@ const generateSlug = (title: string) => {
     .replace(/-+/g, '-');
 }
 
-export function SolusiForm({ solution = null }: SolusiFormProps) {
+export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps) {
   const { toast } = useToast();
   const isEditing = !!solution;
   const formAction = isEditing ? updateSolution : createSolution;
@@ -189,6 +190,23 @@ export function SolusiForm({ solution = null }: SolusiFormProps) {
                  <Card>
                     <CardHeader><CardTitle>Pengaturan</CardTitle></CardHeader>
                     <CardContent className="space-y-4">
+                        <div className="space-y-1">
+                            <Label htmlFor="parentId">Solusi Induk (Opsional)</Label>
+                            <Select name="parentId" defaultValue={solution?.parentId?.toString() ?? 'none'}>
+                                <SelectTrigger><SelectValue placeholder="Pilih solusi induk..." /></SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none">-- Jadikan Solusi Induk --</SelectItem>
+                                    {parentSolutions
+                                        .filter(p => !solution || p.id !== solution.id) // Exclude self from list
+                                        .map(parent => (
+                                            <SelectItem key={parent.id} value={parent.id.toString()}>
+                                                {parent.title}
+                                            </SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
+                            <p className="text-xs text-muted-foreground">Jadikan ini sebagai sub-solusi dari solusi lain.</p>
+                        </div>
                         <div className="space-y-1">
                             <Label htmlFor="slug">URL (Slug)</Label>
                             <Input id="slug" name="slug" required value={slug} onChange={(e) => setSlug(e.target.value)} />

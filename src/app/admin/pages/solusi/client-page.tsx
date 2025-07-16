@@ -24,13 +24,16 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-import { PlusCircle, Trash2, Loader2, Pencil } from 'lucide-react';
+import { PlusCircle, Trash2, Loader2, Pencil, CornerDownRight } from 'lucide-react';
 import type { Solution } from '@prisma/client';
 import { deleteSolution } from './actions';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import Link from 'next/link';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
+type SolutionWithChildren = Solution & { children: Solution[] };
 
 function DeleteButton({ solutionId }: { solutionId: number }) {
   const [isPending, startTransition] = useTransition();
@@ -58,7 +61,7 @@ function DeleteButton({ solutionId }: { solutionId: number }) {
         <AlertDialogHeader>
           <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
           <AlertDialogDescription>
-            Tindakan ini tidak dapat dibatalkan. Ini akan menghapus solusi secara permanen.
+            Tindakan ini akan menghapus solusi dan semua sub-solusi di dalamnya secara permanen.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -72,7 +75,7 @@ function DeleteButton({ solutionId }: { solutionId: number }) {
   );
 }
 
-export default function SolusiListPage({ solutions }: { solutions: Solution[] }) {
+export default function SolusiListPage({ solutions }: { solutions: SolutionWithChildren[] }) {
 
   return (
     <div>
@@ -86,47 +89,70 @@ export default function SolusiListPage({ solutions }: { solutions: Solution[] })
         </Button>
       </div>
 
-      <div className="border rounded-lg bg-card">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[80px]">Ikon</TableHead>
-              <TableHead>Judul</TableHead>
-              <TableHead>Tanggal Dibuat</TableHead>
-              <TableHead className="text-right w-[100px]">Aksi</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {solutions.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground h-24">
-                  Belum ada data solusi.
-                </TableCell>
-              </TableRow>
-            ) : (
-               solutions.map((solution) => (
-                  <TableRow key={solution.id}>
-                    <TableCell>
-                      <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center">
-                          <DynamicIcon name={solution.icon} className="w-5 h-5 text-muted-foreground" />
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">{solution.title}</TableCell>
-                    <TableCell>{format(new Date(solution.createdAt), "d MMMM yyyy", { locale: id })}</TableCell>
-                    <TableCell className="text-right">
-                      <Button asChild variant="ghost" size="icon">
+      <Card>
+        <CardHeader>
+          <CardTitle>Daftar Solusi</CardTitle>
+          <CardDescription>Kelola solusi induk dan sub-solusi di sini.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {solutions.length === 0 ? (
+            <div className="text-center text-muted-foreground py-16">
+              <p>Belum ada data solusi.</p>
+            </div>
+          ) : (
+            solutions.map((solution) => (
+              <div key={solution.id} className="border-b last:border-b-0">
+                {/* Parent Row */}
+                <div className="flex items-center p-4 bg-secondary/50 font-semibold">
+                  <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center mr-4 flex-shrink-0">
+                    <DynamicIcon name={solution.icon} className="w-5 h-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-grow">{solution.title}</div>
+                  <div className="text-sm text-muted-foreground mr-8 hidden md:block">{format(new Date(solution.createdAt), "d MMMM yyyy", { locale: id })}</div>
+                  <div className="flex-shrink-0">
+                     <Button asChild variant="ghost" size="icon">
                         <Link href={`/admin/pages/solusi/edit/${solution.id}`}>
                           <Pencil className="h-4 w-4" />
                         </Link>
                       </Button>
                       <DeleteButton solutionId={solution.id} />
-                    </TableCell>
-                  </TableRow>
-                ))
-            )}
-          </TableBody>
-        </Table>
-      </div>
+                  </div>
+                </div>
+                {/* Children Table */}
+                {solution.children && solution.children.length > 0 && (
+                  <div className="pl-4 md:pl-10">
+                    <Table>
+                      <TableBody>
+                        {solution.children.map(child => (
+                           <TableRow key={child.id}>
+                             <TableCell className="w-[80px]">
+                                <div className="flex items-center">
+                                  <CornerDownRight className="h-4 w-4 mr-2 text-muted-foreground" />
+                                  <div className="w-10 h-10 rounded-md bg-secondary flex items-center justify-center flex-shrink-0">
+                                      <DynamicIcon name={child.icon} className="w-5 h-5 text-muted-foreground" />
+                                  </div>
+                                </div>
+                             </TableCell>
+                             <TableCell className="font-medium">{child.title}</TableCell>
+                             <TableCell className="text-right w-[100px]">
+                               <Button asChild variant="ghost" size="icon">
+                                 <Link href={`/admin/pages/solusi/edit/${child.id}`}>
+                                   <Pencil className="h-4 w-4" />
+                                 </Link>
+                               </Button>
+                               <DeleteButton solutionId={child.id} />
+                             </TableCell>
+                           </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                )}
+              </div>
+            ))
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }

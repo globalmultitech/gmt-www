@@ -35,6 +35,7 @@ const SolutionSchema = z.object({
       return z.NEVER;
     }
   }),
+  parentId: z.string().transform(val => (val === 'none' || !val) ? null : Number(val)).nullable(),
 });
 
 const UpdateSolutionSchema = SolutionSchema.extend({
@@ -51,6 +52,7 @@ export async function createSolution(prevState: { message: string, success?: boo
     image: formData.get('image'),
     aiHint: formData.get('aiHint'),
     keyPoints: formData.get('keyPoints'),
+    parentId: formData.get('parentId'),
   });
 
   if (!validatedFields.success) {
@@ -90,6 +92,7 @@ export async function updateSolution(prevState: { message: string, success?: boo
         image: formData.get('image'),
         aiHint: formData.get('aiHint'),
         keyPoints: formData.get('keyPoints'),
+        parentId: formData.get('parentId'),
     });
 
     if (!validatedFields.success) {
@@ -119,6 +122,7 @@ export async function updateSolution(prevState: { message: string, success?: boo
     revalidatePath('/admin/pages/solusi');
     revalidatePath('/solusi');
     revalidatePath(`/solusi/${data.slug}`);
+    revalidatePath('/');
     redirect('/admin/pages/solusi');
 }
 
@@ -131,6 +135,7 @@ export async function deleteSolution(solutionId: number) {
         revalidatePath('/admin/pages/solusi');
         revalidatePath('/solusi');
         revalidatePath(`/solusi/${solution.slug}`);
+        revalidatePath('/');
         return { message: 'Solusi berhasil dihapus.' };
     }
     return { message: 'Solusi tidak ditemukan.' };

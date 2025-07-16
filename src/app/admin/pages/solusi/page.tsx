@@ -6,6 +6,14 @@ export const dynamic = 'force-dynamic';
 
 async function getSolusiData() {
   const solutions = await prisma.solution.findMany({
+    where: {
+      parentId: null // Fetch only parent solutions
+    },
+    include: {
+      children: { // Include their children (sub-solutions)
+        orderBy: { createdAt: 'asc' }
+      }
+    },
     orderBy: { createdAt: 'asc' }
   });
   return { solutions };

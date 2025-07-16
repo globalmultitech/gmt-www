@@ -7,16 +7,21 @@ const parseJsonField = (field: any, fallback: any[] = []) => {
     if (typeof field === 'string') {
         try {
             const parsed = JSON.parse(field);
+            // Check if the parsed result is an array, otherwise return fallback
             return Array.isArray(parsed) ? parsed : fallback;
         } catch (e) {
+            // If parsing fails, return the fallback
             return fallback;
         }
     }
+    // If it's already an array, return it
     if (Array.isArray(field)) {
         return field;
     }
+    // For any other case, return fallback
     return fallback;
 };
+
 
 async function getHomePageData() {
   const productsRaw = await prisma.product.findMany({
@@ -59,6 +64,12 @@ async function getHomePageData() {
   });
 
   const solutions = await prisma.solution.findMany({
+    where: { parentId: null }, // Only fetch parent solutions
+    include: {
+      children: { // And include their direct children
+        orderBy: { createdAt: 'asc' }
+      }
+    },
     orderBy: { createdAt: 'asc' },
   });
 

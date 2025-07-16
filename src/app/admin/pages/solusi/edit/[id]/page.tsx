@@ -6,14 +6,21 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-async function getSolusi(id: number) {
+async function getPageData(id: number) {
     const solution = await prisma.solution.findUnique({
         where: { id },
     });
+
     if (!solution) {
         notFound();
     }
-    return solution;
+    
+    const parentSolutions = await prisma.solution.findMany({
+        where: { parentId: null },
+        orderBy: { title: 'asc' },
+    });
+
+    return { solution, parentSolutions };
 }
 
 export default async function EditSolusiPage({ params }: { params: { id: string }}) {
@@ -21,7 +28,7 @@ export default async function EditSolusiPage({ params }: { params: { id: string 
   if (isNaN(id)) {
     notFound();
   }
-  const solution = await getSolusi(id);
+  const { solution, parentSolutions } = await getPageData(id);
 
   return (
      <div>
@@ -32,7 +39,7 @@ export default async function EditSolusiPage({ params }: { params: { id: string 
             </Link>
         </Button>
         <h1 className="text-3xl font-bold mb-6">Edit Solusi</h1>
-        <SolusiForm solution={solution}/>
+        <SolusiForm solution={solution} parentSolutions={parentSolutions} />
     </div>
   );
 }

@@ -8,8 +8,10 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { DynamicIcon } from './dynamic-icon';
 
+type SolutionWithChildren = Solution & { children: Solution[] };
+
 type HomeSolutionsTabsProps = {
-  solutions: Solution[];
+  solutions: SolutionWithChildren[];
 };
 
 export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
@@ -17,11 +19,14 @@ export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
     return null;
   }
 
-  // In a real scenario, you'd group solutions by a category.
-  // For now, we'll put them all under one tab.
-  const solutionGroups = {
-    'Sadaya Solusi': solutions,
-  };
+  // Filter out parent solutions that have no children, as they won't have content to show in tabs.
+  const solutionGroups = solutions.filter(s => s.children && s.children.length > 0);
+
+  if (solutionGroups.length === 0) {
+    return null; // Or some fallback UI
+  }
+  
+  const defaultTab = solutionGroups[0]?.title || '';
 
   return (
     <section className="py-20 md:py-28 bg-background">
@@ -33,17 +38,17 @@ export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
           </p>
         </div>
 
-        <Tabs defaultValue={Object.keys(solutionGroups)[0]} className="w-full">
-          <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto max-w-4xl">
-            {Object.keys(solutionGroups).map((groupName) => (
-              <TabsTrigger key={groupName} value={groupName}>{groupName}</TabsTrigger>
+        <Tabs defaultValue={defaultTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-4 mx-auto max-w-4xl h-auto flex-wrap">
+            {solutionGroups.map((group) => (
+              <TabsTrigger key={group.id} value={group.title} className="flex-1">{group.title}</TabsTrigger>
             ))}
           </TabsList>
           
-          {Object.entries(solutionGroups).map(([groupName, groupSolutions]) => (
-            <TabsContent key={groupName} value={groupName} className="mt-12">
+          {solutionGroups.map((group) => (
+            <TabsContent key={group.id} value={group.title} className="mt-12">
               <div className="grid md:grid-cols-2 gap-8">
-                {groupSolutions.map((solution) => (
+                {group.children.map((solution) => (
                   <Card key={solution.id} className="p-8 shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                     <div className="flex items-start gap-6">
                       <div className="bg-primary/10 p-4 rounded-lg flex-shrink-0">

@@ -249,6 +249,7 @@ async function main() {
       {
           icon: 'Briefcase',
           title: 'Solusi Transformasi Cabang',
+          slug: 'solusi-transformasi-cabang',
           description: 'Revolusikan cabang konvensional menjadi pusat layanan digital yang efisien dan modern. Kami membantu bank mengurangi biaya operasional sambil meningkatkan kualitas layanan.',
           image: "https://placehold.co/600x400.png",
           aiHint: "modern bank interior",
@@ -261,6 +262,7 @@ async function main() {
       {
           icon: 'Smartphone',
           title: 'Digital Onboarding (e-KYC)',
+          slug: 'digital-onboarding-ekyc',
           description: 'Permudah proses akuisisi nasabah baru dengan solusi pembukaan rekening secara digital, cepat, dan aman, langsung dari smartphone.',
           image: "https://placehold.co/600x400.png",
           aiHint: "person using phone app",
@@ -273,6 +275,7 @@ async function main() {
       {
           icon: 'ShieldCheck',
           title: 'Deteksi Penipuan Berbasis AI',
+          slug: 'deteksi-penipuan-berbasis-ai',
           description: 'Lindungi aset dan nasabah Anda dengan sistem deteksi anomali dan penipuan secara real-time yang didukung oleh kecerdasan buatan canggih.',
           image: "https://placehold.co/600x400.png",
           aiHint: "security data analysis",
@@ -285,6 +288,7 @@ async function main() {
       {
           icon: 'Gem',
           title: 'Platform Wealth Management',
+          slug: 'platform-wealth-management',
           description: 'Sediakan platform digital yang intuitif bagi nasabah prioritas untuk mengelola investasi dan portofolio mereka dengan mudah dan transparan.',
           image: "https://placehold.co/600x400.png",
           aiHint: "financial dashboard charts",
@@ -296,7 +300,7 @@ async function main() {
       }
   ];
   await prisma.solution.createMany({
-    data: solutionsToSeed.map(s => ({...s, slug: toSlug(s.title)}))
+    data: solutionsToSeed
   });
   
   console.log('Seeding Timeline Events...');
