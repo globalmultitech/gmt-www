@@ -4,9 +4,9 @@
 import { revalidatePath } from 'next/cache';
 import prisma from '@/lib/db';
 import { z } from 'zod';
-import type { ProfessionalService } from '@prisma/client';
+import { redirect } from 'next/navigation';
 
-const toSlug = (name: string) => {
+const toSlug = (name: string): string => {
   if (!name) return '';
   return name
     .toLowerCase()
@@ -16,136 +16,140 @@ const toSlug = (name: string) => {
 };
 
 
-// Schema for updating the page settings (title, subtitle, etc.)
-const LayananPageSettingsSchema = z.object({
-  servicesPageTitle: z.string().optional(),
-  servicesPageSubtitle: z.string().optional(),
-  servicesPageCommitmentTitle: z.string().optional(),
-  servicesPageCommitmentText: z.string().optional(),
-  servicesPageHeaderImageUrl: z.string().optional(),
+const ServiceSchema = z.object({
+  icon: z.string().min(1, 'Ikon harus dipilih'),
+  title: z.string().min(1, 'Judul tidak boleh kosong'),
+  slug: z.string().min(1, 'Slug tidak boleh kosong').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
+  description: z.string().min(1, 'Deskripsi singkat tidak boleh kosong'),
+  longDescription: z.string().optional(),
+  imageUrl: z.string().optional(),
+  details: z.string().transform((str, ctx) => {
+    try {
+      const parsed = JSON.parse(str);
+      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+        return parsed as string[];
+      }
+      throw new Error();
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk Poin Detail tidak valid' });
+      return z.NEVER;
+    }
+  }),
+  benefits: z.string().transform((str, ctx) => {
+    try {
+      const parsed = JSON.parse(str);
+      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
+        return parsed as string[];
+      }
+      throw new Error();
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk Manfaat tidak valid' });
+      return z.NEVER;
+    }
+  }),
 });
 
-export async function updateLayananPageSettings(prevState: { message: string } | undefined, formData: FormData) {
+const UpdateServiceSchema = ServiceSchema.extend({
+    id: z.coerce.number()
+});
+
+
+export async function createProfessionalService(prevState: { message: string, success?: boolean } | undefined, formData: FormData) {
+  const validatedFields = ServiceSchema.safeParse({
+    icon: formData.get('icon'),
+    title: formData.get('title'),
+    slug: formData.get('slug'),
+    description: formData.get('description'),
+    longDescription: formData.get('longDescription'),
+    imageUrl: formData.get('imageUrl'),
+    details: formData.get('details'),
+    benefits: formData.get('benefits'),
+  });
+
+  if (!validatedFields.success) {
+    const error = validatedFields.error.flatten().fieldErrors;
+    const message = Object.values(error).flat()[0] || "Input tidak valid";
+    return { message, success: false };
+  }
+  
+  const { ...data } = validatedFields.data;
+
   try {
-    const jsonString = formData.get('layananData') as string;
-    if (!jsonString) return { message: 'Data formulir tidak ditemukan.' };
-
-    const dataToValidate = JSON.parse(jsonString);
-    const validatedFields = LayananPageSettingsSchema.safeParse(dataToValidate);
-
-    if (!validatedFields.success) {
-      console.error('Validation Error:', validatedFields.error);
-      return { message: "Input tidak valid." };
+    const existingSlug = await prisma.professionalService.findUnique({ where: { slug: data.slug } });
+    if(existingSlug) {
+      return { message: 'URL (slug) sudah digunakan oleh layanan lain.', success: false }
     }
-    
-    await prisma.webSettings.update({
-        where: { id: 1 },
-        data: validatedFields.data
-    });
 
-    revalidatePath('/layanan');
-    revalidatePath('/admin/pages/layanan');
-    return { message: 'Pengaturan header halaman berhasil diperbarui.' };
+    await prisma.professionalService.create({ data });
 
   } catch (error) {
-    console.error('Update Layanan Page settings error:', error);
-    return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
+    console.error('Create service error:', error);
+    return { message: 'Gagal membuat layanan karena kesalahan server.', success: false };
   }
+  
+  revalidatePath('/admin/pages/layanan');
+  revalidatePath('/layanan');
+  revalidatePath(`/layanan/${data.slug}`);
+  redirect('/admin/pages/layanan');
+}
+
+export async function updateProfessionalService(prevState: { message: string, success?: boolean } | undefined, formData: FormData) {
+    const validatedFields = UpdateServiceSchema.safeParse({
+        id: formData.get('id'),
+        icon: formData.get('icon'),
+        title: formData.get('title'),
+        slug: formData.get('slug'),
+        description: formData.get('description'),
+        longDescription: formData.get('longDescription'),
+        imageUrl: formData.get('imageUrl'),
+        details: formData.get('details'),
+        benefits: formData.get('benefits'),
+    });
+
+    if (!validatedFields.success) {
+        const error = validatedFields.error.flatten().fieldErrors;
+        const message = Object.values(error).flat()[0] || "Input tidak valid";
+        return { message, success: false };
+    }
+
+    const { id, ...data } = validatedFields.data;
+
+    try {
+        const existingSlug = await prisma.professionalService.findFirst({ where: { slug: data.slug, id: { not: id } } });
+        if(existingSlug) {
+             return { message: 'URL (slug) sudah digunakan oleh layanan lain.', success: false }
+        }
+        
+        await prisma.professionalService.update({
+            where: { id },
+            data,
+        });
+
+    } catch (error) {
+        console.error('Update service error:', error);
+        return { message: 'Gagal memperbarui layanan.', success: false };
+    }
+
+    revalidatePath('/admin/pages/layanan');
+    revalidatePath('/layanan');
+    revalidatePath(`/layanan/${data.slug}`);
+    redirect('/admin/pages/layanan');
 }
 
 
-// Schema for a single service item from the client
-const ServiceSchema = z.object({
-    id: z.number(), // Use a temporary ID from the client for existing items
-    icon: z.string().default(''),
-    title: z.string().default(''),
-    slug: z.string().default(''),
-    description: z.string().default(''),
-    details: z.array(z.string()).default([]),
-    longDescription: z.string().optional().default(''),
-    imageUrl: z.string().optional().default(''),
-    benefits: z.array(z.string()).default([]),
-});
-
-const ServicesFormSchema = z.array(ServiceSchema);
-
-// This action updates ALL professional services based on the form state.
-export async function updateProfessionalServices(prevState: { message: string } | undefined, formData: FormData) {
-    try {
-        const jsonString = formData.get('servicesData') as string;
-        if (!jsonString) return { message: 'Data formulir tidak ditemukan.' };
-        
-        const dataToValidate = JSON.parse(jsonString);
-        const validatedFields = ServicesFormSchema.safeParse(dataToValidate);
-
-        if (!validatedFields.success) {
-            console.error('Validation Error:', JSON.stringify(validatedFields.error.flatten(), null, 2));
-            return { message: "Input tidak valid. Silakan periksa kembali." };
-        }
-
-        const servicesFromClient = validatedFields.data;
-
-        const servicesInDb = await prisma.professionalService.findMany({ select: { id: true, slug: true } });
-        const dbServiceIds = new Set(servicesInDb.map(s => s.id));
-        const clientServiceIds = new Set(servicesFromClient.map(s => s.id).filter(id => id < Date.now()));
-
-        const operations = [];
-
-        const idsToDelete = [...dbServiceIds].filter(id => !clientServiceIds.has(id));
-        if (idsToDelete.length > 0) {
-            operations.push(prisma.professionalService.deleteMany({ where: { id: { in: idsToDelete } } }));
-        }
-
-        for (const service of servicesFromClient) {
-            
-            const finalSlug = service.slug || toSlug(service.title);
-
-            const existingSlugItem = await prisma.professionalService.findFirst({ 
-                where: { 
-                    slug: finalSlug, 
-                    id: { not: dbServiceIds.has(service.id) ? service.id : 0 }
-                }
-            });
-
-            if (existingSlugItem) {
-                return { message: `Gagal menyimpan: URL (slug) "${finalSlug}" sudah digunakan oleh layanan lain.` };
-            }
-            
-            const sanitizedData = {
-                icon: service.icon,
-                title: service.title,
-                slug: finalSlug,
-                description: service.description,
-                details: service.details.filter(d => d.trim() !== ''),
-                longDescription: service.longDescription,
-                imageUrl: service.imageUrl,
-                benefits: service.benefits.filter(b => b.trim() !== ''),
-            };
-
-            if (!service.title && !service.description && sanitizedData.details.length === 0) {
-                continue;
-            }
-
-            if (dbServiceIds.has(service.id)) {
-                operations.push(prisma.professionalService.update({
-                    where: { id: service.id },
-                    data: sanitizedData
-                }));
-            } else {
-                operations.push(prisma.professionalService.create({ data: sanitizedData }));
-            }
-        }
-        
-        await prisma.$transaction(operations);
-
-        revalidatePath('/', 'layout');
-        revalidatePath('/layanan');
-        revalidatePath('/layanan/[slug]', 'page');
+export async function deleteProfessionalService(serviceId: number) {
+  try {
+    const service = await prisma.professionalService.findUnique({ where: { id: serviceId }});
+    if (service) {
+        await prisma.professionalService.delete({ where: { id: serviceId } });
         revalidatePath('/admin/pages/layanan');
-        return { message: 'Daftar layanan berhasil diperbarui.' };
-
-    } catch (error) {
-        console.error('Update Professional Services error:', error);
-        return { message: 'Gagal memperbarui daftar layanan karena kesalahan server.' };
+        revalidatePath('/layanan');
+        revalidatePath(`/layanan/${service.slug}`);
+        return { message: 'Layanan berhasil dihapus.' };
     }
+    return { message: 'Layanan tidak ditemukan.' };
+  } catch (error) {
+    console.error('Delete service error:', error);
+    return { message: 'Gagal menghapus layanan.' };
+  }
 }
