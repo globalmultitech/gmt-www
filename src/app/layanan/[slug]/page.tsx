@@ -33,7 +33,9 @@ export async function generateStaticParams() {
     select: { slug: true },
   });
  
-  return services.map((service) => ({
+  return services
+    .filter(service => service.slug)
+    .map((service) => ({
     // @ts-ignore
     slug: service.slug,
   }));
@@ -142,7 +144,7 @@ export default async function ServiceDetailPage({ params }: Props) {
                 <h2 className="text-3xl font-headline font-bold text-primary mb-4">Deskripsi Lengkap Layanan</h2>
                 <article className="prose prose-lg dark:prose-invert max-w-none">
                      {/* @ts-ignore */}
-                    <p>{service.longDescription}</p>
+                    <div dangerouslySetInnerHTML={{ __html: service.longDescription || '' }} />
                 </article>
             </div>
             <div className="lg:col-span-4">
