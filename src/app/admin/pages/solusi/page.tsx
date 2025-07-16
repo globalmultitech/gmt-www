@@ -1,26 +1,18 @@
 
-import SolusiPageClientPage from './client-page';
-import { redirect } from 'next/navigation';
 import prisma from '@/lib/db';
-import { getSettings } from '@/lib/settings';
+import SolusiListPage from './client-page';
 
 export const dynamic = 'force-dynamic';
 
-async function getSolutionsData() {
-  const settings = await getSettings();
+async function getSolusiData() {
   const solutions = await prisma.solution.findMany({
     orderBy: { createdAt: 'asc' }
   });
-  return { settings, solutions };
+  return { solutions };
 }
 
 export default async function SolusiSettingsPage() {
-  const { settings, solutions } = await getSolutionsData();
+  const { solutions } = await getSolusiData();
 
-  if (!settings) {
-    console.error("Web settings not found! Please seed the database.");
-    redirect('/admin/dashboard?error=settings_not_found');
-  }
-
-  return <SolusiPageClientPage settings={settings} initialSolutions={solutions} />;
+  return <SolusiListPage solutions={solutions} />;
 }
