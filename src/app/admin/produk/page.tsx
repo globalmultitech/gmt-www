@@ -1,17 +1,27 @@
 import prisma from '@/lib/db';
 import ProductManagementClientPage from './client-page';
-import { getCategoriesWithSubcategories } from '../kategori/actions';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ProductManagementPage() {
-  const products = await prisma.product.findMany({
-    orderBy: {
-      createdAt: 'desc',
+async function getGroupedProducts() {
+  const categoriesWithProducts = await prisma.productCategory.findMany({
+    include: {
+      subCategories: {
+        orderBy: { name: 'asc' },
+        include: {
+          products: {
+            orderBy: { createdAt: 'desc' },
+          },
+        },
+      },
     },
+    orderBy: { name: 'asc' },
   });
+  return categoriesWithProducts;
+}
 
-  const categories = await getCategoriesWithSubcategories();
+export default async function ProductManagementPage() {
+  const groupedProducts = await getGroupedProducts();
 
-  return <ProductManagementClientPage products={products} categories={categories} />;
+  return <ProductManagementClientPage groupedProducts={groupedProducts} />;
 }
