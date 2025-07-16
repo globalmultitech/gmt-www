@@ -6,6 +6,16 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import type { ProfessionalService } from '@prisma/client';
 
+const toSlug = (name: string) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') 
+    .replace(/\s+/g, '-') 
+    .replace(/-+/g, '-'); 
+};
+
+
 // Schema for updating the page settings (title, subtitle, etc.)
 const LayananPageSettingsSchema = z.object({
   servicesPageTitle: z.string().optional(),
@@ -49,8 +59,12 @@ const ServiceSchema = z.object({
     id: z.number(), // Use a temporary ID from the client for existing items
     icon: z.string().default(''),
     title: z.string().default(''),
+    slug: z.string().default(''),
     description: z.string().default(''),
     details: z.array(z.string()).default([]),
+    longDescription: z.string().optional().default(''),
+    imageUrl: z.string().optional().default(''),
+    benefits: z.array(z.string()).default([]),
 });
 
 const ServicesFormSchema = z.array(ServiceSchema);
@@ -65,13 +79,13 @@ export async function updateProfessionalServices(prevState: { message: string } 
         const validatedFields = ServicesFormSchema.safeParse(dataToValidate);
 
         if (!validatedFields.success) {
-            console.error('Validation Error:', validatedFields.error);
+            console.error('Validation Error:', JSON.stringify(validatedFields.error.flatten(), null, 2));
             return { message: "Input tidak valid. Silakan periksa kembali." };
         }
 
         const servicesFromClient = validatedFields.data;
 
-        const servicesInDb = await prisma.professionalService.findMany({ select: { id: true } });
+        const servicesInDb = await prisma.professionalService.findMany({ select: { id: true, slug: true } });
         const dbServiceIds = new Set(servicesInDb.map(s => s.id));
         const clientServiceIds = new Set(servicesFromClient.map(s => s.id).filter(id => id < Date.now()));
 
@@ -83,11 +97,29 @@ export async function updateProfessionalServices(prevState: { message: string } 
         }
 
         for (const service of servicesFromClient) {
+            
+            const finalSlug = service.slug || toSlug(service.title);
+
+            const existingSlugItem = await prisma.professionalService.findFirst({ 
+                where: { 
+                    slug: finalSlug, 
+                    id: { not: dbServiceIds.has(service.id) ? service.id : 0 }
+                }
+            });
+
+            if (existingSlugItem) {
+                return { message: `Gagal menyimpan: URL (slug) "${finalSlug}" sudah digunakan oleh layanan lain.` };
+            }
+            
             const sanitizedData = {
                 icon: service.icon,
                 title: service.title,
+                slug: finalSlug,
                 description: service.description,
-                details: service.details.filter(d => d.trim() !== '')
+                details: service.details.filter(d => d.trim() !== ''),
+                longDescription: service.longDescription,
+                imageUrl: service.imageUrl,
+                benefits: service.benefits.filter(b => b.trim() !== ''),
             };
 
             if (!service.title && !service.description && sanitizedData.details.length === 0) {
@@ -108,6 +140,7 @@ export async function updateProfessionalServices(prevState: { message: string } 
 
         revalidatePath('/', 'layout');
         revalidatePath('/layanan');
+        revalidatePath('/layanan/[slug]', 'page');
         revalidatePath('/admin/pages/layanan');
         return { message: 'Daftar layanan berhasil diperbarui.' };
 

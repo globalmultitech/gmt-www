@@ -1,10 +1,11 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, ShieldCheck } from 'lucide-react';
+import { Handshake, ShieldCheck, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { getSettings } from '@/lib/settings';
 import prisma from '@/lib/db';
+import Link from 'next/link';
 
 async function getPageData() {
     const settings = await getSettings();
@@ -32,30 +33,35 @@ export default async function LayananPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             {services.map((service, index) => (
-              <Card key={index} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <div className="bg-primary/10 p-4 rounded-full">
-                    <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
-                  </div>
-                  <div>
-                    <CardTitle className="font-headline text-2xl">{service.title}</CardTitle>
-                    {service.description && (
-                         <p className="mt-1 text-muted-foreground">{service.description}</p>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 pt-4 border-t">
-                    {/* @ts-ignore */}
-                    {(Array.isArray(service.details) ? service.details : []).map((detail, detailIndex) => (
-                      <li key={detailIndex} className="flex items-start gap-3">
-                        <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
-                        <span className="text-sm text-muted-foreground">{detail}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
+              <Link key={service.id} href={`/layanan/${service.slug}`} className="group block">
+                <Card className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl h-full flex flex-col">
+                  <CardHeader className="flex flex-row items-center gap-4">
+                    <div className="bg-primary/10 p-4 rounded-full">
+                      <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
+                    </div>
+                    <div>
+                      <CardTitle className="font-headline text-2xl group-hover:text-sky-blue transition-colors">{service.title}</CardTitle>
+                      {service.description && (
+                          <p className="mt-1 text-muted-foreground">{service.description}</p>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent className="flex-grow flex flex-col justify-between">
+                    <ul className="space-y-3 pt-4 border-t">
+                      {/* @ts-ignore */}
+                      {(Array.isArray(service.details) ? service.details : []).map((detail, detailIndex) => (
+                        <li key={detailIndex} className="flex items-start gap-3">
+                          <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
+                          <span className="text-sm text-muted-foreground">{detail}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-4 font-semibold text-primary flex items-center group-hover:text-sky-blue transition-colors">
+                      Pelajari Lebih Lanjut <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
             ))}
           </div>
         </div>
