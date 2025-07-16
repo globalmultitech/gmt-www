@@ -129,27 +129,29 @@ export default function HomeClientPage({ products, settings, professionalService
               </div>
               <div className="grid md:grid-cols-2 gap-8">
                 {professionalServices.map((service) => (
-                  <Card key={service.id} className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-                    <div className="flex flex-row items-center gap-4 p-6">
-                      <div className="bg-primary/10 p-4 rounded-full">
-                        <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
+                  <Link key={service.id} href={`/layanan/${service.slug}`} className="group block">
+                    <Card className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl h-full">
+                      <div className="flex flex-row items-center gap-4 p-6">
+                        <div className="bg-primary/10 p-4 rounded-full">
+                          <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
+                        </div>
+                        <div>
+                          <h3 className="font-headline text-2xl font-bold group-hover:text-sky-blue transition-colors">{service.title}</h3>
+                          <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
+                        </div>
                       </div>
-                      <div>
-                        <h3 className="font-headline text-2xl font-bold">{service.title}</h3>
-                        <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
-                      </div>
-                    </div>
-                    <CardContent>
-                      <ul className="space-y-3 pt-4 border-t">
-                        {(service.details as string[]).map((detail, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                            <Handshake className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                            <span className="text-sm text-muted-foreground">{detail}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CardContent>
-                  </Card>
+                      <CardContent>
+                        <ul className="space-y-3 pt-4 border-t">
+                          {(service.details as string[]).map((detail, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                              <Handshake className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
+                              <span className="text-sm text-muted-foreground">{detail}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>
