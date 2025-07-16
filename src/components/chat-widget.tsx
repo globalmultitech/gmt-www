@@ -264,7 +264,7 @@ export default function ChatWidget() {
         >
         <Button
           size="icon"
-          className="rounded-full w-16 h-16 shadow-lg"
+          className="rounded-full w-16 h-16 shadow-lg bg-[#0071bb] hover:bg-[#005a9e]"
           onClick={() => setIsOpen(!isOpen)}
         >
             <AnimatePresence mode="wait">
