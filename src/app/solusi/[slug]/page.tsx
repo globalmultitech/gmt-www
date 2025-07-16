@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Home, ChevronRight, CheckCircle, Award } from 'lucide-react';
+import { Home, ChevronRight, CheckCircle } from 'lucide-react';
 import Image from 'next/image';
 import { getSettings } from '@/lib/settings';
 import { Button } from '@/components/ui/button';
@@ -29,7 +29,7 @@ const parseJsonField = (field: any, fallback: any[] = []) => {
 
 export async function generateStaticParams() {
   const solutions = await prisma.solution.findMany({
-    where: { slug: { not: null } },
+    where: { slug: { not: '' } }, // Filter out empty or null slugs
     select: { slug: true },
   });
  
