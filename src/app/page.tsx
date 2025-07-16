@@ -58,11 +58,15 @@ async function getHomePageData() {
     orderBy: { id: 'desc' },
   });
 
-  return { products, settings, professionalServices, newsItems };
+  const solutions = await prisma.solution.findMany({
+    orderBy: { createdAt: 'asc' },
+  });
+
+  return { products, settings, professionalServices, newsItems, solutions };
 }
 
 export default async function Home() {
-  const { products, settings, professionalServices, newsItems } = await getHomePageData();
+  const { products, settings, professionalServices, newsItems, solutions } = await getHomePageData();
   
   return (
     <HomeClientPage 
@@ -70,6 +74,7 @@ export default async function Home() {
       settings={settings} 
       professionalServices={professionalServices} 
       newsItems={newsItems}
+      solutions={solutions}
     />
   );
 }

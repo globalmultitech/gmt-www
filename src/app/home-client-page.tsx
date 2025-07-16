@@ -1,7 +1,7 @@
 
 'use client';
 
-import type { Product, ProductSubCategory, ProductCategory, ProfessionalService, NewsItem } from '@prisma/client';
+import type { Product, ProductSubCategory, ProductCategory, ProfessionalService, NewsItem, Solution } from '@prisma/client';
 import { ArrowRight, CheckCircle, Handshake } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -10,6 +10,7 @@ import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent } from '@/components/ui/card';
 import type { WebSettings, FeatureCard, TrustedByLogo } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import { HomeSolutionsTabs } from '@/components/home-solutions-tabs';
 
 type EnrichedProduct = Product & {
   subCategory: ProductSubCategory & {
@@ -22,9 +23,10 @@ type HomePageProps = {
   settings: WebSettings;
   professionalServices: ProfessionalService[];
   newsItems: NewsItem[];
+  solutions: Solution[];
 }
 
-export default function HomeClientPage({ products, settings, professionalServices, newsItems }: HomePageProps) {
+export default function HomeClientPage({ products, settings, professionalServices, newsItems, solutions }: HomePageProps) {
   return (
     <div className="flex flex-col bg-background text-foreground">
       {/* Hero Section */}
@@ -153,6 +155,9 @@ export default function HomeClientPage({ products, settings, professionalService
             </div>
           </section>
         )}
+
+      {/* Solutions Tabs Section */}
+      <HomeSolutionsTabs solutions={solutions} />
       
        {/* CTA Section */}
        <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: `url('${settings.ctaImageUrl || 'https://placehold.co/1920x1080.png'}')`}}>
@@ -189,15 +194,6 @@ export default function HomeClientPage({ products, settings, professionalService
           )}
         </div>
       </section>
-      
-      {/* Testimonial Section */}
-      {false && settings.testimonials && (settings.testimonials as any[]).length > 0 && (
-        <section className="py-20 md:py-28 bg-background">
-          <div className="container mx-auto px-4">
-            <TestimonialCarousel testimonials={settings.testimonials as any[]} />
-          </div>
-        </section>
-      )}
       
        {/* Products Section */}
       <section className="py-20 md:py-28 bg-dark-slate">
