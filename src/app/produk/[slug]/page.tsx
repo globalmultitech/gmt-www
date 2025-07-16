@@ -82,19 +82,13 @@ async function getProductBySlug(slug: string) {
   }
 }
 
-async function getRandomProducts(currentProductId: number) {
-    const allProductIds = await prisma.product.findMany({
-        where: { id: { not: currentProductId } },
-        select: { id: true },
-    });
-
-    if (allProductIds.length === 0) return [];
-
-    const shuffledIds = allProductIds.sort(() => 0.5 - Math.random());
-    const randomIdsToFetch = shuffledIds.slice(0, 4).map(p => p.id);
-
+async function getRelatedProducts(currentProductId: number, subCategoryId: number) {
     const rawProducts = await prisma.product.findMany({
-        where: { id: { in: randomIdsToFetch } },
+        where: { 
+            id: { not: currentProductId },
+            subCategoryId: subCategoryId,
+        },
+        take: 4,
     });
 
     // Parse the images field for each product
@@ -147,7 +141,7 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
   
-  const randomProducts = await getRandomProducts(product.id);
+  const relatedProducts = await getRelatedProducts(product.id, product.subCategoryId);
   
   const featuresList = product.features as string[];
   const specifications = Object.entries(product.specifications);
@@ -241,7 +235,7 @@ export default async function ProductDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <RelatedProducts products={randomProducts} />
+      <RelatedProducts products={relatedProducts} />
     </>
   );
 }
