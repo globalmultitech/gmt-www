@@ -29,14 +29,13 @@ const parseJsonField = (field: any, fallback: any[] = []) => {
 
 export async function generateStaticParams() {
   const services = await prisma.professionalService.findMany({
-    where: { slug: { not: null } },
+    where: { slug: { not: '' } },
     select: { slug: true },
   });
  
   return services
     .filter(service => service.slug)
     .map((service) => ({
-    // @ts-ignore
     slug: service.slug,
   }));
 }
@@ -73,7 +72,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     openGraph: {
         title: service.title,
         description: service.description || '',
-        // @ts-ignore
         images: service.imageUrl ? [service.imageUrl] : [],
     },
   };
@@ -97,9 +95,7 @@ export default async function ServiceDetailPage({ params }: Props) {
     notFound();
   }
   
-  // @ts-ignore
   const benefitsList = service.benefits as string[];
-  // @ts-ignore
   const detailsList = service.details as string[];
 
   return (
@@ -118,10 +114,8 @@ export default async function ServiceDetailPage({ params }: Props) {
                 <p className="mt-4 text-lg text-muted-foreground">{service.description}</p>
             </div>
             <div className="relative h-80 w-full rounded-lg overflow-hidden shadow-lg border bg-muted">
-                {/* @ts-ignore */}
                 {service.imageUrl ? (
                     <Image
-                        // @ts-ignore
                         src={service.imageUrl}
                         alt={service.title}
                         fill
@@ -143,7 +137,6 @@ export default async function ServiceDetailPage({ params }: Props) {
             <div className="lg:col-span-8">
                 <h2 className="text-3xl font-headline font-bold text-primary mb-4">Deskripsi Lengkap Layanan</h2>
                 <article className="prose prose-lg dark:prose-invert max-w-none">
-                     {/* @ts-ignore */}
                     <div dangerouslySetInnerHTML={{ __html: service.longDescription || '' }} />
                 </article>
             </div>

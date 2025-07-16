@@ -14,6 +14,7 @@ type Props = {
 
 export async function generateStaticParams() {
   const posts = await prisma.newsItem.findMany({
+    where: { slug: { not: '' } },
     select: { slug: true },
   });
  

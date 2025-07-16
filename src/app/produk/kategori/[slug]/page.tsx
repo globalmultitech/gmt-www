@@ -19,6 +19,7 @@ const toSlug = (name: string) => {
 
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
+    where: { name: { not: '' } },
     select: { name: true },
   });
  
