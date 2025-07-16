@@ -1,3 +1,4 @@
+
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
@@ -12,125 +13,72 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
   name      String
+  email     String   @unique
   password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
-  id                        Int     @id @default(1)
-  logoUrl                   String? @db.Text
-  companyName               String?
-  whatsappSales             String?
-  footerText                String? @db.Text
-  address                   String?
-  contactEmail              String?
-  contactPhone              String?
-  openingHours              String?
-  socialMedia               Json?
-  menuItems                 Json?
-  heroHeadline              String?
-  heroDescription           String? @db.Text
-  heroImageUrl              String? @db.Text
-  heroButton1Text           String?
-  heroButton1Link           String?
-  heroButton2Text           String?
-  heroButton2Link           String?
-  featureCards              Json?
-  aboutUsSubtitle           String?
-  aboutUsTitle              String?
-  aboutUsDescription        String? @db.Text
-  aboutUsImageUrl           String? @db.Text
-  aboutUsChecklist          Json?
-  servicesSubtitle          String?
-  servicesTitle             String?
-  servicesDescription       String? @db.Text
-  ctaHeadline               String?
-  ctaDescription            String? @db.Text
-  ctaImageUrl               String? @db.Text
-  ctaButtonText             String?
-  ctaButtonLink             String?
-  trustedByText             String?
-  trustedByLogos            Json?
-  testimonials              Json?
-  servicesPageTitle         String?
-  servicesPageSubtitle      String?
+  id              Int     @id @default(1)
+  logoUrl         String? @db.Text
+  companyName     String?
+  whatsappSales   String?
+  footerText      String? @db.Text
+  address         String?
+  contactEmail    String?
+  contactPhone    String?
+  openingHours    String?
+  socialMedia     Json?
+  menuItems       Json?
+  heroHeadline    String?
+  heroDescription String? @db.Text
+  heroImageUrl    String? @db.Text
+  heroButton1Text String?
+  heroButton1Link String?
+  heroButton2Text String?
+  heroButton2Link String?
+  featureCards    Json?
+  aboutUsSubtitle String?
+  aboutUsTitle    String?
+  aboutUsDescription  String? @db.Text
+  aboutUsImageUrl     String? @db.Text
+  aboutUsChecklist    Json?
+  servicesSubtitle String?
+  servicesTitle   String?
+  servicesDescription String? @db.Text
+  ctaHeadline     String?
+  ctaDescription  String? @db.Text
+  ctaImageUrl     String? @db.Text
+  ctaButtonText   String?
+  ctaButtonLink   String?
+  trustedByText   String?
+  trustedByLogos  Json?
+  testimonials    Json?
+
+  servicesPageTitle           String?
+  servicesPageSubtitle        String?
   servicesPageCommitmentTitle String?
-  servicesPageCommitmentText String? @db.Text
-  servicesPageHeaderImageUrl String? @db.Text
-  solutionsPageTitle        String?
-  solutionsPageSubtitle     String?
-  aboutPageTitle            String?
-  aboutPageSubtitle         String?
-  missionTitle              String?
-  missionText               String? @db.Text
-  visionTitle               String?
-  visionText                String? @db.Text
-  resourcesPageTitle        String?
-  resourcesPageSubtitle     String? @db.Text
+  servicesPageCommitmentText  String? @db.Text
+  servicesPageHeaderImageUrl  String? @db.Text
+
+  solutionsPageTitle    String?
+  solutionsPageSubtitle String?
+  
+  aboutPageTitle    String?
+  aboutPageSubtitle String?
+  missionTitle      String?
+  missionText       String? @db.Text
+  visionTitle       String?
+  visionText        String? @db.Text
+
+  resourcesPageTitle   String?
+  resourcesPageSubtitle String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
-
-
-model ProfessionalService {
-  id              Int      @id @default(autoincrement())
-  icon            String
-  title           String
-  slug            String   @unique
-  description     String   @db.Text
-  details         Json
-  longDescription String?  @db.Text
-  imageUrl        String?  @db.Text
-  benefits        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model Solution {
-  id          Int      @id @default(autoincrement())
-  icon        String
-  title       String
-  description String   @db.Text
-  image       String?  @db.Text
-  aiHint      String?
-  keyPoints   Json
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-model NewsItem {
-  id        Int      @id @default(autoincrement())
-  title     String
-  slug      String   @unique
-  category  String
-  image     String?  @db.Text
-  content   String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TimelineEvent {
-  id        Int      @id @default(autoincrement())
-  year      String
-  event     String   @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model TeamMember {
-  id        Int      @id @default(autoincrement())
-  name      String
-  role      String
-  image     String?  @db.Text
-  linkedin  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
@@ -143,30 +91,86 @@ model ProductCategory {
 }
 
 model ProductSubCategory {
-  id         Int             @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
   products   Product[]
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 }
 
 model Product {
-  id              Int                 @id @default(autoincrement())
+  id               Int      @id @default(autoincrement())
+  title            String
+  slug             String   @unique
+  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategoryId    Int
+  description      String   @db.Text
+  longDescription  String?  @db.Text
+  images           Json?
+  features         Json?
+  specifications   Json?
+  metaTitle        String?
+  metaDescription  String?  @db.Text
+  tokopediaUrl     String?  @db.Text
+  shopeeUrl        String?  @db.Text
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model ProfessionalService {
+  id              Int      @id @default(autoincrement())
+  icon            String
   title           String
-  slug            String              @unique
-  subCategory     ProductSubCategory  @relation(fields: [subCategoryId], references: [id])
-  subCategoryId   Int
-  description     String              @db.Text
-  longDescription String?             @db.Text
-  images          Json
-  features        Json
-  specifications  Json
-  metaTitle       String?
-  metaDescription String?             @db.Text
-  tokopediaUrl    String?
-  shopeeUrl       String?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
+  slug            String   @unique
+  description     String   @db.Text
+  details         String[] @db.Json
+  longDescription String?  @db.Text
+  imageUrl        String?  @db.Text
+  benefits        String[] @db.Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Solution {
+    id          Int      @id @default(autoincrement())
+    icon        String
+    title       String
+    slug        String   @unique
+    description String   @db.Text
+    image       String?  @db.Text
+    aiHint      String?
+    keyPoints   String[] @db.Json
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+}
+
+model TimelineEvent {
+    id        Int      @id @default(autoincrement())
+    year      String
+    event     String   @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model TeamMember {
+    id        Int      @id @default(autoincrement())
+    name      String
+    role      String
+    image     String?  @db.Text
+    linkedin  String?
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model NewsItem {
+    id        Int      @id @default(autoincrement())
+    title     String
+    slug      String   @unique
+    category  String
+    image     String?  @db.Text
+    content   String?  @db.Text
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }

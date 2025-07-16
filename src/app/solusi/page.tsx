@@ -36,21 +36,27 @@ export default async function SolusiPage() {
             {solutions.map((solution, index) => (
               <div key={solution.id} className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
                 <div className={`relative h-80 rounded-lg overflow-hidden shadow-lg ${index % 2 === 1 ? 'md:order-last' : ''}`}>
+                  <Link href={`/solusi/${solution.slug}`}>
                     <Image
                         src={solution.image || "https://placehold.co/600x400.png"}
                         alt={solution.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 50vw"
-                        className="object-cover"
+                        className="object-cover transition-transform duration-300 hover:scale-105"
                         data-ai-hint={solution.aiHint || 'technology solution'}
                     />
+                   </Link>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <div className="bg-primary/10 p-3 rounded-full text-sky-blue">
                       <DynamicIcon name={solution.icon} className="h-10 w-10" />
                     </div>
-                    <h2 className="text-3xl font-headline font-bold text-primary">{solution.title}</h2>
+                    <h2 className="text-3xl font-headline font-bold text-primary">
+                       <Link href={`/solusi/${solution.slug}`} className="hover:text-sky-blue transition-colors">
+                        {solution.title}
+                       </Link>
+                    </h2>
                   </div>
                   <p className="text-muted-foreground">{solution.description}</p>
                   <ul className="space-y-2 pt-2">
@@ -62,6 +68,11 @@ export default async function SolusiPage() {
                       </li>
                     ))}
                   </ul>
+                   <div className="pt-4">
+                      <Button asChild>
+                        <Link href={`/solusi/${solution.slug}`}>Pelajari Lebih Lanjut <ArrowRight className="ml-2 h-4 w-4"/></Link>
+                      </Button>
+                   </div>
                 </div>
               </div>
             ))}

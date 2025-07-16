@@ -55,6 +55,16 @@ function SubmitButton({ isDirty }: { isDirty: boolean }) {
   );
 }
 
+const toSlug = (name: string) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') 
+    .replace(/\s+/g, '-') 
+    .replace(/-+/g, '-'); 
+};
+
+
 export default function SolusiPageClientPage({ settings, initialSolutions }: SolusiPageClientProps) {
   const { toast } = useToast();
   const [headerState, headerFormAction] = useActionState(updateSolusiPageSettings, undefined);
@@ -65,10 +75,12 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
     solutionsPageSubtitle: settings.solutionsPageSubtitle ?? '',
   });
 
-  const [solutions, setSolutions] = useState(initialSolutions.map(s => ({
+  const getInitialSolutions = () => initialSolutions.map(s => ({
     ...s,
     keyPoints: Array.isArray(s.keyPoints) ? s.keyPoints : []
-  })));
+  }));
+
+  const [solutions, setSolutions] = useState(getInitialSolutions());
 
   const [isHeaderDirty, setIsHeaderDirty] = useState(false);
   const [isSolutionsDirty, setIsSolutionsDirty] = useState(false);
@@ -79,10 +91,7 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
         solutionsPageTitle: settings.solutionsPageTitle ?? '',
         solutionsPageSubtitle: settings.solutionsPageSubtitle ?? '',
     });
-    setSolutions(initialSolutions.map(s => ({
-      ...s,
-      keyPoints: Array.isArray(s.keyPoints) ? s.keyPoints : []
-    })));
+    setSolutions(getInitialSolutions());
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [settings, initialSolutions]);
 
@@ -94,7 +103,7 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
   }, [headerForm, settings]);
 
   useEffect(() => {
-    const initialSolutionsFormatted = initialSolutions.map(s => ({...s, keyPoints: Array.isArray(s.keyPoints) ? s.keyPoints : [] }));
+    const initialSolutionsFormatted = getInitialSolutions();
     setIsSolutionsDirty(JSON.stringify(solutions) !== JSON.stringify(initialSolutionsFormatted));
   }, [solutions, initialSolutions]);
 
@@ -102,9 +111,19 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
     setHeaderForm(prev => ({...prev, [field]: value}));
   };
 
+  const handleTitleChange = (index: number, newTitle: string) => {
+    setSolutions(prev => {
+        const newSolutions = [...prev];
+        const newSlug = toSlug(newTitle);
+        newSolutions[index] = {...newSolutions[index], title: newTitle, slug: newSlug};
+        return newSolutions;
+    });
+  };
+
   const handleSolutionChange = (index: number, field: string, value: any) => {
     setSolutions(prev => {
       const newSolutions = [...prev];
+      // @ts-ignore
       newSolutions[index] = {...newSolutions[index], [field]: value};
       return newSolutions;
     });
@@ -123,7 +142,7 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
 
   const addSolution = () => {
     // @ts-ignore
-    setSolutions(prev => [...prev, { id: Date.now(), icon: 'Briefcase', title: '', description: '', image: '', aiHint: '', keyPoints: [], createdAt: new Date(), updatedAt: new Date() }]);
+    setSolutions(prev => [...prev, { id: Date.now(), icon: 'Briefcase', title: '', slug: '', description: '', image: '', aiHint: '', keyPoints: [], createdAt: new Date(), updatedAt: new Date() }]);
   };
   const removeSolution = (index: number) => {
     setSolutions(prev => prev.filter((_, i) => i !== index));
@@ -235,7 +254,11 @@ export default function SolusiPageClientPage({ settings, initialSolutions }: Sol
                         <div className="flex items-end gap-2">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2 flex-grow">
                                 <div className="space-y-1"><Label className="text-xs">Ikon</Label><Select value={solution.icon} onValueChange={(value) => handleSolutionChange(index, 'icon', value)}><SelectTrigger><SelectValue placeholder="Pilih ikon..." /></SelectTrigger><SelectContent>{availableIcons.map(iconName => (<SelectItem key={iconName} value={iconName}><div className="flex items-center gap-2"><DynamicIcon name={iconName} className="h-4 w-4" /><span>{iconName}</span></div></SelectItem>))}</SelectContent></Select></div>
-                                <div className="space-y-1"><Label className="text-xs">Judul</Label><Input value={solution.title} onChange={e => handleSolutionChange(index, 'title', e.target.value)} /></div>
+                                 <div className="space-y-1">
+                                    <Label className="text-xs">URL (Slug)</Label>
+                                    <Input value={solution.slug || ''} onChange={e => handleSolutionChange(index, 'slug', e.target.value)} disabled />
+                                </div>
+                                <div className="md:col-span-2 space-y-1"><Label className="text-xs">Judul</Label><Input value={solution.title} onChange={e => handleTitleChange(index, e.target.value)} /></div>
                                 <div className="md:col-span-2 space-y-1"><Label className="text-xs">Deskripsi</Label><Textarea value={solution.description} onChange={e => handleSolutionChange(index, 'description', e.target.value)} /></div>
                             </div>
                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSolution(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>

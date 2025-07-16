@@ -6,11 +6,22 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import type { Solution } from '@prisma/client';
 
+const toSlug = (name: string) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') 
+    .replace(/\s+/g, '-') 
+    .replace(/-+/g, '-'); 
+};
+
+
 // Schema for a single solution item from the client
 const SolutionSchema = z.object({
     id: z.number(), // Use a temporary ID from the client for existing items
     icon: z.string().default(''),
     title: z.string().default(''),
+    slug: z.string().default(''),
     description: z.string().default(''),
     image: z.string().nullable().default(''),
     aiHint: z.string().nullable().default(''),
@@ -30,7 +41,7 @@ export async function updateSolutions(prevState: { message: string } | undefined
         const validatedFields = SolutionsFormSchema.safeParse(dataToValidate);
 
         if (!validatedFields.success) {
-            console.error('Validation Error:', validatedFields.error);
+            console.error('Validation Error:', JSON.stringify(validatedFields.error.flatten(), null, 2));
             return { message: "Input tidak valid. Silakan periksa kembali." };
         }
 
@@ -52,9 +63,23 @@ export async function updateSolutions(prevState: { message: string } | undefined
         }
 
         for (const solution of solutionsFromClient) {
+             const finalSlug = solution.slug || toSlug(solution.title);
+
+            const existingSlugItem = await prisma.solution.findFirst({ 
+                where: { 
+                    slug: finalSlug, 
+                    id: { not: dbSolutionIds.has(solution.id) ? solution.id : 0 }
+                }
+            });
+
+            if (existingSlugItem) {
+                return { message: `Gagal menyimpan: URL (slug) "${finalSlug}" sudah digunakan oleh solusi lain.` };
+            }
+
             const sanitizedData = {
                 icon: solution.icon,
                 title: solution.title,
+                slug: finalSlug,
                 description: solution.description,
                 image: solution.image,
                 aiHint: solution.aiHint,
@@ -83,6 +108,7 @@ export async function updateSolutions(prevState: { message: string } | undefined
 
         revalidatePath('/', 'layout');
         revalidatePath('/solusi');
+        revalidatePath('/solusi/[slug]', 'page');
         revalidatePath('/admin/pages/solusi');
         return { message: 'Daftar solusi berhasil diperbarui.' };
 
