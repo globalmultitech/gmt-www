@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Home, ChevronRight, CheckCircle, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -26,6 +27,22 @@ export async function generateStaticParams() {
   }));
 }
 
+const parseJsonField = (field: any, fallback: any[] = []) => {
+    if (typeof field === 'string') {
+        try {
+            const parsed = JSON.parse(field);
+            return Array.isArray(parsed) ? parsed : fallback;
+        } catch (e) {
+            return fallback;
+        }
+    }
+    if (Array.isArray(field)) {
+        return field;
+    }
+    return fallback;
+};
+
+
 async function getCategoryBySlug(slug: string) {
   const categories = await prisma.productCategory.findMany();
   // Find the category by comparing its slug-ified name with the slug from the URL
@@ -42,7 +59,7 @@ async function getCategoryBySlug(slug: string) {
   
   const subCategoryIds = subCategories.map(sc => sc.id);
 
-  const products = await prisma.product.findMany({
+  const rawProducts = await prisma.product.findMany({
     where: {
       subCategoryId: {
         in: subCategoryIds,
@@ -52,6 +69,12 @@ async function getCategoryBySlug(slug: string) {
       createdAt: 'asc',
     },
   });
+  
+  const products = rawProducts.map(product => ({
+      ...product,
+      images: parseJsonField(product.images),
+      features: parseJsonField(product.features),
+  }));
 
   return {
     ...category,
@@ -126,8 +149,7 @@ export default async function CategoryProductPage({ params }: Props) {
           {products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
               {products.map((product) => {
-                const featuresList =
-                  (product.features && Array.isArray(product.features)) ? product.features : [];
+                const featuresList = (product.features as string[]) || [];
                 const mainImage = (product.images as string[])?.[0];
 
                 return (
