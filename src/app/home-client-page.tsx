@@ -70,15 +70,15 @@ export default function HomeClientPage({ products, settings, professionalService
             <div className="container mx-auto px-4 relative z-10 -mt-20">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {(settings.featureCards as FeatureCard[]).map((card: FeatureCard, index: number) => (
-                        <Card key={index} className="p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                            <div className="flex justify-center mb-6">
+                        <Card key={index} className="p-6 md:p-8 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                            <div className="flex justify-center mb-4 md:mb-6">
                               <DynamicIcon 
                                 name={card.icon} 
-                                className="h-10 w-10 text-primary"
+                                className="h-8 w-8 md:h-10 md:w-10 text-primary"
                               />
                             </div>
-                            <h3 className="text-xl font-bold text-primary mb-2">{card.title}</h3>
-                            <p className="text-muted-foreground">{card.description}</p>
+                            <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{card.title}</h3>
+                            <p className="text-sm md:text-base text-muted-foreground">{card.description}</p>
                         </Card>
                     ))}
                 </div>
@@ -134,11 +134,11 @@ export default function HomeClientPage({ products, settings, professionalService
                   <Link key={service.id} href={`/layanan/${service.slug}`} className="group block">
                     <Card className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl h-full">
                       <div className="flex flex-row items-center gap-4 p-6">
-                        <div className="bg-primary/10 p-4 rounded-full">
-                          <DynamicIcon name={service.icon} className="h-10 w-10 text-primary" />
+                        <div className="bg-primary/10 p-3 md:p-4 rounded-full">
+                          <DynamicIcon name={service.icon} className="h-8 w-8 md:h-10 md:w-10 text-primary" />
                         </div>
                         <div>
-                          <h3 className="font-headline text-2xl font-bold group-hover:text-sky-blue transition-colors">{service.title}</h3>
+                          <h3 className="font-headline text-xl md:text-2xl font-bold group-hover:text-sky-blue transition-colors">{service.title}</h3>
                           <p className="mt-1 text-sm text-muted-foreground">{service.description}</p>
                         </div>
                       </div>
@@ -227,7 +227,7 @@ export default function HomeClientPage({ products, settings, professionalService
                                 data-ai-hint="product technology"/>
                           </div>
                           <div className="p-6">
-                            <h3 className="text-xl font-bold font-headline mb-4 text-primary group-hover:text-primary-dark transition-colors">{product.title}</h3>
+                            <h3 className="text-lg md:text-xl font-bold font-headline mb-4 text-primary group-hover:text-primary-dark transition-colors">{product.title}</h3>
                             <div className="grid grid-cols-2 gap-4 text-sm mb-4 border-b pb-4">
                                 <div>
                                     <p className="text-muted-foreground text-xs uppercase font-semibold">KATEGORI</p>

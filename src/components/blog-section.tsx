@@ -18,9 +18,11 @@ const FormattedDate = ({ dateString }: { dateString: string }) => {
   const [formattedDate, setFormattedDate] = useState('');
 
   useEffect(() => {
+    // Ensure this runs only on the client after hydration
     setFormattedDate(format(new Date(dateString), 'MMMM d, yyyy', { locale: id }));
   }, [dateString]);
 
+  // Render a placeholder or empty string on the server and during the initial client render
   return <>{formattedDate || ' '}</>;
 };
 
@@ -59,7 +61,7 @@ export default function BlogSection({ newsItems }: BlogSectionProps) {
                   <p className="text-sm text-muted-foreground mb-2">
                     <FormattedDate dateString={item.createdAt.toISOString()} />
                   </p>
-                  <h3 className="font-bold text-lg leading-tight mb-4 h-16 overflow-hidden">
+                  <h3 className="font-bold text-base md:text-lg leading-tight mb-4 h-16 overflow-hidden">
                     {item.title}
                   </h3>
                   <div className="font-semibold text-primary flex items-center gap-2 group-hover:text-sky-blue transition-colors">

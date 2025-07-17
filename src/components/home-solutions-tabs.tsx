@@ -49,13 +49,13 @@ export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
             <TabsContent key={group.id} value={group.title} className="mt-12">
               <div className="grid md:grid-cols-2 gap-8">
                 {group.children.map((solution) => (
-                  <Card key={solution.id} className="p-8 shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                    <div className="flex items-start gap-6">
-                      <div className="bg-primary/10 p-4 rounded-lg flex-shrink-0">
-                         <DynamicIcon name={solution.icon} className="h-8 w-8 text-primary" />
+                  <Card key={solution.id} className="p-6 md:p-8 shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                    <div className="flex items-start gap-4 md:gap-6">
+                      <div className="bg-primary/10 p-3 md:p-4 rounded-lg flex-shrink-0">
+                         <DynamicIcon name={solution.icon} className="h-6 w-6 md:h-8 md:w-8 text-primary" />
                       </div>
                       <div className="flex-grow">
-                        <h3 className="text-xl font-bold text-primary mb-2">{solution.title}</h3>
+                        <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{solution.title}</h3>
                         <p className="text-muted-foreground text-sm mb-4 h-20">{solution.description}</p>
                         <Link href={`/solusi/${solution.slug}`} className="font-semibold text-sky-blue flex items-center group">
                           Pelajari lebih jauh

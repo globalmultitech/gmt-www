@@ -22,12 +22,12 @@ export function Logo({
   const sidebar = useSidebar();
   
   const imageSizeClasses = {
-    default: 'h-16 w-auto',
+    default: 'h-12 md:h-16 w-auto',
     footer: 'h-14 w-auto',
   };
 
   const textSizeClasses = {
-    default: 'text-3xl md:text-4xl',
+    default: 'text-2xl md:text-4xl',
     footer: 'text-3xl md:text-4xl',
   };
   
