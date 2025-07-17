@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useTransition } from 'react';
 import { db } from '@/lib/firebase';
 import { collection, query, onSnapshot, orderBy, doc, collectionGroup, addDoc, serverTimestamp, updateDoc } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
@@ -10,10 +10,24 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, User, Bot, Circle } from 'lucide-react';
+import { Send, User, Bot, Circle, Trash2, Loader2 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import { useToast } from '@/hooks/use-toast';
+import { deleteChatSession } from './actions';
+
 
 type ChatSession = {
   id: string;
@@ -30,6 +44,55 @@ type Message = {
   sender: 'user' | 'admin';
   createdAt: any;
 };
+
+function DeleteSessionButton({ sessionId, onDeleted }: { sessionId: string, onDeleted: () => void }) {
+  const [isPending, startTransition] = useTransition();
+  const { toast } = useToast();
+
+  const handleDelete = () => {
+    startTransition(async () => {
+      const result = await deleteChatSession(sessionId);
+      if (result.success) {
+        toast({
+          title: 'Sukses',
+          description: result.message,
+        });
+        onDeleted();
+      } else {
+        toast({
+          title: 'Gagal',
+          description: result.message,
+          variant: 'destructive',
+        });
+      }
+    });
+  };
+
+  return (
+    <AlertDialog onOpenChange={(open) => open && event?.stopPropagation()}>
+      <AlertDialogTrigger asChild>
+        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:bg-destructive/10" onClick={(e) => e.stopPropagation()}>
+          {isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Hapus Sesi Obrolan?</AlertDialogTitle>
+          <AlertDialogDescription>
+            Tindakan ini tidak dapat dibatalkan. Seluruh riwayat percakapan dalam sesi ini akan dihapus secara permanen.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Batal</AlertDialogCancel>
+          <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
+            {isPending ? <Loader2 className="animate-spin" /> : 'Ya, Hapus'}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 
 export default function ChatAdminClientPage() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
@@ -109,6 +172,13 @@ export default function ChatAdminClientPage() {
     }
   };
 
+  const handleSessionDeleted = () => {
+    if (activeSession && activeSession.id === activeSession.id) {
+        setActiveSession(null);
+        setMessages([]);
+    }
+  }
+
   const formatRelativeTime = (timestamp: any) => {
     if (!timestamp?.toDate) return '';
     return formatDistanceToNow(timestamp.toDate(), { addSuffix: true, locale: id });
@@ -127,18 +197,23 @@ export default function ChatAdminClientPage() {
               key={session.id}
               onClick={() => setActiveSession(session)}
               className={cn(
-                "w-full text-left p-4 border-b hover:bg-muted",
+                "w-full text-left p-4 border-b hover:bg-muted group",
                 activeSession?.id === session.id && "bg-secondary"
               )}
             >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center gap-2">
-                   <Circle className={cn("h-2.5 w-2.5", session.status === 'open' ? 'text-green-500 fill-green-500' : 'text-gray-400 fill-gray-400')} />
-                   <p className="font-bold truncate">{session.guestName || `Tamu #${session.id.substring(0, 6)}`}</p>
+              <div className="flex justify-between items-start">
+                <div className="flex items-start gap-2 flex-grow min-w-0">
+                   <Circle className={cn("h-2.5 w-2.5 mt-1.5 flex-shrink-0", session.status === 'open' ? 'text-green-500 fill-green-500' : 'text-gray-400 fill-gray-400')} />
+                   <div className="flex-grow min-w-0">
+                    <p className="font-bold truncate">{session.guestName || `Tamu #${session.id.substring(0, 6)}`}</p>
+                    <p className="text-sm text-muted-foreground truncate">{session.lastMessage}</p>
+                   </div>
                 </div>
-                <p className="text-xs text-muted-foreground">{formatRelativeTime(session.updatedAt)}</p>
+                <div className='flex items-center gap-1 flex-shrink-0 pl-2'>
+                    <p className="text-xs text-muted-foreground">{formatRelativeTime(session.updatedAt)}</p>
+                    <DeleteSessionButton sessionId={session.id} onDeleted={handleSessionDeleted} />
+                </div>
               </div>
-              <p className="text-sm text-muted-foreground truncate pl-5">{session.lastMessage}</p>
             </button>
           ))}
         </ScrollArea>
