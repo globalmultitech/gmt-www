@@ -65,18 +65,27 @@ function LoginFormContent() {
   );
 }
 
-export default function LoginPage() {
+// Wrap the component with Suspense to handle searchParams
+function LoginPage() {
   return (
-    <div 
-      className="relative flex min-h-screen items-center justify-center bg-cover bg-center p-4"
-      style={{ backgroundImage: "url('/login-background.png')" }}
-    >
-        <div className="absolute inset-0 bg-black/50 z-0"></div>
-        <div className="relative z-10">
-            <Suspense fallback={<Card className="w-full max-w-sm h-96 shadow-2xl" />}>
-                <LoginFormContent />
-            </Suspense>
-        </div>
-    </div>
+      <div 
+        className="relative flex min-h-screen items-center justify-center bg-cover bg-center p-4"
+        style={{ backgroundImage: "url('/login-background.png')" }}
+      >
+          <div className="absolute inset-0 bg-black/50 z-0"></div>
+          <div className="relative z-10 w-full max-w-sm">
+              <Suspense fallback={<Card className="w-full h-96 shadow-2xl" />}>
+                  <LoginFormContent />
+              </Suspense>
+          </div>
+      </div>
   );
+}
+
+export default function LoginPageWrapper() {
+  return (
+    <Suspense>
+      <LoginPage />
+    </Suspense>
+  )
 }

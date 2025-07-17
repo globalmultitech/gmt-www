@@ -2,11 +2,19 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { jwtVerify } from 'jose';
+
+// This is outside the function to avoid re-encoding on every request
+const secretKey = new TextEncoder().encode(process.env.AUTH_SECRET);
  
 async function verifySession(token: string) {
+  if (!process.env.AUTH_SECRET) {
+    console.error('AUTH_SECRET environment variable is not set. Authentication is disabled.');
+    return null;
+  }
   if (!token) return null;
+  
   try {
-    const { payload } = await jwtVerify(token, new TextEncoder().encode(process.env.AUTH_SECRET));
+    const { payload } = await jwtVerify(token, secretKey);
     return payload;
   } catch (err) {
     console.error("Session verification failed:", err);
