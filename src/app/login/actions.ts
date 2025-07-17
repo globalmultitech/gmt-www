@@ -4,7 +4,26 @@
 import { redirect } from 'next/navigation';
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
+import { SignJWT } from 'jose';
 import { cookies } from 'next/headers';
+
+const secretKey = new TextEncoder().encode(process.env.AUTH_SECRET);
+
+async function createSession(userId: number) {
+  const payload = { userId, iat: Math.floor(Date.now() / 1000) };
+  const session = await new SignJWT(payload)
+    .setProtectedHeader({ alg: 'HS256' })
+    .setExpirationTime('7d')
+    .sign(secretKey);
+  
+  cookies().set('auth_session', session, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 60 * 60 * 24 * 7, // 1 week
+    path: '/',
+    sameSite: 'lax',
+  });
+}
 
 export async function login(prevState: { message: string } | undefined, formData: FormData) {
   const email = formData.get('email') as string;
@@ -34,15 +53,8 @@ export async function login(prevState: { message: string } | undefined, formData
       return { message: 'Email atau kata sandi salah.' };
     }
     
-    // If credentials are valid, set the cookie
-    const sessionData = { userId: user.id, name: user.name, email: user.email };
-    await cookies().set('auth_session', JSON.stringify(sessionData), {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-      path: '/',
-      sameSite: 'lax',
-    });
+    // If credentials are valid, create the session
+    await createSession(user.id);
     
   } catch (error) {
     console.error('Login error:', error);

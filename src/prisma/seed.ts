@@ -1,4 +1,4 @@
-import 'dotenv/config';
+
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 
@@ -144,7 +144,7 @@ async function main() {
       solutionsPageSubtitle: 'Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.',
       
       aboutPageTitle: 'Tentang Global Multi Technology',
-      aboutPageSubtitle: 'Mendorong Inovasi, Memberdayakan Pertumbuhan.',
+      aboutPageSubtitle: 'Bekerja Sama dengan Para Pemimpin Industri untuk Memberikan Solusi Terbaik',
       missionTitle: 'Misi Kami', // This field is no longer displayed but we keep it for now
       missionText: 'Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif di era modern.',
       visionTitle: 'Visi Kami', // This field is no longer displayed but we keep it for now
@@ -411,8 +411,9 @@ async function main() {
   });
 
   console.log('Seeding categories and sub-categories...');
-  await prisma.productSubCategory.deleteMany({});
+  // Clear existing product data
   await prisma.product.deleteMany({});
+  await prisma.productSubCategory.deleteMany({});
   await prisma.productCategory.deleteMany({});
 
   const hardwareCategory = await prisma.productCategory.create({
