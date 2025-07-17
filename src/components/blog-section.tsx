@@ -8,9 +8,20 @@ import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { useState, useEffect } from 'react';
 
 type BlogSectionProps = {
   newsItems: NewsItem[];
+};
+
+const FormattedDate = ({ dateString }: { dateString: string }) => {
+  const [formattedDate, setFormattedDate] = useState('');
+
+  useEffect(() => {
+    setFormattedDate(format(new Date(dateString), 'MMMM d, yyyy', { locale: id }));
+  }, [dateString]);
+
+  return <>{formattedDate || ' '}</>;
 };
 
 export default function BlogSection({ newsItems }: BlogSectionProps) {
@@ -46,7 +57,7 @@ export default function BlogSection({ newsItems }: BlogSectionProps) {
                 </div>
                 <CardContent className="p-6">
                   <p className="text-sm text-muted-foreground mb-2">
-                    {format(new Date(item.createdAt), 'MMMM d, yyyy', { locale: id })}
+                    <FormattedDate dateString={item.createdAt.toISOString()} />
                   </p>
                   <h3 className="font-bold text-lg leading-tight mb-4 h-16 overflow-hidden">
                     {item.title}
