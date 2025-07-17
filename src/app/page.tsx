@@ -59,7 +59,7 @@ async function getHomePageData() {
 
 
   const newsItems = await prisma.newsItem.findMany({
-    take: 3,
+    take: 4,
     orderBy: { id: 'desc' },
   });
 

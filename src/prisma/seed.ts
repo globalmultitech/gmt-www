@@ -145,10 +145,10 @@ async function main() {
       solutionsPageSubtitle: 'Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.',
       
       aboutPageTitle: 'Tentang Global Multi Technology',
-      aboutPageSubtitle: 'Mendorong Inovasi, Memberdayakan Pertumbuhan Bisnis Anda.',
-      missionTitle: 'Misi Kami',
+      aboutPageSubtitle: 'Bekerja Sama dengan Para Pemimpin Industri untuk Memberikan Solusi Terbaik',
+      missionTitle: 'Misi Kami', // This field is no longer displayed but we keep it for now
       missionText: 'Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif di era modern.',
-      visionTitle: 'Visi Kami',
+      visionTitle: 'Visi Kami', // This field is no longer displayed but we keep it for now
       visionText: 'Menjadi mitra teknologi terdepan dan terpercaya di Asia Tenggara, yang dikenal karena inovasi, kualitas layanan, dan komitmen kami terhadap kesuksesan setiap pelanggan.',
       
       resourcesPageTitle: 'Wawasan & Berita',
@@ -161,8 +161,8 @@ async function main() {
   console.log('Clearing old page data...');
   await prisma.professionalService.deleteMany({});
   await prisma.solution.deleteMany({});
-  await prisma.timelineEvent.deleteMany({});
-  await prisma.teamMember.deleteMany({});
+  await prisma.partnerLogo.deleteMany({});
+  await prisma.customerLogo.deleteMany({});
   await prisma.newsItem.deleteMany({});
   console.log('Old page data cleared.');
 
@@ -348,25 +348,27 @@ async function main() {
     data: subSolutions
   });
   
-  console.log('Seeding Timeline Events...');
-  await prisma.timelineEvent.createMany({
+  console.log('Seeding Partner & Customer Logos...');
+  await prisma.partnerLogo.createMany({
     data: [
-      { year: '2010', event: 'Global Multi Technology didirikan dengan fokus pada penyediaan perangkat keras perbankan.' },
-      { year: '2015', event: 'Memperluas layanan ke pengembangan perangkat lunak kustom dan solusi sistem antrian.' },
-      { year: '2018', event: 'Meluncurkan solusi Digital Kiosk pertama yang diadopsi oleh bank nasional terkemuka.' },
-      { year: '2021', event: 'Meraih penghargaan sebagai Penyedia Solusi Teknologi Perbankan Terbaik.' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Partner A' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Partner B' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Partner C' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Partner D' },
     ]
   });
 
-  console.log('Seeding Team Members...');
-  await prisma.teamMember.createMany({
+  await prisma.customerLogo.createMany({
     data: [
-      { name: 'Budi Santoso', role: 'Chief Executive Officer', image: 'https://placehold.co/400x400.png', linkedin: '#' },
-      { name: 'Citra Dewi', role: 'Chief Technology Officer', image: 'https://placehold.co/400x400.png', linkedin: '#' },
-      { name: 'Agus Setiawan', role: 'Head of Sales', image: 'https://placehold.co/400x400.png', linkedin: '#' },
-      { name: 'Rina Kartika', role: 'Head of Operations', image: 'https://placehold.co/400x400.png', linkedin: '#' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Customer 1' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Customer 2' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Customer 3' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Customer 4' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Customer 5' },
+        { src: 'https://placehold.co/200x100.png', alt: 'Customer 6' },
     ]
   });
+
 
   console.log('Seeding News Items...');
   const newsItemsToSeed = [
@@ -393,12 +395,6 @@ async function main() {
           category: 'Webinar',
           image: 'https://placehold.co/600x400.png',
           content: 'Dalam webinar eksklusif ini, kami membahas bagaimana solusi deteksi penipuan berbasis AI dari GMT dapat membantu lembaga keuangan mengurangi risiko kerugian akibat fraud. Kami mendemonstrasikan kemampuan sistem dalam menganalisis jutaan transaksi secara real-time untuk mendeteksi pola anomali yang mencurigakan.'
-      },
-      {
-          title: 'GMT Meluncurkan Program Kemitraan untuk Startup Fintech',
-          category: 'Siaran Pers',
-          image: 'https://placehold.co/600x400.png',
-          content: 'Sebagai komitmen kami untuk mendorong inovasi, Global Multi Technology meluncurkan program kemitraan yang dirancang khusus untuk startup fintech. Program ini menawarkan akses ke teknologi, mentoring dari para ahli, dan potensi investasi bagi startup yang memiliki visi sejalan dengan misi kami untuk mentransformasi lanskap keuangan digital.'
       },
   ];
 
