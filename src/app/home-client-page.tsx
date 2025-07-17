@@ -12,6 +12,7 @@ import type { WebSettings, FeatureCard, TrustedByLogo } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { HomeSolutionsTabs } from '@/components/home-solutions-tabs';
 import { HomeMapSection } from '@/components/home-map-section';
+import BlogSection from '@/components/blog-section';
 
 type EnrichedProduct = Product & {
   subCategory: ProductSubCategory & {
@@ -164,6 +165,9 @@ export default function HomeClientPage({ products, settings, professionalService
       
       {/* Map Section */}
       <HomeMapSection />
+
+      {/* Knowledge Center/Blog Section */}
+      <BlogSection newsItems={newsItems} />
 
        {/* CTA Section */}
        <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: `url('${settings.ctaImageUrl || 'https://placehold.co/1920x1080.png'}')`}}>
