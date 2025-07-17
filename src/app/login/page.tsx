@@ -31,7 +31,7 @@ function LoginFormContent() {
   const error = state?.message || errorFromUrl;
 
   return (
-    <Card className="w-full max-w-sm shadow-2xl">
+    <Card className="w-full max-w-sm shadow-2xl bg-background/90 backdrop-blur-sm">
       <CardHeader className="text-center">
         <div className="mx-auto mb-4">
           <Logo companyName={"Admin"} />
@@ -67,10 +67,16 @@ function LoginFormContent() {
 
 export default function LoginPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
-      <Suspense fallback={<Card className="w-full max-w-sm h-96 shadow-2xl" />}>
-        <LoginFormContent />
-      </Suspense>
+    <div 
+      className="relative flex min-h-screen items-center justify-center bg-cover bg-center p-4"
+      style={{ backgroundImage: "url('/login-background.png')" }}
+    >
+        <div className="absolute inset-0 bg-black/50 z-0"></div>
+        <div className="relative z-10">
+            <Suspense fallback={<Card className="w-full max-w-sm h-96 shadow-2xl" />}>
+                <LoginFormContent />
+            </Suspense>
+        </div>
     </div>
   );
 }
