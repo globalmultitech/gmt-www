@@ -56,7 +56,7 @@ const Breadcrumbs = ({ postTitle }: { postTitle: string }) => (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
     <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href="/resources" className="hover:text-primary">Blog</Link>
+    <Link href="/resources" className="hover:text-primary">Knowledge Center</Link>
     <ChevronRight className="h-4 w-4" />
     <span className="font-semibold text-foreground truncate max-w-xs">{postTitle}</span>
   </nav>

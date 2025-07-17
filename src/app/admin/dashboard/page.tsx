@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Package, Shapes, Handshake, Newspaper } from "lucide-react";
 import prisma from '@/lib/db';
 import LiveChatCard from "./live-chat-card";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 async function getStats() {
     const [productCount, serviceCount, solutionCount, newsCount] = await prisma.$transaction([
@@ -72,7 +74,7 @@ export default async function AdminDashboardPage() {
                     </CardHeader>
                     <CardContent>
                         <p className="text-3xl font-bold">{newsCount}</p>
-                        <CardDescription>Artikel di halaman Blog/Resources.</CardDescription>
+                        <CardDescription>Artikel di Knowledge Center.</CardDescription>
                     </CardContent>
                 </Card>
             </div>
@@ -87,7 +89,7 @@ export default async function AdminDashboardPage() {
                        <Button asChild variant="outline"><Link href="/admin/produk">Manajemen Produk</Link></Button>
                        <Button asChild variant="outline"><Link href="/admin/pages/layanan">Manajemen Layanan</Link></Button>
                        <Button asChild variant="outline"><Link href="/admin/pages/solusi">Manajemen Solusi</Link></Button>
-                       <Button asChild variant="outline"><Link href="/admin/pages/resources">Manajemen Blog</Link></Button>
+                       <Button asChild variant="outline"><Link href="/admin/pages/resources">Manajemen Knowledge Center</Link></Button>
                        <Button asChild variant="outline"><Link href="/admin/settings">Pengaturan Umum</Link></Button>
                     </div>
                 </CardContent>

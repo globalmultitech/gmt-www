@@ -177,8 +177,8 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="resourcesData" value={JSON.stringify(formState)} />
       <div className="mb-6">
-        <h1 className="text-3xl font-bold">Pengaturan Halaman Blog</h1>
-        <p className="text-muted-foreground">Kelola berita dan artikel yang tampil di halaman Blog.</p>
+        <h1 className="text-3xl font-bold">Pengaturan Halaman Knowledge Center</h1>
+        <p className="text-muted-foreground">Kelola berita dan artikel yang tampil di halaman Knowledge Center.</p>
       </div>
 
       <Card>
@@ -194,7 +194,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
       <Card>
           <CardHeader>
               <CardTitle>Daftar Artikel/Berita</CardTitle>
-              <CardDescription>Kelola daftar artikel yang ditampilkan di halaman Blog.</CardDescription>
+              <CardDescription>Kelola daftar artikel yang ditampilkan di halaman Knowledge Center.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
               {formState.newsItems.map((item, index) => (

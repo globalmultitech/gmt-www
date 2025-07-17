@@ -59,7 +59,7 @@ async function main() {
         { label: 'Produk', href: '/produk' },
         { label: 'Solusi', href: '/solusi' },
         { label: 'Layanan', href: '/layanan' },
-        { label: 'Blog', href: '/resources' },
+        { label: 'Knowledge Center', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
         { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ]),
@@ -144,13 +144,13 @@ async function main() {
       solutionsPageSubtitle: 'Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.',
       
       aboutPageTitle: 'Tentang Global Multi Technology',
-      aboutPageSubtitle: 'Bekerja Sama dengan Para Pemimpin Industri untuk Memberikan Solusi Terbaik',
+      aboutPageSubtitle: 'Mendorong Inovasi, Memberdayakan Pertumbuhan Bisnis Anda.',
       missionTitle: 'Misi Kami', // This field is no longer displayed but we keep it for now
       missionText: 'Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif di era modern.',
       visionTitle: 'Visi Kami', // This field is no longer displayed but we keep it for now
       visionText: 'Menjadi mitra teknologi terdepan dan terpercaya di Asia Tenggara, yang dikenal karena inovasi, kualitas layanan, dan komitmen kami terhadap kesuksesan setiap pelanggan.',
       
-      resourcesPageTitle: 'Wawasan & Berita',
+      resourcesPageTitle: 'Knowledge Center',
       resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.',
     },
   });
@@ -604,4 +604,3 @@ main()
     
 
     
-
