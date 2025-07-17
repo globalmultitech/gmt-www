@@ -47,7 +47,7 @@ export default function BlogSection({ newsItems }: BlogSectionProps) {
           {newsItems.map((item) => (
             <Link key={item.id} href={`/resources/${item.slug}`} className="group block">
               <Card className="h-full overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
-                <div className="relative aspect-[4/3] w-full">
+                <div className="relative h-48 md:aspect-[4/3] w-full">
                   <Image
                     src={item.image || 'https://placehold.co/400x300.png'}
                     alt={item.title}
@@ -61,7 +61,7 @@ export default function BlogSection({ newsItems }: BlogSectionProps) {
                   <p className="text-sm text-muted-foreground mb-2">
                     <FormattedDate dateString={item.createdAt.toISOString()} />
                   </p>
-                  <h3 className="font-bold text-base md:text-lg leading-tight mb-4 h-16 overflow-hidden">
+                  <h3 className="font-bold text-base leading-tight mb-4 h-16 overflow-hidden">
                     {item.title}
                   </h3>
                   <div className="font-semibold text-primary flex items-center gap-2 group-hover:text-sky-blue transition-colors">
