@@ -1,7 +1,6 @@
-
+import 'dotenv/config';
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
-import 'dotenv/config';
 
 const toSlug = (name: string) => {
   return name
@@ -145,7 +144,7 @@ async function main() {
       solutionsPageSubtitle: 'Kami menyediakan solusi end-to-end yang dirancang untuk mengatasi tantangan spesifik dalam industri layanan keuangan dan perbankan.',
       
       aboutPageTitle: 'Tentang Global Multi Technology',
-      aboutPageSubtitle: 'Bekerja Sama dengan Para Pemimpin Industri untuk Memberikan Solusi Terbaik',
+      aboutPageSubtitle: 'Mendorong Inovasi, Memberdayakan Pertumbuhan.',
       missionTitle: 'Misi Kami', // This field is no longer displayed but we keep it for now
       missionText: 'Menyediakan solusi teknologi inovatif dan layanan profesional yang andal untuk membantu klien kami bertransformasi secara digital, meningkatkan efisiensi, dan mencapai keunggulan kompetitif di era modern.',
       visionTitle: 'Visi Kami', // This field is no longer displayed but we keep it for now
@@ -396,6 +395,12 @@ async function main() {
           image: 'https://placehold.co/600x400.png',
           content: 'Dalam webinar eksklusif ini, kami membahas bagaimana solusi deteksi penipuan berbasis AI dari GMT dapat membantu lembaga keuangan mengurangi risiko kerugian akibat fraud. Kami mendemonstrasikan kemampuan sistem dalam menganalisis jutaan transaksi secara real-time untuk mendeteksi pola anomali yang mencurigakan.'
       },
+      {
+          title: 'GMT Meluncurkan Program Kemitraan untuk Startup Fintech',
+          category: 'Siaran Pers',
+          image: 'https://placehold.co/600x400.png',
+          content: 'Sebagai komitmen kami untuk mendorong inovasi, Global Multi Technology meluncurkan program kemitraan yang dirancang khusus untuk startup fintech. Program ini menawarkan akses ke teknologi, mentoring dari para ahli, dan potensi investasi bagi startup yang memiliki visi sejalan dengan misi kami untuk mentransformasi lanskap keuangan digital.'
+      },
   ];
 
   await prisma.newsItem.createMany({
@@ -406,9 +411,8 @@ async function main() {
   });
 
   console.log('Seeding categories and sub-categories...');
-  // Clear existing product data
-  await prisma.product.deleteMany({});
   await prisma.productSubCategory.deleteMany({});
+  await prisma.product.deleteMany({});
   await prisma.productCategory.deleteMany({});
 
   const hardwareCategory = await prisma.productCategory.create({
@@ -599,3 +603,4 @@ main()
     
 
     
+
