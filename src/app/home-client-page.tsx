@@ -166,9 +166,6 @@ export default function HomeClientPage({ products, settings, professionalService
       {/* Map Section */}
       <HomeMapSection />
 
-      {/* Knowledge Center/Blog Section */}
-      <BlogSection newsItems={newsItems} />
-
        {/* CTA Section */}
        <section className="relative py-20 bg-cover bg-center bg-fixed" style={{backgroundImage: `url('${settings.ctaImageUrl || 'https://placehold.co/1920x1080.png'}')`}}>
         <div className="absolute inset-0 bg-black/70"></div>
@@ -248,6 +245,9 @@ export default function HomeClientPage({ products, settings, professionalService
               </div>
           </div>
       </section>
+
+      {/* Knowledge Center/Blog Section */}
+      <BlogSection newsItems={newsItems} />
 
     </div>
   );
