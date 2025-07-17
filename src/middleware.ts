@@ -3,6 +3,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
  
 export function middleware(request: NextRequest) {
+  // Check for the developer mode switch
+  if (process.env.DISABLE_AUTH_MIDDLEWARE === 'true') {
+    return NextResponse.next();
+  }
+
   const sessionCookie = request.cookies.get('auth_session');
  
   const { pathname } = request.nextUrl;
@@ -10,6 +15,7 @@ export function middleware(request: NextRequest) {
   // If user is trying to access admin pages but is not logged in, redirect to login
   if (pathname.startsWith('/admin') && !sessionCookie) {
     const loginUrl = new URL('/login', request.url)
+    loginUrl.searchParams.set('error', 'unauthorized');
     return NextResponse.redirect(loginUrl)
   }
 
