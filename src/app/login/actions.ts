@@ -7,6 +7,9 @@ import bcryptjs from 'bcryptjs';
 import { SignJWT } from 'jose';
 import { cookies } from 'next/headers';
 
+if (!process.env.AUTH_SECRET) {
+  throw new Error('AUTH_SECRET environment variable is not set');
+}
 const secretKey = new TextEncoder().encode(process.env.AUTH_SECRET);
 
 async function createSession(userId: number) {

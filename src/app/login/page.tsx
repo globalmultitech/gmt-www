@@ -17,7 +17,7 @@ import { useSearchParams } from 'next/navigation';
 function SubmitButton() {
   const { pending } = useFormStatus();
   return (
-    <Button type="submit" className="w-full !mt-8" size="lg" disabled={pending}>
+    <Button type="submit" className="w-full !mt-6" size="lg" disabled={pending}>
       {pending ? <Loader2 className="animate-spin" /> : 'Masuk'}
     </Button>
   );
@@ -49,7 +49,7 @@ function LoginFormContent() {
             </AlertDescription>
           </Alert>
         )}
-        <form action={formAction} className="space-y-6">
+        <form action={formAction} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="email">Alamat Email</Label>
             <Input id="email" name="email" type="email" placeholder="admin@gmt.co.id" required autoComplete="email" />
