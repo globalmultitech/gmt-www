@@ -23,7 +23,7 @@ function SubmitButton() {
   );
 }
 
-function LoginForm() {
+function LoginFormContent() {
   const [state, formAction] = useActionState(login, undefined);
   const searchParams = useSearchParams();
   const errorFromUrl = searchParams.get('error');
@@ -45,7 +45,7 @@ function LoginForm() {
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Login Gagal</AlertTitle>
             <AlertDescription>
-              {error}
+              {error === 'unauthorized' ? 'Sesi Anda telah berakhir, silakan login kembali.' : error}
             </AlertDescription>
           </Alert>
         )}
@@ -65,12 +65,11 @@ function LoginForm() {
   );
 }
 
-// This page remains a client component to use useActionState
 export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-secondary p-4">
-      <Suspense fallback={<div>Loading...</div>}>
-        <LoginForm />
+      <Suspense fallback={<Card className="w-full max-w-sm h-96 shadow-2xl" />}>
+        <LoginFormContent />
       </Suspense>
     </div>
   );
