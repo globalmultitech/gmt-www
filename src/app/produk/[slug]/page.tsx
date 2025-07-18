@@ -209,7 +209,7 @@ export default async function ProductDetailPage({ params }: Props) {
                               </div>
                               <div>
                                 <p className='font-semibold'>{feature.title}</p>
-                                <p className="text-muted-foreground">{feature.description}</p>
+                                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: feature.description }} />
                               </div>
                           </li>
                           ))}

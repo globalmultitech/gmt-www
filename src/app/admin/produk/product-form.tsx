@@ -101,6 +101,8 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
 
   const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }], true));
   const [specifications, setSpecifications] = useState<Specification[]>(parseJsonSafe(product?.specifications, [{ key: '', value: '' }], true));
+  
+  const longDescriptionRef = useRef<HTMLInputElement>(null);
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -158,6 +160,21 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const addSpecification = () => setSpecifications([...specifications, { key: '', value: '' }]);
   const removeSpecification = (index: number) => setSpecifications(specifications.filter((_, i) => i !== index));
 
+  const handleFormSubmit = (formData: FormData) => {
+    // Manually set features from state because RichTextEditor is not a standard input
+    const featuresWithRichText = features.map((feature, index) => {
+        const editorContent = document.querySelector(`[data-feature-editor-index="${index}"] input[type="hidden"]`)?.getAttribute('value');
+        return {
+            ...feature,
+            description: editorContent || feature.description,
+        };
+    });
+
+    formData.set('features', JSON.stringify(featuresWithRichText.filter(f => f && typeof f.title === 'string' && f.title.trim() !== '')));
+    formData.set('specifications', JSON.stringify(specifications.filter(s => s && typeof s.key === 'string' && s.key.trim() !== '')))
+
+    dispatch(formData);
+  }
 
   useEffect(() => {
     if (state?.message) {
@@ -170,13 +187,9 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   }, [state, toast]);
 
   return (
-    <form action={dispatch} className="space-y-8">
+    <form action={handleFormSubmit} className="space-y-8">
         {isEditing && <input type="hidden" name="id" value={product.id} />}
         <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
-        <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f && typeof f.title === 'string' && f.title.trim() !== ''))} />
-        <input type="hidden" name="specifications" value={JSON.stringify(
-            specifications.filter(s => s && typeof s.key === 'string' && s.key.trim() !== '')
-        )} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
@@ -236,16 +249,26 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
                           <Label>Fitur Utama</Label>
-                          <div className="space-y-2">
+                           <div className="space-y-4">
                             {features.map((feature, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <Input value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
-                                <Input value={feature.description} onChange={(e) => handleFeatureChange(index, 'description', e.target.value)} placeholder={`Deskripsi Fitur ${index + 1}`} />
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                              <div key={index} className="border p-4 rounded-md space-y-2 relative">
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-8 w-8 absolute top-2 right-2"><Trash2 className="h-4 w-4" /></Button>
+                                <div className='space-y-1'>
+                                    <Label htmlFor={`feature-title-${index}`}>Judul Fitur {index + 1}</Label>
+                                    <Input id={`feature-title-${index}`} value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
+                                </div>
+                                <div className='space-y-1' data-feature-editor-index={index}>
+                                     <Label>Deskripsi Fitur {index + 1}</Label>
+                                     <RichTextEditor
+                                        key={`feature-desc-${index}`}
+                                        defaultValue={feature.description}
+                                        onUpdate={({ editor }) => handleFeatureChange(index, 'description', editor.getHTML())}
+                                     />
+                                </div>
                               </div>
                             ))}
                           </div>
-                          <Button type="button" variant="outline" size="sm" onClick={addFeature}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Fitur</Button>
+                          <Button type="button" variant="outline" size="sm" onClick={addFeature} className="mt-2"><PlusCircle className="mr-2 h-4 w-4" /> Tambah Fitur</Button>
                         </div>
                         <div className="space-y-2">
                           <Label>Spesifikasi</Label>

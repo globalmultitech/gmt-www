@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useEditor, EditorContent, type Editor } from '@tiptap/react';
+import { useEditor, EditorContent, type Editor, type EditorEvents } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import { Bold, Italic, Strikethrough, List, ListOrdered, Heading1, Heading2, Heading3 } from 'lucide-react';
 import { Toggle } from '@/components/ui/toggle';
@@ -9,6 +9,7 @@ import { Toggle } from '@/components/ui/toggle';
 interface RichTextEditorProps {
   name?: string;
   defaultValue?: string;
+  onUpdate?: (props: EditorEvents['update']) => void;
 }
 
 const Toolbar = ({ editor }: { editor: Editor | null }) => {
@@ -78,7 +79,7 @@ const Toolbar = ({ editor }: { editor: Editor | null }) => {
   );
 };
 
-const RichTextEditor = ({ name, defaultValue = '' }: RichTextEditorProps) => {
+const RichTextEditor = ({ name, defaultValue = '', onUpdate }: RichTextEditorProps) => {
   const editor = useEditor({
     extensions: [
       StarterKit.configure({
@@ -98,9 +99,10 @@ const RichTextEditor = ({ name, defaultValue = '' }: RichTextEditorProps) => {
     content: defaultValue,
     editorProps: {
       attributes: {
-        class: 'prose dark:prose-invert prose-sm sm:prose-base min-h-[300px] w-full rounded-b-md border border-input bg-background px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
+        class: 'prose dark:prose-invert prose-sm sm:prose-base min-h-[150px] max-h-[300px] overflow-y-auto w-full rounded-b-md border border-input bg-background px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',
       },
     },
+    onUpdate: onUpdate ? onUpdate : undefined,
   });
 
   return (
