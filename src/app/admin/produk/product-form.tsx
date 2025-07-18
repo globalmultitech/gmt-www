@@ -61,15 +61,28 @@ const generateSlug = (title: string) => {
     .replace(/-+/g, '-');
 }
 
-const parseJsonSafe = (json: any, fallback: any) => {
+const parseJsonSafe = (json: any, fallback: any, forceArray = false) => {
+    let parsedJson;
     if (typeof json === 'string') {
         try {
-            return JSON.parse(json);
+            parsedJson = JSON.parse(json);
         } catch (e) {
-            return fallback;
+            parsedJson = fallback;
         }
+    } else {
+        parsedJson = json ?? fallback;
     }
-    return json ?? fallback;
+
+    if (forceArray && !Array.isArray(parsedJson)) {
+        // If it's an object, convert it to an array of its key-value pairs
+        if (typeof parsedJson === 'object' && parsedJson !== null) {
+             return Object.entries(parsedJson).map(([key, value]) => ({ key, value }));
+        }
+        // Otherwise, wrap it in an array or return the fallback if it's not convertible
+        return fallback;
+    }
+    
+    return parsedJson;
 }
 
 
@@ -82,12 +95,12 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const [state, dispatch] = useActionState(formAction, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>(parseJsonSafe(product?.images, []));
+  const [imageUrls, setImageUrls] = useState<string[]>(parseJsonSafe(product?.images, [], true));
   const [productTitle, setProductTitle] = useState(product?.title ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
 
-  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }]));
-  const [specifications, setSpecifications] = useState<Specification[]>(parseJsonSafe(product?.specifications, [{ key: '', value: '' }]));
+  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }], true));
+  const [specifications, setSpecifications] = useState<Specification[]>(parseJsonSafe(product?.specifications, [{ key: '', value: '' }], true));
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -317,5 +330,3 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     </form>
   )
 }
-
-    
