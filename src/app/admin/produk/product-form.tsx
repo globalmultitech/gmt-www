@@ -33,6 +33,16 @@ type ProductFormProps = {
   product?: Product | null;
 }
 
+type Feature = {
+    title: string;
+    description: string;
+}
+
+type Specification = {
+    key: string;
+    value: string;
+}
+
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
   const { pending } = useFormStatus();
   return (
@@ -50,6 +60,18 @@ const generateSlug = (title: string) => {
     .replace(/-+/g, '-');
 }
 
+const parseJsonSafe = (json: any, fallback: any) => {
+    if (typeof json === 'string') {
+        try {
+            return JSON.parse(json);
+        } catch (e) {
+            return fallback;
+        }
+    }
+    return json ?? fallback;
+}
+
+
 export function ProductForm({ categories, product = null }: ProductFormProps) {
   const { toast } = useToast();
   const isEditing = !!product;
@@ -59,16 +81,12 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const [state, dispatch] = useActionState(formAction, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>((product?.images as string[]) ?? []);
+  const [imageUrls, setImageUrls] = useState<string[]>(parseJsonSafe(product?.images, []));
   const [productTitle, setProductTitle] = useState(product?.title ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
 
-  const [features, setFeatures] = useState<string[]>(Array.isArray(product?.features) ? product.features : ['']);
-  const [specifications, setSpecifications] = useState<{ key: string, value: string }[]>(
-    product?.specifications && typeof product.specifications === 'object'
-      ? Object.entries(product.specifications).map(([key, value]) => ({ key: String(key), value: String(value) }))
-      : [{ key: '', value: '' }]
-  );
+  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }]));
+  const [specifications, setSpecifications] = useState<Specification[]>(parseJsonSafe(product?.specifications, [{ key: '', value: '' }]));
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -110,12 +128,12 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     setImageUrls(prev => prev.filter((_, index) => index !== indexToRemove));
   }
   
-  const handleFeatureChange = (index: number, value: string) => {
+  const handleFeatureChange = (index: number, field: keyof Feature, value: string) => {
     const newFeatures = [...features];
-    newFeatures[index] = value;
+    newFeatures[index][field] = value;
     setFeatures(newFeatures);
   };
-  const addFeature = () => setFeatures([...features, '']);
+  const addFeature = () => setFeatures([...features, { title: '', description: '' }]);
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
 
   const handleSpecificationChange = (index: number, field: 'key' | 'value', value: string) => {
@@ -141,9 +159,9 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     <form action={dispatch} className="space-y-8">
         {isEditing && <input type="hidden" name="id" value={product.id} />}
         <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
-        <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f.trim() !== ''))} />
+        <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f.title.trim() !== ''))} />
         <input type="hidden" name="specifications" value={JSON.stringify(
-            Object.fromEntries(specifications.filter(s => s.key.trim() !== '').map(s => [s.key, s.value]))
+            specifications.filter(s => s.key.trim() !== '')
         )} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -207,7 +225,8 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                           <div className="space-y-2">
                             {features.map((feature, index) => (
                               <div key={index} className="flex items-center gap-2">
-                                <Input value={feature} onChange={(e) => handleFeatureChange(index, e.target.value)} placeholder={`Fitur ${index + 1}`} />
+                                <Input value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
+                                <Input value={feature.description} onChange={(e) => handleFeatureChange(index, 'description', e.target.value)} placeholder={`Deskripsi Fitur ${index + 1}`} />
                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
                               </div>
                             ))}

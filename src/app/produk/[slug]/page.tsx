@@ -29,21 +29,26 @@ type Props = {
   params: { slug: string };
 };
 
-const parseJsonField = (field: any, fallback: any[] | {} = []) => {
-    if (typeof field === 'string') {
+type Feature = {
+    title: string;
+    description: string;
+}
+
+type Specification = {
+    key: string;
+    value: string;
+}
+
+const parseJsonSafe = (json: any, fallback: any) => {
+    if (typeof json === 'string') {
         try {
-            return JSON.parse(field);
+            return JSON.parse(json);
         } catch (e) {
             return fallback;
         }
     }
-    // Handle cases where Prisma might already parse it
-    if (typeof field === 'object' && field !== null) {
-        return field;
-    }
-    return fallback;
-};
-
+    return json ?? fallback;
+}
 
 // Fungsi ini memberitahu Next.js halaman dinamis mana yang harus dibuat saat build
 export async function generateStaticParams() {
@@ -76,9 +81,9 @@ async function getProductBySlug(slug: string) {
   // Parse all JSON fields here
   return {
     ...productRaw,
-    images: parseJsonField(productRaw.images, []),
-    features: parseJsonField(productRaw.features, []),
-    specifications: parseJsonField(productRaw.specifications, {}),
+    images: parseJsonSafe(productRaw.images, []),
+    features: parseJsonSafe(productRaw.features, []),
+    specifications: parseJsonSafe(productRaw.specifications, []),
   }
 }
 
@@ -94,7 +99,7 @@ async function getRelatedProducts(currentProductId: number, subCategoryId: numbe
     // Parse the images field for each product
     return rawProducts.map(product => ({
         ...product,
-        images: parseJsonField(product.images, []),
+        images: parseJsonSafe(product.images, []),
     }));
 }
 
@@ -143,8 +148,8 @@ export default async function ProductDetailPage({ params }: Props) {
   
   const relatedProducts = await getRelatedProducts(product.id, product.subCategoryId);
   
-  const featuresList = product.features as string[];
-  const specifications = Object.entries(product.specifications);
+  const featuresList = product.features as Feature[];
+  const specificationsList = product.specifications as Specification[];
 
   return (
     <>
@@ -202,7 +207,10 @@ export default async function ProductDetailPage({ params }: Props) {
                               <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
                               <CheckCircle className="h-4 w-4" />
                               </div>
-                              <span className="text-muted-foreground">{String(feature)}</span>
+                              <div>
+                                <p className='font-semibold'>{feature.title}</p>
+                                <p className="text-muted-foreground">{feature.description}</p>
+                              </div>
                           </li>
                           ))}
                       </ul>
@@ -210,17 +218,17 @@ export default async function ProductDetailPage({ params }: Props) {
                   </AccordionItem>
                 )}
                 
-                {specifications.length > 0 && (
+                {specificationsList.length > 0 && (
                   <AccordionItem value="item-specs">
                     <AccordionTrigger className="text-xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
                     <AccordionContent>
                       <div className="overflow-x-auto rounded-lg border bg-card mt-2">
                           <Table>
                               <TableBody>
-                              {specifications.map(([key, value]) => (
-                                  <TableRow key={key}>
-                                  <TableCell className="font-semibold text-card-foreground w-1/3">{String(key)}</TableCell>
-                                  <TableCell className="text-muted-foreground">{String(value)}</TableCell>
+                              {specificationsList.map((spec) => (
+                                  <TableRow key={spec.key}>
+                                  <TableCell className="font-semibold text-card-foreground w-1/3">{spec.key}</TableCell>
+                                  <TableCell className="text-muted-foreground">{spec.value}</TableCell>
                                   </TableRow>
                               ))}
                               </TableBody>

@@ -1,7 +1,6 @@
 
 import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
-import 'dotenv/config';
 
 const toSlug = (name: string) => {
   return name
@@ -60,7 +59,7 @@ async function main() {
         { label: 'Produk', href: '/produk' },
         { label: 'Solusi', href: '/solusi' },
         { label: 'Layanan', href: '/layanan' },
-        { label: 'Blog', href: '/resources' },
+        { label: 'Knowledge Center', href: '/resources' },
         { label: 'Tentang Kami', href: '/tentang-kami' },
         { label: 'Hubungi Kami', href: '/hubungi-kami' },
       ]),
@@ -151,7 +150,7 @@ async function main() {
       visionTitle: 'Visi Kami', // This field is no longer displayed but we keep it for now
       visionText: 'Menjadi mitra teknologi terdepan dan terpercaya di Asia Tenggara, yang dikenal karena inovasi, kualitas layanan, dan komitmen kami terhadap kesuksesan setiap pelanggan.',
       
-      resourcesPageTitle: 'Wawasan & Berita',
+      resourcesPageTitle: 'Knowledge Center',
       resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.',
     },
   });
@@ -466,20 +465,20 @@ async function main() {
         longDescription: 'Digital Kiosk GMT-K1 merupakan terobosan dalam layanan perbankan mandiri. Dirancang dengan desain yang elegan dan futuristik, kiosk ini memungkinkan nasabah untuk melakukan berbagai transaksi tanpa perlu antri di teller, mulai dari pembukaan rekening, transfer, hingga pembayaran tagihan. Dibangun dengan material berkualitas tinggi dan sistem keamanan berlapis, GMT-K1 adalah investasi cerdas untuk modernisasi cabang bank Anda.',
         images: JSON.stringify(['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png']),
         features: JSON.stringify([
-          "Layar sentuh 21.5 inci Full HD responsif",
-          "Dilengkapi NFC dan QR Code Reader terintegrasi",
-          "Desain modular yang kokoh dan mudah perawatannya",
-          "Sistem operasi yang aman dan terkunci untuk perbankan"
+          { title: "Layar Sentuh Responsif", description: "Layar sentuh 21.5 inci Full HD yang tajam dan mudah digunakan." },
+          { title: "Pembaca Terintegrasi", description: "Dilengkapi NFC dan QR Code Reader untuk berbagai metode input." },
+          { title: "Desain Modular", description: "Desain yang kokoh, elegan, dan mudah perawatannya." },
+          { title: "Sistem Operasi Aman", description: "Sistem operasi yang aman dan terkunci khusus untuk kebutuhan perbankan." },
         ]),
-        specifications: JSON.stringify({
-          "Ukuran Layar": "21.5 inci",
-          "Resolusi": "1920 x 1080 (Full HD)",
-          "Tipe Panel": "IPS, 10-point capacitive touch",
-          "Prosesor": "Intel Core i5",
-          "Memori": "8GB DDR4 RAM",
-          "Penyimpanan": "256GB SSD NVMe",
-          "Konektivitas": "Wi-Fi, Ethernet, Bluetooth"
-        }),
+        specifications: JSON.stringify([
+          { key: "Ukuran Layar", value: "21.5 inci" },
+          { key: "Resolusi", value: "1920 x 1080 (Full HD)" },
+          { key: "Tipe Panel", value: "IPS, 10-point capacitive touch" },
+          { key: "Prosesor", value: "Intel Core i5" },
+          { key: "Memori", value: "8GB DDR4 RAM" },
+          { key: "Penyimpanan", value: "256GB SSD NVMe" },
+          { key: "Konektivitas", value: "Wi-Fi, Ethernet, Bluetooth" },
+        ]),
         metaTitle: 'Jual Digital Kiosk GMT-K1 | Solusi Perbankan Modern',
         metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.',
         tokopediaUrl: '#',
@@ -493,17 +492,17 @@ async function main() {
         longDescription: 'Tinggalkan sistem antrian konvensional dan beralih ke SmartQ. Solusi manajemen antrian kami tidak hanya mengatur alur nasabah, tetapi juga mengumpulkan data berharga untuk analisis performa layanan. Nasabah dapat mengambil nomor antrian dari jarak jauh melalui aplikasi mobile, memantau status antrian secara real-time, dan mendapatkan estimasi waktu tunggu yang akurat. Ini adalah kunci untuk meningkatkan kepuasan dan loyalitas nasabah.',
         images: JSON.stringify(['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png']),
         features: JSON.stringify([
-          "Manajemen antrian multi-layanan dan multi-teller",
-          "Tiket antrian virtual via aplikasi mobile atau QR code",
-          "Dasbor analitik dan laporan performa layanan real-time",
-          "Panggilan suara otomatis dan display digital informatif"
+          { title: "Manajemen Multi-Layanan", description: "Dukungan untuk antrian multi-layanan dan multi-teller." },
+          { title: "Tiket Virtual", description: "Pengambilan tiket antrian via aplikasi mobile atau QR code." },
+          { title: "Dasbor Analitik", description: "Laporan performa layanan dan analisis data real-time." },
+          { title: "Panggilan Otomatis", description: "Panggilan suara otomatis dan display digital informatif." },
         ]),
-        specifications: JSON.stringify({
-          "Komponen": "Mesin Tiket, Display Utama, Display Teller, Software Manajemen",
-          "Integrasi": "API untuk Aplikasi Mobile, Notifikasi SMS/WhatsApp",
-          "Kustomisasi": "Alur layanan, jenis layanan, branding display",
-          "Platform": "Berbasis Web, dapat diakses dari mana saja"
-        }),
+        specifications: JSON.stringify([
+          { key: "Komponen", value: "Mesin Tiket, Display Utama, Display Teller, Software Manajemen" },
+          { key: "Integrasi", value: "API untuk Aplikasi Mobile, Notifikasi SMS/WhatsApp" },
+          { key: "Kustomisasi", value: "Alur layanan, jenis layanan, branding display" },
+          { key: "Platform", value: "Berbasis Web, dapat diakses dari mana saja" },
+        ]),
         metaTitle: 'SmartQ Queue System | Sistem Antrian Cerdas',
         metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.',
         tokopediaUrl: '#',
@@ -517,18 +516,18 @@ async function main() {
         longDescription: 'Sajikan informasi kurs valuta asing dengan cara yang modern dan dapat diandalkan menggunakan ForexRate Display F-32. Dengan layar 32 inci beresolusi tinggi, informasi kurs menjadi jelas terbaca dari berbagai sudut. Sistem kami terhubung langsung ke sumber data terpercaya untuk memastikan kurs selalu up-to-date secara real-time. Konten tambahan seperti video promosi atau berita juga dapat ditampilkan, menjadikannya alat komunikasi yang efektif di dalam cabang.',
         images: JSON.stringify(['https://placehold.co/800x800.png']),
         features: JSON.stringify([
-          "Layar 32 inci profesional dengan kecerahan tinggi",
-          "Pembaruan kurs otomatis dan real-time dari sumber terpercaya",
-          "Tampilan dapat dikustomisasi sepenuhnya dengan logo bank",
-          "Manajemen konten terpusat berbasis web yang mudah digunakan"
+            { title: "Layar Profesional", description: "Layar 32 inci dengan kecerahan tinggi, ideal untuk area publik." },
+            { title: "Pembaruan Real-Time", description: "Update kurs otomatis dari sumber data terpercaya." },
+            { title: "Tampilan Kustom", description: "Dapat dikustomisasi sepenuhnya dengan logo dan branding bank." },
+            { title: "Manajemen Terpusat", description: "Manajemen konten berbasis web yang mudah digunakan." },
         ]),
-         specifications: JSON.stringify({
-          "Ukuran Layar": "32 inci",
-          "Resolusi": "1920 x 1080 (Full HD)",
-          "Orientasi": "Potrait / Landscape",
-          "Fitur Software": "Manajemen playlist, penjadwalan konten, template kurs",
-          "Input Data": "API, XML, atau input manual"
-        }),
+         specifications: JSON.stringify([
+            { key: "Ukuran Layar", value: "32 inci" },
+            { key: "Resolusi", value: "1920 x 1080 (Full HD)" },
+            { key: "Orientasi", value: "Potrait / Landscape" },
+            { key: "Fitur Software", value: "Manajemen playlist, penjadwalan konten, template kurs" },
+            { key: "Input Data", value: "API, XML, atau input manual" },
+        ]),
         metaTitle: 'ForexRate Display F-32 | Papan Kurs Digital',
         metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.',
         tokopediaUrl: '#',
@@ -542,17 +541,17 @@ async function main() {
         longDescription: 'KYC-Flow Engine adalah solusi perangkat lunak end-to-end yang memungkinkan lembaga keuangan melakukan proses verifikasi identitas nasabah secara digital. Dengan teknologi pengenalan wajah (face recognition), liveness detection, dan koneksi ke database kependudukan, platform ini memastikan proses onboarding yang cepat, akurat, dan aman, mengurangi risiko penipuan serta mematuhi peraturan yang berlaku.',
         images: JSON.stringify(['https://placehold.co/800x800.png']),
         features: JSON.stringify([
-          "Liveness detection untuk mencegah spoofing",
-          "Verifikasi KTP dan pengenalan wajah (biometrik)",
-          "Dapat diintegrasikan dengan aplikasi mobile atau web",
-          "Dasbor monitoring dan audit trail lengkap"
+            { title: "Anti-Spoofing", description: "Teknologi Liveness Detection untuk mencegah pemalsuan identitas." },
+            { title: "Verifikasi Biometrik", description: "Verifikasi KTP dengan pengenalan wajah yang akurat." },
+            { title: "Integrasi Fleksibel", description: "Dapat diintegrasikan dengan mudah ke aplikasi mobile atau web." },
+            { title: "Audit Trail", description: "Dasbor monitoring dan rekam jejak audit yang lengkap." },
         ]),
-        specifications: JSON.stringify({
-          "Tipe": "Perangkat Lunak (SaaS/On-premise)",
-          "Modul Utama": "Face Recognition, OCR, Liveness Detection",
-          "SDK Tersedia": "Android, iOS, Web (JavaScript)",
-          "Keamanan": "Enkripsi AES-256"
-        }),
+        specifications: JSON.stringify([
+            { key: "Tipe", value: "Perangkat Lunak (SaaS/On-premise)" },
+            { key: "Modul Utama", value: "Face Recognition, OCR, Liveness Detection" },
+            { key: "SDK Tersedia", value: "Android, iOS, Web (JavaScript)" },
+            { key: "Keamanan", value: "Enkripsi AES-256" },
+        ]),
         metaTitle: 'KYC-Flow Engine | Platform e-KYC Otomatis',
         metaDescription: 'Otomatiskan proses e-KYC Anda dengan KYC-Flow Engine. Solusi perangkat lunak yang aman, cepat, dan terintegrasi.',
         tokopediaUrl: '',
@@ -566,17 +565,17 @@ async function main() {
         longDescription: 'InstantCard Printer P-200 memungkinkan bank untuk memberikan kartu kepada nasabah secara langsung saat pembukaan rekening atau penggantian kartu. Ini menghilangkan waktu tunggu pengiriman kartu dan meningkatkan kepuasan nasabah. Dengan kemampuan cetak warna, embossing, dan encoding magnetic stripe/chip, P-200 adalah solusi lengkap untuk penerbitan kartu instan.',
         images: JSON.stringify(['https://placehold.co/800x800.png', 'https://placehold.co/800x800.png']),
         features: JSON.stringify([
-          "Cetak satu sisi atau dua sisi (full color/monochrome)",
-          "Kemampuan encoding magnetic stripe dan smart chip",
-          "Kecepatan cetak tinggi (hingga 180 kartu/jam)",
-          "Desain ringkas cocok untuk meja teller"
+            { title: "Cetak Fleksibel", description: "Cetak satu sisi atau dua sisi (full color/monochrome)." },
+            { title: "Encoding Lengkap", description: "Mendukung encoding magnetic stripe dan smart chip." },
+            { title: "Kecepatan Tinggi", description: "Kecepatan cetak hingga 180 kartu per jam." },
+            { title: "Desain Ringkas", description: "Cocok untuk ditempatkan di meja teller atau back office." },
         ]),
-        specifications: JSON.stringify({
-          "Resolusi Cetak": "300 dpi",
-          "Kapasitas Hopper": "100 kartu",
-          "Konektivitas": "USB, Ethernet",
-          "Tipe Kartu": "PVC, PET, Composite PVC, 30-40 mil"
-        }),
+        specifications: JSON.stringify([
+            { key: "Resolusi Cetak", value: "300 dpi" },
+            { key: "Kapasitas Hopper", value: "100 kartu" },
+            { key: "Konektivitas", value: "USB, Ethernet" },
+            { key: "Tipe Kartu", value: "PVC, PET, Composite PVC, 30-40 mil" },
+        ]),
         metaTitle: 'InstantCard Printer P-200 | Mesin Cetak Kartu Instan',
         metaDescription: 'Cetak kartu debit, kredit, atau member secara instan di cabang Anda dengan InstantCard Printer P-200. Cepat, aman, dan andal.',
         tokopediaUrl: '#',
@@ -605,3 +604,4 @@ main()
     
 
     
+

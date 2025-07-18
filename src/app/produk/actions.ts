@@ -6,6 +6,11 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
+const FeatureSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+});
+
 const ProductSchema = z.object({
   title: z.string().min(1, 'Judul tidak boleh kosong'),
   slug: z.string().min(1, 'Slug tidak boleh kosong').regex(/^[a-z0-9-]+$/, 'Slug hanya boleh berisi huruf kecil, angka, dan tanda hubung'),
@@ -27,8 +32,9 @@ const ProductSchema = z.object({
   features: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-       if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
-        return parsed as string[];
+      const result = z.array(FeatureSchema).safeParse(parsed);
+      if (result.success) {
+        return result.data;
       }
       throw new Error();
     } catch (e) {
@@ -39,7 +45,7 @@ const ProductSchema = z.object({
   specifications: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-      if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      if (typeof parsed === 'object' && parsed !== null) { // More flexible check for object/array
         return parsed;
       }
       throw new Error();
@@ -101,7 +107,7 @@ export async function createProduct(prevState: { message: string, success?: bool
   }
   
   revalidatePath('/admin/produk');
-  revalidatePath('/produk');
+  revalidatePath('/produk', 'layout');
   revalidatePath(`/produk/${rest.slug}`);
   redirect('/admin/produk');
 }
@@ -150,7 +156,7 @@ export async function updateProduct(prevState: { message: string, success?: bool
     }
 
     revalidatePath('/admin/produk');
-    revalidatePath('/produk');
+    revalidatePath('/produk', 'layout');
     revalidatePath(`/produk/${rest.slug}`);
     redirect('/admin/produk');
 }

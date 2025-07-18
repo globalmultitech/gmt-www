@@ -78,7 +78,7 @@ export default async function ProdukPage() {
                         <CardContent className="pt-6 flex-grow flex flex-col">
                             <p className="text-muted-foreground text-sm flex-grow">{category.description}</p>
                             <div className="mt-4 font-semibold text-sky-blue flex items-center group-hover:text-sky-blue/80 transition-colors">
-                                Lihat Produk <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                                Lihat Kategori <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </div>
                         </CardContent>
                      </Card>
