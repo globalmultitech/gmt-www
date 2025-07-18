@@ -62,28 +62,29 @@ const generateSlug = (title: string) => {
 }
 
 const parseJsonSafe = (json: any, fallback: any, forceArray = false) => {
-    let parsedJson;
-    if (typeof json === 'string') {
-        try {
-            parsedJson = JSON.parse(json);
-        } catch (e) {
-            parsedJson = fallback;
-        }
-    } else {
-        parsedJson = json ?? fallback;
+  let parsedJson;
+  if (typeof json === 'string') {
+    try {
+      parsedJson = JSON.parse(json);
+    } catch (e) {
+      parsedJson = fallback;
     }
+  } else {
+    parsedJson = json ?? fallback;
+  }
 
-    if (forceArray && !Array.isArray(parsedJson)) {
-        // If it's an object, convert it to an array of its key-value pairs
-        if (typeof parsedJson === 'object' && parsedJson !== null) {
-             return Object.entries(parsedJson).map(([key, value]) => ({ key, value }));
-        }
-        // Otherwise, wrap it in an array or return the fallback if it's not convertible
-        return fallback;
+  if (forceArray && !Array.isArray(parsedJson)) {
+    // If it's an object (like the old specifications), convert it to an array of its key-value pairs
+    if (typeof parsedJson === 'object' && parsedJson !== null) {
+      return Object.entries(parsedJson).map(([key, value]) => ({ key, value }));
     }
-    
-    return parsedJson;
-}
+    // Otherwise, if it's not an array and not an object, return the fallback
+    return fallback;
+  }
+  
+  return parsedJson;
+};
+
 
 
 export function ProductForm({ categories, product = null }: ProductFormProps) {
@@ -161,16 +162,13 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const removeSpecification = (index: number) => setSpecifications(specifications.filter((_, i) => i !== index));
 
   const handleFormSubmit = (formData: FormData) => {
-    // Manually set features from state because RichTextEditor is not a standard input
-    const featuresWithRichText = features.map((feature, index) => {
-        const editorContent = document.querySelector(`[data-feature-editor-index="${index}"] input[type="hidden"]`)?.getAttribute('value');
-        return {
-            ...feature,
-            description: editorContent || feature.description,
-        };
+    const featuresToSave = features.filter(f => {
+        const descHtml = f.description || '';
+        const descText = descHtml.replace(/<[^>]*>?/gm, '').trim();
+        return (f.title && f.title.trim() !== '') || descText !== '';
     });
 
-    formData.set('features', JSON.stringify(featuresWithRichText.filter(f => f && typeof f.title === 'string' && f.title.trim() !== '')));
+    formData.set('features', JSON.stringify(featuresToSave));
     formData.set('specifications', JSON.stringify(specifications.filter(s => s && typeof s.key === 'string' && s.key.trim() !== '')))
 
     dispatch(formData);
@@ -257,7 +255,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                                     <Label htmlFor={`feature-title-${index}`}>Judul Fitur {index + 1}</Label>
                                     <Input id={`feature-title-${index}`} value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
                                 </div>
-                                <div className='space-y-1' data-feature-editor-index={index}>
+                                <div className='space-y-1'>
                                      <Label>Deskripsi Fitur {index + 1}</Label>
                                      <RichTextEditor
                                         key={`feature-desc-${index}`}
