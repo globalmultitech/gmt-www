@@ -53,6 +53,7 @@ function SubmitButton({ isEditing }: { isEditing: boolean }) {
 }
 
 const generateSlug = (title: string) => {
+  if (!title) return '';
   return title
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, '')
@@ -159,9 +160,9 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     <form action={dispatch} className="space-y-8">
         {isEditing && <input type="hidden" name="id" value={product.id} />}
         <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
-        <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f.title.trim() !== ''))} />
+        <input type="hidden" name="features" value={JSON.stringify(features.filter(f => f && typeof f.title === 'string' && f.title.trim() !== ''))} />
         <input type="hidden" name="specifications" value={JSON.stringify(
-            specifications.filter(s => s.key.trim() !== '')
+            specifications.filter(s => s && typeof s.key === 'string' && s.key.trim() !== '')
         )} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -316,3 +317,5 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     </form>
   )
 }
+
+    
