@@ -3,6 +3,7 @@ import prisma from '@/lib/db';
 import bcryptjs from 'bcryptjs';
 
 const toSlug = (name: string) => {
+  if (!name) return '';
   return name
     .toLowerCase()
     .replace(/ /g, '-')

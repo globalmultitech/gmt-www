@@ -1,6 +1,8 @@
-
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -26,13 +28,13 @@ model WebSettings {
   companyName                  String?
   whatsappSales                String?
   footerText                   String? @db.Text
-  address                      String?
+  address                      String? @db.Text
   contactEmail                 String?
   contactPhone                 String?
   openingHours                 String?
   socialMedia                  Json?
   menuItems                    Json?
-  heroHeadline                 String?
+  heroHeadline                 String? @db.Text
   heroDescription              String? @db.Text
   heroImageUrl                 String? @db.Text
   heroButton1Text              String?
@@ -48,7 +50,7 @@ model WebSettings {
   servicesSubtitle             String?
   servicesTitle                String?
   servicesDescription          String? @db.Text
-  ctaHeadline                  String?
+  ctaHeadline                  String? @db.Text
   ctaDescription               String? @db.Text
   ctaImageUrl                  String? @db.Text
   ctaButtonText                String?
@@ -56,23 +58,81 @@ model WebSettings {
   trustedByText                String?
   trustedByLogos               Json?
   testimonials                 Json?
-  servicesPageTitle            String?
-  servicesPageSubtitle         String? @db.Text
-  servicesPageCommitmentTitle  String?
-  servicesPageCommitmentText   String? @db.Text
-  servicesPageHeaderImageUrl   String? @db.Text
-  solutionsPageTitle           String?
-  solutionsPageSubtitle        String? @db.Text
-  aboutPageTitle               String?
-  aboutPageSubtitle            String? @db.Text
-  missionTitle                 String?
-  missionText                  String? @db.Text
-  visionTitle                  String?
-  visionText                   String? @db.Text
-  resourcesPageTitle           String?
-  resourcesPageSubtitle        String? @db.Text
-  createdAt                    DateTime @default(now())
-  updatedAt                    DateTime @updatedAt
+  
+  servicesPageTitle             String?
+  servicesPageSubtitle          String?
+  servicesPageCommitmentTitle   String?
+  servicesPageCommitmentText    String? @db.Text
+  servicesPageHeaderImageUrl    String? @db.Text
+  
+  solutionsPageTitle            String?
+  solutionsPageSubtitle         String? @db.Text
+
+  aboutPageTitle                String?
+  aboutPageSubtitle             String? @db.Text
+  missionTitle                  String?
+  missionText                   String? @db.Text
+  visionTitle                   String?
+  visionText                    String? @db.Text
+  
+  resourcesPageTitle            String?
+  resourcesPageSubtitle         String? @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProfessionalService {
+  id              Int      @id @default(autoincrement())
+  icon            String
+  title           String
+  slug            String   @unique
+  description     String   @db.Text
+  longDescription String?  @db.Text
+  imageUrl        String?  @db.Text
+  details         Json?    @db.Json
+  benefits        Json?    @db.Json
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Solution {
+  id           Int        @id @default(autoincrement())
+  icon         String
+  title        String
+  slug         String     @unique
+  description  String     @db.Text
+  image        String?    @db.Text
+  aiHint       String?
+  keyPoints    Json?
+  parentId     Int?
+  parent       Solution?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+  children     Solution[] @relation("ParentChild")
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+}
+
+model PartnerLogo {
+  id  Int    @id @default(autoincrement())
+  src String @db.Text
+  alt String
+}
+
+model CustomerLogo {
+  id  Int    @id @default(autoincrement())
+  src String @db.Text
+  alt String
+}
+
+model NewsItem {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  category  String
+  image     String?  @db.Text
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductCategory {
@@ -102,68 +162,12 @@ model Product {
   features                Json?
   technicalSpecifications Json?
   generalSpecifications   Json?
-  metaTitle               String?
+  metaTitle               String?            @db.Text
   metaDescription         String?            @db.Text
-  tokopediaUrl            String?
-  shopeeUrl               String?
+  tokopediaUrl            String?            @db.Text
+  shopeeUrl               String?            @db.Text
   subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   subCategoryId           Int
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
-}
-
-model ProfessionalService {
-    id                 Int       @id @default(autoincrement())
-    icon               String
-    title              String
-    slug               String    @unique
-    description        String    @db.Text
-    longDescription    String?   @db.Text
-    imageUrl           String?   @db.Text
-    details            Json?
-    benefits           Json?
-    createdAt          DateTime  @default(now())
-    updatedAt          DateTime  @updatedAt
-}
-
-model Solution {
-  id             Int        @id @default(autoincrement())
-  icon           String
-  title          String
-  slug           String     @unique
-  description    String     @db.Text
-  image          String?    @db.Text
-  aiHint         String?
-  keyPoints      Json?
-  
-  parent         Solution?  @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
-  parentId       Int?
-  children       Solution[] @relation("SolutionHierarchy")
-
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-}
-
-
-model PartnerLogo {
-  id  Int    @id @default(autoincrement())
-  src String @db.Text
-  alt String
-}
-
-model CustomerLogo {
-  id  Int    @id @default(autoincrement())
-  src String @db.Text
-  alt String
-}
-
-model NewsItem {
-  id         Int      @id @default(autoincrement())
-  title      String
-  slug       String   @unique
-  category   String
-  image      String?  @db.Text
-  content    String?  @db.Text
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
 }

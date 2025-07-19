@@ -7,47 +7,37 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-const toSlug = (name: string) => {
-    if (!name) return '';
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-};
-
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
-    select: { name: true },
+    where: { slug: { not: '' } },
+    select: { slug: true },
   });
  
   return categories.map((category) => ({
-    slug: toSlug(category.name),
+    slug: category.slug,
   }));
 }
 
 async function getCategoryDataBySlug(slug: string) {
-  const allCategories = await prisma.productCategory.findMany({
-      include: {
-        subCategories: {
-            orderBy: { name: 'asc' },
-            select: {
-                id: true,
-                name: true,
-            }
+  const category = await prisma.productCategory.findUnique({
+    where: { slug },
+    include: {
+      subCategories: {
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          name: true,
         },
+      },
     },
   });
 
-  const category = allCategories.find(c => toSlug(c.name) === slug);
-  
   if (!category) {
-      return null;
+    return null;
   }
 
   return { category, subCategories: category.subCategories };
 }
-
 
 type Props = {
   params: { slug: string };
@@ -67,14 +57,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: `${category.name} | Kategori Produk`,
     description: category.description || `Jelajahi semua produk dalam kategori ${category.name}.`,
     openGraph: {
-        title: category.name,
-        description: category.description || `Jelajahi semua produk dalam kategori ${category.name}.`,
-        images: category.imageUrl ? [category.imageUrl] : [],
+      title: category.name,
+      description: category.description || `Jelajahi semua produk dalam kategori ${category.name}.`,
+      images: category.imageUrl ? [category.imageUrl] : [],
     },
   };
 }
 
 const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { categoryName: string, categorySlug: string, subCategoryName?: string }) => {
+    const toSubCategorySlug = (name: string) => {
+      if (!name) return '';
+      return name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-');
+    };
+
     return (
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
@@ -121,7 +120,7 @@ export default async function CategoryPage({ params }: Props) {
         <div className="container mx-auto px-4 py-8">
             <Breadcrumbs categoryName={category.name} categorySlug={slug} />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{category.name}</h1>
-            <p className="mt-2 text-lg text-muted-foreground">
+            <p className="mt-2 text-lg text-muted-foreground text-justify">
               {category.description}
             </p>
         </div>
