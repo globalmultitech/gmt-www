@@ -119,22 +119,7 @@ async function main() {
           { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/797b0afb-03b1-4dad-8dd8-299cd9f151ce.jpeg', alt: 'Client Logo 5' },
           { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/2143fc3d-dd14-4739-93ea-cd909f06baba.jpeg', alt: 'Client Logo 6' },
       ]),
-      testimonials: JSON.stringify([
-        {
-            quote: "We've been using Daltech for a few years now, and we're very happy with the results. They're a great team to work with, and they're always willing to go the extra mile to help us succeed.",
-            name: 'John Doe',
-            role: 'CEO, Company',
-            image: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/b29d2c5b-d179-4034-92ee-a936537b5af9.png',
-            aiHint: 'professional man portrait',
-        },
-        {
-            quote: "The team at Daltech is incredibly talented and passionate about what they do. They took the time to understand our business and our goals, and they delivered a solution that exceeded our expectations.",
-            name: 'Jane Smith',
-            role: 'CTO, Another Corp',
-            image: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/ea02196b-878c-43a7-bbd4-b0b847f51338.png',
-            aiHint: 'professional woman portrait',
-        },
-      ]),
+      testimonials: JSON.stringify([]),
       servicesPageTitle: 'Layanan Profesional Kami',
       servicesPageSubtitle: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.',
       servicesPageCommitmentTitle: 'Komitmen Kami Pada Keamanan',

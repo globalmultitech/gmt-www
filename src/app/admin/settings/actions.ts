@@ -23,14 +23,6 @@ const FeatureCardSchema = z.object({
     description: z.string().default(''),
 });
 
-const TestimonialSchema = z.object({
-    quote: z.string().default(''),
-    name: z.string().default(''),
-    role: z.string().default(''),
-    image: z.string().default(''),
-    aiHint: z.string().default(''),
-});
-
 const TrustedByLogoSchema = z.object({
   src: z.string().default(''),
   alt: z.string().default(''),
@@ -70,7 +62,6 @@ const SettingsSchema = z.object({
   ctaButtonLink: z.string().optional(),
   trustedByText: z.string().optional(),
   trustedByLogos: z.array(TrustedByLogoSchema).optional(),
-  testimonials: z.array(TestimonialSchema).optional(),
 });
 
 
@@ -102,7 +93,6 @@ export async function updateWebSettings(prevState: { message: string } | undefin
       menuItems: data.menuItems?.filter(item => item.label || item.href) ?? [],
       aboutUsChecklist: data.aboutUsChecklist?.filter(item => item) ?? [],
       trustedByLogos: data.trustedByLogos?.filter(logo => logo.src || logo.alt) ?? [],
-      testimonials: data.testimonials?.filter(item => item.name || item.quote) ?? [],
     };
     
     await prisma.webSettings.update({
@@ -110,6 +100,7 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         data: {
           ...sanitizedData,
           socialMedia: sanitizedData.socialMedia ?? {},
+          testimonials: [], // Clear testimonials
         }
     });
 

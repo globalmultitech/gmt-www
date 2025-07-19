@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Loader2, Image as ImageIcon, PlusCircle, Trash2 } from 'lucide-react';
-import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard, Testimonial } from '@/lib/settings';
+import type { WebSettings, MenuItem, SocialMediaLinks, TrustedByLogo, FeatureCard } from '@/lib/settings';
 import { updateWebSettings } from './actions';
 import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -450,55 +450,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-10" className="hidden">
-                <AccordionTrigger className="text-lg font-semibold p-4 bg-muted/50 rounded-md">Halaman Utama: Testimonial</AccordionTrigger>
-                <AccordionContent>
-                    <Card>
-                        <CardContent className="space-y-4 pt-6">
-                            {formState.testimonials.map((item, index) => (
-                                <div key={index} className="flex items-start gap-4 p-4 border rounded-md">
-                                    <div className="flex-shrink-0 space-y-2">
-                                        <div className="relative w-24 h-24 rounded-md bg-muted overflow-hidden border">
-                                            {item.image ? ( <Image src={item.image} alt={item.name} fill sizes="96px" className="object-cover" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
-                                        </div>
-                                        <div className="flex items-center gap-2 w-24">
-                                            <Input type="file" onChange={(e) => handleImageUpload(e, 'testimonials', index, 'image')} accept="image/png, image/jpeg" disabled={!!(uploadingStates['testimonials'] as any)?.[index]} className="w-full"/>
-                                            {(uploadingStates['testimonials'] as any)?.[index] && <Loader2 className="animate-spin" />}
-                                        </div>
-                                    </div>
-                                    <div className="flex-grow space-y-2">
-                                    <div className="space-y-1">
-                                            <Label className="text-xs">Kutipan</Label>
-                                            <Textarea value={item.quote} onChange={e => handleArrayChange('testimonials', index, 'quote', e.target.value)} />
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-2">
-                                        <div className="space-y-1">
-                                                <Label className="text-xs">Nama</Label>
-                                                <Input value={item.name} onChange={e => handleArrayChange('testimonials', index, 'name', e.target.value)} />
-                                            </div>
-                                            <div className="space-y-1">
-                                                <Label className="text-xs">Jabatan</Label>
-                                                <Input value={item.role} onChange={e => handleArrayChange('testimonials', index, 'role', e.target.value)} />
-                                            </div>
-                                    </div>
-                                    <div className="space-y-1">
-                                            <Label className="text-xs">AI Hint (untuk gambar)</Label>
-                                            <Input value={item.aiHint || ''} onChange={e => handleArrayChange('testimonials', index, 'aiHint', e.target.value)} />
-                                        </div>
-                                    </div>
-                                    <Button type="button" variant="ghost" size="icon" onClick={() => removeItemFromArray('testimonials', index)} className="text-destructive h-9 w-9">
-                                        <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                </div>
-                            ))}
-                            <Button type="button" variant="outline" onClick={() => addItemToArray('testimonials', { quote: '', name: '', role: '', image: '', aiHint: ''})}>
-                                <PlusCircle className="mr-2 h-4 w-4" /> Tambah Testimonial
-                            </Button>
-                        </CardContent>
-                    </Card>
-                </AccordionContent>
-            </AccordionItem>
-            
         </Accordion>
 
         <div className="mt-8 flex justify-end">
