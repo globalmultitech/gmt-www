@@ -6,15 +6,11 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
-const toSlug = (name: string): string => {
-  if (!name) return '';
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') 
-    .replace(/\s+/g, '-') 
-    .replace(/-+/g, '-'); 
-};
-
+const DetailPointSchema = z.object({
+  title: z.string().default(''),
+  image: z.string().optional().default(''),
+  description: z.string().default(''),
+});
 
 const ServiceSchema = z.object({
   icon: z.string().min(1, 'Ikon harus dipilih'),
@@ -26,10 +22,11 @@ const ServiceSchema = z.object({
   details: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
-        return parsed as string[];
+      const result = z.array(DetailPointSchema).safeParse(parsed);
+      if (result.success) {
+        return result.data;
       }
-      throw new Error();
+      throw new Error(result.error.message);
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk Poin Detail tidak valid' });
       return z.NEVER;
@@ -38,10 +35,11 @@ const ServiceSchema = z.object({
   benefits: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
-        return parsed as string[];
+      const result = z.array(DetailPointSchema).safeParse(parsed);
+       if (result.success) {
+        return result.data;
       }
-      throw new Error();
+      throw new Error(result.error.message);
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk Manfaat tidak valid' });
       return z.NEVER;
@@ -80,7 +78,7 @@ export async function createProfessionalService(prevState: { message: string, su
       return { message: 'URL (slug) sudah digunakan oleh layanan lain.', success: false }
     }
 
-    await prisma.professionalService.create({ data });
+    await prisma.professionalService.create({ data: data as any });
 
   } catch (error) {
     console.error('Create service error:', error);
@@ -122,7 +120,7 @@ export async function updateProfessionalService(prevState: { message: string, su
         
         await prisma.professionalService.update({
             where: { id },
-            data,
+            data: data as any,
         });
 
     } catch (error) {

@@ -13,65 +13,69 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  password  String
   name      String
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
-  id                         Int      @id @default(1)
-  logoUrl                    String?  @db.Text
-  companyName                String?
-  whatsappSales              String?
-  footerText                 String?  @db.Text
-  address                    String?
-  contactEmail               String?
-  contactPhone               String?
-  openingHours               String?
-  socialMedia                Json?
-  menuItems                  Json?
-  heroHeadline               String?  @db.Text
-  heroDescription            String?  @db.Text
-  heroImageUrl               String?  @db.Text
-  heroButton1Text            String?
-  heroButton1Link            String?
-  heroButton2Text            String?
-  heroButton2Link            String?
-  featureCards               Json?
-  aboutUsSubtitle            String?
-  aboutUsTitle               String?
-  aboutUsDescription         String?  @db.Text
-  aboutUsImageUrl            String?  @db.Text
-  aboutUsChecklist           Json?
-  servicesSubtitle           String?
-  servicesTitle              String?
-  servicesDescription        String?  @db.Text
-  ctaHeadline                String?  @db.Text
-  ctaDescription             String?  @db.Text
-  ctaImageUrl                String?  @db.Text
-  ctaButtonText              String?
-  ctaButtonLink              String?
-  trustedByText              String?
-  trustedByLogos             Json?
-  testimonials               Json?
-  servicesPageTitle          String?
-  servicesPageSubtitle       String?  @db.Text
-  servicesPageCommitmentTitle String?
-  servicesPageCommitmentText String?  @db.Text
-  servicesPageHeaderImageUrl String?  @db.Text
-  solutionsPageTitle         String?
-  solutionsPageSubtitle      String?  @db.Text
-  aboutPageTitle             String?
-  aboutPageSubtitle          String?  @db.Text
-  missionTitle               String?
-  missionText                String?  @db.Text
-  visionTitle                String?
-  visionText                 String?  @db.Text
-  resourcesPageTitle         String?
-  resourcesPageSubtitle      String?  @db.Text
-  createdAt                  DateTime @default(now())
-  updatedAt                  DateTime @updatedAt
+  id                Int      @id @default(1)
+  logoUrl           String?  @db.Text
+  companyName       String
+  whatsappSales     String
+  footerText        String   @db.Text
+  address           String
+  contactEmail      String
+  contactPhone      String
+  openingHours      String
+  socialMedia       Json
+  menuItems         Json
+  heroHeadline      String
+  heroDescription   String   @db.Text
+  heroImageUrl      String   @db.Text
+  heroButton1Text   String
+  heroButton1Link   String
+  heroButton2Text   String
+  heroButton2Link   String
+  featureCards      Json
+  aboutUsSubtitle   String
+  aboutUsTitle      String
+  aboutUsDescription String   @db.Text
+  aboutUsImageUrl   String   @db.Text
+  aboutUsChecklist  Json
+  servicesSubtitle  String
+  servicesTitle     String
+  servicesDescription String   @db.Text
+  ctaHeadline       String
+  ctaDescription    String   @db.Text
+  ctaImageUrl       String   @db.Text
+  ctaButtonText     String
+  ctaButtonLink     String
+  trustedByText     String
+  trustedByLogos    Json
+  testimonials      Json
+  servicesPageTitle String
+  servicesPageSubtitle String @db.Text
+  servicesPageCommitmentTitle String
+  servicesPageCommitmentText  String @db.Text
+  servicesPageHeaderImageUrl String @db.Text
+
+  solutionsPageTitle String
+  solutionsPageSubtitle String @db.Text
+  
+  aboutPageTitle String
+  aboutPageSubtitle String @db.Text
+  missionTitle String
+  missionText String @db.Text
+  visionTitle String
+  visionText String @db.Text
+
+  resourcesPageTitle String
+  resourcesPageSubtitle String @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductCategory {
@@ -80,6 +84,8 @@ model ProductCategory {
   description   String?              @db.Text
   imageUrl      String?              @db.Text
   subCategories ProductSubCategory[]
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
 }
 
 model ProductSubCategory {
@@ -88,25 +94,27 @@ model ProductSubCategory {
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
   products   Product[]
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 }
 
 model Product {
-  id               Int                @id @default(autoincrement())
-  title            String
-  slug             String             @unique
-  subCategory      ProductSubCategory @relation(fields: [subCategoryId], references: [id])
-  subCategoryId    Int
-  description      String             @db.Text
-  longDescription  String?            @db.Text
-  images           Json?
-  features         Json?
-  specifications   Json?
-  metaTitle        String?
-  metaDescription  String?            @db.Text
-  tokopediaUrl     String?
-  shopeeUrl        String?
-  createdAt        DateTime           @default(now())
-  updatedAt        DateTime           @updatedAt
+  id              Int                @id @default(autoincrement())
+  title           String
+  slug            String             @unique
+  description     String             @db.Text
+  longDescription String?            @db.Text
+  images          Json
+  features        Json
+  specifications  Json?
+  metaTitle       String?
+  metaDescription String?            @db.Text
+  tokopediaUrl    String?
+  shopeeUrl       String?
+  subCategory     ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId   Int
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
 }
 
 model ProfessionalService {
@@ -117,8 +125,8 @@ model ProfessionalService {
   description     String   @db.Text
   longDescription String?  @db.Text
   imageUrl        String?  @db.Text
-  details         Json?
-  benefits        Json?
+  details         Json
+  benefits        Json
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -131,7 +139,7 @@ model Solution {
   description String    @db.Text
   image       String?   @db.Text
   aiHint      String?
-  keyPoints   Json?
+  keyPoints   Json
   parentId    Int?
   parent      Solution? @relation("SubSolutions", fields: [parentId], references: [id], onDelete: Cascade)
   children    Solution[] @relation("SubSolutions")
@@ -140,24 +148,24 @@ model Solution {
 }
 
 model PartnerLogo {
-  id  Int    @id @default(autoincrement())
-  src String @db.Text
-  alt String
+    id   Int    @id @default(autoincrement())
+    src  String @db.Text
+    alt  String
 }
 
 model CustomerLogo {
-  id  Int    @id @default(autoincrement())
-  src String @db.Text
-  alt String
+    id   Int    @id @default(autoincrement())
+    src  String @db.Text
+    alt  String
 }
 
 model NewsItem {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String
-  slug      String   @unique
+  slug      String    @unique
   category  String
-  image     String?  @db.Text
-  content   String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  image     String?   @db.Text
+  content   String?   @db.Text
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Home, ChevronRight, CheckCircle, Award } from 'lucide-react';
+import { Home, ChevronRight } from 'lucide-react';
 import Image from 'next/image';
 import { getSettings } from '@/lib/settings';
 import { Button } from '@/components/ui/button';
@@ -13,19 +13,22 @@ type Props = {
   params: { slug: string };
 };
 
-const parseJsonField = (field: any, fallback: any[] = []) => {
-    if (typeof field === 'string') {
-        try {
-            return JSON.parse(field);
-        } catch (e) {
-            return fallback;
-        }
+type DetailPoint = {
+    title: string;
+    image?: string;
+    description: string;
+}
+
+const parseJsonSafe = (jsonString: any, fallback: any[]) => {
+    if (Array.isArray(jsonString)) return jsonString;
+    if (typeof jsonString !== 'string') return fallback;
+    try {
+      const parsed = JSON.parse(jsonString);
+      return Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
     }
-    if (typeof field === 'object' && field !== null) {
-        return field;
-    }
-    return fallback;
-};
+  }
 
 export async function generateStaticParams() {
   const services = await prisma.professionalService.findMany({
@@ -51,8 +54,8 @@ async function getServiceBySlug(slug: string) {
   
   return {
     ...serviceRaw,
-    details: parseJsonField(serviceRaw.details),
-    benefits: parseJsonField(serviceRaw.benefits),
+    details: parseJsonSafe(serviceRaw.details, []),
+    benefits: parseJsonSafe(serviceRaw.benefits, []),
   }
 }
 
@@ -95,8 +98,8 @@ export default async function ServiceDetailPage({ params }: Props) {
     notFound();
   }
   
-  const benefitsList = service.benefits as string[];
-  const detailsList = service.details as string[];
+  const detailsList = service.details as DetailPoint[];
+  const benefitsList = service.benefits as DetailPoint[];
 
   return (
     <>
@@ -133,28 +136,53 @@ export default async function ServiceDetailPage({ params }: Props) {
       </div>
 
       <div className="container mx-auto px-4 py-16 md:py-24">
-        <div className="grid lg:grid-cols-12 gap-8">
-            <div className="lg:col-span-8">
-                <h2 className="text-3xl font-headline font-bold text-primary mb-4">Deskripsi Lengkap Layanan</h2>
-                <article className="prose prose-lg dark:prose-invert max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: service.longDescription || '' }} />
-                </article>
+        <div className="max-w-4xl mx-auto space-y-12">
+            <div>
+              <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">Deskripsi Lengkap Layanan</h2>
+              <article className="prose prose-lg dark:prose-invert max-w-none">
+                  <div dangerouslySetInnerHTML={{ __html: service.longDescription || '' }} />
+              </article>
             </div>
-            <div className="lg:col-span-4">
-                <div className="p-6 rounded-lg bg-dark-slate sticky top-24">
-                    <h3 className="text-2xl font-headline font-bold text-primary mb-4">Manfaat Utama</h3>
-                     <ul className="space-y-3">
-                        {benefitsList.map((item, index) => (
-                            <li key={index} className="flex items-start gap-3">
-                                <Award className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
-                                <span className="text-muted-foreground">{item}</span>
-                            </li>
+            
+            {detailsList && detailsList.length > 0 && (
+                <div>
+                    <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">Detail Layanan Kami</h2>
+                    <div className="space-y-8">
+                        {detailsList.map((item, index) => (
+                           <div key={index} className="grid md:grid-cols-2 gap-6 items-center">
+                               {item.image && (
+                                   <div className={`relative h-64 rounded-lg overflow-hidden ${index % 2 === 1 ? 'md:order-last' : ''}`}>
+                                       <Image src={item.image} alt={item.title} fill className="object-cover" />
+                                   </div>
+                               )}
+                               <div className={`space-y-3 ${!item.image ? 'md:col-span-2' : ''}`}>
+                                   <h3 className="text-2xl font-bold font-headline">{item.title}</h3>
+                                   <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: item.description }} />
+                               </div>
+                           </div>
                         ))}
-                    </ul>
-                    <Button asChild className="w-full mt-6">
-                        <Link href="/hubungi-kami">Diskusikan Kebutuhan Anda</Link>
-                    </Button>
+                    </div>
                 </div>
+            )}
+            
+            {benefitsList && benefitsList.length > 0 && (
+                 <div>
+                    <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">Manfaat & Keuntungan</h2>
+                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {benefitsList.map((item, index) => (
+                           <div key={index} className="p-6 rounded-lg bg-dark-slate">
+                               <h3 className="text-xl font-bold font-headline mb-2">{item.title}</h3>
+                               <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: item.description }} />
+                           </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            <div className="text-center pt-8">
+               <Button asChild size="lg">
+                    <Link href="/hubungi-kami">Diskusikan Kebutuhan Anda</Link>
+                </Button>
             </div>
         </div>
       </div>

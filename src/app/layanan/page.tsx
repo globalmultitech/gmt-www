@@ -1,6 +1,6 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Handshake, ShieldCheck, ArrowRight } from 'lucide-react';
+import { ShieldCheck, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { getSettings } from '@/lib/settings';
@@ -41,21 +41,10 @@ export default async function LayananPage() {
                     </div>
                     <div>
                       <CardTitle className="font-headline text-2xl group-hover:text-sky-blue transition-colors">{service.title}</CardTitle>
-                      {service.description && (
-                          <p className="mt-1 text-muted-foreground">{service.description}</p>
-                      )}
                     </div>
                   </CardHeader>
                   <CardContent className="flex-grow flex flex-col justify-between">
-                    <ul className="space-y-3 pt-4 border-t">
-                      {/* @ts-ignore */}
-                      {(Array.isArray(service.details) ? service.details : []).map((detail, detailIndex) => (
-                        <li key={detailIndex} className="flex items-start gap-3">
-                          <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
-                          <span className="text-sm text-muted-foreground">{detail}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-muted-foreground">{service.description}</p>
                     <div className="mt-4 font-semibold text-primary flex items-center group-hover:text-sky-blue transition-colors">
                       Pelajari Lebih Lanjut <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                     </div>

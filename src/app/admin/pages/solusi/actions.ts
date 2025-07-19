@@ -6,14 +6,11 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
-const toSlug = (name: string): string => {
-  if (!name) return '';
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '') 
-    .replace(/\s+/g, '-') 
-    .replace(/-+/g, '-'); 
-};
+const KeyPointSchema = z.object({
+  title: z.string().default(''),
+  image: z.string().optional().default(''),
+  description: z.string().default(''),
+});
 
 
 const SolutionSchema = z.object({
@@ -26,8 +23,9 @@ const SolutionSchema = z.object({
   keyPoints: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-      if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
-        return parsed as string[];
+      const result = z.array(KeyPointSchema).safeParse(parsed);
+      if (result.success) {
+        return result.data;
       }
       throw new Error();
     } catch (e) {

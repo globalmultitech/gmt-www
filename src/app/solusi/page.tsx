@@ -8,9 +8,13 @@ import { DynamicIcon } from '@/components/dynamic-icon';
 import prisma from '@/lib/db';
 import type { Solution } from '@prisma/client';
 
+type SolutionWithChildren = Solution & { children: Solution[] };
+
 async function getPageData() {
     const settings = await getSettings();
     const solutions = await prisma.solution.findMany({
+        where: { parentId: null },
+        include: { children: { orderBy: { createdAt: 'asc' }}},
         orderBy: { createdAt: 'asc' }
     });
     return { settings, solutions };
@@ -59,15 +63,16 @@ export default async function SolusiPage() {
                     </h2>
                   </div>
                   <p className="text-muted-foreground">{solution.description}</p>
-                  <ul className="space-y-2 pt-2">
-                    {/* @ts-ignore */}
-                    {(Array.isArray(solution.keyPoints) ? solution.keyPoints : []).map((point, i) => (
-                      <li key={i} className="flex items-start gap-3">
-                        <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
-                        <span className="text-muted-foreground">{point}</span>
-                      </li>
-                    ))}
-                  </ul>
+                   {solution.children.length > 0 && (
+                      <ul className="space-y-2 pt-2">
+                        {solution.children.map((child, i) => (
+                          <li key={i} className="flex items-start gap-3">
+                            <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
+                            <span className="text-muted-foreground">{child.title}</span>
+                          </li>
+                        ))}
+                      </ul>
+                   )}
                    <div className="pt-4">
                       <Button asChild>
                         <Link href={`/solusi/${solution.slug}`}>Pelajari Lebih Lanjut <ArrowRight className="ml-2 h-4 w-4"/></Link>

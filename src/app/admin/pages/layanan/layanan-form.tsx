@@ -21,6 +21,13 @@ import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import RichTextEditor from '@/app/admin/produk/rich-text-editor';
+
+type DetailPoint = {
+    title: string;
+    image?: string;
+    description: string;
+}
 
 type LayananFormProps = {
   service?: ProfessionalService | null;
@@ -74,7 +81,7 @@ export function LayananForm({ service = null }: LayananFormProps) {
   // @ts-ignore
   const [state, dispatch] = useActionState(formAction, undefined);
   
-  const [isUploading, setIsUploading] = useState(false);
+  const [isUploading, setIsUploading] = useState<{ [key: string]: boolean }>({});
   const [imageUrl, setImageUrl] = useState<string>(service?.imageUrl ?? '');
   const [serviceTitle, setServiceTitle] = useState(service?.title ?? '');
   const [slug, setSlug] = useState(service?.slug ?? '');
@@ -90,8 +97,8 @@ export function LayananForm({ service = null }: LayananFormProps) {
     }
   }
 
-  const [details, setDetails] = useState<string[]>(parseJsonSafe(service?.details, ['']));
-  const [benefits, setBenefits] = useState<string[]>(parseJsonSafe(service?.benefits, ['']));
+  const [details, setDetails] = useState<DetailPoint[]>(parseJsonSafe(service?.details, [{ title: '', description: '' }]));
+  const [benefits, setBenefits] = useState<DetailPoint[]>(parseJsonSafe(service?.benefits, [{ title: '', description: '' }]));
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -99,11 +106,13 @@ export function LayananForm({ service = null }: LayananFormProps) {
     setSlug(generateSlug(newTitle));
   }
   
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: 'imageUrl' | 'details' | 'benefits', index?: number) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    setIsUploading(true);
+    const uploadKey = index !== undefined ? `${fieldName}-${index}` : fieldName;
+    setIsUploading(prev => ({...prev, [uploadKey]: true}));
+
     const formData = new FormData();
     formData.append("file", file);
 
@@ -111,24 +120,31 @@ export function LayananForm({ service = null }: LayananFormProps) {
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Gagal mengunggah gambar");
       const { publicUrl } = await res.json();
-      setImageUrl(publicUrl);
+      
+      if (fieldName === 'imageUrl') {
+        setImageUrl(publicUrl);
+      } else if (index !== undefined) {
+        handleArrayChange(fieldName === 'details' ? setDetails : setBenefits, index, 'image', publicUrl);
+      }
+
     } catch (error) {
       toast({ title: 'Upload Gagal', variant: 'destructive' });
     } finally {
-      setIsUploading(false);
+      setIsUploading(prev => ({...prev, [uploadKey]: false}));
       event.target.value = '';
     }
   };
   
-  const handleArrayChange = (setter: React.Dispatch<React.SetStateAction<string[]>>, index: number, value: string) => {
+  const handleArrayChange = (setter: React.Dispatch<React.SetStateAction<DetailPoint[]>>, index: number, field: keyof DetailPoint, value: string) => {
     setter(prev => {
         const newArray = [...prev];
-        newArray[index] = value;
+        newArray[index] = { ...newArray[index], [field]: value };
         return newArray;
     });
   };
-  const addArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>) => setter(prev => [...prev, '']);
-  const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<string[]>>, index: number) => setter(prev => prev.filter((_, i) => i !== index));
+  
+  const addArrayItem = (setter: React.Dispatch<React.SetStateAction<DetailPoint[]>>) => setter(prev => [...prev, { title: '', description: '' }]);
+  const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<DetailPoint[]>>, index: number) => setter(prev => prev.filter((_, i) => i !== index));
 
   useEffect(() => {
     if (state?.message) {
@@ -140,12 +156,59 @@ export function LayananForm({ service = null }: LayananFormProps) {
     }
   }, [state, toast]);
 
+  const handleFormSubmit = (formData: FormData) => {
+    const detailsToSave = details.filter(f => (f.title && f.title.trim() !== '') || (f.description && f.description.replace(/<[^>]*>?/gm, '').trim() !== ''));
+    const benefitsToSave = benefits.filter(f => (f.title && f.title.trim() !== '') || (f.description && f.description.replace(/<[^>]*>?/gm, '').trim() !== ''));
+    
+    formData.set('details', JSON.stringify(detailsToSave));
+    formData.set('benefits', JSON.stringify(benefitsToSave));
+
+    dispatch(formData);
+  }
+  
+  const PointEditor = ({ title, points, setPoints, onUpload, onArrayChange, onAddItem, onRemoveItem }: any) => (
+    <Card>
+        <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+            {points.map((item: DetailPoint, index: number) => (
+                <div key={index} className="border p-4 rounded-md space-y-4 relative">
+                    <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveItem(setPoints, index)} className="text-destructive h-8 w-8 absolute top-2 right-2"><Trash2 className="h-4 w-4" /></Button>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                        <div className="space-y-1">
+                            <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
+                            <Input id={`point-title-${index}`} value={item.title} onChange={(e) => onArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
+                        </div>
+                        <div className="space-y-2">
+                            <Label>Gambar (Opsional)</Label>
+                            <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
+                                {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                            </div>
+                            <div className="flex items-center gap-4">
+                                <Input type="file" onChange={(e) => onUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`points-${index}`]} />
+                                {isUploading[`points-${index}`] && <Loader2 className="animate-spin" />}
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <Label>Deskripsi Poin</Label>
+                        <RichTextEditor
+                            key={`point-desc-${index}-${item.description}`}
+                            defaultValue={item.description}
+                            onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
+                        />
+                    </div>
+                </div>
+            ))}
+            <Button type="button" variant="outline" size="sm" onClick={() => onAddItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
+        </CardContent>
+    </Card>
+  );
+
+
   return (
-    <form action={dispatch} className="space-y-8">
+    <form action={handleFormSubmit} className="space-y-8">
         {isEditing && <input type="hidden" name="id" value={service.id} />}
         <input type="hidden" name="imageUrl" value={imageUrl} />
-        <input type="hidden" name="details" value={JSON.stringify(details.filter(f => f.trim() !== ''))} />
-        <input type="hidden" name="benefits" value={JSON.stringify(benefits.filter(f => f.trim() !== ''))} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
@@ -164,43 +227,31 @@ export function LayananForm({ service = null }: LayananFormProps) {
                             <Textarea id="description" name="description" required defaultValue={service?.description} />
                         </div>
                         <div className="space-y-1">
-                          <Label>Deskripsi Lengkap (HTML didukung)</Label>
-                          <Textarea id="longDescription" name="longDescription" defaultValue={service?.longDescription ?? ''} rows={10}/>
+                          <Label>Deskripsi Halaman Lengkap</Label>
+                          <RichTextEditor name="longDescription" defaultValue={service?.longDescription ?? ''} />
                         </div>
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Poin-poin & Manfaat</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
-                          <Label>Poin-poin Detail</Label>
-                          <div className="space-y-2">
-                            {details.map((item, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <Input value={item} onChange={(e) => handleArrayChange(setDetails, index, e.target.value)} placeholder={`Poin ${index + 1}`} />
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setDetails, index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                              </div>
-                            ))}
-                          </div>
-                          <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setDetails)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
-                        </div>
-                        <div className="space-y-2">
-                          <Label>Manfaat/Keuntungan</Label>
-                          <div className="space-y-2">
-                            {benefits.map((item, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <Input value={item} onChange={(e) => handleArrayChange(setBenefits, index, e.target.value)} placeholder={`Manfaat ${index + 1}`} />
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setBenefits, index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                              </div>
-                            ))}
-                          </div>
-                          <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setBenefits)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Manfaat</Button>
-                        </div>
-                    </CardContent>
-                </Card>
+                <PointEditor
+                  title="Poin-poin Detail Layanan"
+                  points={details}
+                  setPoints={setDetails}
+                  onUpload={(e: any, index: number) => handleFileChange(e, 'details', index)}
+                  onArrayChange={handleArrayChange}
+                  onAddItem={addArrayItem}
+                  onRemoveItem={removeArrayItem}
+                />
+                
+                <PointEditor
+                  title="Manfaat / Keuntungan"
+                  points={benefits}
+                  setPoints={setBenefits}
+                  onUpload={(e: any, index: number) => handleFileChange(e, 'benefits', index)}
+                  onArrayChange={handleArrayChange}
+                  onAddItem={addArrayItem}
+                  onRemoveItem={removeArrayItem}
+                />
             </div>
 
             <div className="lg:col-span-1 space-y-6">
@@ -228,7 +279,7 @@ export function LayananForm({ service = null }: LayananFormProps) {
                 </Card>
                  <Card>
                     <CardHeader>
-                        <CardTitle>Gambar Layanan</CardTitle>
+                        <CardTitle>Gambar Utama</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
                         <div className="relative w-full aspect-video rounded-md bg-muted overflow-hidden border">
@@ -241,8 +292,8 @@ export function LayananForm({ service = null }: LayananFormProps) {
                             )}
                         </div>
                         <div className="flex items-center gap-4">
-                          <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
-                          {isUploading && <Loader2 className="animate-spin" />}
+                          <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, 'imageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading['imageUrl']}/>
+                          {isUploading['imageUrl'] && <Loader2 className="animate-spin" />}
                         </div>
                     </CardContent>
                 </Card>

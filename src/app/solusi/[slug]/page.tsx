@@ -13,19 +13,22 @@ type Props = {
   params: { slug: string };
 };
 
-const parseJsonField = (field: any, fallback: any[] = []) => {
-    if (typeof field === 'string') {
-        try {
-            return JSON.parse(field);
-        } catch (e) {
-            return fallback;
-        }
+type KeyPoint = {
+    title: string;
+    image?: string;
+    description: string;
+}
+
+const parseJsonSafe = (jsonString: any, fallback: any[]) => {
+    if (Array.isArray(jsonString)) return jsonString;
+    if (typeof jsonString !== 'string') return fallback;
+    try {
+      const parsed = JSON.parse(jsonString);
+      return Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
     }
-    if (Array.isArray(field)) {
-        return field;
-    }
-    return fallback;
-};
+  }
 
 export async function generateStaticParams() {
   const solutions = await prisma.solution.findMany({
@@ -51,7 +54,7 @@ async function getSolutionBySlug(slug: string) {
   
   return {
     ...solutionRaw,
-    keyPoints: parseJsonField(solutionRaw.keyPoints),
+    keyPoints: parseJsonSafe(solutionRaw.keyPoints, []),
   }
 }
 
@@ -94,7 +97,7 @@ export default async function SolutionDetailPage({ params }: Props) {
     notFound();
   }
   
-  const keyPoints = solution.keyPoints as string[];
+  const keyPoints = solution.keyPoints as KeyPoint[];
 
   return (
     <>
@@ -132,15 +135,25 @@ export default async function SolutionDetailPage({ params }: Props) {
 
       <div className="container mx-auto px-4 py-16 md:py-24">
          <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-headline font-bold text-primary mb-6">Poin-Poin Kunci Solusi</h2>
-             <ul className="space-y-4">
+            <h2 className="text-3xl font-headline font-bold text-primary mb-8 text-center">Poin-Poin Kunci Solusi</h2>
+             <div className="space-y-8">
                 {keyPoints.map((item, index) => (
-                    <li key={index} className="flex items-start gap-4 p-4 rounded-lg bg-dark-slate">
-                        <CheckCircle className="h-6 w-6 text-sky-blue mt-1 flex-shrink-0" />
-                        <span className="text-lg text-muted-foreground">{item}</span>
-                    </li>
+                  <div key={index} className="grid md:grid-cols-5 gap-6 items-center bg-dark-slate/50 p-6 rounded-lg">
+                      {item.image && (
+                          <div className="relative h-48 md:h-full rounded-lg overflow-hidden md:col-span-2">
+                              <Image src={item.image} alt={item.title} fill className="object-cover" />
+                          </div>
+                      )}
+                      <div className={`space-y-3 ${item.image ? 'md:col-span-3' : 'md:col-span-5'}`}>
+                          <div className="flex items-center gap-3">
+                            <CheckCircle className="h-6 w-6 text-sky-blue flex-shrink-0" />
+                            <h3 className="text-2xl font-bold font-headline">{item.title}</h3>
+                          </div>
+                          <div className="prose dark:prose-invert max-w-none pl-9" dangerouslySetInnerHTML={{ __html: item.description }} />
+                      </div>
+                  </div>
                 ))}
-            </ul>
+            </div>
             <div className="mt-12 text-center">
                 <Button asChild className="w-full md:w-auto" size="lg">
                     <Link href="/hubungi-kami">Diskusikan Kebutuhan Anda</Link>
