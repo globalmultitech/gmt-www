@@ -189,7 +189,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 )}
               </div>
 
-              <Accordion type="multiple" className="w-full">
+              <Accordion type="multiple" className="w-full" defaultValue={['item-desc']}>
                   <AccordionItem value="item-desc">
                   <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                   <AccordionContent>
@@ -219,43 +219,41 @@ export default async function ProductDetailPage({ params }: Props) {
                     </AccordionContent>
                   </AccordionItem>
                 )}
-                
-                {specifications && specifications.headers && specifications.headers.length > 0 && specifications.rows.length > 0 && (
-                  <AccordionItem value="item-specs">
-                    <AccordionTrigger className="text-xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
-                    <AccordionContent>
-                      <div className="overflow-x-auto rounded-lg border bg-card mt-2">
-                          <Table>
-                              <TableHeader>
-                                <TableRow>
-                                  {specifications.headers.map((header, index) => (
-                                    <TableHead key={index}>{header}</TableHead>
-                                  ))}
-                                </TableRow>
-                              </TableHeader>
-                              <TableBody>
-                              {specifications.rows.map((row, rowIndex) => (
-                                  <TableRow key={rowIndex}>
-                                    {row.map((cell, cellIndex) => (
-                                      <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
-                                    ))}
-                                  </TableRow>
-                              ))}
-                              </TableBody>
-                          </Table>
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
-                )}
               </Accordion>
             </div>
           </div>
         </div>
       </div>
+      
+      {specifications && specifications.headers && specifications.headers.length > 0 && specifications.rows.length > 0 && (
+          <section className="bg-background py-16 md:py-24">
+              <div className="container mx-auto px-4">
+                <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">Spesifikasi Teknis</h2>
+                <div className="overflow-x-auto rounded-lg border bg-card mt-2 max-w-4xl mx-auto shadow-lg">
+                    <Table>
+                        <TableHeader>
+                          <TableRow>
+                            {specifications.headers.map((header, index) => (
+                              <TableHead key={index}>{header}</TableHead>
+                            ))}
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                        {specifications.rows.map((row, rowIndex) => (
+                            <TableRow key={rowIndex}>
+                              {row.map((cell, cellIndex) => (
+                                <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
+                              ))}
+                            </TableRow>
+                        ))}
+                        </TableBody>
+                    </Table>
+                </div>
+              </div>
+          </section>
+        )}
 
       <RelatedProducts products={relatedProducts} />
     </>
   );
 }
-
-    
