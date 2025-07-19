@@ -1,7 +1,8 @@
 
+
 'use client';
 
-import { useState, useActionState, useEffect, useRef } from 'react';
+import { useState, useActionState, useEffect } from 'react';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import {
@@ -38,9 +39,9 @@ type Feature = {
     description: string;
 }
 
-type Specification = {
-    key: string;
-    value: string;
+type Specifications = {
+    headers: string[];
+    rows: string[][];
 }
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
@@ -61,28 +62,18 @@ const generateSlug = (title: string) => {
     .replace(/-+/g, '-');
 }
 
-const parseJsonSafe = (json: any, fallback: any, forceArray = false) => {
-  let parsedJson;
-  if (typeof json === 'string') {
-    try {
-      parsedJson = JSON.parse(json);
-    } catch (e) {
-      parsedJson = fallback;
+const parseJsonSafe = (json: any, fallback: any) => {
+    let parsedJson;
+    if (typeof json === 'string') {
+        try {
+            parsedJson = JSON.parse(json);
+        } catch (e) {
+            parsedJson = fallback;
+        }
+    } else {
+        parsedJson = json ?? fallback;
     }
-  } else {
-    parsedJson = json ?? fallback;
-  }
-
-  if (forceArray && !Array.isArray(parsedJson)) {
-    // If it's an object (like the old specifications), convert it to an array of its key-value pairs
-    if (typeof parsedJson === 'object' && parsedJson !== null) {
-      return Object.entries(parsedJson).map(([key, value]) => ({ key, value }));
-    }
-    // Otherwise, if it's not an array and not an object, return the fallback
-    return fallback;
-  }
-  
-  return parsedJson;
+    return parsedJson;
 };
 
 
@@ -96,15 +87,13 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const [state, dispatch] = useActionState(formAction, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>(parseJsonSafe(product?.images, [], true));
+  const [imageUrls, setImageUrls] = useState<string[]>(parseJsonSafe(product?.images, []));
   const [productTitle, setProductTitle] = useState(product?.title ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
 
-  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }], true));
-  const [specifications, setSpecifications] = useState<Specification[]>(parseJsonSafe(product?.specifications, [{ key: '', value: '' }], true));
+  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }]));
+  const [specifications, setSpecifications] = useState<Specifications>(parseJsonSafe(product?.specifications, { headers: [''], rows: [['']] }));
   
-  const longDescriptionRef = useRef<HTMLInputElement>(null);
-
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
     setProductTitle(newTitle);
@@ -153,13 +142,40 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const addFeature = () => setFeatures([...features, { title: '', description: '' }]);
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
 
-  const handleSpecificationChange = (index: number, field: 'key' | 'value', value: string) => {
-    const newSpecifications = [...specifications];
-    newSpecifications[index][field] = value;
-    setSpecifications(newSpecifications);
-  };
-  const addSpecification = () => setSpecifications([...specifications, { key: '', value: '' }]);
-  const removeSpecification = (index: number) => setSpecifications(specifications.filter((_, i) => i !== index));
+  const handleSpecHeaderChange = (index: number, value: string) => {
+      const newSpecs = { ...specifications };
+      newSpecs.headers[index] = value;
+      setSpecifications(newSpecs);
+  }
+  const addSpecHeader = () => {
+      const newSpecs = { ...specifications };
+      newSpecs.headers.push('');
+      newSpecs.rows.forEach(row => row.push(''));
+      setSpecifications(newSpecs);
+  }
+  const removeSpecHeader = (index: number) => {
+      const newSpecs = { ...specifications };
+      newSpecs.headers.splice(index, 1);
+      newSpecs.rows.forEach(row => row.splice(index, 1));
+      setSpecifications(newSpecs);
+  }
+
+  const handleSpecRowChange = (rowIndex: number, colIndex: number, value: string) => {
+      const newSpecs = { ...specifications };
+      newSpecs.rows[rowIndex][colIndex] = value;
+      setSpecifications(newSpecs);
+  }
+  const addSpecRow = () => {
+      const newSpecs = { ...specifications };
+      newSpecs.rows.push(Array(newSpecs.headers.length).fill(''));
+      setSpecifications(newSpecs);
+  }
+  const removeSpecRow = (rowIndex: number) => {
+      const newSpecs = { ...specifications };
+      newSpecs.rows.splice(rowIndex, 1);
+      setSpecifications(newSpecs);
+  }
+
 
   const handleFormSubmit = (formData: FormData) => {
     const featuresToSave = features.filter(f => {
@@ -167,9 +183,15 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
         const descText = descHtml.replace(/<[^>]*>?/gm, '').trim();
         return (f.title && f.title.trim() !== '') || descText !== '';
     });
-
     formData.set('features', JSON.stringify(featuresToSave));
-    formData.set('specifications', JSON.stringify(specifications.filter(s => s && typeof s.key === 'string' && s.key.trim() !== '')))
+    
+    const specsToSave = {
+        headers: specifications.headers.filter(h => h.trim() !== ''),
+        rows: specifications.rows.map(row => 
+            row.slice(0, specifications.headers.filter(h => h.trim() !== '').length)
+        ).filter(row => row.some(cell => cell.trim() !== ''))
+    };
+    formData.set('specifications', JSON.stringify(specsToSave));
 
     dispatch(formData);
   }
@@ -268,18 +290,36 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                           </div>
                           <Button type="button" variant="outline" size="sm" onClick={addFeature} className="mt-2"><PlusCircle className="mr-2 h-4 w-4" /> Tambah Fitur</Button>
                         </div>
-                        <div className="space-y-2">
-                          <Label>Spesifikasi</Label>
-                          <div className="space-y-2">
-                            {specifications.map((spec, index) => (
-                              <div key={index} className="flex items-center gap-2">
-                                <Input value={spec.key} onChange={(e) => handleSpecificationChange(index, 'key', e.target.value)} placeholder="Label (e.g. Ukuran)" />
-                                <Input value={spec.value} onChange={(e) => handleSpecificationChange(index, 'value', e.target.value)} placeholder="Nilai (e.g. 21.5 inci)" />
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecification(index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
-                              </div>
-                            ))}
-                          </div>
-                          <Button type="button" variant="outline" size="sm" onClick={addSpecification}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Spesifikasi</Button>
+                        <div className="space-y-4">
+                            <Label>Spesifikasi Dinamis</Label>
+                            {/* Headers */}
+                            <div className="p-2 border rounded-md space-y-2 bg-muted/50">
+                                <Label className="text-sm font-semibold">Judul Kolom</Label>
+                                <div className="grid grid-cols-2 gap-2">
+                                    {specifications.headers.map((header, index) => (
+                                        <div key={index} className="flex items-center gap-2">
+                                            <Input value={header} onChange={(e) => handleSpecHeaderChange(index, e.target.value)} placeholder={`Kolom ${index + 1}`} />
+                                            <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecHeader(index)} className="text-destructive h-9 w-9 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                                        </div>
+                                    ))}
+                                </div>
+                                <Button type="button" variant="outline" size="sm" onClick={addSpecHeader}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Kolom</Button>
+                            </div>
+                            {/* Rows */}
+                             <div className="space-y-2">
+                                <Label className="text-sm font-semibold">Baris Data</Label>
+                                {specifications.rows.map((row, rowIndex) => (
+                                    <div key={rowIndex} className="flex items-center gap-2 p-2 border rounded-md">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 flex-grow" style={{ gridTemplateColumns: `repeat(${specifications.headers.length}, minmax(0, 1fr))` }}>
+                                            {row.map((cell, colIndex) => (
+                                                <Input key={colIndex} value={cell} onChange={(e) => handleSpecRowChange(rowIndex, colIndex, e.target.value)} placeholder={specifications.headers[colIndex] || `Data ${colIndex + 1}`} />
+                                            ))}
+                                        </div>
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-9 w-9 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                                    </div>
+                                ))}
+                                <Button type="button" variant="outline" size="sm" onClick={addSpecRow}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Baris</Button>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

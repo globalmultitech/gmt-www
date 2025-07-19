@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -12,8 +13,8 @@ const FeatureSchema = z.object({
 });
 
 const SpecificationSchema = z.object({
-  key: z.string().default(''),
-  value: z.string().default(''),
+  headers: z.array(z.string()).default([]),
+  rows: z.array(z.array(z.string())).default([]),
 });
 
 
@@ -51,7 +52,7 @@ const ProductSchema = z.object({
   specifications: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-      const result = z.array(SpecificationSchema).safeParse(parsed);
+      const result = SpecificationSchema.safeParse(parsed);
        if (result.success) {
         return result.data;
       }
@@ -105,6 +106,8 @@ export async function createProduct(prevState: { message: string, success?: bool
     await prisma.product.create({
       data: {
         ...rest,
+        // Prisma expects a JsonValue for Json fields
+        specifications: rest.specifications as any,
       },
     });
 
@@ -154,6 +157,7 @@ export async function updateProduct(prevState: { message: string, success?: bool
             where: { id },
             data: {
                 ...rest,
+                specifications: rest.specifications as any,
             },
         });
 

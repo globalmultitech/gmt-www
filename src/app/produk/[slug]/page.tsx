@@ -10,6 +10,8 @@ import {
   TableBody,
   TableCell,
   TableRow,
+  TableHeader,
+  TableHead,
 } from '@/components/ui/table';
 import {
   Accordion,
@@ -34,9 +36,9 @@ type Feature = {
     description: string;
 }
 
-type Specification = {
-    key: string;
-    value: string;
+type Specifications = {
+    headers: string[];
+    rows: string[][];
 }
 
 const parseJsonSafe = (json: any, fallback: any) => {
@@ -83,7 +85,7 @@ async function getProductBySlug(slug: string) {
     ...productRaw,
     images: parseJsonSafe(productRaw.images, []),
     features: parseJsonSafe(productRaw.features, []),
-    specifications: parseJsonSafe(productRaw.specifications, []),
+    specifications: parseJsonSafe(productRaw.specifications, { headers: [], rows: [] }),
   }
 }
 
@@ -149,7 +151,7 @@ export default async function ProductDetailPage({ params }: Props) {
   const relatedProducts = await getRelatedProducts(product.id, product.subCategoryId);
   
   const featuresList = product.features as Feature[];
-  const specificationsList = product.specifications as Specification[];
+  const specifications = product.specifications as Specifications;
 
   return (
     <>
@@ -218,17 +220,25 @@ export default async function ProductDetailPage({ params }: Props) {
                   </AccordionItem>
                 )}
                 
-                {specificationsList.length > 0 && (
+                {specifications && specifications.headers && specifications.headers.length > 0 && specifications.rows.length > 0 && (
                   <AccordionItem value="item-specs">
                     <AccordionTrigger className="text-xl font-headline font-bold text-primary">Spesifikasi Teknis</AccordionTrigger>
                     <AccordionContent>
                       <div className="overflow-x-auto rounded-lg border bg-card mt-2">
                           <Table>
+                              <TableHeader>
+                                <TableRow>
+                                  {specifications.headers.map((header, index) => (
+                                    <TableHead key={index}>{header}</TableHead>
+                                  ))}
+                                </TableRow>
+                              </TableHeader>
                               <TableBody>
-                              {specificationsList.map((spec) => (
-                                  <TableRow key={spec.key}>
-                                  <TableCell className="font-semibold text-card-foreground w-1/3">{spec.key}</TableCell>
-                                  <TableCell className="text-muted-foreground">{spec.value}</TableCell>
+                              {specifications.rows.map((row, rowIndex) => (
+                                  <TableRow key={rowIndex}>
+                                    {row.map((cell, cellIndex) => (
+                                      <TableCell key={cellIndex} className="text-muted-foreground">{cell}</TableCell>
+                                    ))}
                                   </TableRow>
                               ))}
                               </TableBody>
