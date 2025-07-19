@@ -126,6 +126,12 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
       setSpecifications(newSpecs);
   }
 
+  const getSummary = (htmlString: string) => {
+    if (!htmlString) return '';
+    const text = htmlString.replace(/<[^>]*>?/gm, '');
+    return text.length > 50 ? text.substring(0, 50) + '...' : text;
+  }
+
   return (
     <Card>
         <CardHeader>
@@ -150,28 +156,35 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                  <div className="space-y-2">
                     <Label className="text-sm font-semibold">Baris Data</Label>
                     <Accordion type="multiple" className="w-full space-y-2">
-                      {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => (
-                          <AccordionItem value={`spec-row-${rowIndex}`} key={rowIndex} className="border rounded-md px-4 bg-card">
-                              <div className="flex justify-between items-center">
-                                <AccordionTrigger className="text-sm font-medium flex-grow py-3">Baris {rowIndex + 1}</AccordionTrigger>
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                              </div>
-                              <AccordionContent>
-                                  <div className="flex flex-col gap-4 pt-2">
-                                      {row.map((cell, colIndex) => (
-                                        <div key={colIndex} className="space-y-1">
-                                          <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
-                                          <RichTextEditor
-                                              key={`${rowIndex}-${colIndex}`}
-                                              defaultValue={cell}
-                                              onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
-                                          />
-                                        </div>
-                                      ))}
-                                  </div>
-                              </AccordionContent>
-                          </AccordionItem>
-                      ))}
+                      {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => {
+                          const summary = getSummary(row[0]);
+                          return (
+                            <AccordionItem value={`spec-row-${rowIndex}`} key={rowIndex} className="border rounded-md px-4 bg-card">
+                                <div className="flex justify-between items-center">
+                                  <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                                      <span className="truncate">
+                                        Baris {rowIndex + 1}: {summary || 'Data Baru'}
+                                      </span>
+                                  </AccordionTrigger>
+                                  <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                                </div>
+                                <AccordionContent>
+                                    <div className="flex flex-col gap-4 pt-2">
+                                        {row.map((cell, colIndex) => (
+                                          <div key={colIndex} className="space-y-1">
+                                            <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
+                                            <RichTextEditor
+                                                key={`${rowIndex}-${colIndex}`}
+                                                defaultValue={cell}
+                                                onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
+                                            />
+                                          </div>
+                                        ))}
+                                    </div>
+                                </AccordionContent>
+                            </AccordionItem>
+                          );
+                      })}
                     </Accordion>
                     <Button type="button" variant="outline" size="sm" onClick={addSpecRow}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Baris</Button>
                 </div>
@@ -349,8 +362,8 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                           {features.map((feature, index) => (
                               <AccordionItem value={`feature-${index}`} key={index} className="border rounded-md px-4 bg-card">
                                   <div className="flex justify-between items-center">
-                                      <AccordionTrigger className="text-sm font-medium flex-grow py-3">
-                                          Fitur: {feature.title || `Fitur Baru ${index + 1}`}
+                                      <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                                          <span className="truncate">Fitur: {feature.title || `Fitur Baru ${index + 1}`}</span>
                                       </AccordionTrigger>
                                       <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
                                   </div>
