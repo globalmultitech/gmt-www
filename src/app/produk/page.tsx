@@ -7,6 +7,15 @@ import Link from 'next/link';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 
+const toSlug = (name: string) => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+};
+
 async function getCategories() {
   return prisma.productCategory.findMany({
     orderBy: {
@@ -15,7 +24,6 @@ async function getCategories() {
     select: {
       id: true,
       name: true,
-      slug: true,
       description: true,
       imageUrl: true,
     }
@@ -55,7 +63,7 @@ export default async function ProdukPage() {
           {categories.length > 0 ? (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {categories.map((category) => (
-                  <Link key={category.id} href={`/produk/kategori/${category.slug}`} className="group block">
+                  <Link key={category.id} href={`/produk/kategori/${toSlug(category.name)}`} className="group block">
                      <Card className="flex flex-col h-full overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                         <div className="relative h-56 w-full">
                            {category.imageUrl ? (
@@ -75,7 +83,7 @@ export default async function ProdukPage() {
                            <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-primary-foreground">{category.name}</h3>
                         </div>
                         <CardContent className="pt-6 flex-grow flex flex-col">
-                            <p className="text-muted-foreground text-sm flex-grow line-clamp-3">{category.description}</p>
+                            <p className="text-muted-foreground text-sm line-clamp-3">{category.description}</p>
                             <div className="mt-4 font-semibold text-sky-blue flex items-center group-hover:text-sky-blue/80 transition-colors">
                                 Lihat Kategori <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </div>
