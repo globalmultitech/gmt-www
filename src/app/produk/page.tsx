@@ -76,7 +76,7 @@ export default async function ProdukPage() {
                            <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-primary-foreground">{category.name}</h3>
                         </div>
                         <CardContent className="pt-6 flex-grow flex flex-col">
-                            <p className="text-muted-foreground text-sm flex-grow">{category.description}</p>
+                            <p className="text-muted-foreground text-sm flex-grow line-clamp-3">{category.description}</p>
                             <div className="mt-4 font-semibold text-sky-blue flex items-center group-hover:text-sky-blue/80 transition-colors">
                                 Lihat Kategori <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                             </div>
