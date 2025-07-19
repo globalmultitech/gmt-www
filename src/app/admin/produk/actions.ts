@@ -49,7 +49,7 @@ const ProductSchema = z.object({
       return z.NEVER;
     }
   }),
-  specifications: z.string().transform((str, ctx) => {
+  technicalSpecifications: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
       const result = SpecificationSchema.safeParse(parsed);
@@ -58,7 +58,20 @@ const ProductSchema = z.object({
       }
       throw new Error();
     } catch (e) {
-      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi tidak valid' });
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi teknis tidak valid' });
+      return z.NEVER;
+    }
+  }),
+  generalSpecifications: z.string().transform((str, ctx) => {
+    try {
+      const parsed = JSON.parse(str);
+      const result = SpecificationSchema.safeParse(parsed);
+       if (result.success) {
+        return result.data;
+      }
+      throw new Error();
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi umum tidak valid' });
       return z.NEVER;
     }
   }),
@@ -82,7 +95,8 @@ export async function createProduct(prevState: { message: string, success?: bool
     longDescription: formData.get('longDescription'),
     images: formData.get('images'),
     features: formData.get('features'),
-    specifications: formData.get('specifications'),
+    technicalSpecifications: formData.get('technicalSpecifications'),
+    generalSpecifications: formData.get('generalSpecifications'),
     metaTitle: formData.get('metaTitle'),
     metaDescription: formData.get('metaDescription'),
     tokopediaUrl: formData.get('tokopediaUrl'),
@@ -107,7 +121,8 @@ export async function createProduct(prevState: { message: string, success?: bool
       data: {
         ...rest,
         // Prisma expects a JsonValue for Json fields
-        specifications: rest.specifications as any,
+        technicalSpecifications: rest.technicalSpecifications as any,
+        generalSpecifications: rest.generalSpecifications as any,
       },
     });
 
@@ -132,7 +147,8 @@ export async function updateProduct(prevState: { message: string, success?: bool
         longDescription: formData.get('longDescription'),
         images: formData.get('images'),
         features: formData.get('features'),
-        specifications: formData.get('specifications'),
+        technicalSpecifications: formData.get('technicalSpecifications'),
+        generalSpecifications: formData.get('generalSpecifications'),
         metaTitle: formData.get('metaTitle'),
         metaDescription: formData.get('metaDescription'),
         tokopediaUrl: formData.get('tokopediaUrl'),
@@ -157,7 +173,8 @@ export async function updateProduct(prevState: { message: string, success?: bool
             where: { id },
             data: {
                 ...rest,
-                specifications: rest.specifications as any,
+                technicalSpecifications: rest.technicalSpecifications as any,
+                generalSpecifications: rest.generalSpecifications as any,
             },
         });
 

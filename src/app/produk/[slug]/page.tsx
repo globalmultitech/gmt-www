@@ -26,6 +26,7 @@ import RelatedProducts from './related-products';
 import { Button } from '@/components/ui/button';
 import { TokopediaIcon } from '@/components/icons/tokopedia-icon';
 import { ShopeeIcon } from '@/components/icons/shopee-icon';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 type Props = {
   params: { slug: string };
@@ -85,7 +86,8 @@ async function getProductBySlug(slug: string) {
     ...productRaw,
     images: parseJsonSafe(productRaw.images, []),
     features: parseJsonSafe(productRaw.features, []),
-    specifications: parseJsonSafe(productRaw.specifications, { headers: [], rows: [] }),
+    technicalSpecifications: parseJsonSafe(productRaw.technicalSpecifications, { headers: [], rows: [] }),
+    generalSpecifications: parseJsonSafe(productRaw.generalSpecifications, { headers: [], rows: [] }),
   }
 }
 
@@ -139,6 +141,39 @@ const Breadcrumbs = ({ productTitle }: { productTitle: string }) => (
   </nav>
 );
 
+const SpecificationTable = ({ title, specs }: { title: string, specs: Specifications }) => {
+  if (!specs || !specs.headers || specs.headers.length === 0 || specs.rows.length === 0) {
+    return null;
+  }
+  return (
+    <section className="bg-background py-16 md:py-24">
+      <div className="container mx-auto px-4">
+        <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">{title}</h2>
+        <div className="overflow-x-auto rounded-lg border bg-card mt-2 max-w-4xl mx-auto shadow-lg">
+            <Table>
+                <TableHeader>
+                  <TableRow>
+                    {specs.headers.map((header, index) => (
+                      <TableHead key={index}>{header}</TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                {specs.rows.map((row, rowIndex) => (
+                    <TableRow key={rowIndex}>
+                      {row.map((cell, cellIndex) => (
+                        <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
+                      ))}
+                    </TableRow>
+                ))}
+                </TableBody>
+            </Table>
+        </div>
+      </div>
+    </section>
+  )
+}
+
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = params;
   const product = await getProductBySlug(slug);
@@ -151,7 +186,8 @@ export default async function ProductDetailPage({ params }: Props) {
   const relatedProducts = await getRelatedProducts(product.id, product.subCategoryId);
   
   const featuresList = product.features as Feature[];
-  const specifications = product.specifications as Specifications;
+  const techSpecs = product.technicalSpecifications as Specifications;
+  const generalSpecs = product.generalSpecifications as Specifications;
 
   return (
     <>
@@ -225,34 +261,9 @@ export default async function ProductDetailPage({ params }: Props) {
         </div>
       </div>
       
-      {specifications && specifications.headers && specifications.headers.length > 0 && specifications.rows.length > 0 && (
-          <section className="bg-background py-16 md:py-24">
-              <div className="container mx-auto px-4">
-                <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">Spesifikasi Teknis</h2>
-                <div className="overflow-x-auto rounded-lg border bg-card mt-2 max-w-4xl mx-auto shadow-lg">
-                    <Table>
-                        <TableHeader>
-                          <TableRow>
-                            {specifications.headers.map((header, index) => (
-                              <TableHead key={index}>{header}</TableHead>
-                            ))}
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {specifications.rows.map((row, rowIndex) => (
-                            <TableRow key={rowIndex}>
-                              {row.map((cell, cellIndex) => (
-                                <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
-                              ))}
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
-                </div>
-              </div>
-          </section>
-        )}
-
+      <SpecificationTable title="Spesifikasi Teknis" specs={techSpecs} />
+      <SpecificationTable title="Spesifikasi Umum" specs={generalSpecs} />
+      
       <RelatedProducts products={relatedProducts} />
     </>
   );

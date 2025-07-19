@@ -470,7 +470,7 @@ async function main() {
           { title: "Desain Modular", description: "Desain yang kokoh, elegan, dan mudah perawatannya." },
           { title: "Sistem Operasi Aman", description: "Sistem operasi yang aman dan terkunci khusus untuk kebutuhan perbankan." },
         ]),
-        specifications: JSON.stringify({
+        technicalSpecifications: JSON.stringify({
           headers: ["Fitur", "Spesifikasi"],
           rows: [
               ["Ukuran Layar", "21.5 inci"],
@@ -481,6 +481,14 @@ async function main() {
               ["Penyimpanan", "256GB SSD NVMe"],
               ["Konektivitas", "Wi-Fi, Ethernet, Bluetooth"]
           ]
+        }),
+        generalSpecifications: JSON.stringify({
+            headers: ["Fitur Tambahan"],
+            rows: [
+                ["Casing", "Metal & ABS Plastic"],
+                ["Power Supply", "AC 100-240V, 50/60Hz"],
+                ["Sertifikasi", "CE, FCC, RoHS"],
+            ]
         }),
         metaTitle: 'Jual Digital Kiosk GMT-K1 | Solusi Perbankan Modern',
         metaDescription: 'Digital Kiosk GMT-K1 adalah solusi layanan mandiri canggih untuk perbankan, dilengkapi fitur modern untuk meningkatkan efisiensi cabang.',
@@ -500,7 +508,7 @@ async function main() {
           { title: "Dasbor Analitik", description: "Laporan performa layanan dan analisis data real-time." },
           { title: "Panggilan Otomatis", description: "Panggilan suara otomatis dan display digital informatif." },
         ]),
-        specifications: JSON.stringify({
+        technicalSpecifications: JSON.stringify({
           headers: ["Fitur", "Keterangan"],
           rows: [
               ["Komponen", "Mesin Tiket, Display Utama, Display Teller, Software Manajemen"],
@@ -508,6 +516,10 @@ async function main() {
               ["Kustomisasi", "Alur layanan, jenis layanan, branding display"],
               ["Platform", "Berbasis Web, dapat diakses dari mana saja"]
           ]
+        }),
+        generalSpecifications: JSON.stringify({
+            headers: [],
+            rows: []
         }),
         metaTitle: 'SmartQ Queue System | Sistem Antrian Cerdas',
         metaDescription: 'Kurangi waktu tunggu dan tingkatkan kepuasan nasabah dengan SmartQ, sistem antrian cerdas dari Global Multi Technology.',
@@ -527,7 +539,7 @@ async function main() {
             { title: "Tampilan Kustom", description: "Dapat dikustomisasi sepenuhnya dengan logo dan branding bank." },
             { title: "Manajemen Terpusat", description: "Manajemen konten berbasis web yang mudah digunakan." },
         ]),
-         specifications: JSON.stringify({
+         technicalSpecifications: JSON.stringify({
            headers: ["Fitur", "Keterangan"],
            rows: [
             ["Ukuran Layar", "32 inci"],
@@ -536,6 +548,10 @@ async function main() {
             ["Fitur Software", "Manajemen playlist, penjadwalan konten, template kurs"],
             ["Input Data", "API, XML, atau input manual"]
            ]
+        }),
+        generalSpecifications: JSON.stringify({
+            headers: [],
+            rows: []
         }),
         metaTitle: 'ForexRate Display F-32 | Papan Kurs Digital',
         metaDescription: 'Sajikan informasi kurs mata uang yang akurat dan real-time dengan ForexRate Display F-32. Profesional dan mudah dikelola.',
@@ -555,7 +571,7 @@ async function main() {
             { title: "Integrasi Fleksibel", description: "Dapat diintegrasikan dengan mudah ke aplikasi mobile atau web." },
             { title: "Audit Trail", description: "Dasbor monitoring dan rekam jejak audit yang lengkap." },
         ]),
-        specifications: JSON.stringify({
+        technicalSpecifications: JSON.stringify({
           headers: ["Fitur", "Keterangan"],
           rows: [
             ["Tipe", "Perangkat Lunak (SaaS/On-premise)"],
@@ -563,6 +579,10 @@ async function main() {
             ["SDK Tersedia", "Android, iOS, Web (JavaScript)"],
             ["Keamanan", "Enkripsi AES-256"]
           ]
+        }),
+        generalSpecifications: JSON.stringify({
+            headers: [],
+            rows: []
         }),
         metaTitle: 'KYC-Flow Engine | Platform e-KYC Otomatis',
         metaDescription: 'Otomatiskan proses e-KYC Anda dengan KYC-Flow Engine. Solusi perangkat lunak yang aman, cepat, dan terintegrasi.',
@@ -582,7 +602,7 @@ async function main() {
             { title: "Kecepatan Tinggi", description: "Kecepatan cetak hingga 180 kartu per jam." },
             { title: "Desain Ringkas", description: "Cocok untuk ditempatkan di meja teller atau back office." },
         ]),
-        specifications: JSON.stringify({
+        technicalSpecifications: JSON.stringify({
           headers: ["Fitur", "Keterangan"],
           rows: [
             ["Resolusi Cetak", "300 dpi"],
@@ -590,6 +610,10 @@ async function main() {
             ["Konektivitas", "USB, Ethernet"],
             ["Tipe Kartu", "PVC, PET, Composite PVC, 30-40 mil"]
           ]
+        }),
+        generalSpecifications: JSON.stringify({
+            headers: [],
+            rows: []
         }),
         metaTitle: 'InstantCard Printer P-200 | Mesin Cetak Kartu Instan',
         metaDescription: 'Cetak kartu debit, kredit, atau member secara instan di cabang Anda dengan InstantCard Printer P-200. Cepat, aman, dan andal.',
@@ -619,5 +643,3 @@ main()
     
 
     
-
-
