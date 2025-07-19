@@ -17,30 +17,18 @@ const toSlug = (name: string) => {
 
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
-    where: { name: { not: '' } },
-    select: { name: true },
+    where: { slug: { not: '' } },
+    select: { slug: true },
   });
  
   return categories.map((category) => ({
-    slug: toSlug(category.name),
+    slug: category.slug,
   }));
 }
 
 async function getCategoryDataBySlug(slug: string) {
-  // First, find the specific category that matches the slug to get its ID.
-  const allCategories = await prisma.productCategory.findMany({
-    select: { id: true, name: true },
-  });
-
-  const matchedCategory = allCategories.find(c => toSlug(c.name) === slug);
-
-  if (!matchedCategory) {
-    return null;
-  }
-
-  // Now, fetch the full data for only that category, including its subcategories.
   const categoryWithDetails = await prisma.productCategory.findUnique({
-    where: { id: matchedCategory.id },
+    where: { slug },
     include: {
       subCategories: {
         orderBy: { name: 'asc' },
@@ -52,7 +40,6 @@ async function getCategoryDataBySlug(slug: string) {
       return null;
   }
 
-  // Return the found category and its subcategories separately
   return { category: categoryWithDetails, subCategories: categoryWithDetails.subCategories };
 }
 
@@ -110,7 +97,7 @@ export default async function CategoryPage({ params }: Props) {
         <div className="container mx-auto px-4 py-8">
             <Breadcrumbs categoryName={category.name} />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{category.name}</h1>
-            <p className="mt-2 text-lg text-muted-foreground">
+            <p className="mt-2 text-lg text-muted-foreground text-justify">
               {category.description}
             </p>
         </div>

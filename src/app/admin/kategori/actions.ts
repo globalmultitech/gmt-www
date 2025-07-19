@@ -5,6 +5,16 @@ import prisma from '@/lib/db';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 
+const toSlug = (name: string) => {
+  if (!name) return '';
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+};
+
+
 export async function getCategoriesWithSubcategories() {
   return prisma.productCategory.findMany({
     include: {
@@ -40,12 +50,15 @@ export async function createCategory(prevState: { message: string } | undefined,
   }
 
   try {
-    const existingName = await prisma.productCategory.findUnique({ where: { name: validatedFields.data.name } });
+    const { name, ...rest } = validatedFields.data;
+    const slug = toSlug(name);
+    
+    const existingName = await prisma.productCategory.findFirst({ where: { OR: [{name}, {slug}] } });
     if(existingName) {
-      return { message: 'Nama kategori sudah digunakan.'}
+      return { message: 'Nama kategori atau URL slug sudah digunakan.'}
     }
 
-    await prisma.productCategory.create({ data: validatedFields.data });
+    await prisma.productCategory.create({ data: { name, slug, ...rest } });
     revalidatePath('/admin/kategori');
     revalidatePath('/produk');
     revalidatePath('/produk/kategori', 'layout');
@@ -69,12 +82,15 @@ export async function updateCategory(prevState: { message: string } | undefined,
   }
   
   try {
-    const existingName = await prisma.productCategory.findFirst({ where: { name: validatedFields.data.name, id: { not: id } } });
+    const { name, ...rest } = validatedFields.data;
+    const slug = toSlug(name);
+
+    const existingName = await prisma.productCategory.findFirst({ where: { OR: [{name}, {slug}], NOT: {id} } });
     if(existingName) {
-      return { message: 'Nama kategori sudah digunakan.'}
+      return { message: 'Nama kategori atau URL slug sudah digunakan.'}
     }
 
-    await prisma.productCategory.update({ where: { id }, data: validatedFields.data });
+    await prisma.productCategory.update({ where: { id }, data: { name, slug, ...rest } });
     revalidatePath('/admin/kategori');
     revalidatePath('/produk');
     revalidatePath('/produk/kategori', 'layout');

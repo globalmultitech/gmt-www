@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -34,7 +31,7 @@ model WebSettings {
   openingHours               String?
   socialMedia                Json?
   menuItems                  Json?
-  heroHeadline               String? @db.Text
+  heroHeadline               String?
   heroDescription            String? @db.Text
   heroImageUrl               String? @db.Text
   heroButton1Text            String?
@@ -50,7 +47,7 @@ model WebSettings {
   servicesSubtitle           String?
   servicesTitle              String?
   servicesDescription        String? @db.Text
-  ctaHeadline                String? @db.Text
+  ctaHeadline                String?
   ctaDescription             String? @db.Text
   ctaImageUrl                String? @db.Text
   ctaButtonText              String?
@@ -59,28 +56,28 @@ model WebSettings {
   trustedByLogos             Json?
   testimonials               Json?
   servicesPageTitle          String?
-  servicesPageSubtitle       String?
+  servicesPageSubtitle       String? @db.Text
   servicesPageCommitmentTitle String?
   servicesPageCommitmentText String? @db.Text
   servicesPageHeaderImageUrl String? @db.Text
   solutionsPageTitle         String?
-  solutionsPageSubtitle      String?
+  solutionsPageSubtitle      String? @db.Text
   aboutPageTitle             String?
-  aboutPageSubtitle          String?
+  aboutPageSubtitle          String? @db.Text
   missionTitle               String?
   missionText                String? @db.Text
   visionTitle                String?
   visionText                 String? @db.Text
   resourcesPageTitle         String?
-  resourcesPageSubtitle      String?
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  resourcesPageSubtitle      String? @db.Text
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 }
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
   name          String               @unique
+  slug          String               @unique
   description   String?              @db.Text
   imageUrl      String?              @db.Text
   subCategories ProductSubCategory[]
@@ -98,7 +95,7 @@ model Product {
   id                      Int                @id @default(autoincrement())
   title                   String
   slug                    String             @unique
-  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id])
+  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   subCategoryId           Int
   description             String             @db.Text
   longDescription         String?            @db.Text
@@ -137,22 +134,11 @@ model Solution {
   image       String?   @db.Text
   aiHint      String?
   keyPoints   Json?
-  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   parentId    Int?
+  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children    Solution[] @relation("SolutionHierarchy")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-}
-
-model NewsItem {
-    id        Int      @id @default(autoincrement())
-    title     String
-    slug      String   @unique
-    category  String
-    image     String?  @db.Text
-    content   String?  @db.Text
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
 }
 
 model PartnerLogo {
@@ -165,4 +151,15 @@ model CustomerLogo {
   id  Int    @id @default(autoincrement())
   src String @db.Text
   alt String
+}
+
+model NewsItem {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  category  String
+  image     String?  @db.Text
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
