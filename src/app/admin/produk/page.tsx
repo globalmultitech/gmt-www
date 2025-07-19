@@ -1,3 +1,4 @@
+
 import prisma from '@/lib/db';
 import ProductManagementClientPage from './client-page';
 
@@ -10,7 +11,7 @@ async function getGroupedProducts() {
         orderBy: { name: 'asc' },
         include: {
           products: {
-            orderBy: { createdAt: 'desc' },
+            orderBy: { id: 'desc' },
           },
         },
       },

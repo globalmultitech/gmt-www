@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { TestimonialCarousel } from '@/components/testimonial-carousel';
 import { Card, CardContent } from '@/components/ui/card';
-import type { WebSettings, FeatureCard, TrustedByLogo } from '@/lib/settings';
+import type { WebSettings, FeatureCard, TrustedByLogo, Testimonial } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { HomeSolutionsTabs } from '@/components/home-solutions-tabs';
 import { HomeMapSection } from '@/components/home-map-section';
@@ -19,6 +19,12 @@ type EnrichedProduct = Product & {
     category: ProductCategory;
   };
 };
+
+type DetailPoint = {
+    title: string;
+    image?: string;
+    description: string;
+}
 
 type HomePageProps = {
   products: EnrichedProduct[];
@@ -144,10 +150,10 @@ export default function HomeClientPage({ products, settings, professionalService
                       </div>
                       <CardContent>
                         <ul className="space-y-3 pt-4 border-t">
-                          {(service.details as string[]).map((detail, index) => (
+                          {(service.details as DetailPoint[]).slice(0, 3).map((detail, index) => (
                             <li key={index} className="flex items-start gap-3">
                               <Handshake className="h-5 w-5 text-primary mt-1 flex-shrink-0" />
-                              <span className="text-sm text-muted-foreground">{detail}</span>
+                              <span className="text-sm text-muted-foreground">{detail.title}</span>
                             </li>
                           ))}
                         </ul>
@@ -245,6 +251,15 @@ export default function HomeClientPage({ products, settings, professionalService
               </div>
           </div>
       </section>
+
+      {/* Testimonials Section */}
+      {settings.testimonials && (settings.testimonials as Testimonial[]).length > 0 && (
+        <section className="py-20 md:py-28 bg-background relative overflow-hidden">
+            <div className="container mx-auto px-4">
+               <TestimonialCarousel testimonials={settings.testimonials as Testimonial[]} />
+            </div>
+        </section>
+       )}
 
       {/* Knowledge Center/Blog Section */}
       <BlogSection newsItems={newsItems} />
