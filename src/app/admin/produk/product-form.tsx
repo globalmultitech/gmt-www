@@ -133,9 +133,9 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
         <CardContent className="space-y-6">
             <div className="space-y-4">
                 {/* Headers */}
-                <div className="p-2 border rounded-md space-y-2 bg-muted/50">
+                <div className="p-4 border rounded-md space-y-2 bg-muted/50">
                     <Label className="text-sm font-semibold">Judul Kolom</Label>
-                    <div className="grid grid-cols-2 gap-2">
+                    <div className="grid grid-cols-1 gap-2">
                         {specifications && specifications.headers && specifications.headers.map((header, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <Input value={header} onChange={(e) => handleSpecHeaderChange(index, e.target.value)} placeholder={`Kolom ${index + 1}`} />
@@ -149,17 +149,23 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                  <div className="space-y-2">
                     <Label className="text-sm font-semibold">Baris Data</Label>
                     {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => (
-                        <div key={rowIndex} className="flex items-start gap-2 p-2 border rounded-md">
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 flex-grow" style={{ gridTemplateColumns: `repeat(${specifications.headers.length || 1}, minmax(0, 1fr))` }}>
+                        <div key={rowIndex} className="flex flex-col gap-2 p-4 border rounded-md">
+                           <div className="flex justify-between items-center">
+                             <Label className="text-xs font-semibold text-muted-foreground">Baris {rowIndex + 1}</Label>
+                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                           </div>
+                           <div className="flex flex-col gap-4">
                                 {row.map((cell, colIndex) => (
+                                   <div key={colIndex} className="space-y-1">
+                                    <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
                                     <RichTextEditor
                                         key={`${rowIndex}-${colIndex}`}
                                         defaultValue={cell}
                                         onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
                                     />
+                                   </div>
                                 ))}
                             </div>
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-9 w-9 shrink-0 mt-1"><Trash2 className="h-4 w-4" /></Button>
                         </div>
                     ))}
                     <Button type="button" variant="outline" size="sm" onClick={addSpecRow}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Baris</Button>
