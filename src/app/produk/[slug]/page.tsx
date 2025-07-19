@@ -262,7 +262,7 @@ export default async function ProductDetailPage({ params }: Props) {
       </div>
       
       <section className="bg-background py-16 md:py-24">
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4">
             <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">Spesifikasi</h2>
             <Accordion type="multiple" className="w-full space-y-4">
                 <SpecificationAccordion title="Spesifikasi Teknis" specs={techSpecs} />
