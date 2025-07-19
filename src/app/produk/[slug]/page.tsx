@@ -141,36 +141,36 @@ const Breadcrumbs = ({ productTitle }: { productTitle: string }) => (
   </nav>
 );
 
-const SpecificationTable = ({ title, specs }: { title: string, specs: Specifications }) => {
+const SpecificationAccordion = ({ title, specs }: { title: string, specs: Specifications }) => {
   if (!specs || !specs.headers || specs.headers.length === 0 || specs.rows.length === 0) {
     return null;
   }
   return (
-    <section className="bg-background py-16 md:py-24">
-      <div className="container mx-auto px-4">
-        <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">{title}</h2>
-        <div className="overflow-x-auto rounded-lg border bg-card mt-2 max-w-4xl mx-auto shadow-lg">
-            <Table>
-                <TableHeader>
-                  <TableRow>
-                    {specs.headers.map((header, index) => (
-                      <TableHead key={index}>{header}</TableHead>
+    <AccordionItem value={title}>
+        <AccordionTrigger className="text-xl font-headline font-bold text-primary">{title}</AccordionTrigger>
+        <AccordionContent>
+            <div className="overflow-x-auto rounded-lg border bg-card mt-2">
+                <Table>
+                    <TableHeader>
+                      <TableRow>
+                        {specs.headers.map((header, index) => (
+                          <TableHead key={index}>{header}</TableHead>
+                        ))}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                    {specs.rows.map((row, rowIndex) => (
+                        <TableRow key={rowIndex}>
+                          {row.map((cell, cellIndex) => (
+                            <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
+                          ))}
+                        </TableRow>
                     ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                {specs.rows.map((row, rowIndex) => (
-                    <TableRow key={rowIndex}>
-                      {row.map((cell, cellIndex) => (
-                        <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
-                      ))}
-                    </TableRow>
-                ))}
-                </TableBody>
-            </Table>
-        </div>
-      </div>
-    </section>
+                    </TableBody>
+                </Table>
+            </div>
+        </AccordionContent>
+    </AccordionItem>
   )
 }
 
@@ -261,8 +261,15 @@ export default async function ProductDetailPage({ params }: Props) {
         </div>
       </div>
       
-      <SpecificationTable title="Spesifikasi Teknis" specs={techSpecs} />
-      <SpecificationTable title="Spesifikasi Umum" specs={generalSpecs} />
+      <section className="bg-background py-16 md:py-24">
+        <div className="container mx-auto px-4 max-w-4xl">
+            <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">Spesifikasi</h2>
+            <Accordion type="multiple" className="w-full space-y-4">
+                <SpecificationAccordion title="Spesifikasi Teknis" specs={techSpecs} />
+                <SpecificationAccordion title="Spesifikasi Umum" specs={generalSpecs} />
+            </Accordion>
+        </div>
+      </section>
       
       <RelatedProducts products={relatedProducts} />
     </>
