@@ -3,22 +3,18 @@ import HomeClientPage from './home-client-page';
 import prisma from '@/lib/db';
 import { getSettings } from '@/lib/settings';
 
-const parseJsonField = (field: any, fallback: any[] = []) => {
+const parseJsonField = (field: any, fallback: any = []) => {
     if (typeof field === 'string') {
         try {
             const parsed = JSON.parse(field);
-            // Check if the parsed result is an array, otherwise return fallback
-            return Array.isArray(parsed) ? parsed : fallback;
+            return parsed;
         } catch (e) {
-            // If parsing fails, return the fallback
             return fallback;
         }
     }
-    // If it's already an array, return it
-    if (Array.isArray(field)) {
+    if (typeof field === 'object' && field !== null) {
         return field;
     }
-    // For any other case, return fallback
     return fallback;
 };
 
@@ -27,19 +23,33 @@ async function getHomePageData() {
   const productsRaw = await prisma.product.findMany({
     take: 3,
     orderBy: { createdAt: 'desc' },
-    include: {
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      images: true,
+      description: true,
       subCategory: {
-        include: {
-          category: true,
-        },
-      },
-    },
+        select: {
+          name: true,
+          category: {
+            select: {
+              name: true
+            }
+          }
+        }
+      }
+    }
   });
 
   const products = productsRaw.map(product => {
     return {
       ...product,
+      // Ensure fields that might not be selected are handled, even though we select them now.
       images: parseJsonField(product.images, []),
+      features: [], // Not needed for home page card
+      technicalSpecifications: { headers: [], rows: [] }, // Not needed
+      generalSpecifications: { headers: [], rows: [] }, // Not needed
     };
   });
 

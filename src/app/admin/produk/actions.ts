@@ -191,7 +191,10 @@ export async function updateProduct(prevState: { message: string, success?: bool
 
 export async function deleteProduct(productId: number) {
   try {
-    const product = await prisma.product.findUnique({ where: { id: productId }});
+    const product = await prisma.product.findUnique({ 
+        where: { id: productId },
+        select: { slug: true } // Only select the slug
+    });
     if (product) {
         await prisma.product.delete({ where: { id: productId } });
         revalidatePath('/admin/produk');

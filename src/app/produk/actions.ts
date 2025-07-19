@@ -1,4 +1,5 @@
 
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -7,9 +8,15 @@ import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
 const FeatureSchema = z.object({
-  title: z.string(),
-  description: z.string(),
+  title: z.string().default(''),
+  description: z.string().default(''),
 });
+
+const SpecificationSchema = z.object({
+  headers: z.array(z.string()).default([]),
+  rows: z.array(z.array(z.string())).default([]),
+});
+
 
 const ProductSchema = z.object({
   title: z.string().min(1, 'Judul tidak boleh kosong'),
@@ -42,15 +49,29 @@ const ProductSchema = z.object({
       return z.NEVER;
     }
   }),
-  specifications: z.string().transform((str, ctx) => {
+  technicalSpecifications: z.string().transform((str, ctx) => {
     try {
       const parsed = JSON.parse(str);
-      if (typeof parsed === 'object' && parsed !== null) { // More flexible check for object/array
-        return parsed;
+      const result = SpecificationSchema.safeParse(parsed);
+       if (result.success) {
+        return result.data;
       }
       throw new Error();
     } catch (e) {
-      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi tidak valid' });
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi teknis tidak valid' });
+      return z.NEVER;
+    }
+  }),
+  generalSpecifications: z.string().transform((str, ctx) => {
+    try {
+      const parsed = JSON.parse(str);
+      const result = SpecificationSchema.safeParse(parsed);
+       if (result.success) {
+        return result.data;
+      }
+      throw new Error();
+    } catch (e) {
+      ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi umum tidak valid' });
       return z.NEVER;
     }
   }),
@@ -74,7 +95,8 @@ export async function createProduct(prevState: { message: string, success?: bool
     longDescription: formData.get('longDescription'),
     images: formData.get('images'),
     features: formData.get('features'),
-    specifications: formData.get('specifications'),
+    technicalSpecifications: formData.get('technicalSpecifications'),
+    generalSpecifications: formData.get('generalSpecifications'),
     metaTitle: formData.get('metaTitle'),
     metaDescription: formData.get('metaDescription'),
     tokopediaUrl: formData.get('tokopediaUrl'),
@@ -98,6 +120,9 @@ export async function createProduct(prevState: { message: string, success?: bool
     await prisma.product.create({
       data: {
         ...rest,
+        // Prisma expects a JsonValue for Json fields
+        technicalSpecifications: rest.technicalSpecifications as any,
+        generalSpecifications: rest.generalSpecifications as any,
       },
     });
 
@@ -107,7 +132,7 @@ export async function createProduct(prevState: { message: string, success?: bool
   }
   
   revalidatePath('/admin/produk');
-  revalidatePath('/produk', 'layout');
+  revalidatePath('/produk');
   revalidatePath(`/produk/${rest.slug}`);
   redirect('/admin/produk');
 }
@@ -122,7 +147,8 @@ export async function updateProduct(prevState: { message: string, success?: bool
         longDescription: formData.get('longDescription'),
         images: formData.get('images'),
         features: formData.get('features'),
-        specifications: formData.get('specifications'),
+        technicalSpecifications: formData.get('technicalSpecifications'),
+        generalSpecifications: formData.get('generalSpecifications'),
         metaTitle: formData.get('metaTitle'),
         metaDescription: formData.get('metaDescription'),
         tokopediaUrl: formData.get('tokopediaUrl'),
@@ -147,6 +173,8 @@ export async function updateProduct(prevState: { message: string, success?: bool
             where: { id },
             data: {
                 ...rest,
+                technicalSpecifications: rest.technicalSpecifications as any,
+                generalSpecifications: rest.generalSpecifications as any,
             },
         });
 
@@ -156,14 +184,17 @@ export async function updateProduct(prevState: { message: string, success?: bool
     }
 
     revalidatePath('/admin/produk');
-    revalidatePath('/produk', 'layout');
+    revalidatePath('/produk');
     revalidatePath(`/produk/${rest.slug}`);
     redirect('/admin/produk');
 }
 
 export async function deleteProduct(productId: number) {
   try {
-    const product = await prisma.product.findUnique({ where: { id: productId }});
+    const product = await prisma.product.findUnique({ 
+        where: { id: productId },
+        select: { slug: true } // Only select the slug
+    });
     if (product) {
         await prisma.product.delete({ where: { id: productId } });
         revalidatePath('/admin/produk');
