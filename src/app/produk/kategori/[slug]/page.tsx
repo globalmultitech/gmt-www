@@ -6,32 +6,43 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+const toSlug = (name: string) => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/ /g, '-')
+      .replace(/[^\w-]+/g, '');
+};
+
+async function getAllCategories() {
+    return prisma.productCategory.findMany({
+        include: {
+            subCategories: {
+                orderBy: { name: 'asc' },
+            },
+        },
+    });
+}
+
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
-    where: { slug: { not: '' } },
-    select: { slug: true },
+    select: { name: true },
   });
  
   return categories.map((category) => ({
-    slug: category.slug,
+    slug: toSlug(category.name),
   }));
 }
 
 async function getCategoryDataBySlug(slug: string) {
-  const categoryWithDetails = await prisma.productCategory.findUnique({
-    where: { slug },
-    include: {
-      subCategories: {
-        orderBy: { name: 'asc' },
-      },
-    },
-  });
-
-  if (!categoryWithDetails) {
+  const categories = await getAllCategories();
+  const category = categories.find(c => toSlug(c.name) === slug);
+  
+  if (!category) {
       return null;
   }
 
-  return { category: categoryWithDetails, subCategories: categoryWithDetails.subCategories };
+  return { category, subCategories: category.subCategories };
 }
 
 
@@ -81,15 +92,6 @@ export default async function CategoryPage({ params }: Props) {
   
   const { category, subCategories } = data;
   
-  const toSlug = (name: string) => {
-    if (!name) return '';
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
-  }
-
   return (
     <>
       {/* Page Header */}

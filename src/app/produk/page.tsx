@@ -1,5 +1,5 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
 import { ArrowRight, Package } from 'lucide-react';
 import Image from 'next/image';
@@ -34,9 +34,8 @@ export default async function ProdukPage() {
     if (!name) return '';
     return name
       .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-');
+      .replace(/ /g, '-')
+      .replace(/[^\w-]+/g, '');
   };
 
   return (
