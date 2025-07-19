@@ -24,6 +24,7 @@ import { useFormStatus } from 'react-dom';
 import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import RichTextEditor from './rich-text-editor';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type CategoryWithSubCategories = ProductCategory & {
   subCategories: ProductSubCategory[];
@@ -148,26 +149,30 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                 {/* Rows */}
                  <div className="space-y-2">
                     <Label className="text-sm font-semibold">Baris Data</Label>
-                    {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => (
-                        <div key={rowIndex} className="flex flex-col gap-2 p-4 border rounded-md">
-                           <div className="flex justify-between items-center">
-                             <Label className="text-xs font-semibold text-muted-foreground">Baris {rowIndex + 1}</Label>
-                             <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                           </div>
-                           <div className="flex flex-col gap-4">
-                                {row.map((cell, colIndex) => (
-                                   <div key={colIndex} className="space-y-1">
-                                    <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
-                                    <RichTextEditor
-                                        key={`${rowIndex}-${colIndex}`}
-                                        defaultValue={cell}
-                                        onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
-                                    />
-                                   </div>
-                                ))}
-                            </div>
-                        </div>
-                    ))}
+                    <Accordion type="multiple" className="w-full space-y-2">
+                      {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => (
+                          <AccordionItem value={`spec-row-${rowIndex}`} key={rowIndex} className="border rounded-md px-4 bg-card">
+                              <div className="flex justify-between items-center">
+                                <AccordionTrigger className="text-sm font-medium flex-grow py-3">Baris {rowIndex + 1}</AccordionTrigger>
+                                <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                              </div>
+                              <AccordionContent>
+                                  <div className="flex flex-col gap-4 pt-2">
+                                      {row.map((cell, colIndex) => (
+                                        <div key={colIndex} className="space-y-1">
+                                          <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
+                                          <RichTextEditor
+                                              key={`${rowIndex}-${colIndex}`}
+                                              defaultValue={cell}
+                                              onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
+                                          />
+                                        </div>
+                                      ))}
+                                  </div>
+                              </AccordionContent>
+                          </AccordionItem>
+                      ))}
+                    </Accordion>
                     <Button type="button" variant="outline" size="sm" onClick={addSpecRow}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Baris</Button>
                 </div>
             </div>
@@ -339,26 +344,35 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                     <CardHeader>
                         <CardTitle>Fitur Utama</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                        <div className="space-y-4">
-                        {features.map((feature, index) => (
-                          <div key={index} className="border p-4 rounded-md space-y-2 relative">
-                            <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-8 w-8 absolute top-2 right-2"><Trash2 className="h-4 w-4" /></Button>
-                            <div className='space-y-1'>
-                                <Label htmlFor={`feature-title-${index}`}>Judul Fitur {index + 1}</Label>
-                                <Input id={`feature-title-${index}`} value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
-                            </div>
-                            <div className='space-y-1'>
-                                 <Label>Deskripsi Fitur {index + 1}</Label>
-                                 <RichTextEditor
-                                    key={`feature-desc-${index}-${feature.description}`}
-                                    defaultValue={feature.description}
-                                    onUpdate={({ editor }) => handleFeatureChange(index, 'description', editor.getHTML())}
-                                 />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
+                    <CardContent className="space-y-2">
+                      <Accordion type="multiple" className="w-full space-y-2">
+                          {features.map((feature, index) => (
+                              <AccordionItem value={`feature-${index}`} key={index} className="border rounded-md px-4 bg-card">
+                                  <div className="flex justify-between items-center">
+                                      <AccordionTrigger className="text-sm font-medium flex-grow py-3">
+                                          Fitur: {feature.title || `Fitur Baru ${index + 1}`}
+                                      </AccordionTrigger>
+                                      <Button type="button" variant="ghost" size="icon" onClick={() => removeFeature(index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                                  </div>
+                                  <AccordionContent>
+                                      <div className="space-y-4 pt-2">
+                                          <div className='space-y-1'>
+                                              <Label htmlFor={`feature-title-${index}`}>Judul Fitur</Label>
+                                              <Input id={`feature-title-${index}`} value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
+                                          </div>
+                                          <div className='space-y-1'>
+                                              <Label>Deskripsi Fitur</Label>
+                                              <RichTextEditor
+                                                  key={`feature-desc-${index}-${feature.description}`}
+                                                  defaultValue={feature.description}
+                                                  onUpdate={({ editor }) => handleFeatureChange(index, 'description', editor.getHTML())}
+                                              />
+                                          </div>
+                                      </div>
+                                  </AccordionContent>
+                              </AccordionItem>
+                          ))}
+                      </Accordion>
                       <Button type="button" variant="outline" size="sm" onClick={addFeature} className="mt-2"><PlusCircle className="mr-2 h-4 w-4" /> Tambah Fitur</Button>
                     </CardContent>
                 </Card>
