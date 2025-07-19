@@ -13,6 +13,7 @@ import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import type { PartnerLogo, CustomerLogo } from '@prisma/client';
+import { Textarea } from '@/components/ui/textarea';
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
@@ -146,23 +147,21 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
           <CardContent className="space-y-4 pt-6">
               {logos.map((logo, index) => (
                   <div key={logo.id} className="flex items-end gap-4 p-2 border rounded-md">
-                      <div className="relative w-24 h-16 rounded-md bg-muted overflow-hidden border">
-                          {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill sizes="96px" className="object-contain p-1" /> ) : <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />}
-                      </div>
-                      <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label className="text-xs">File Gambar Logo</Label>
+                            <Input value={logo.src} disabled placeholder="Unggah gambar untuk mendapatkan URL" />
+                            <div className="flex items-center gap-2 pt-1">
+                                <Input type="file" onChange={(e) => onUpload(e, arrayName, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`${arrayName}-${index}`]} />
+                                {uploadingStates[`${arrayName}-${index}`] && <Loader2 className="animate-spin" />}
+                            </div>
+                        </div>
                         <div className="space-y-1">
                             <Label className="text-xs">Nama / Alt Text</Label>
                             <Input value={logo.alt} onChange={e => onChange(arrayName, index, 'alt', e.target.value)} />
                         </div>
-                        <div className="space-y-1">
-                          <Label className="text-xs">File Gambar Logo</Label>
-                          <div className="flex items-center gap-2">
-                            <Input type="file" onChange={(e) => onUpload(e, arrayName, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`${arrayName}-${index}`]} />
-                            {uploadingStates[`${arrayName}-${index}`] && <Loader2 className="animate-spin" />}
-                          </div>
-                        </div>
                       </div>
-                      <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(arrayName, index)} className="text-destructive h-9 w-9"><Trash2 className="h-4 w-4" /></Button>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(arrayName, index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
                   </div>
               ))}
               <Button type="button" variant="outline" onClick={() => onAdd(arrayName)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo</Button>
