@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Home, ChevronRight, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
@@ -6,20 +7,27 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
+const toSlug = (name: string) => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+};
+
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
-    where: { slug: { not: '' } },
-    select: { slug: true },
+    select: { name: true },
   });
  
   return categories.map((category) => ({
-    slug: category.slug,
+    slug: toSlug(category.name),
   }));
 }
 
 async function getCategoryDataBySlug(slug: string) {
-  const category = await prisma.productCategory.findUnique({
-      where: { slug },
+  const allCategories = await prisma.productCategory.findMany({
       include: {
         subCategories: {
             orderBy: { name: 'asc' },
@@ -30,6 +38,8 @@ async function getCategoryDataBySlug(slug: string) {
         },
     },
   });
+
+  const category = allCategories.find(c => toSlug(c.name) === slug);
   
   if (!category) {
       return null;
@@ -65,15 +75,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { categoryName: string, categorySlug: string, subCategoryName?: string }) => {
-    const toSlug = (name: string) => {
-        if (!name) return '';
-        return name
-          .toLowerCase()
-          .replace(/[^a-z0-9\s-]/g, '')
-          .replace(/\s+/g, '-')
-          .replace(/-+/g, '-');
-    };
-    
     return (
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
         <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
@@ -118,9 +119,9 @@ export default async function CategoryPage({ params }: Props) {
       {/* Page Header */}
       <section className="bg-secondary pt-20">
         <div className="container mx-auto px-4 py-8">
-            <Breadcrumbs categoryName={category.name} categorySlug={category.slug} />
+            <Breadcrumbs categoryName={category.name} categorySlug={slug} />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{category.name}</h1>
-            <p className="mt-2 text-lg text-muted-foreground text-justify">
+            <p className="mt-2 text-lg text-muted-foreground">
               {category.description}
             </p>
         </div>
