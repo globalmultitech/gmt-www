@@ -237,7 +237,7 @@ export default async function ProductDetailPage({ params }: Props) {
                               {specifications.rows.map((row, rowIndex) => (
                                   <TableRow key={rowIndex}>
                                     {row.map((cell, cellIndex) => (
-                                      <TableCell key={cellIndex} className="text-muted-foreground">{cell}</TableCell>
+                                      <TableCell key={cellIndex} className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: cell }} />
                                     ))}
                                   </TableRow>
                               ))}
@@ -257,3 +257,5 @@ export default async function ProductDetailPage({ params }: Props) {
     </>
   );
 }
+
+    

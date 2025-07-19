@@ -322,13 +322,17 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                              <div className="space-y-2">
                                 <Label className="text-sm font-semibold">Baris Data</Label>
                                 {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => (
-                                    <div key={rowIndex} className="flex items-center gap-2 p-2 border rounded-md">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 flex-grow" style={{ gridTemplateColumns: `repeat(${specifications.headers.length}, minmax(0, 1fr))` }}>
+                                    <div key={rowIndex} className="flex items-start gap-2 p-2 border rounded-md">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 flex-grow" style={{ gridTemplateColumns: `repeat(${specifications.headers.length || 1}, minmax(0, 1fr))` }}>
                                             {row.map((cell, colIndex) => (
-                                                <Input key={colIndex} value={cell} onChange={(e) => handleSpecRowChange(rowIndex, colIndex, e.target.value)} placeholder={specifications.headers[colIndex] || `Data ${colIndex + 1}`} />
+                                                <RichTextEditor
+                                                    key={colIndex}
+                                                    defaultValue={cell}
+                                                    onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
+                                                />
                                             ))}
                                         </div>
-                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-9 w-9 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                                        <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecRow(rowIndex)} className="text-destructive h-9 w-9 shrink-0 mt-1"><Trash2 className="h-4 w-4" /></Button>
                                     </div>
                                 ))}
                                 <Button type="button" variant="outline" size="sm" onClick={addSpecRow}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Baris</Button>
@@ -404,3 +408,5 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     </form>
   )
 }
+
+    
