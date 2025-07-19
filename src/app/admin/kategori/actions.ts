@@ -51,15 +51,16 @@ export async function createCategory(prevState: { message: string } | undefined,
 
   try {
     const { name, ...rest } = validatedFields.data;
+    const slug = toSlug(name);
     
-    const existingName = await prisma.productCategory.findFirst({ where: { name } });
+    const existingName = await prisma.productCategory.findFirst({ where: { OR: [{ name }, { slug }] } });
     if(existingName) {
       return { message: 'Nama kategori atau URL slug sudah digunakan.'}
     }
 
-    await prisma.productCategory.create({ data: { name, ...rest } });
+    await prisma.productCategory.create({ data: { name, slug, ...rest } });
     revalidatePath('/admin/kategori');
-    revalidatePath('/produk');
+    revalidatePath('/produk', 'layout');
     revalidatePath('/produk/kategori', 'layout');
     return { message: 'Kategori berhasil dibuat.' };
   } catch (e) {
@@ -82,15 +83,16 @@ export async function updateCategory(prevState: { message: string } | undefined,
   
   try {
     const { name, ...rest } = validatedFields.data;
+    const slug = toSlug(name);
 
-    const existingName = await prisma.productCategory.findFirst({ where: { name, NOT: {id} } });
+    const existingName = await prisma.productCategory.findFirst({ where: { OR: [{ name }, { slug }], NOT: {id} } });
     if(existingName) {
       return { message: 'Nama kategori atau URL slug sudah digunakan.'}
     }
 
-    await prisma.productCategory.update({ where: { id }, data: { name, ...rest } });
+    await prisma.productCategory.update({ where: { id }, data: { name, slug, ...rest } });
     revalidatePath('/admin/kategori');
-    revalidatePath('/produk');
+    revalidatePath('/produk', 'layout');
     revalidatePath('/produk/kategori', 'layout');
     return { message: 'Kategori berhasil diperbarui.' };
   } catch (e) {
@@ -102,7 +104,7 @@ export async function deleteCategory(id: number) {
   try {
     await prisma.productCategory.delete({ where: { id } });
     revalidatePath('/admin/kategori');
-    revalidatePath('/produk');
+    revalidatePath('/produk', 'layout');
     revalidatePath('/produk/kategori', 'layout');
     return { message: 'Kategori berhasil dihapus.' };
   } catch (e) {

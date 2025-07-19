@@ -6,37 +6,30 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-const toSlug = (name: string) => {
-    if (!name) return '';
-    return name
-      .toLowerCase()
-      .replace(/ /g, '-')
-      .replace(/[^\w-]+/g, '');
-};
-
-async function getAllCategories() {
-    return prisma.productCategory.findMany({
-        include: {
-            subCategories: {
-                orderBy: { name: 'asc' },
-            },
-        },
-    });
-}
-
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
-    select: { name: true },
+    where: { slug: { not: '' } },
+    select: { slug: true },
   });
  
   return categories.map((category) => ({
-    slug: toSlug(category.name),
+    slug: category.slug,
   }));
 }
 
 async function getCategoryDataBySlug(slug: string) {
-  const categories = await getAllCategories();
-  const category = categories.find(c => toSlug(c.name) === slug);
+  const category = await prisma.productCategory.findUnique({
+      where: { slug },
+      include: {
+        subCategories: {
+            orderBy: { name: 'asc' },
+            select: {
+                id: true,
+                name: true,
+            }
+        },
+    },
+  });
   
   if (!category) {
       return null;
@@ -71,15 +64,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Breadcrumbs = ({ categoryName }: { categoryName: string }) => (
-  <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-    <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
-    <ChevronRight className="h-4 w-4" />
-    <Link href="/produk" className="hover:text-primary">Produk</Link>
-    <ChevronRight className="h-4 w-4" />
-    <span className="font-semibold text-foreground">{categoryName}</span>
-  </nav>
-);
+const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { categoryName: string, categorySlug: string, subCategoryName?: string }) => {
+    const toSlug = (name: string) => {
+        if (!name) return '';
+        return name
+          .toLowerCase()
+          .replace(/[^a-z0-9\s-]/g, '')
+          .replace(/\s+/g, '-')
+          .replace(/-+/g, '-');
+    };
+    
+    return (
+      <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
+        <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+        <ChevronRight className="h-4 w-4" />
+        <Link href="/produk" className="hover:text-primary">Produk</Link>
+        <ChevronRight className="h-4 w-4" />
+        {subCategoryName ? (
+            <>
+                <Link href={`/produk/kategori/${categorySlug}`} className="hover:text-primary">{categoryName}</Link>
+                <ChevronRight className="h-4 w-4" />
+                <span className="font-semibold text-foreground">{subCategoryName}</span>
+            </>
+        ) : (
+            <span className="font-semibold text-foreground">{categoryName}</span>
+        )}
+      </nav>
+    );
+};
 
 
 export default async function CategoryPage({ params }: Props) {
@@ -91,13 +103,22 @@ export default async function CategoryPage({ params }: Props) {
   }
   
   const { category, subCategories } = data;
+
+  const toSubCategorySlug = (name: string) => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  };
   
   return (
     <>
       {/* Page Header */}
       <section className="bg-secondary pt-20">
         <div className="container mx-auto px-4 py-8">
-            <Breadcrumbs categoryName={category.name} />
+            <Breadcrumbs categoryName={category.name} categorySlug={category.slug} />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{category.name}</h1>
             <p className="mt-2 text-lg text-muted-foreground text-justify">
               {category.description}
@@ -112,7 +133,7 @@ export default async function CategoryPage({ params }: Props) {
           {subCategories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {subCategories.map((subCategory) => (
-                <Link key={subCategory.id} href={`/produk/sub-kategori/${toSlug(subCategory.name)}`} className="group block">
+                <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block">
                     <Card className="h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
                       <CardContent className="p-6 flex justify-between items-center">
                         <span className="font-semibold text-lg">{subCategory.name}</span>
