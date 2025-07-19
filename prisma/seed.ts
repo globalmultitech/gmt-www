@@ -419,7 +419,6 @@ async function main() {
   const hardwareCategory = await prisma.productCategory.create({
     data: { 
       name: 'Perangkat Keras',
-      slug: 'perangkat-keras',
       description: 'Solusi perangkat keras inovatif untuk perbankan dan layanan keuangan, dirancang untuk keandalan dan efisiensi.',
       imageUrl: 'https://placehold.co/600x400.png'
     },
@@ -428,7 +427,6 @@ async function main() {
   const softwareCategory = await prisma.productCategory.create({
     data: { 
       name: 'Perangkat Lunak',
-      slug: 'perangkat-lunak',
       description: 'Aplikasi dan platform canggih untuk mengoptimalkan operasional, meningkatkan layanan, dan mendorong transformasi digital.',
       imageUrl: 'https://placehold.co/600x400.png'
     },
@@ -645,3 +643,4 @@ main()
     
 
     
+

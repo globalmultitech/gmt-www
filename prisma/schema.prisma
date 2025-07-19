@@ -13,15 +13,15 @@ datasource db {
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
   password  String
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 model WebSettings {
   id                         Int     @id @default(1)
-  logoUrl                    String? @db.Text
+  logoUrl                    String?
   companyName                String?
   whatsappSales              String?
   footerText                 String? @db.Text
@@ -33,7 +33,7 @@ model WebSettings {
   menuItems                  Json?
   heroHeadline               String?
   heroDescription            String? @db.Text
-  heroImageUrl               String? @db.Text
+  heroImageUrl               String?
   heroButton1Text            String?
   heroButton1Link            String?
   heroButton2Text            String?
@@ -42,24 +42,25 @@ model WebSettings {
   aboutUsSubtitle            String?
   aboutUsTitle               String?
   aboutUsDescription         String? @db.Text
-  aboutUsImageUrl            String? @db.Text
+  aboutUsImageUrl            String?
   aboutUsChecklist           Json?
   servicesSubtitle           String?
   servicesTitle              String?
   servicesDescription        String? @db.Text
   ctaHeadline                String?
   ctaDescription             String? @db.Text
-  ctaImageUrl                String? @db.Text
+  ctaImageUrl                String?
   ctaButtonText              String?
   ctaButtonLink              String?
   trustedByText              String?
   trustedByLogos             Json?
   testimonials               Json?
+  // Page specific settings
   servicesPageTitle          String?
   servicesPageSubtitle       String? @db.Text
   servicesPageCommitmentTitle String?
   servicesPageCommitmentText String? @db.Text
-  servicesPageHeaderImageUrl String? @db.Text
+  servicesPageHeaderImageUrl String?
   solutionsPageTitle         String?
   solutionsPageSubtitle      String? @db.Text
   aboutPageTitle             String?
@@ -70,16 +71,69 @@ model WebSettings {
   visionText                 String? @db.Text
   resourcesPageTitle         String?
   resourcesPageSubtitle      String? @db.Text
+  // Timestamps
   createdAt                  DateTime @default(now())
   updatedAt                  DateTime @updatedAt
+}
+
+model ProfessionalService {
+  id               Int      @id @default(autoincrement())
+  icon             String
+  title            String
+  slug             String   @unique
+  description      String   @db.Text
+  longDescription  String?  @db.Text
+  imageUrl         String?
+  details          Json
+  benefits         Json
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Solution {
+  id          Int       @id @default(autoincrement())
+  icon        String
+  title       String
+  slug        String    @unique
+  description String    @db.Text
+  image       String?
+  aiHint      String?
+  keyPoints   Json
+  parentId    Int?
+  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Solution[] @relation("SolutionHierarchy")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model PartnerLogo {
+  id  Int    @id @default(autoincrement())
+  src String
+  alt String
+}
+
+model CustomerLogo {
+  id  Int    @id @default(autoincrement())
+  src String
+  alt String
+}
+
+model NewsItem {
+  id        Int      @id @default(autoincrement())
+  title     String
+  slug      String   @unique
+  category  String
+  image     String?
+  content   String?  @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
   name          String               @unique
-  slug          String               @unique
   description   String?              @db.Text
-  imageUrl      String?              @db.Text
+  imageUrl      String?
   subCategories ProductSubCategory[]
 }
 
@@ -95,71 +149,18 @@ model Product {
   id                      Int                @id @default(autoincrement())
   title                   String
   slug                    String             @unique
-  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  subCategoryId           Int
   description             String             @db.Text
   longDescription         String?            @db.Text
-  images                  Json?
-  features                Json?
-  technicalSpecifications Json?
-  generalSpecifications   Json?
+  images                  Json
+  features                Json
+  technicalSpecifications Json
+  generalSpecifications   Json
   metaTitle               String?
   metaDescription         String?            @db.Text
   tokopediaUrl            String?
   shopeeUrl               String?
+  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId           Int
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
-}
-
-model ProfessionalService {
-  id              Int      @id @default(autoincrement())
-  icon            String
-  title           String
-  slug            String   @unique
-  description     String   @db.Text
-  longDescription String?  @db.Text
-  imageUrl        String?  @db.Text
-  details         Json?
-  benefits        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-}
-
-model Solution {
-  id          Int       @id @default(autoincrement())
-  icon        String
-  title       String
-  slug        String    @unique
-  description String    @db.Text
-  image       String?   @db.Text
-  aiHint      String?
-  keyPoints   Json?
-  parentId    Int?
-  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
-  children    Solution[] @relation("SolutionHierarchy")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-}
-
-model PartnerLogo {
-  id  Int    @id @default(autoincrement())
-  src String @db.Text
-  alt String
-}
-
-model CustomerLogo {
-  id  Int    @id @default(autoincrement())
-  src String @db.Text
-  alt String
-}
-
-model NewsItem {
-  id        Int      @id @default(autoincrement())
-  title     String
-  slug      String   @unique
-  category  String
-  image     String?  @db.Text
-  content   String?  @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }

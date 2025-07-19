@@ -51,14 +51,13 @@ export async function createCategory(prevState: { message: string } | undefined,
 
   try {
     const { name, ...rest } = validatedFields.data;
-    const slug = toSlug(name);
     
-    const existingName = await prisma.productCategory.findFirst({ where: { OR: [{name}, {slug}] } });
+    const existingName = await prisma.productCategory.findFirst({ where: { name } });
     if(existingName) {
       return { message: 'Nama kategori atau URL slug sudah digunakan.'}
     }
 
-    await prisma.productCategory.create({ data: { name, slug, ...rest } });
+    await prisma.productCategory.create({ data: { name, ...rest } });
     revalidatePath('/admin/kategori');
     revalidatePath('/produk');
     revalidatePath('/produk/kategori', 'layout');
@@ -83,14 +82,13 @@ export async function updateCategory(prevState: { message: string } | undefined,
   
   try {
     const { name, ...rest } = validatedFields.data;
-    const slug = toSlug(name);
 
-    const existingName = await prisma.productCategory.findFirst({ where: { OR: [{name}, {slug}], NOT: {id} } });
+    const existingName = await prisma.productCategory.findFirst({ where: { name, NOT: {id} } });
     if(existingName) {
       return { message: 'Nama kategori atau URL slug sudah digunakan.'}
     }
 
-    await prisma.productCategory.update({ where: { id }, data: { name, slug, ...rest } });
+    await prisma.productCategory.update({ where: { id }, data: { name, ...rest } });
     revalidatePath('/admin/kategori');
     revalidatePath('/produk');
     revalidatePath('/produk/kategori', 'layout');
