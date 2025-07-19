@@ -22,6 +22,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import RichTextEditor from '@/app/admin/produk/rich-text-editor';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type KeyPoint = {
     title: string;
@@ -191,37 +192,48 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                     <CardHeader>
                         <CardTitle>Poin-poin Kunci</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
-                       {keyPoints.map((item, index) => (
-                            <div key={index} className="border p-4 rounded-md space-y-4 relative">
-                                <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setKeyPoints, index)} className="text-destructive h-8 w-8 absolute top-2 right-2"><Trash2 className="h-4 w-4" /></Button>
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                                    <div className="space-y-1">
-                                        <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
-                                        <Input id={`point-title-${index}`} value={item.title} onChange={(e) => handleArrayChange(setKeyPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Gambar (Opsional)</Label>
-                                        <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
-                                            {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                    <CardContent className="space-y-2">
+                       <Accordion type="multiple" className="w-full space-y-2">
+                        {keyPoints.map((item, index) => (
+                           <AccordionItem value={`point-${index}`} key={index} className="border rounded-md px-4 bg-card">
+                               <div className="flex justify-between items-center">
+                                   <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                                      <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
+                                   </AccordionTrigger>
+                                   <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setKeyPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                               </div>
+                               <AccordionContent>
+                                   <div className="border-t pt-4 space-y-4">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                            <div className="space-y-1">
+                                                <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
+                                                <Input id={`point-title-${index}`} value={item.title} onChange={(e) => handleArrayChange(setKeyPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label>Gambar (Opsional)</Label>
+                                                <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
+                                                    {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                                                </div>
+                                                <div className="flex items-center gap-4">
+                                                    <Input type="file" onChange={(e) => handleFileChange(e, 'keyPoints', index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`keyPoints-${index}`]} />
+                                                    {isUploading[`keyPoints-${index}`] && <Loader2 className="animate-spin" />}
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div className="flex items-center gap-4">
-                                            <Input type="file" onChange={(e) => handleFileChange(e, 'keyPoints', index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`keyPoints-${index}`]} />
-                                            {isUploading[`keyPoints-${index}`] && <Loader2 className="animate-spin" />}
+                                        <div>
+                                            <Label>Deskripsi Poin</Label>
+                                            <RichTextEditor
+                                                key={`point-desc-${index}-${item.description}`}
+                                                defaultValue={item.description}
+                                                onUpdate={({ editor }) => handleArrayChange(setKeyPoints, index, 'description', editor.getHTML())}
+                                            />
                                         </div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <Label>Deskripsi Poin</Label>
-                                    <RichTextEditor
-                                        key={`point-desc-${index}-${item.description}`}
-                                        defaultValue={item.description}
-                                        onUpdate={({ editor }) => handleArrayChange(setKeyPoints, index, 'description', editor.getHTML())}
-                                    />
-                                </div>
-                            </div>
+                                   </div>
+                               </AccordionContent>
+                           </AccordionItem>
                         ))}
-                        <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setKeyPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
+                       </Accordion>
+                       <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setKeyPoints)} className="mt-2"><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
                     </CardContent>
                 </Card>
             </div>

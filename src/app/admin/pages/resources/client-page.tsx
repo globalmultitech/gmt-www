@@ -14,6 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import Image from 'next/image';
 import type { NewsItem } from '@prisma/client';
 import { Textarea } from '@/components/ui/textarea';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
@@ -196,51 +197,62 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
               <CardTitle>Daftar Artikel/Berita</CardTitle>
               <CardDescription>Kelola daftar artikel yang ditampilkan di halaman Knowledge Center.</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-              {formState.newsItems.map((item, index) => (
-                  <div key={item.id} className="space-y-4 p-4 border rounded-md">
-                      <div className="flex items-start gap-4">
-                        <div className="flex-shrink-0 space-y-2">
-                          <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
-                            {/* @ts-ignore */}
-                            {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
-                          </div>
-                          <Input type="file" onChange={(e) => handleImageUpload(e, item.id)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[item.id]} className="w-40" />
+          <CardContent className="space-y-2">
+              <Accordion type="multiple" className="w-full space-y-2">
+                {formState.newsItems.map((item, index) => (
+                    <AccordionItem value={`article-${item.id}`} key={item.id} className="border rounded-md px-4 bg-card">
+                        <div className="flex justify-between items-center">
+                            <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                                <span className="truncate">Artikel: {item.title || `Artikel Baru ${index + 1}`}</span>
+                            </AccordionTrigger>
+                            <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
                         </div>
-                        <div className="flex-grow grid grid-cols-1 gap-2">
-                             <div className="grid grid-cols-2 gap-2">
+                        <AccordionContent>
+                           <div className="border-t pt-4 space-y-4">
+                                <div className="flex items-start gap-4">
+                                <div className="flex-shrink-0 space-y-2">
+                                <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
+                                    {/* @ts-ignore */}
+                                    {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
+                                </div>
+                                <Input type="file" onChange={(e) => handleImageUpload(e, item.id)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[item.id]} className="w-40" />
+                                </div>
+                                <div className="flex-grow grid grid-cols-1 gap-2">
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">Kategori</Label>
+                                            {/* @ts-ignore */}
+                                            <Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} />
+                                        </div>
+                                        <div className="space-y-1">
+                                            <Label className="text-xs">URL Slug</Label>
+                                            {/* @ts-ignore */}
+                                            <Input value={item.slug || ''} onChange={e => handleItemChange(index, 'slug', e.target.value)} disabled />
+                                        </div>
+                                    </div>
+                                    <div className="space-y-1">
+                                        <Label className="text-xs">Judul</Label>
+                                        <div className="flex gap-2">
+                                        {/* @ts-ignore */}
+                                        <Input value={item.title} onChange={e => handleTitleChange(index, e.target.value)} />
+                                        <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateContent(item.id)} disabled={generatingStates[item.id]}>
+                                            {generatingStates[item.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-primary" />}
+                                        </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                                </div>
                                 <div className="space-y-1">
-                                    <Label className="text-xs">Kategori</Label>
-                                    {/* @ts-ignore */}
-                                    <Input value={item.category} onChange={e => handleItemChange(index, 'category', e.target.value)} />
+                                <Label className="text-xs">Konten</Label>
+                                {/* @ts-ignore */}
+                                <Textarea value={item.content || ''} onChange={e => handleItemChange(index, 'content', e.target.value)} rows={8}/>
                                 </div>
-                                 <div className="space-y-1">
-                                    <Label className="text-xs">URL Slug</Label>
-                                    {/* @ts-ignore */}
-                                    <Input value={item.slug || ''} onChange={e => handleItemChange(index, 'slug', e.target.value)} disabled />
-                                </div>
-                             </div>
-                             <div className="space-y-1">
-                                <Label className="text-xs">Judul</Label>
-                                <div className="flex gap-2">
-                                  {/* @ts-ignore */}
-                                  <Input value={item.title} onChange={e => handleTitleChange(index, e.target.value)} />
-                                  <Button type="button" variant="outline" size="icon" onClick={() => handleGenerateContent(item.id)} disabled={generatingStates[item.id]}>
-                                      {generatingStates[item.id] ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4 text-primary" />}
-                                  </Button>
-                                </div>
-                            </div>
-                        </div>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeItem(index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                      </div>
-                      <div className="space-y-1">
-                        <Label className="text-xs">Konten</Label>
-                        {/* @ts-ignore */}
-                        <Textarea value={item.content || ''} onChange={e => handleItemChange(index, 'content', e.target.value)} rows={8}/>
-                      </div>
-                  </div>
-              ))}
-              <Button type="button" variant="outline" onClick={addItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Artikel</Button>
+                           </div>
+                        </AccordionContent>
+                    </AccordionItem>
+                ))}
+              </Accordion>
+              <Button type="button" variant="outline" onClick={addItem} className="mt-2"><PlusCircle className="mr-2 h-4 w-4" /> Tambah Artikel</Button>
           </CardContent>
       </Card>
       

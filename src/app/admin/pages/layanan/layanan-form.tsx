@@ -22,6 +22,7 @@ import Image from 'next/image';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import RichTextEditor from '@/app/admin/produk/rich-text-editor';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type DetailPoint = {
     title: string;
@@ -169,36 +170,47 @@ export function LayananForm({ service = null }: LayananFormProps) {
   const PointEditor = ({ title, points, setPoints, onUpload, onArrayChange, onAddItem, onRemoveItem }: any) => (
     <Card>
         <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-2">
+            <Accordion type="multiple" className="w-full space-y-2">
             {points.map((item: DetailPoint, index: number) => (
-                <div key={index} className="border p-4 rounded-md space-y-4 relative">
-                    <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveItem(setPoints, index)} className="text-destructive h-8 w-8 absolute top-2 right-2"><Trash2 className="h-4 w-4" /></Button>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                        <div className="space-y-1">
-                            <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
-                            <Input id={`point-title-${index}`} value={item.title} onChange={(e) => onArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
-                        </div>
-                        <div className="space-y-2">
-                            <Label>Gambar (Opsional)</Label>
-                            <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
-                                {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
-                            </div>
-                            <div className="flex items-center gap-4">
-                                <Input type="file" onChange={(e) => onUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`points-${index}`]} />
-                                {isUploading[`points-${index}`] && <Loader2 className="animate-spin" />}
-                            </div>
-                        </div>
+                <AccordionItem value={`point-${index}`} key={index} className="border rounded-md px-4 bg-card">
+                    <div className="flex justify-between items-center">
+                        <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                           <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
+                        </AccordionTrigger>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveItem(setPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
                     </div>
-                    <div>
-                        <Label>Deskripsi Poin</Label>
-                        <RichTextEditor
-                            key={`point-desc-${index}-${item.description}`}
-                            defaultValue={item.description}
-                            onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
-                        />
-                    </div>
-                </div>
+                    <AccordionContent>
+                        <div className="border-t pt-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                <div className="space-y-1">
+                                    <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
+                                    <Input id={`point-title-${index}`} value={item.title} onChange={(e) => onArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Gambar (Opsional)</Label>
+                                    <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
+                                        {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <Input type="file" onChange={(e: any) => onUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`points-${index}`]} />
+                                        {isUploading[`points-${index}`] && <Loader2 className="animate-spin" />}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <Label>Deskripsi Poin</Label>
+                                <RichTextEditor
+                                    key={`point-desc-${index}-${item.description}`}
+                                    defaultValue={item.description}
+                                    onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
+                                />
+                            </div>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
             ))}
+            </Accordion>
             <Button type="button" variant="outline" size="sm" onClick={() => onAddItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
         </CardContent>
     </Card>
