@@ -6,15 +6,6 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 
-const toSlug = (name: string) => {
-  if (!name) return '';
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
-
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
     where: { slug: { not: '' } },
@@ -89,6 +80,15 @@ export default async function CategoryPage({ params }: Props) {
   }
   
   const { category, subCategories } = data;
+  
+  const toSlug = (name: string) => {
+    if (!name) return '';
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-');
+  }
 
   return (
     <>
