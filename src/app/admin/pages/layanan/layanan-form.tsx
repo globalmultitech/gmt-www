@@ -25,7 +25,7 @@ import RichTextEditor from '@/app/admin/produk/rich-text-editor';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type DetailPoint = {
-    id: number | string; // Add id for stable key
+    id: number | string;
     title: string;
     image?: string;
     description: string;
@@ -76,6 +76,106 @@ const generateSlug = (title: string) => {
     .replace(/-+/g, '-');
 }
 
+// PointEditor Component - Moved outside of the main component
+const PointEditor = ({ title, points, setPoints, isUploading, setIsUploading, toast }: {
+  title: string;
+  points: DetailPoint[];
+  setPoints: React.Dispatch<React.SetStateAction<DetailPoint[]>>;
+  isUploading: { [key: string]: boolean };
+  setIsUploading: React.Dispatch<React.SetStateAction<{ [key: string]: boolean }>>;
+  toast: (options: any) => void;
+}) => {
+  
+  const handleArrayChange = (index: number, field: keyof DetailPoint, value: string) => {
+    setPoints(currentPoints => {
+        const newPoints = [...currentPoints];
+        newPoints[index] = { ...newPoints[index], [field]: value };
+        return newPoints;
+    });
+  };
+
+  const addArrayItem = () => {
+    setPoints(currentPoints => [...currentPoints, { id: `new-${Date.now()}`, title: '', description: '', image: '' }]);
+  };
+
+  const removeArrayItem = (index: number) => {
+    setPoints(currentPoints => currentPoints.filter((_, i) => i !== index));
+  };
+  
+  const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const uploadKey = `${title.toLowerCase()}-${index}`;
+    setIsUploading(prev => ({...prev, [uploadKey]: true}));
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) throw new Error("Gagal mengunggah gambar");
+      const { publicUrl } = await res.json();
+      
+      handleArrayChange(index, 'image', publicUrl);
+
+    } catch (error) {
+      toast({ title: 'Upload Gagal', variant: 'destructive' });
+    } finally {
+      setIsUploading(prev => ({...prev, [uploadKey]: false}));
+      event.target.value = '';
+    }
+  };
+  
+  return (
+  <Card>
+      <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+      <CardContent className="space-y-2">
+          <Accordion type="multiple" className="w-full space-y-2">
+          {points.map((item, index) => (
+              <AccordionItem value={`point-${item.id}`} key={item.id} className="border rounded-md px-4 bg-card">
+                  <div className="flex justify-between items-center">
+                      <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                         <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
+                      </AccordionTrigger>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+                  <AccordionContent>
+                      <div className="border-t pt-4 space-y-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                              <div className="space-y-1">
+                                  <Label htmlFor={`point-title-${item.id}`}>Judul Poin {index + 1}</Label>
+                                  <Input id={`point-title-${item.id}`} value={item.title} onChange={(e) => handleArrayChange(index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
+                              </div>
+                              <div className="space-y-2">
+                                  <Label>Gambar (Opsional)</Label>
+                                  <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
+                                      {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                                  </div>
+                                  <div className="flex items-center gap-4">
+                                      <Input type="file" onChange={(e: any) => handleUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`${title.toLowerCase()}-${index}`]} />
+                                      {isUploading[`${title.toLowerCase()}-${index}`] && <Loader2 className="animate-spin" />}
+                                  </div>
+                              </div>
+                          </div>
+                          <div>
+                              <Label>Deskripsi Poin</Label>
+                              <RichTextEditor
+                                  key={`point-desc-${item.id}`}
+                                  defaultValue={item.description}
+                                  onUpdate={({ editor }) => handleArrayChange(index, 'description', editor.getHTML())}
+                              />
+                          </div>
+                      </div>
+                  </AccordionContent>
+              </AccordionItem>
+          ))}
+          </Accordion>
+          <Button type="button" variant="outline" size="sm" onClick={addArrayItem}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
+      </CardContent>
+  </Card>
+  )};
+
 export function LayananForm({ service = null }: LayananFormProps) {
   const { toast } = useToast();
   const isEditing = !!service;
@@ -104,7 +204,6 @@ export function LayananForm({ service = null }: LayananFormProps) {
     
     if (!Array.isArray(parsed)) return fallback;
 
-    // Ensure each item has a unique ID for stable keys
     return parsed.map((item, index) => ({
         ...item,
         id: item.id || `item-${Date.now()}-${index}`,
@@ -120,11 +219,11 @@ export function LayananForm({ service = null }: LayananFormProps) {
     setSlug(generateSlug(newTitle));
   }
   
-  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: 'imageUrl' | 'details' | 'benefits', index?: number) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    const uploadKey = index !== undefined ? `${fieldName}-${index}` : fieldName;
+    const uploadKey = 'imageUrl';
     setIsUploading(prev => ({...prev, [uploadKey]: true}));
 
     const formData = new FormData();
@@ -135,12 +234,7 @@ export function LayananForm({ service = null }: LayananFormProps) {
       if (!res.ok) throw new Error("Gagal mengunggah gambar");
       const { publicUrl } = await res.json();
       
-      if (fieldName === 'imageUrl') {
-        setImageUrl(publicUrl);
-      } else if (index !== undefined) {
-        const setter = fieldName === 'details' ? setDetails : setBenefits;
-        handleArrayChange(setter, index, 'image', publicUrl);
-      }
+      setImageUrl(publicUrl);
 
     } catch (error) {
       toast({ title: 'Upload Gagal', variant: 'destructive' });
@@ -150,21 +244,6 @@ export function LayananForm({ service = null }: LayananFormProps) {
     }
   };
   
-  const handleArrayChange = (setter: React.Dispatch<React.SetStateAction<DetailPoint[]>>, index: number, field: keyof DetailPoint, value: string) => {
-    setter(prev => prev.map((item, i) => 
-        i === index ? { ...item, [field]: value } : item
-    ));
-  };
-  
-  const addArrayItem = (setter: React.Dispatch<React.SetStateAction<DetailPoint[]>>) => {
-    setter(prev => [...prev, { id: `new-${Date.now()}`, title: '', description: '', image: '' }]);
-  };
-  
-  const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<DetailPoint[]>>, index: number) => {
-    setter(prev => prev.filter((_, i) => i !== index));
-  };
-
-
   useEffect(() => {
     if (state?.message) {
       toast({
@@ -184,87 +263,6 @@ export function LayananForm({ service = null }: LayananFormProps) {
 
     dispatch(formData);
   }
-  
-  const PointEditor = ({ title, points, setPoints }: {
-    title: string;
-    points: DetailPoint[];
-    setPoints: React.Dispatch<React.SetStateAction<DetailPoint[]>>;
-  }) => {
-    
-    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-  
-      const uploadKey = `${title.toLowerCase()}-${index}`;
-      setIsUploading(prev => ({...prev, [uploadKey]: true}));
-  
-      const formData = new FormData();
-      formData.append("file", file);
-  
-      try {
-        const res = await fetch("/api/upload", { method: "POST", body: formData });
-        if (!res.ok) throw new Error("Gagal mengunggah gambar");
-        const { publicUrl } = await res.json();
-        
-        handleArrayChange(setPoints, index, 'image', publicUrl);
-  
-      } catch (error) {
-        toast({ title: 'Upload Gagal', variant: 'destructive' });
-      } finally {
-        setIsUploading(prev => ({...prev, [uploadKey]: false}));
-        event.target.value = '';
-      }
-    };
-    
-    return (
-    <Card>
-        <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-            <Accordion type="multiple" className="w-full space-y-2">
-            {points.map((item, index) => (
-                <AccordionItem value={`point-${item.id}`} key={item.id} className="border rounded-md px-4 bg-card">
-                    <div className="flex justify-between items-center">
-                        <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
-                           <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
-                        </AccordionTrigger>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                    </div>
-                    <AccordionContent>
-                        <div className="border-t pt-4 space-y-4">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                                <div className="space-y-1">
-                                    <Label htmlFor={`point-title-${item.id}`}>Judul Poin {index + 1}</Label>
-                                    <Input id={`point-title-${item.id}`} value={item.title} onChange={(e) => handleArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Gambar (Opsional)</Label>
-                                    <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
-                                        {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
-                                    </div>
-                                    <div className="flex items-center gap-4">
-                                        <Input type="file" onChange={(e: any) => handleUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`${title.toLowerCase()}-${index}`]} />
-                                        {isUploading[`${title.toLowerCase()}-${index}`] && <Loader2 className="animate-spin" />}
-                                    </div>
-                                </div>
-                            </div>
-                            <div>
-                                <Label>Deskripsi Poin</Label>
-                                <RichTextEditor
-                                    key={`point-desc-${item.id}`}
-                                    defaultValue={item.description}
-                                    onUpdate={({ editor }) => handleArrayChange(setPoints, index, 'description', editor.getHTML())}
-                                />
-                            </div>
-                        </div>
-                    </AccordionContent>
-                </AccordionItem>
-            ))}
-            </Accordion>
-            <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
-        </CardContent>
-    </Card>
-    )};
-
 
   return (
     <form action={handleFormSubmit} className="space-y-8">
@@ -298,12 +296,18 @@ export function LayananForm({ service = null }: LayananFormProps) {
                   title="Poin-poin Detail Layanan"
                   points={details}
                   setPoints={setDetails}
+                  isUploading={isUploading}
+                  setIsUploading={setIsUploading}
+                  toast={toast}
                 />
                 
                 <PointEditor
                   title="Manfaat / Keuntungan"
                   points={benefits}
                   setPoints={setBenefits}
+                  isUploading={isUploading}
+                  setIsUploading={setIsUploading}
+                  toast={toast}
                 />
             </div>
 
@@ -345,7 +349,7 @@ export function LayananForm({ service = null }: LayananFormProps) {
                             )}
                         </div>
                         <div className="flex items-center gap-4">
-                          <Input id="image-upload" type="file" onChange={(e) => handleFileChange(e, 'imageUrl')} accept="image/png, image/jpeg, image/webp" disabled={isUploading['imageUrl']}/>
+                          <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading['imageUrl']}/>
                           {isUploading['imageUrl'] && <Loader2 className="animate-spin" />}
                         </div>
                     </CardContent>

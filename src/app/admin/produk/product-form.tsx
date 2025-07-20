@@ -36,14 +36,14 @@ type ProductFormProps = {
 }
 
 type Feature = {
-    id: number | string; // Add id for stable key
+    id: number | string;
     title: string;
     description: string;
 }
 
 type Specifications = {
     headers: string[];
-    rows: (string[] & { id: number | string })[]; // Add id for stable key
+    rows: (string[] & { id: number | string })[];
 }
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
@@ -76,7 +76,6 @@ const parseJsonSafe = (json: any, fallback: any) => {
         parsedJson = json ?? fallback;
     }
     
-    // Ensure the parsed value for specifications has the correct shape
     if (typeof parsedJson === 'object' && parsedJson !== null && 'headers' in parsedJson && 'rows' in parsedJson) {
         if (!Array.isArray(parsedJson.headers)) {
             parsedJson.headers = fallback.headers;
@@ -84,8 +83,7 @@ const parseJsonSafe = (json: any, fallback: any) => {
         if (!Array.isArray(parsedJson.rows)) {
             parsedJson.rows = fallback.rows;
         }
-        // Ensure rows have stable keys
-        parsedJson.rows = parsedJson.rows.map((row: string[], index: number) => {
+        parsedJson.rows = parsedJson.rows.map((row: string[] | (string[] & {id: any}), index: number) => {
             const newRow = [...row] as (string[] & { id: number | string});
             // @ts-ignore
             if (!newRow.id) {
@@ -93,7 +91,7 @@ const parseJsonSafe = (json: any, fallback: any) => {
             }
             return newRow;
         });
-    } else if (Array.isArray(parsedJson)) { // Handle features array
+    } else if (Array.isArray(parsedJson)) {
         return parsedJson.map((item, index) => ({
             ...item,
             id: item.id || `item-${Date.now()}-${index}`
@@ -105,7 +103,7 @@ const parseJsonSafe = (json: any, fallback: any) => {
     return parsedJson;
 };
 
-
+// Moved outside the main component
 const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title: string, specifications: Specifications, setSpecifications: React.Dispatch<React.SetStateAction<Specifications>> }) => {
 
   const handleSpecHeaderChange = (index: number, value: string) => {
@@ -119,27 +117,24 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
   const addSpecHeader = () => {
     setSpecifications(prev => ({
         headers: [...prev.headers, ''],
-        rows: prev.rows.map(row => [...row, ''])
+        rows: prev.rows.map(row => [...row, ''] as (string[] & { id: string | number}))
     }));
   }
 
   const removeSpecHeader = (index: number) => {
     setSpecifications(prev => ({
         headers: prev.headers.filter((_, i) => i !== index),
-        rows: prev.rows.map(row => row.filter((_, i) => i !== index))
+        rows: prev.rows.map(row => row.filter((_, i) => i !== index) as (string[] & { id: string | number}))
     }));
   }
 
   const handleSpecRowChange = (rowIndex: number, colIndex: number, value: string) => {
     setSpecifications(prev => {
-        const newRows = prev.rows.map((row, rIdx) => {
-            if (rIdx === rowIndex) {
-                const newCells = [...row];
-                newCells[colIndex] = value;
-                return newCells as (string[] & { id: number | string});
-            }
-            return row;
-        });
+        const newRows = [...prev.rows];
+        const newRow = [...newRows[rowIndex]] as (string[] & {id: any});
+        newRow[colIndex] = value;
+        newRow.id = newRows[rowIndex].id;
+        newRows[rowIndex] = newRow;
         return { ...prev, rows: newRows };
     });
   }
@@ -172,11 +167,10 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
         </CardHeader>
         <CardContent className="space-y-6">
             <div className="space-y-4">
-                {/* Headers */}
                 <div className="p-4 border rounded-md space-y-2 bg-muted/50">
                     <Label className="text-sm font-semibold">Judul Kolom</Label>
                     <div className="grid grid-cols-1 gap-2">
-                        {specifications && specifications.headers && specifications.headers.map((header, index) => (
+                        {specifications?.headers?.map((header, index) => (
                             <div key={index} className="flex items-center gap-2">
                                 <Input value={header} onChange={(e) => handleSpecHeaderChange(index, e.target.value)} placeholder={`Kolom ${index + 1}`} />
                                 <Button type="button" variant="ghost" size="icon" onClick={() => removeSpecHeader(index)} className="text-destructive h-9 w-9 shrink-0"><Trash2 className="h-4 w-4" /></Button>
@@ -185,11 +179,10 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                     </div>
                     <Button type="button" variant="outline" size="sm" onClick={addSpecHeader}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Kolom</Button>
                 </div>
-                {/* Rows */}
                  <div className="space-y-2">
                     <Label className="text-sm font-semibold">Baris Data</Label>
                     <Accordion type="multiple" className="w-full space-y-2">
-                      {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => {
+                      {specifications?.rows?.map((row, rowIndex) => {
                           const summary = getSummary(row[0]);
                           return (
                             <AccordionItem value={`spec-row-${row.id}`} key={row.id} className="border rounded-md px-4 bg-card">
@@ -226,6 +219,7 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
     </Card>
   )
 }
+
 
 export function ProductForm({ categories, product = null }: ProductFormProps) {
   const { toast } = useToast();
@@ -286,9 +280,11 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   }
   
   const handleFeatureChange = (index: number, field: keyof Feature, value: string) => {
-    setFeatures(prev => prev.map((item, i) =>
-        i === index ? { ...item, [field]: value } : item
-    ));
+    setFeatures(currentFeatures => {
+        const newFeatures = [...currentFeatures];
+        newFeatures[index] = { ...newFeatures[index], [field]: value };
+        return newFeatures;
+    });
   };
   const addFeature = () => setFeatures([...features, { id: `new-${Date.now()}`, title: '', description: '' }]);
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
@@ -304,22 +300,18 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     const techSpecsToSave = {
         headers: technicalSpecifications.headers.filter(h => h.trim() !== ''),
         rows: technicalSpecifications.rows.map(rowWithId => {
-            const { id, ...rest } = rowWithId; // remove id before saving
-            return Object.values(rest);
-        }).map(row => 
-            row.slice(0, technicalSpecifications.headers.filter(h => h.trim() !== '').length)
-        ).filter(row => row.some(cell => typeof cell === 'string' && cell.trim() !== ''))
+            const { id, ...rest } = rowWithId;
+            return Object.values(rest).slice(0, techSpecsToSave.headers.length);
+        }).filter(row => row.some(cell => typeof cell === 'string' && cell.replace(/<[^>]*>?/gm, '').trim() !== ''))
     };
     formData.set('technicalSpecifications', JSON.stringify(techSpecsToSave));
     
     const generalSpecsToSave = {
         headers: generalSpecifications.headers.filter(h => h.trim() !== ''),
         rows: generalSpecifications.rows.map(rowWithId => {
-            const { id, ...rest } = rowWithId; // remove id before saving
-            return Object.values(rest);
-        }).map(row => 
-            row.slice(0, generalSpecifications.headers.filter(h => h.trim() !== '').length)
-        ).filter(row => row.some(cell => typeof cell === 'string' && cell.trim() !== ''))
+            const { id, ...rest } = rowWithId;
+            return Object.values(rest).slice(0, generalSpecsToSave.headers.length);
+        }).filter(row => row.some(cell => typeof cell === 'string' && cell.replace(/<[^>]*>?/gm, '').trim() !== ''))
     };
     formData.set('generalSpecifications', JSON.stringify(generalSpecsToSave));
 
