@@ -36,14 +36,14 @@ type ProductFormProps = {
 }
 
 type Feature = {
-    id?: number | string; // Add id for stable key
+    id: number | string; // Add id for stable key
     title: string;
     description: string;
 }
 
 type Specifications = {
     headers: string[];
-    rows: (string[] & { id?: number | string })[]; // Add id for stable key
+    rows: (string[] & { id: number | string })[]; // Add id for stable key
 }
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
@@ -86,9 +86,11 @@ const parseJsonSafe = (json: any, fallback: any) => {
         }
         // Ensure rows have stable keys
         parsedJson.rows = parsedJson.rows.map((row: string[], index: number) => {
-            const newRow = [...row];
+            const newRow = [...row] as (string[] & { id: number | string});
             // @ts-ignore
-            newRow.id = `row-${Date.now()}-${index}`;
+            if (!newRow.id) {
+               newRow.id = `row-${Date.now()}-${index}`;
+            }
             return newRow;
         });
     } else if (Array.isArray(parsedJson)) { // Handle features array
@@ -107,39 +109,54 @@ const parseJsonSafe = (json: any, fallback: any) => {
 const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title: string, specifications: Specifications, setSpecifications: React.Dispatch<React.SetStateAction<Specifications>> }) => {
 
   const handleSpecHeaderChange = (index: number, value: string) => {
-      const newSpecs = { ...specifications };
-      newSpecs.headers[index] = value;
-      setSpecifications(newSpecs);
+    setSpecifications(prev => {
+        const newHeaders = [...prev.headers];
+        newHeaders[index] = value;
+        return { ...prev, headers: newHeaders };
+    });
   }
+
   const addSpecHeader = () => {
-      const newSpecs = { ...specifications };
-      newSpecs.headers.push('');
-      newSpecs.rows.forEach(row => row.push(''));
-      setSpecifications(newSpecs);
+    setSpecifications(prev => ({
+        headers: [...prev.headers, ''],
+        rows: prev.rows.map(row => [...row, ''])
+    }));
   }
+
   const removeSpecHeader = (index: number) => {
-      const newSpecs = { ...specifications };
-      newSpecs.headers.splice(index, 1);
-      newSpecs.rows.forEach(row => row.splice(index, 1));
-      setSpecifications(newSpecs);
+    setSpecifications(prev => ({
+        headers: prev.headers.filter((_, i) => i !== index),
+        rows: prev.rows.map(row => row.filter((_, i) => i !== index))
+    }));
   }
 
   const handleSpecRowChange = (rowIndex: number, colIndex: number, value: string) => {
-      const newSpecs = { ...specifications };
-      newSpecs.rows[rowIndex][colIndex] = value;
-      setSpecifications(newSpecs);
+    setSpecifications(prev => {
+        const newRows = prev.rows.map((row, rIdx) => {
+            if (rIdx === rowIndex) {
+                const newCells = [...row];
+                newCells[colIndex] = value;
+                return newCells as (string[] & { id: number | string});
+            }
+            return row;
+        });
+        return { ...prev, rows: newRows };
+    });
   }
+  
   const addSpecRow = () => {
-      const newSpecs = { ...specifications };
-      const newRow = Array(newSpecs.headers.length).fill('') as (string[] & { id?: string | number });
-      newRow.id = `new-${Date.now()}`;
-      newSpecs.rows.push(newRow);
-      setSpecifications(newSpecs);
+    setSpecifications(prev => {
+        const newRow = Array(prev.headers.length).fill('') as (string[] & { id: string | number });
+        newRow.id = `new-${Date.now()}`;
+        return { ...prev, rows: [...prev.rows, newRow] };
+    });
   }
+
   const removeSpecRow = (rowIndex: number) => {
-      const newSpecs = { ...specifications };
-      newSpecs.rows.splice(rowIndex, 1);
-      setSpecifications(newSpecs);
+    setSpecifications(prev => ({
+        ...prev,
+        rows: prev.rows.filter((_, i) => i !== rowIndex)
+    }));
   }
 
   const getSummary = (htmlString: string) => {
@@ -269,9 +286,9 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   }
   
   const handleFeatureChange = (index: number, field: keyof Feature, value: string) => {
-    const newFeatures = [...features];
-    newFeatures[index][field] = value;
-    setFeatures(newFeatures);
+    setFeatures(prev => prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+    ));
   };
   const addFeature = () => setFeatures([...features, { id: `new-${Date.now()}`, title: '', description: '' }]);
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
@@ -286,25 +303,23 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     
     const techSpecsToSave = {
         headers: technicalSpecifications.headers.filter(h => h.trim() !== ''),
-        rows: technicalSpecifications.rows.map(row => {
-            // @ts-ignore
-            const {id, ...rest} = row;
+        rows: technicalSpecifications.rows.map(rowWithId => {
+            const { id, ...rest } = rowWithId; // remove id before saving
             return Object.values(rest);
         }).map(row => 
             row.slice(0, technicalSpecifications.headers.filter(h => h.trim() !== '').length)
-        ).filter(row => row.some(cell => cell.trim() !== ''))
+        ).filter(row => row.some(cell => typeof cell === 'string' && cell.trim() !== ''))
     };
     formData.set('technicalSpecifications', JSON.stringify(techSpecsToSave));
     
     const generalSpecsToSave = {
         headers: generalSpecifications.headers.filter(h => h.trim() !== ''),
-        rows: generalSpecifications.rows.map(row => {
-            // @ts-ignore
-            const {id, ...rest} = row;
+        rows: generalSpecifications.rows.map(rowWithId => {
+            const { id, ...rest } = rowWithId; // remove id before saving
             return Object.values(rest);
         }).map(row => 
             row.slice(0, generalSpecifications.headers.filter(h => h.trim() !== '').length)
-        ).filter(row => row.some(cell => cell.trim() !== ''))
+        ).filter(row => row.some(cell => typeof cell === 'string' && cell.trim() !== ''))
     };
     formData.set('generalSpecifications', JSON.stringify(generalSpecsToSave));
 
@@ -394,8 +409,8 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                                   <AccordionContent>
                                       <div className="space-y-4 pt-2">
                                           <div className='space-y-1'>
-                                              <Label htmlFor={`feature-title-${index}`}>Judul Fitur</Label>
-                                              <Input id={`feature-title-${index}`} value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
+                                              <Label htmlFor={`feature-title-${feature.id}`}>Judul Fitur</Label>
+                                              <Input id={`feature-title-${feature.id}`} value={feature.title} onChange={(e) => handleFeatureChange(index, 'title', e.target.value)} placeholder={`Judul Fitur ${index + 1}`} />
                                           </div>
                                           <div className='space-y-1'>
                                               <Label>Deskripsi Fitur</Label>

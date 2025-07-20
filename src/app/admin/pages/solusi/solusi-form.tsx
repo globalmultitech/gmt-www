@@ -25,7 +25,7 @@ import RichTextEditor from '@/app/admin/produk/rich-text-editor';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type KeyPoint = {
-    id?: number | string; // Add id for stable key
+    id: number | string; // Add id for stable key
     title: string;
     image?: string;
     description: string;
@@ -151,15 +151,13 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
   };
   
   const handleArrayChange = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>, index: number, field: keyof KeyPoint, value: string) => {
-    setter(prev => {
-        const newArray = [...prev];
-        newArray[index] = { ...newArray[index], [field]: value };
-        return newArray;
-    });
+    setter(prev => prev.map((item, i) =>
+        i === index ? { ...item, [field]: value } : item
+    ));
   };
   
   const addArrayItem = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>) => {
-    setter(prev => [...prev, { id: `new-${Date.now()}`, title: '', description: '' }]);
+    setter(prev => [...prev, { id: `new-${Date.now()}`, title: '', description: '', image: '' }]);
   };
 
   const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>, index: number) => {
@@ -183,7 +181,11 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
     dispatch(formData);
   }
 
-  const PointEditor = ({ title, points, setPoints, onArrayChange, onAddItem, onRemoveItem }: any) => {
+  const PointEditor = ({ title, points, setPoints }: {
+    title: string;
+    points: KeyPoint[];
+    setPoints: React.Dispatch<React.SetStateAction<KeyPoint[]>>;
+  }) => {
     
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
       const file = event.target.files?.[0];
@@ -215,20 +217,20 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
         <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
         <CardContent className="space-y-2">
             <Accordion type="multiple" className="w-full space-y-2">
-            {points.map((item: KeyPoint, index: number) => (
+            {points.map((item, index) => (
                 <AccordionItem value={`point-${item.id}`} key={item.id} className="border rounded-md px-4 bg-card">
                     <div className="flex justify-between items-center">
                         <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
                            <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
                         </AccordionTrigger>
-                        <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveItem(setPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                     <AccordionContent>
                         <div className="border-t pt-4 space-y-4">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
                                 <div className="space-y-1">
-                                    <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
-                                    <Input id={`point-title-${index}`} value={item.title} onChange={(e) => onArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
+                                    <Label htmlFor={`point-title-${item.id}`}>Judul Poin {index + 1}</Label>
+                                    <Input id={`point-title-${item.id}`} value={item.title} onChange={(e) => handleArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label>Gambar (Opsional)</Label>
@@ -246,7 +248,7 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                                 <RichTextEditor
                                     key={`point-desc-${item.id}`}
                                     defaultValue={item.description}
-                                    onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
+                                    onUpdate={({ editor }) => handleArrayChange(setPoints, index, 'description', editor.getHTML())}
                                 />
                             </div>
                         </div>
@@ -254,7 +256,7 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                 </AccordionItem>
             ))}
             </Accordion>
-            <Button type="button" variant="outline" size="sm" onClick={() => onAddItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
+            <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
         </CardContent>
     </Card>
     )};
@@ -287,9 +289,6 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                   title="Poin-poin Kunci"
                   points={keyPoints}
                   setPoints={setKeyPoints}
-                  onArrayChange={handleArrayChange}
-                  onAddItem={addArrayItem}
-                  onRemoveItem={removeArrayItem}
                 />
 
             </div>
