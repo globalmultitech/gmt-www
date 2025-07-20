@@ -25,6 +25,7 @@ import RichTextEditor from '@/app/admin/produk/rich-text-editor';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 type KeyPoint = {
+    id?: number | string; // Add id for stable key
     title: string;
     image?: string;
     description: string;
@@ -89,18 +90,30 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
   const [solutionTitle, setSolutionTitle] = useState(solution?.title ?? '');
   const [slug, setSlug] = useState(solution?.slug ?? '');
 
-  const parseJsonSafe = (jsonString: any, fallback: any[]) => {
-    if (Array.isArray(jsonString)) return jsonString;
-    if (typeof jsonString !== 'string') return fallback;
-    try {
-      const parsed = JSON.parse(jsonString);
-      return Array.isArray(parsed) ? parsed : fallback;
-    } catch {
-      return fallback;
+  const parseJsonSafe = (jsonString: any, fallback: any[]): KeyPoint[] => {
+    let parsed;
+    if (Array.isArray(jsonString)) {
+        parsed = jsonString;
+    } else if (typeof jsonString === 'string') {
+        try {
+            parsed = JSON.parse(jsonString);
+        } catch {
+            return fallback;
+        }
+    } else {
+        return fallback;
     }
+
+    if (!Array.isArray(parsed)) return fallback;
+
+    // Ensure each item has a unique ID for stable keys
+    return parsed.map((item, index) => ({
+        ...item,
+        id: item.id || `item-${Date.now()}-${index}`,
+    }));
   }
 
-  const [keyPoints, setKeyPoints] = useState<KeyPoint[]>(parseJsonSafe(solution?.keyPoints, [{ title: '', description: '' }]));
+  const [keyPoints, setKeyPoints] = useState<KeyPoint[]>(parseJsonSafe(solution?.keyPoints, []));
 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -145,8 +158,14 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
     });
   };
   
-  const addArrayItem = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>) => setter(prev => [...prev, { title: '', description: '' }]);
-  const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>, index: number) => setter(prev => prev.filter((_, i) => i !== index));
+  const addArrayItem = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>) => {
+    setter(prev => [...prev, { id: `new-${Date.now()}`, title: '', description: '' }]);
+  };
+
+  const removeArrayItem = (setter: React.Dispatch<React.SetStateAction<KeyPoint[]>>, index: number) => {
+    setter(prev => prev.filter((_, i) => i !== index));
+  };
+
 
   useEffect(() => {
     if (state?.message) {
@@ -159,18 +178,45 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
   }, [state, toast]);
 
   const handleFormSubmit = (formData: FormData) => {
-    const keyPointsToSave = keyPoints.filter(f => (f.title && f.title.trim() !== '') || (f.description && f.description.replace(/<[^>]*>?/gm, '').trim() !== ''));
+    const keyPointsToSave = keyPoints.map(({id, ...rest}) => rest).filter(f => (f.title && f.title.trim() !== '') || (f.description && f.description.replace(/<[^>]*>?/gm, '').trim() !== ''));
     formData.set('keyPoints', JSON.stringify(keyPointsToSave));
     dispatch(formData);
   }
 
-  const PointEditor = ({ title, points, setPoints, onUpload, onArrayChange, onAddItem, onRemoveItem }: any) => (
+  const PointEditor = ({ title, points, setPoints, onArrayChange, onAddItem, onRemoveItem }: any) => {
+    
+    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>, index: number) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
+  
+      const uploadKey = `${title.toLowerCase()}-${index}`;
+      setIsUploading(prev => ({...prev, [uploadKey]: true}));
+  
+      const formData = new FormData();
+      formData.append("file", file);
+  
+      try {
+        const res = await fetch("/api/upload", { method: "POST", body: formData });
+        if (!res.ok) throw new Error("Gagal mengunggah gambar");
+        const { publicUrl } = await res.json();
+        
+        handleArrayChange(setPoints, index, 'image', publicUrl);
+  
+      } catch (error) {
+        toast({ title: 'Upload Gagal', variant: 'destructive' });
+      } finally {
+        setIsUploading(prev => ({...prev, [uploadKey]: false}));
+        event.target.value = '';
+      }
+    };
+    
+    return (
     <Card>
         <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
         <CardContent className="space-y-2">
             <Accordion type="multiple" className="w-full space-y-2">
             {points.map((item: KeyPoint, index: number) => (
-                <AccordionItem value={`point-${index}`} key={index} className="border rounded-md px-4 bg-card">
+                <AccordionItem value={`point-${item.id}`} key={item.id} className="border rounded-md px-4 bg-card">
                     <div className="flex justify-between items-center">
                         <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
                            <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
@@ -190,15 +236,15 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                                         {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
                                     </div>
                                     <div className="flex items-center gap-4">
-                                        <Input type="file" onChange={(e: any) => onUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`points-${index}`]} />
-                                        {isUploading[`points-${index}`] && <Loader2 className="animate-spin" />}
+                                        <Input type="file" onChange={(e: any) => handleUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`${title.toLowerCase()}-${index}`]} />
+                                        {isUploading[`${title.toLowerCase()}-${index}`] && <Loader2 className="animate-spin" />}
                                     </div>
                                 </div>
                             </div>
                             <div>
                                 <Label>Deskripsi Poin</Label>
                                 <RichTextEditor
-                                    key={`point-desc-${index}`}
+                                    key={`point-desc-${item.id}`}
                                     defaultValue={item.description}
                                     onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
                                 />
@@ -211,7 +257,7 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
             <Button type="button" variant="outline" size="sm" onClick={() => onAddItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
         </CardContent>
     </Card>
-  );
+    )};
 
   return (
     <form action={handleFormSubmit} className="space-y-8">
@@ -241,7 +287,6 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                   title="Poin-poin Kunci"
                   points={keyPoints}
                   setPoints={setKeyPoints}
-                  onUpload={(e: any, index: number) => handleFileChange(e, 'keyPoints', index)}
                   onArrayChange={handleArrayChange}
                   onAddItem={addArrayItem}
                   onRemoveItem={removeArrayItem}

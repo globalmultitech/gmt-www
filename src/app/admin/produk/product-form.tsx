@@ -36,13 +36,14 @@ type ProductFormProps = {
 }
 
 type Feature = {
+    id?: number | string; // Add id for stable key
     title: string;
     description: string;
 }
 
 type Specifications = {
     headers: string[];
-    rows: string[][];
+    rows: (string[] & { id?: number | string })[]; // Add id for stable key
 }
 
 function SubmitButton({ isEditing }: { isEditing: boolean }) {
@@ -69,26 +70,39 @@ const parseJsonSafe = (json: any, fallback: any) => {
         try {
             parsedJson = JSON.parse(json);
         } catch (e) {
-            parsedJson = fallback;
+            return fallback;
         }
     } else {
         parsedJson = json ?? fallback;
     }
     
     // Ensure the parsed value for specifications has the correct shape
-    if (typeof parsedJson === 'object' && parsedJson !== null) {
-        if (!('headers' in parsedJson) || !Array.isArray(parsedJson.headers)) {
+    if (typeof parsedJson === 'object' && parsedJson !== null && 'headers' in parsedJson && 'rows' in parsedJson) {
+        if (!Array.isArray(parsedJson.headers)) {
             parsedJson.headers = fallback.headers;
         }
-        if (!('rows' in parsedJson) || !Array.isArray(parsedJson.rows)) {
+        if (!Array.isArray(parsedJson.rows)) {
             parsedJson.rows = fallback.rows;
         }
+        // Ensure rows have stable keys
+        parsedJson.rows = parsedJson.rows.map((row: string[], index: number) => {
+            const newRow = [...row];
+            // @ts-ignore
+            newRow.id = `row-${Date.now()}-${index}`;
+            return newRow;
+        });
+    } else if (Array.isArray(parsedJson)) { // Handle features array
+        return parsedJson.map((item, index) => ({
+            ...item,
+            id: item.id || `item-${Date.now()}-${index}`
+        }));
     } else {
         return fallback;
     }
 
     return parsedJson;
 };
+
 
 const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title: string, specifications: Specifications, setSpecifications: React.Dispatch<React.SetStateAction<Specifications>> }) => {
 
@@ -117,7 +131,9 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
   }
   const addSpecRow = () => {
       const newSpecs = { ...specifications };
-      newSpecs.rows.push(Array(newSpecs.headers.length).fill(''));
+      const newRow = Array(newSpecs.headers.length).fill('') as (string[] & { id?: string | number });
+      newRow.id = `new-${Date.now()}`;
+      newSpecs.rows.push(newRow);
       setSpecifications(newSpecs);
   }
   const removeSpecRow = (rowIndex: number) => {
@@ -159,7 +175,7 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                       {specifications && specifications.rows && specifications.rows.map((row, rowIndex) => {
                           const summary = getSummary(row[0]);
                           return (
-                            <AccordionItem value={`spec-row-${rowIndex}`} key={rowIndex} className="border rounded-md px-4 bg-card">
+                            <AccordionItem value={`spec-row-${row.id}`} key={row.id} className="border rounded-md px-4 bg-card">
                                 <div className="flex justify-between items-center">
                                   <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
                                       <span className="truncate">
@@ -174,7 +190,7 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                                           <div key={colIndex} className="space-y-1">
                                             <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
                                             <RichTextEditor
-                                                key={`spec-${rowIndex}-${colIndex}`}
+                                                key={`spec-${row.id}-${colIndex}`}
                                                 defaultValue={cell}
                                                 onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
                                             />
@@ -207,10 +223,10 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const [productTitle, setProductTitle] = useState(product?.title ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
 
-  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, [{ title: '', description: '' }]));
+  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, []));
   
-  const [technicalSpecifications, setTechnicalSpecifications] = useState<Specifications>(parseJsonSafe(product?.technicalSpecifications, { headers: [''], rows: [['']] }));
-  const [generalSpecifications, setGeneralSpecifications] = useState<Specifications>(parseJsonSafe(product?.generalSpecifications, { headers: [''], rows: [['']] }));
+  const [technicalSpecifications, setTechnicalSpecifications] = useState<Specifications>(parseJsonSafe(product?.technicalSpecifications, { headers: [''], rows: [] }));
+  const [generalSpecifications, setGeneralSpecifications] = useState<Specifications>(parseJsonSafe(product?.generalSpecifications, { headers: [''], rows: [] }));
   
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -257,11 +273,11 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     newFeatures[index][field] = value;
     setFeatures(newFeatures);
   };
-  const addFeature = () => setFeatures([...features, { title: '', description: '' }]);
+  const addFeature = () => setFeatures([...features, { id: `new-${Date.now()}`, title: '', description: '' }]);
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
 
   const handleFormSubmit = (formData: FormData) => {
-    const featuresToSave = features.filter(f => {
+    const featuresToSave = features.map(({id, ...rest}) => rest).filter(f => {
         const descHtml = f.description || '';
         const descText = descHtml.replace(/<[^>]*>?/gm, '').trim();
         return (f.title && f.title.trim() !== '') || descText !== '';
@@ -270,7 +286,11 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     
     const techSpecsToSave = {
         headers: technicalSpecifications.headers.filter(h => h.trim() !== ''),
-        rows: technicalSpecifications.rows.map(row => 
+        rows: technicalSpecifications.rows.map(row => {
+            // @ts-ignore
+            const {id, ...rest} = row;
+            return Object.values(rest);
+        }).map(row => 
             row.slice(0, technicalSpecifications.headers.filter(h => h.trim() !== '').length)
         ).filter(row => row.some(cell => cell.trim() !== ''))
     };
@@ -278,7 +298,11 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     
     const generalSpecsToSave = {
         headers: generalSpecifications.headers.filter(h => h.trim() !== ''),
-        rows: generalSpecifications.rows.map(row => 
+        rows: generalSpecifications.rows.map(row => {
+            // @ts-ignore
+            const {id, ...rest} = row;
+            return Object.values(rest);
+        }).map(row => 
             row.slice(0, generalSpecifications.headers.filter(h => h.trim() !== '').length)
         ).filter(row => row.some(cell => cell.trim() !== ''))
     };
@@ -360,7 +384,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                     <CardContent className="space-y-2">
                       <Accordion type="multiple" className="w-full space-y-2">
                           {features.map((feature, index) => (
-                              <AccordionItem value={`feature-${index}`} key={index} className="border rounded-md px-4 bg-card">
+                              <AccordionItem value={`feature-${feature.id}`} key={feature.id} className="border rounded-md px-4 bg-card">
                                   <div className="flex justify-between items-center">
                                       <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
                                           <span className="truncate">Fitur: {feature.title || `Fitur Baru ${index + 1}`}</span>
@@ -376,7 +400,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                                           <div className='space-y-1'>
                                               <Label>Deskripsi Fitur</Label>
                                               <RichTextEditor
-                                                  key={`feature-desc-${index}`}
+                                                  key={`feature-desc-${feature.id}`}
                                                   defaultValue={feature.description}
                                                   onUpdate={({ editor }) => handleFeatureChange(index, 'description', editor.getHTML())}
                                               />
