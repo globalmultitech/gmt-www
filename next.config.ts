@@ -19,6 +19,18 @@ const remotePatterns: NextConfig['images']['remotePatterns'] = [
     port: '',
     pathname: '/**',
   },
+  {
+    protocol: 'https',
+    hostname: 'pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev',
+    port: '',
+    pathname: '/**',
+  },
+  {
+    protocol: 'https',
+    hostname: 'bucket-gmt.c-ss.co.id',
+    port: '',
+    pathname: '/**',
+  }
 ];
 
 if (r2Hostname) {

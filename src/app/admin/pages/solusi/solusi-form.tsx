@@ -164,6 +164,55 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
     dispatch(formData);
   }
 
+  const PointEditor = ({ title, points, setPoints, onUpload, onArrayChange, onAddItem, onRemoveItem }: any) => (
+    <Card>
+        <CardHeader><CardTitle>{title}</CardTitle></CardHeader>
+        <CardContent className="space-y-2">
+            <Accordion type="multiple" className="w-full space-y-2">
+            {points.map((item: KeyPoint, index: number) => (
+                <AccordionItem value={`point-${index}`} key={index} className="border rounded-md px-4 bg-card">
+                    <div className="flex justify-between items-center">
+                        <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
+                           <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
+                        </AccordionTrigger>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => onRemoveItem(setPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                    <AccordionContent>
+                        <div className="border-t pt-4 space-y-4">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                                <div className="space-y-1">
+                                    <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
+                                    <Input id={`point-title-${index}`} value={item.title} onChange={(e) => onArrayChange(setPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Gambar (Opsional)</Label>
+                                    <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
+                                        {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                                    </div>
+                                    <div className="flex items-center gap-4">
+                                        <Input type="file" onChange={(e: any) => onUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`points-${index}`]} />
+                                        {isUploading[`points-${index}`] && <Loader2 className="animate-spin" />}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <Label>Deskripsi Poin</Label>
+                                <RichTextEditor
+                                    key={`point-desc-${index}`}
+                                    defaultValue={item.description}
+                                    onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
+                                />
+                            </div>
+                        </div>
+                    </AccordionContent>
+                </AccordionItem>
+            ))}
+            </Accordion>
+            <Button type="button" variant="outline" size="sm" onClick={() => onAddItem(setPoints)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
+        </CardContent>
+    </Card>
+  );
+
   return (
     <form action={handleFormSubmit} className="space-y-8">
         {isEditing && <input type="hidden" name="id" value={solution.id} />}
@@ -188,54 +237,16 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                     </CardContent>
                 </Card>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Poin-poin Kunci</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                       <Accordion type="multiple" className="w-full space-y-2">
-                        {keyPoints.map((item, index) => (
-                           <AccordionItem value={`point-${index}`} key={index} className="border rounded-md px-4 bg-card">
-                               <div className="flex justify-between items-center">
-                                   <AccordionTrigger className="text-sm font-medium flex-grow py-3 text-left">
-                                      <span className="truncate">Poin: {item.title || `Poin Baru ${index + 1}`}</span>
-                                   </AccordionTrigger>
-                                   <Button type="button" variant="ghost" size="icon" onClick={() => removeArrayItem(setKeyPoints, index)} className="text-destructive h-8 w-8 shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                               </div>
-                               <AccordionContent>
-                                   <div className="border-t pt-4 space-y-4">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-                                            <div className="space-y-1">
-                                                <Label htmlFor={`point-title-${index}`}>Judul Poin {index + 1}</Label>
-                                                <Input id={`point-title-${index}`} value={item.title} onChange={(e) => handleArrayChange(setKeyPoints, index, 'title', e.target.value)} placeholder={`Judul Poin ${index + 1}`} />
-                                            </div>
-                                            <div className="space-y-2">
-                                                <Label>Gambar (Opsional)</Label>
-                                                <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
-                                                    {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
-                                                </div>
-                                                <div className="flex items-center gap-4">
-                                                    <Input type="file" onChange={(e) => handleFileChange(e, 'keyPoints', index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`keyPoints-${index}`]} />
-                                                    {isUploading[`keyPoints-${index}`] && <Loader2 className="animate-spin" />}
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div>
-                                            <Label>Deskripsi Poin</Label>
-                                            <RichTextEditor
-                                                key={`point-desc-${index}-${item.description}`}
-                                                defaultValue={item.description}
-                                                onUpdate={({ editor }) => handleArrayChange(setKeyPoints, index, 'description', editor.getHTML())}
-                                            />
-                                        </div>
-                                   </div>
-                               </AccordionContent>
-                           </AccordionItem>
-                        ))}
-                       </Accordion>
-                       <Button type="button" variant="outline" size="sm" onClick={() => addArrayItem(setKeyPoints)} className="mt-2"><PlusCircle className="mr-2 h-4 w-4" /> Tambah Poin</Button>
-                    </CardContent>
-                </Card>
+                <PointEditor
+                  title="Poin-poin Kunci"
+                  points={keyPoints}
+                  setPoints={setKeyPoints}
+                  onUpload={(e: any, index: number) => handleFileChange(e, 'keyPoints', index)}
+                  onArrayChange={handleArrayChange}
+                  onAddItem={addArrayItem}
+                  onRemoveItem={removeArrayItem}
+                />
+
             </div>
 
             <div className="lg:col-span-1 space-y-6">

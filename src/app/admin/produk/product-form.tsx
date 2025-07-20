@@ -174,7 +174,7 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
                                           <div key={colIndex} className="space-y-1">
                                             <Label className="text-sm text-muted-foreground">{specifications.headers[colIndex] || `Kolom ${colIndex + 1}`}</Label>
                                             <RichTextEditor
-                                                key={`${rowIndex}-${colIndex}`}
+                                                key={`spec-${rowIndex}-${colIndex}`}
                                                 defaultValue={cell}
                                                 onUpdate={({ editor }) => handleSpecRowChange(rowIndex, colIndex, editor.getHTML())}
                                             />
@@ -376,7 +376,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                                           <div className='space-y-1'>
                                               <Label>Deskripsi Fitur</Label>
                                               <RichTextEditor
-                                                  key={`feature-desc-${index}-${feature.description}`}
+                                                  key={`feature-desc-${index}`}
                                                   defaultValue={feature.description}
                                                   onUpdate={({ editor }) => handleFeatureChange(index, 'description', editor.getHTML())}
                                               />

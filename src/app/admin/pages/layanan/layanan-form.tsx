@@ -201,7 +201,7 @@ export function LayananForm({ service = null }: LayananFormProps) {
                             <div>
                                 <Label>Deskripsi Poin</Label>
                                 <RichTextEditor
-                                    key={`point-desc-${index}-${item.description}`}
+                                    key={`point-desc-${index}`}
                                     defaultValue={item.description}
                                     onUpdate={({ editor }) => onArrayChange(setPoints, index, 'description', editor.getHTML())}
                                 />
