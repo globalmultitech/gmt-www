@@ -22,26 +22,17 @@ export type TrustedByLogo = {
   alt: string;
 };
 
-export type Testimonial = {
-    quote: string;
-    name: string;
-    role: string;
-    image: string;
-    aiHint?: string;
-};
-
 // Interface for database reads, ensuring all fields from prisma are present
 export interface FullWebSettings extends PrismaWebSettings {}
 
 // Interface for client-side usage, with JSON fields properly typed
-export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'trustedByLogos' | 'testimonials'> {
+export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'menuItems' | 'featureCards' | 'aboutUsChecklist' | 'trustedByLogos'> {
   logoUrl: string | null;
   socialMedia: SocialMediaLinks;
   menuItems: MenuItem[];
   featureCards: FeatureCard[];
   aboutUsChecklist: string[];
   trustedByLogos: TrustedByLogo[];
-  testimonials: Testimonial[];
 }
 
 const defaultSettings: WebSettings = {
@@ -79,7 +70,6 @@ const defaultSettings: WebSettings = {
   ctaButtonLink: '/hubungi-kami',
   trustedByText: "Trusted by the world's leading companies",
   trustedByLogos: [],
-  testimonials: [],
   
   servicesPageTitle: 'Layanan Profesional Kami',
   servicesPageSubtitle: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda.',
@@ -99,6 +89,8 @@ const defaultSettings: WebSettings = {
 
   resourcesPageTitle: 'Resources',
   resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri.',
+  contactPageTitle: 'Hubungi Kami',
+  contactPageSubtitle: 'Kami siap membantu. Hubungi kami untuk pertanyaan, permintaan demo, atau dukungan teknis.',
   createdAt: new Date(),
   updatedAt: new Date(),
 };
@@ -146,7 +138,6 @@ export async function getSettings(): Promise<WebSettings> {
             featureCards: parseJson(settingsFromDb.featureCards, defaultSettings.featureCards),
             aboutUsChecklist: parseJson(settingsFromDb.aboutUsChecklist, defaultSettings.aboutUsChecklist),
             trustedByLogos: parseJson(settingsFromDb.trustedByLogos, defaultSettings.trustedByLogos),
-            testimonials: parseJson(settingsFromDb.testimonials, defaultSettings.testimonials),
         };
 
     } catch (error) {

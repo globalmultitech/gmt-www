@@ -95,11 +95,11 @@ export default async function HubungiKamiPage() {
               </div>
               <div className="relative h-64 w-full rounded-lg overflow-hidden shadow-md mt-6">
                 <Image
-                  src={settings.contactPageMapImageUrl || 'https://placehold.co/600x400.png'}
+                  src={settings.logoUrl || 'https://placehold.co/600x400.png'}
                   alt="Lokasi Kantor"
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover"
+                  className="object-contain p-8"
                   data-ai-hint="map"
                 />
               </div>
