@@ -119,7 +119,6 @@ async function main() {
           { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/797b0afb-03b1-4dad-8dd8-299cd9f151ce.jpeg', alt: 'Client Logo 5' },
           { src: 'https://pub-8fe748634fad4596b4e1c41b579fb2ea.r2.dev/2143fc3d-dd14-4739-93ea-cd909f06baba.jpeg', alt: 'Client Logo 6' },
       ]),
-      testimonials: JSON.stringify([]),
       servicesPageTitle: 'Layanan Profesional Kami',
       servicesPageSubtitle: 'Lebih dari sekadar penyedia produk, kami adalah mitra teknologi Anda. Temukan bagaimana layanan kami dapat mendukung kesuksesan Anda.',
       servicesPageCommitmentTitle: 'Komitmen Kami Pada Keamanan',
@@ -138,6 +137,10 @@ async function main() {
       
       resourcesPageTitle: 'Knowledge Center',
       resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.',
+
+      contactPageTitle: 'Hubungi Kami',
+      contactPageSubtitle: 'Kami siap membantu. Hubungi kami untuk pertanyaan, permintaan demo, atau dukungan teknis.',
+      contactPageMapImageUrl: 'https://placehold.co/600x400.png',
     },
   });
   console.log('Web settings seeded.');

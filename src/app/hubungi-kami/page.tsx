@@ -19,9 +19,9 @@ export default async function HubungiKamiPage() {
     <>
       <section className="bg-dark-slate pt-20">
         <div className="container mx-auto px-4 py-16 text-center">
-          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">Hubungi Kami</h1>
+          <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{settings.contactPageTitle}</h1>
           <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
-            Kami siap membantu. Hubungi kami untuk pertanyaan, permintaan demo, atau dukungan teknis.
+            {settings.contactPageSubtitle}
           </p>
         </div>
       </section>
@@ -92,9 +92,7 @@ export default async function HubungiKamiPage() {
                   <h3 className="font-headline text-2xl text-primary">Kantor Pusat</h3>
                 </div>
                 <p className="text-muted-foreground pl-16">
-                  Jl. Teknologi Raya No. 123,
-                  <br />
-                  Jakarta Selatan, Indonesia 12345
+                  {settings.address}
                 </p>
               </div>
               <div className="space-y-3">
@@ -105,7 +103,7 @@ export default async function HubungiKamiPage() {
                   <h3 className="font-headline text-2xl text-primary">Email</h3>
                 </div>
                 <p className="text-muted-foreground pl-16">
-                    <a href="mailto:sales@gmt.co.id" className="hover:text-accent">sales@gmt.co.id</a>
+                    <a href={`mailto:${settings.contactEmail}`} className="hover:text-accent">{settings.contactEmail}</a>
                 </p>
               </div>
               <div className="space-y-3">
@@ -121,7 +119,7 @@ export default async function HubungiKamiPage() {
               </div>
               <div className="relative h-64 w-full rounded-lg overflow-hidden shadow-md mt-6">
                 <Image
-                  src="https://placehold.co/600x400.png"
+                  src={settings.contactPageMapImageUrl || 'https://placehold.co/600x400.png'}
                   alt="Lokasi Kantor"
                   fill
                   sizes="(max-width: 768px) 100vw, 33vw"
