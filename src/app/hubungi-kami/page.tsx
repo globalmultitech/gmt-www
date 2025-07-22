@@ -1,4 +1,5 @@
 
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
@@ -13,6 +14,7 @@ async function getPageData() {
     const products = await prisma.product.findMany({
         select: {
             title: true,
+            slug: true, // Also fetch the slug
         },
         orderBy: {
             title: 'asc',

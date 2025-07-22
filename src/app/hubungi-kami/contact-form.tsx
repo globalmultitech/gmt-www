@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState } from 'react';
@@ -12,20 +13,30 @@ import type { Product } from '@prisma/client';
 type ContactFormProps = {
     whatsappNumber: string;
     companyName: string;
-    products: Pick<Product, 'title'>[];
+    products: Pick<Product, 'title' | 'slug'>[];
 }
 
 export default function ContactForm({ whatsappNumber, companyName, products }: ContactFormProps) {
     const [name, setName] = useState('');
     const [clientCompany, setClientCompany] = useState('');
-    const [selectedProduct, setSelectedProduct] = useState('');
+    const [selectedProductSlug, setSelectedProductSlug] = useState('');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        const cleanWaNumber = whatsappNumber.replace(/[^0-9]/g, '');
+        const selectedProduct = products.find(p => p.slug === selectedProductSlug);
+        if (!selectedProduct) return;
 
-        let messageBody = `Yth. Tim Sales ${companyName},\n\nSaya ingin meminta penawaran untuk produk berikut:\n\n- *Nama:* ${name}\n- *Perusahaan:* ${clientCompany}\n- *Produk yang diminati:* ${selectedProduct}\n\nMohon informasinya. Terima kasih.`;
+        const cleanWaNumber = whatsappNumber.replace(/[^0-9]/g, '');
+        const productUrl = `${window.location.origin}/produk/${selectedProduct.slug}`;
+
+        let messageBody = 
+`Yth. Tim Sales ${companyName},
+
+Saya ${name} dari ${clientCompany} meminta penawaran untuk produk berikut:
+${selectedProduct.title} (${productUrl}).
+
+Mohon informasinya. Terima kasih.`;
         
         const encodedMessage = encodeURIComponent(messageBody);
         const whatsappUrl = `https://wa.me/${cleanWaNumber}?text=${encodedMessage}`;
@@ -57,13 +68,13 @@ export default function ContactForm({ whatsappNumber, companyName, products }: C
             </div>
             <div className="space-y-2">
                 <Label htmlFor="interest">Produk yang diminati</Label>
-                <Select onValueChange={setSelectedProduct} required>
+                <Select onValueChange={setSelectedProductSlug} required value={selectedProductSlug}>
                     <SelectTrigger id="interest">
                         <SelectValue placeholder="Pilih produk..." />
                     </SelectTrigger>
                     <SelectContent>
                         {products.map((product) => (
-                            <SelectItem key={product.title} value={product.title}>
+                            <SelectItem key={product.slug} value={product.slug}>
                                 {product.title}
                             </SelectItem>
                         ))}
@@ -75,7 +86,7 @@ export default function ContactForm({ whatsappNumber, companyName, products }: C
                     type="submit" 
                     className="w-full" 
                     size="lg"
-                    disabled={!name || !clientCompany || !selectedProduct}
+                    disabled={!name || !clientCompany || !selectedProductSlug}
                 >
                     <WhatsAppIcon className="mr-2 h-5 w-5" />
                     Kirim via WhatsApp
