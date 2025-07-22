@@ -13,12 +13,6 @@ import { DynamicIcon } from '@/components/dynamic-icon';
 import { HomeSolutionsTabs } from '@/components/home-solutions-tabs';
 import { HomeMapSection } from '@/components/home-map-section';
 import BlogSection from '@/components/blog-section';
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel"
-import Autoplay from "embla-carousel-autoplay"
 import * as React from 'react';
 
 type EnrichedProduct = Product & {
@@ -41,24 +35,25 @@ type HomePageProps = {
   solutions: Solution[];
 }
 
-// Helper function to chunk array
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const chunkedArr: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunkedArr.push(array.slice(i, i + size));
-  }
-  return chunkedArr;
-}
+const Marquee = ({ logos, duration, reverse = false }: { logos: TrustedByLogo[], duration: string, reverse?: boolean }) => (
+    <div className="flex w-max items-center animate-marquee" style={{ animationDuration: duration, animationDirection: reverse ? 'reverse' : 'normal' }}>
+        {[...logos, ...logos].map((logo, index) => (
+            <div key={`logo-${index}`} className="relative mx-8 h-12 w-36 flex-shrink-0" title={logo.alt}>
+                 {logo.src ? (
+                    <Image src={logo.src} alt={logo.alt} fill sizes="144px" className="object-contain" />
+                ): (
+                    <div className="w-full h-full bg-white/20 rounded flex items-center justify-center text-sm">{logo.alt}</div>
+                )}
+            </div>
+        ))}
+    </div>
+);
+
 
 export default function HomeClientPage({ products, settings, professionalServices, newsItems, solutions }: HomePageProps) {
   
-  const autoplayPlugin = React.useRef(
-    Autoplay({ delay: 5000, stopOnInteraction: false })
-  );
-  
   const trustedByLogos = settings.trustedByLogos as TrustedByLogo[];
-  const logoChunks = chunkArray(trustedByLogos, 6); // Chunk logos into groups of 6 for a 2x3 grid per slide
-
+  
   return (
     <div className="flex flex-col bg-background text-foreground">
       {/* Hero Section */}
@@ -69,12 +64,12 @@ export default function HomeClientPage({ products, settings, professionalService
         <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up" style={{ textShadow: '0 0 2px rgba(0,0,0,0.5), 1px 1px 0 rgba(0,0,0,0.2), -1px -1px 0 rgba(0,0,0,0.2), 1px -1px 0 rgba(0,0,0,0.2), -1px 1px 0 rgba(0,0,0,0.2)' }}>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up" style={{ textShadow: '0 0 1px #000, 1px 1px 1px #000, -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000' }}>
                 {settings.heroHeadline}
               </h1>
             )}
             {settings.heroDescription && (
-              <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto fade-in-up" style={{ animationDelay: '0.2s', textShadow: '0 0 2px rgba(0,0,0,0.5), 1px 1px 2px rgba(0, 0, 0, 0.7), -1px -1px 0 rgba(0,0,0,0.2), 1px -1px 0 rgba(0,0,0,0.2), -1px 1px 0 rgba(0,0,0,0.2), 1px 1px 0 rgba(0,0,0,0.2)' }}>
+              <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto fade-in-up" style={{ animationDelay: '0.2s', textShadow: '0 0 1px #000, 1px 1px 1px #000, -1px -1px 1px #000, 1px -1px 1px #000, -1px 1px 1px #000' }}>
                 {settings.heroDescription}
               </p>
             )}
@@ -213,35 +208,21 @@ export default function HomeClientPage({ products, settings, professionalService
                 </div>
             )}
           </div>
-          {Array.isArray(settings.trustedByLogos) && settings.trustedByLogos.length > 0 && (
+          {Array.isArray(trustedByLogos) && trustedByLogos.length > 0 && (
             <div className="mt-12 border-t border-primary-foreground/20 pt-8">
               {settings.trustedByText && <h3 className="text-center font-semibold uppercase tracking-widest mb-6">{settings.trustedByText}</h3>}
-              <Carousel
-                opts={{
-                  align: "start",
-                  loop: true,
-                }}
-                plugins={[autoplayPlugin.current]}
-                className="w-full"
+              <div
+                  className="relative w-full overflow-hidden"
+                  style={{
+                      maskImage: 'linear-gradient(to right, transparent, white 10%, white 90%, transparent)',
+                      WebkitMaskImage: 'linear-gradient(to right, transparent, white 10%, white 90%, transparent)',
+                  }}
               >
-                <CarouselContent>
-                  {logoChunks.map((chunk, index) => (
-                    <CarouselItem key={index}>
-                      <div className="grid grid-cols-3 grid-rows-2 gap-x-12 gap-y-8 items-center justify-items-center">
-                        {chunk.map((logo, logoIndex) => (
-                          <div key={logoIndex} className="relative h-12 w-36 grayscale opacity-60 hover:opacity-100 hover:grayscale-0 transition-all">
-                            {logo.src ? (
-                                <Image src={logo.src} alt={logo.alt} fill sizes="144px" className="object-contain" />
-                            ): (
-                               <div className="w-full h-full bg-white/20 rounded flex items-center justify-center text-sm">{logo.alt}</div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-              </Carousel>
+                  <div className="flex flex-col gap-8 py-4">
+                      <Marquee logos={trustedByLogos} duration="80s" />
+                      <Marquee logos={trustedByLogos} duration="120s" reverse={true} />
+                  </div>
+              </div>
             </div>
           )}
         </div>
