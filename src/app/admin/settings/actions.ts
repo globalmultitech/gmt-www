@@ -100,7 +100,6 @@ export async function updateWebSettings(prevState: { message: string } | undefin
         data: {
           ...sanitizedData,
           socialMedia: sanitizedData.socialMedia ?? {},
-          testimonials: [], // Clear testimonials
         }
     });
 

@@ -1,3 +1,4 @@
+
 import prisma from '@/lib/db';
 import type { WebSettings as PrismaWebSettings } from '@prisma/client';
 
