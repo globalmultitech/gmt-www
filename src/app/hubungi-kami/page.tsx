@@ -1,17 +1,28 @@
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { getSettings } from '@/lib/settings';
-import { Building, Mail, Phone, MessageSquare } from 'lucide-react';
+import { Building, Mail, MessageSquare } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import ContactForm from './contact-form';
+import prisma from '@/lib/db';
+
+async function getPageData() {
+    const settings = await getSettings();
+    const products = await prisma.product.findMany({
+        select: {
+            title: true,
+        },
+        orderBy: {
+            title: 'asc',
+        },
+    });
+    return { settings, products };
+}
 
 export default async function HubungiKamiPage() {
-  const settings = await getSettings();
+  const { settings, products } = await getPageData();
   const whatsappNumber = settings.whatsappSales;
   const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=Halo,%20saya%20tertarik%20dengan%20produk/layanan%20Anda.`;
 
@@ -33,51 +44,14 @@ export default async function HubungiKamiPage() {
             <div className="md:col-span-7 lg:col-span-8">
               <Card className="shadow-lg">
                 <CardHeader>
-                  <CardTitle className="font-headline text-3xl">Kirim Pesan</CardTitle>
+                  <CardTitle className="font-headline text-3xl">Minta Penawaran Cepat</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <form className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <Label htmlFor="firstName">Nama Depan</Label>
-                      <Input id="firstName" placeholder="John" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="lastName">Nama Belakang</Label>
-                      <Input id="lastName" placeholder="Doe" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="email">Email</Label>
-                      <Input id="email" type="email" placeholder="john.doe@example.com" />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="phone">Nomor Telepon</Label>
-                      <Input id="phone" type="tel" placeholder="+62 812 3456 7890" />
-                    </div>
-                    <div className="md:col-span-2 space-y-2">
-                      <Label htmlFor="interest">Topik yang diminati</Label>
-                      <Select>
-                        <SelectTrigger id="interest">
-                          <SelectValue placeholder="Pilih topik..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="sales">Pertanyaan Penjualan</SelectItem>
-                          <SelectItem value="demo">Permintaan Demo Produk</SelectItem>
-                          <SelectItem value="support">Dukungan Teknis</SelectItem>
-                          <SelectItem value="partnership">Kemitraan</SelectItem>
-                          <SelectItem value="other">Lainnya</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="md:col-span-2 space-y-2">
-                      <Label htmlFor="message">Pesan Anda</Label>
-                      <Textarea id="message" placeholder="Tuliskan pesan Anda di sini..." rows={5} />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Button type="submit" className="w-full" size="lg">
-                        Kirim Pesan
-                      </Button>
-                    </div>
-                  </form>
+                  <ContactForm 
+                    whatsappNumber={settings.whatsappSales}
+                    companyName={settings.companyName}
+                    products={products}
+                  />
                 </CardContent>
               </Card>
             </div>
