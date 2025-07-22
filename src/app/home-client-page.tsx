@@ -44,12 +44,12 @@ export default function HomeClientPage({ products, settings, professionalService
         <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (
-              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up" style={{textShadow: '2px 2px 4px rgba(0,0,0,0.5)'}}>
+              <h1 className="text-5xl md:text-7xl lg:text-8xl font-headline font-extrabold uppercase leading-tight mb-6 fade-in-up" style={{ textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7), -1px -1px 0 rgba(0,0,0,0.2), 1px -1px 0 rgba(0,0,0,0.2), -1px 1px 0 rgba(0,0,0,0.2), 1px 1px 0 rgba(0,0,0,0.2)' }}>
                 {settings.heroHeadline}
               </h1>
             )}
             {settings.heroDescription && (
-              <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto fade-in-up" style={{animationDelay: '0.2s', textShadow: '1px 1px 3px rgba(0,0,0,0.5)'}}>
+              <p className="text-lg md:text-xl mb-10 max-w-2xl mx-auto fade-in-up" style={{ animationDelay: '0.2s', textShadow: '1px 1px 2px rgba(0, 0, 0, 0.7), -1px -1px 0 rgba(0,0,0,0.2), 1px -1px 0 rgba(0,0,0,0.2), -1px 1px 0 rgba(0,0,0,0.2), 1px 1px 0 rgba(0,0,0,0.2)' }}>
                 {settings.heroDescription}
               </p>
             )}
