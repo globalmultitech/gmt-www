@@ -297,20 +297,24 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
     });
     formData.set('features', JSON.stringify(featuresToSave));
     
+    // Technical Specifications
+    const filteredTechHeaders = technicalSpecifications.headers.filter(h => h.trim() !== '');
     const techSpecsToSave = {
-        headers: technicalSpecifications.headers.filter(h => h.trim() !== ''),
+        headers: filteredTechHeaders,
         rows: technicalSpecifications.rows.map(rowWithId => {
             const { id, ...rest } = rowWithId;
-            return Object.values(rest).slice(0, techSpecsToSave.headers.length);
+            return Object.values(rest).slice(0, filteredTechHeaders.length);
         }).filter(row => row.some(cell => typeof cell === 'string' && cell.replace(/<[^>]*>?/gm, '').trim() !== ''))
     };
     formData.set('technicalSpecifications', JSON.stringify(techSpecsToSave));
     
+    // General Specifications
+    const filteredGeneralHeaders = generalSpecifications.headers.filter(h => h.trim() !== '');
     const generalSpecsToSave = {
-        headers: generalSpecifications.headers.filter(h => h.trim() !== ''),
+        headers: filteredGeneralHeaders,
         rows: generalSpecifications.rows.map(rowWithId => {
             const { id, ...rest } = rowWithId;
-            return Object.values(rest).slice(0, generalSpecsToSave.headers.length);
+            return Object.values(rest).slice(0, filteredGeneralHeaders.length);
         }).filter(row => row.some(cell => typeof cell === 'string' && cell.replace(/<[^>]*>?/gm, '').trim() !== ''))
     };
     formData.set('generalSpecifications', JSON.stringify(generalSpecsToSave));
