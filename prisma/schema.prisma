@@ -6,16 +6,15 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql" // THIS WAS THE MISSING LINE
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
-
 
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
-  name      String?
   password  String
+  name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -32,7 +31,7 @@ model WebSettings {
   openingHours               String?
   socialMedia                Json?
   menuItems                  Json?
-  heroHeadline               String? @db.Text
+  heroHeadline               String?
   heroDescription            String? @db.Text
   heroImageUrl               String? @db.Text
   heroButton1Text            String?
@@ -49,49 +48,38 @@ model WebSettings {
   servicesTitle              String?
   servicesDescription        String? @db.Text
   ctaHeadline                String?
-  ctaDescription             String? @db.Text
+  ctaDescription             String?
   ctaImageUrl                String? @db.Text
   ctaButtonText              String?
   ctaButtonLink              String?
   trustedByText              String?
   trustedByLogos             Json?
-
   servicesPageTitle          String?
-  servicesPageSubtitle       String? @db.Text
+  servicesPageSubtitle       String?
   servicesPageCommitmentTitle String?
   servicesPageCommitmentText String? @db.Text
   servicesPageHeaderImageUrl String? @db.Text
-
   solutionsPageTitle         String?
-  solutionsPageSubtitle      String? @db.Text
-
+  solutionsPageSubtitle      String?
   aboutPageTitle             String?
-  aboutPageSubtitle          String? @db.Text
+  aboutPageSubtitle          String?
   missionTitle               String?
-  missionText                String? @db.Text
+  missionText                String?
   visionTitle                String?
-  visionText                 String? @db.Text
-
+  visionText                 String?
   resourcesPageTitle         String?
-  resourcesPageSubtitle      String? @db.Text
-
-  contactPageTitle           String?
-  contactPageSubtitle        String? @db.Text
-  contactPageMapImageUrl     String? @db.Text
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  resourcesPageSubtitle      String?
+  createdAt                  DateTime @default(now())
+  updatedAt                  DateTime @updatedAt
 }
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
-  name          String
+  name          String               @unique
   slug          String               @unique
   description   String?              @db.Text
   imageUrl      String?              @db.Text
   subCategories ProductSubCategory[]
-  createdAt     DateTime             @default(now())
-  updatedAt     DateTime             @updatedAt
 }
 
 model ProductSubCategory {
@@ -100,28 +88,26 @@ model ProductSubCategory {
   products   Product[]
   category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
-  createdAt  DateTime        @default(now())
-  updatedAt  DateTime        @updatedAt
 }
 
 model Product {
-  id                      Int                @id @default(autoincrement())
+  id                      Int                 @id @default(autoincrement())
   title                   String
-  slug                    String             @unique
-  description             String             @db.Text
-  longDescription         String?            @db.Text
+  slug                    String              @unique
+  description             String              @db.Text
+  longDescription         String?             @db.Text
   images                  Json?
   features                Json?
   technicalSpecifications Json?
   generalSpecifications   Json?
   metaTitle               String?
-  metaDescription         String?            @db.Text
+  metaDescription         String?             @db.Text
   tokopediaUrl            String?
   shopeeUrl               String?
-  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategory             ProductSubCategory  @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   subCategoryId           Int
-  createdAt               DateTime           @default(now())
-  updatedAt               DateTime           @updatedAt
+  createdAt               DateTime            @default(now())
+  updatedAt               DateTime            @updatedAt
 }
 
 model ProfessionalService {
@@ -147,8 +133,8 @@ model Solution {
   image       String?   @db.Text
   aiHint      String?
   keyPoints   Json?
-  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   parentId    Int?
+  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
   children    Solution[] @relation("SolutionHierarchy")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt

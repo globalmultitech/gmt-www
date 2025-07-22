@@ -31,7 +31,6 @@ import {
   Newspaper,
   ChevronDown,
   MessageSquare,
-  Phone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { logout } from '@/app/login/actions';
@@ -58,11 +57,10 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     { href: '/admin/pages/solusi', label: 'Solusi', icon: <Handshake /> },
     { href: '/admin/pages/tentang-kami', label: 'Tentang Kami', icon: <Building2 /> },
     { href: '/admin/pages/resources', label: 'Knowledge Center', icon: <Newspaper /> },
-    { href: '/admin/pages/hubungi-kami', label: 'Hubungi Kami', icon: <Phone /> },
   ];
 
   const settingsNavItems = [
-    { href: '/admin/settings', label: 'Pengaturan Web', icon: <Settings /> },
+    { href: '/admin/settings', label: 'Pengaturan Umum', icon: <Settings /> },
     { href: '/admin/users', label: 'Manajemen User', icon: <Users /> },
   ];
 

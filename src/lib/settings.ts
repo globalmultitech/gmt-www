@@ -22,14 +22,6 @@ export type TrustedByLogo = {
   alt: string;
 };
 
-export type Testimonial = {
-    quote: string;
-    name: string;
-    role: string;
-    image: string;
-    aiHint?: string;
-};
-
 // Interface for database reads, ensuring all fields from prisma are present
 export interface FullWebSettings extends PrismaWebSettings {}
 
@@ -97,10 +89,6 @@ const defaultSettings: WebSettings = {
 
   resourcesPageTitle: 'Resources',
   resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri.',
-
-  contactPageTitle: 'Hubungi Kami',
-  contactPageSubtitle: 'Kami siap membantu.',
-  contactPageMapImageUrl: 'https://placehold.co/600x400.png',
 
   createdAt: new Date(),
   updatedAt: new Date(),

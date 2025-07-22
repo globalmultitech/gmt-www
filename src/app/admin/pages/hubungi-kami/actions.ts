@@ -1,41 +1,153 @@
+'use client';
 
-'use server';
+import type { ReactNode } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import {
+  SidebarProvider,
+  Sidebar,
+  SidebarHeader,
+  SidebarTrigger,
+  SidebarContent,
+  SidebarMenu,
+  SidebarMenuItem,
+  SidebarMenuButton,
+  SidebarFooter,
+  SidebarInset,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+} from '@/components/ui/sidebar';
+import {
+  LayoutDashboard,
+  Users,
+  LogOut,
+  Settings,
+  Package,
+  Shapes,
+  FileText,
+  Handshake,
+  Building2,
+  Newspaper,
+  ChevronDown,
+  MessageSquare,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { logout } from '@/app/login/actions';
+import { Logo } from '@/components/logo';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
-import { revalidatePath } from 'next/cache';
-import prisma from '@/lib/db';
-import { z } from 'zod';
+export default function AdminLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
 
-const HubungiKamiPageSettingsSchema = z.object({
-  contactPageTitle: z.string().optional(),
-  contactPageSubtitle: z.string().optional(),
-  contactPageMapImageUrl: z.string().optional(),
-});
+  const navItems = [
+    { href: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard /> },
+    { href: '/admin/chat', label: 'Live Chat', icon: <MessageSquare /> },
+    { href: '/admin/produk', label: 'Produk', icon: <Package /> },
+    { href: '/admin/kategori', label: 'Kategori', icon: <Shapes /> },
+  ];
 
-export async function updateHubungiKamiPageSettings(prevState: { message: string } | undefined, formData: FormData) {
-  try {
-    const dataToValidate = {
-        contactPageTitle: formData.get('contactPageTitle'),
-        contactPageSubtitle: formData.get('contactPageSubtitle'),
-        contactPageMapImageUrl: formData.get('contactPageMapImageUrl'),
-    };
+  const pageNavItems = [
+    { href: '/admin/pages/layanan', label: 'Layanan', icon: <FileText /> },
+    { href: '/admin/pages/solusi', label: 'Solusi', icon: <Handshake /> },
+    { href: '/admin/pages/tentang-kami', label: 'Tentang Kami', icon: <Building2 /> },
+    { href: '/admin/pages/resources', label: 'Knowledge Center', icon: <Newspaper /> },
+  ];
 
-    const validatedFields = HubungiKamiPageSettingsSchema.safeParse(dataToValidate);
+  const settingsNavItems = [
+    { href: '/admin/settings', label: 'Pengaturan Umum', icon: <Settings /> },
+    { href: '/admin/users', label: 'Manajemen User', icon: <Users /> },
+  ];
 
-    if (!validatedFields.success) {
-      return { message: "Input tidak valid. Silakan periksa kembali." };
-    }
-    
-    await prisma.webSettings.update({
-        where: { id: 1 },
-        data: validatedFields.data
-    });
+  return (
+    <SidebarProvider>
+      <Sidebar>
+        <SidebarHeader>
+           <Logo companyName="Admin" />
+           <SidebarTrigger />
+        </SidebarHeader>
+        <SidebarContent>
+          <SidebarMenu>
+            {navItems.map((item) => (
+              <SidebarMenuItem key={item.href}>
+                <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
+                  <Link href={item.href}>
+                    {item.icon}
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            ))}
 
-    revalidatePath('/hubungi-kami');
-    revalidatePath('/admin/pages/hubungi-kami');
-    return { message: 'Pengaturan Halaman Hubungi Kami berhasil diperbarui.' };
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton
+                    isActive={pageNavItems.some(item => pathname.startsWith(item.href))}
+                    tooltip="Halaman"
+                  >
+                    <FileText />
+                    <span>Halaman</span>
+                    <ChevronDown className="ml-auto size-4" />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-56" side="right" sideOffset={10}>
+                  {pageNavItems.map((item) => (
+                    <DropdownMenuItem key={item.href} asChild>
+                      <Link href={item.href}>{item.label}</Link>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
 
-  } catch (error) {
-    console.error('Update Hubungi Kami Page settings error:', error);
-    return { message: 'Gagal memperbarui pengaturan karena kesalahan server.' };
-  }
+              <SidebarMenuSub>
+                 {pageNavItems.map((item) => (
+                    <SidebarMenuItem key={item.href}>
+                        <SidebarMenuSubButton asChild isActive={pathname.startsWith(item.href)}>
+                            <Link href={item.href}>
+                                <span>{item.label}</span>
+                            </Link>
+                        </SidebarMenuSubButton>
+                    </SidebarMenuItem>
+                 ))}
+              </SidebarMenuSub>
+            </SidebarMenuItem>
+
+
+            {settingsNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
+                        <Link href={item.href}>
+                            {item.icon}
+                            <span>{item.label}</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+            ))}
+
+          </SidebarMenu>
+        </SidebarContent>
+        <SidebarFooter>
+          <SidebarMenu>
+             <SidebarMenuItem>
+                <form action={logout} className="w-full">
+                    <SidebarMenuButton tooltip="Logout">
+                        <LogOut/>
+                        <span>Logout</span>
+                    </SidebarMenuButton>
+                </form>
+            </SidebarMenuItem>
+            <div className="text-center text-xs text-muted-foreground p-2 group-data-[collapsible=icon]:hidden">
+                Crafted by <a href="https://c-ss.co.id" target="_blank" rel="noopener noreferrer" className="font-semibold hover:text-foreground underline">Creative Software Solution</a>
+            </div>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
+      <SidebarInset>{children}</SidebarInset>
+    </SidebarProvider>
+  );
 }
