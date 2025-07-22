@@ -60,7 +60,7 @@ export default function HomeClientPage({ products, settings, professionalService
                   </Button>
               )}
                {settings.heroButton2Text && settings.heroButton2Link && (
-                  <Button asChild size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+                  <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                     <Link href={settings.heroButton2Link}>{settings.heroButton2Text}</Link>
                   </Button>
                )}
