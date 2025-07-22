@@ -137,10 +137,6 @@ async function main() {
       
       resourcesPageTitle: 'Knowledge Center',
       resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri, berita perusahaan, dan artikel mendalam dari para ahli kami.',
-
-      contactPageTitle: 'Hubungi Kami',
-      contactPageSubtitle: 'Kami siap membantu. Hubungi kami untuk pertanyaan, permintaan demo, atau dukungan teknis.',
-      contactPageMapImageUrl: 'https://placehold.co/600x400.png',
     },
   });
   console.log('Web settings seeded.');
