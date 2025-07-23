@@ -53,7 +53,6 @@ const parseJsonSafe = (json: any, fallback: any) => {
     return json ?? fallback;
 }
 
-// Fungsi ini memberitahu Next.js halaman dinamis mana yang harus dibuat saat build
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({
     select: { slug: true },
@@ -64,53 +63,53 @@ export async function generateStaticParams() {
   }));
 }
 
-
-async function getProductBySlug(slug: string) {
-  const productRaw = await prisma.product.findUnique({
-    where: { slug },
-    include: {
-      subCategory: {
-        include: {
-          category: true,
+async function getProductData(slug: string) {
+  try {
+    const productRaw = await prisma.product.findUnique({
+      where: { slug },
+      include: {
+        subCategory: {
+          include: {
+            category: true,
+          },
         },
       },
-    },
-  });
-
-  if (!productRaw) {
-    return null;
-  }
-  
-  // Parse all JSON fields here
-  return {
-    ...productRaw,
-    images: parseJsonSafe(productRaw.images, []),
-    features: parseJsonSafe(productRaw.features, []),
-    technicalSpecifications: parseJsonSafe(productRaw.technicalSpecifications, { headers: [], rows: [] }),
-    generalSpecifications: parseJsonSafe(productRaw.generalSpecifications, { headers: [], rows: [] }),
-  }
-}
-
-async function getRelatedProducts(currentProductId: number, subCategoryId: number) {
-    const rawProducts = await prisma.product.findMany({
-        where: { 
-            id: { not: currentProductId },
-            subCategoryId: subCategoryId,
-        },
-        take: 4,
     });
 
-    // Parse the images field for each product
-    return rawProducts.map(product => ({
-        ...product,
-        images: parseJsonSafe(product.images, []),
+    if (!productRaw) {
+      return { product: null, relatedProducts: [] };
+    }
+
+    const product = {
+      ...productRaw,
+      images: parseJsonSafe(productRaw.images, []),
+      features: parseJsonSafe(productRaw.features, []),
+      technicalSpecifications: parseJsonSafe(productRaw.technicalSpecifications, { headers: [], rows: [] }),
+      generalSpecifications: parseJsonSafe(productRaw.generalSpecifications, { headers: [], rows: [] }),
+    };
+
+    const relatedProductsRaw = await prisma.product.findMany({
+      where: { 
+          id: { not: product.id },
+          subCategoryId: product.subCategoryId,
+      },
+      take: 4,
+    });
+
+    const relatedProducts = relatedProductsRaw.map(p => ({
+        ...p,
+        images: parseJsonSafe(p.images, []),
     }));
+
+    return { product, relatedProducts };
+  } catch (error) {
+    console.error("Failed to fetch product data:", error);
+    return { product: null, relatedProducts: [] };
+  }
 }
 
-
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = params;
-  const product = await getProductBySlug(slug);
+  const { product } = await getProductData(params.slug);
 
   if (!product) {
     return {
@@ -176,15 +175,13 @@ const SpecificationAccordion = ({ title, specs }: { title: string, specs: Specif
 
 export default async function ProductDetailPage({ params }: Props) {
   const { slug } = params;
-  const product = await getProductBySlug(slug);
+  const { product, relatedProducts } = await getProductData(slug);
   const settings = await getSettings();
 
   if (!product) {
     notFound();
   }
-  
-  const relatedProducts = await getRelatedProducts(product.id, product.subCategoryId);
-  
+    
   const featuresList = product.features as Feature[];
   const techSpecs = product.technicalSpecifications as Specifications;
   const generalSpecs = product.generalSpecifications as Specifications;
@@ -226,7 +223,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   )}
                 </div>
 
-                <Accordion type="multiple" className="w-full" defaultValue={['item-desc']}>
+                <Accordion type="multiple" className="w-full">
                     <AccordionItem value="item-desc">
                     <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                     <AccordionContent>
