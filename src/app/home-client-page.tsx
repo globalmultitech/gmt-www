@@ -95,7 +95,7 @@ export default function HomeClientPage({ products, settings, professionalService
             <div className="container mx-auto px-4 relative z-10 -mt-20">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {(settings.featureCards as FeatureCard[]).map((card: FeatureCard, index: number) => (
-                        <Card key={index} className="p-6 text-center bg-card shadow-lg rounded-lg transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+                        <Card key={index} className="p-6 text-center bg-card shadow-lg rounded-lg transition-all duration-300 hover:shadow-2xl">
                             <div className="flex justify-center mb-4">
                               <DynamicIcon 
                                 name={card.icon} 
@@ -157,7 +157,7 @@ export default function HomeClientPage({ products, settings, professionalService
               <div className="grid md:grid-cols-2 gap-8">
                 {professionalServices.map((service) => (
                   <Link key={service.id} href={`/layanan/${service.slug}`} className="group block">
-                    <Card className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl h-full">
+                    <Card className="transform transition-all duration-300 hover:shadow-xl h-full">
                       <div className="flex flex-row items-center gap-4 p-6">
                         <div className="bg-primary/10 p-3 md:p-4 rounded-full">
                           <DynamicIcon name={service.icon} className="h-8 w-8 md:h-10 md:w-10 text-primary" />
@@ -240,31 +240,25 @@ export default function HomeClientPage({ products, settings, professionalService
                     Semua Produk <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <div className="grid md:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
                   {products.map((product) => (
-                     <Link key={product.id} href={`/produk/${product.slug}`} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
-                          <div className="relative h-48 md:h-56">
+                     <Link key={product.id} href={`/produk/${product.slug}`} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:shadow-2xl">
+                          <div className="relative h-40">
                             <Image 
                                 src={(product.images as string[])?.[0] ?? 'https://placehold.co/600x400.png'} 
                                 alt={product.title} 
                                 fill
-                                sizes="(max-width: 768px) 100vw, 33vw" 
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 16vw" 
                                 className="object-cover" 
                                 data-ai-hint="product technology"/>
                           </div>
-                          <div className="p-6">
-                            <h3 className="text-lg font-bold font-headline mb-4 text-primary group-hover:text-primary-dark transition-colors">{product.title}</h3>
-                            <div className="grid grid-cols-2 gap-4 text-sm mb-4 border-b pb-4">
-                                <div>
-                                    <p className="text-muted-foreground text-xs uppercase font-semibold">KATEGORI</p>
-                                    <p className="font-bold">{product.subCategory.category.name}</p>
-                                </div>
-                                <div>
-                                    <p className="text-muted-foreground text-xs uppercase font-semibold">SUB-KATEGORI</p>
-                                    <p className="font-bold">{product.subCategory.name}</p>
-                                </div>
+                          <div className="p-4">
+                            <h3 className="text-sm font-bold font-headline mb-2 text-primary group-hover:text-primary-dark transition-colors h-10 overflow-hidden">{product.title}</h3>
+                            <div className="text-xs mb-2 border-b pb-2">
+                                <p className="text-muted-foreground uppercase font-semibold">KATEGORI</p>
+                                <p className="font-bold truncate">{product.subCategory.category.name}</p>
                             </div>
-                            <p className="text-muted-foreground text-sm h-16 overflow-hidden">{product.description}</p>
+                            <p className="text-muted-foreground text-xs h-16 overflow-hidden">{product.description}</p>
                           </div>
                       </Link>
                   ))}
