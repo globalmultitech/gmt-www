@@ -15,8 +15,30 @@ async function getPageData() {
     return { settings, services };
 }
 
+const parseJsonSafe = (jsonString: any, fallback: any[]) => {
+    if (Array.isArray(jsonString)) return jsonString;
+    if (typeof jsonString !== 'string') return fallback;
+    try {
+      const parsed = JSON.parse(jsonString);
+      return Array.isArray(parsed) ? parsed : fallback;
+    } catch {
+      return fallback;
+    }
+}
+
 export default async function LayananPage() {
   const { settings, services } = await getPageData();
+  
+  // Collect all possible images from service details
+  const allDetailImages = services.flatMap(service => {
+    const details = parseJsonSafe(service.details, []);
+    return details.map((detail: { image?: string }) => detail.image).filter(Boolean);
+  });
+
+  // Pick a random image, or use the default from settings as a fallback
+  const commitmentImageUrl = allDetailImages.length > 0 
+    ? allDetailImages[Math.floor(Math.random() * allDetailImages.length)]
+    : settings.servicesPageHeaderImageUrl;
 
   return (
     <>
@@ -70,7 +92,7 @@ export default async function LayananPage() {
           </div>
           <div className="relative h-64 md:h-80">
             <Image 
-                src={settings.servicesPageHeaderImageUrl || "https://placehold.co/600x400.png"} 
+                src={commitmentImageUrl || "https://placehold.co/600x400.png"} 
                 alt="Keamanan Siber" 
                 fill 
                 className="object-cover rounded-lg shadow-md" 
