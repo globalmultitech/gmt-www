@@ -21,7 +21,7 @@ const parseJsonField = (field: any, fallback: any = []) => {
 
 async function getHomePageData() {
   const productsRaw = await prisma.product.findMany({
-    take: 6,
+    take: 5,
     orderBy: { createdAt: 'desc' },
     select: {
       id: true,

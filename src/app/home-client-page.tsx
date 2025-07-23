@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import type { Product, ProductSubCategory, ProductCategory, ProfessionalService, NewsItem, Solution } from '@prisma/client';
@@ -240,25 +239,25 @@ export default function HomeClientPage({ products, settings, professionalService
                     Semua Produk <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                   {products.map((product) => (
                      <Link key={product.id} href={`/produk/${product.slug}`} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:shadow-2xl">
-                          <div className="relative h-40">
+                          <div className="relative h-48">
                             <Image 
                                 src={(product.images as string[])?.[0] ?? 'https://placehold.co/600x400.png'} 
                                 alt={product.title} 
                                 fill
-                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 16vw" 
+                                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 33vw, 20vw" 
                                 className="object-cover" 
                                 data-ai-hint="product technology"/>
                           </div>
                           <div className="p-4">
-                            <h3 className="text-sm font-bold font-headline mb-2 text-primary group-hover:text-primary-dark transition-colors h-10 overflow-hidden">{product.title}</h3>
+                            <h3 className="text-base font-bold font-headline mb-2 text-primary group-hover:text-primary-dark transition-colors h-12 overflow-hidden">{product.title}</h3>
                             <div className="text-xs mb-2 border-b pb-2">
                                 <p className="text-muted-foreground uppercase font-semibold">KATEGORI</p>
                                 <p className="font-bold truncate">{product.subCategory.category.name}</p>
                             </div>
-                            <p className="text-muted-foreground text-xs h-16 overflow-hidden">{product.description}</p>
+                            <p className="text-muted-foreground text-sm h-20 overflow-hidden">{product.description}</p>
                           </div>
                       </Link>
                   ))}
