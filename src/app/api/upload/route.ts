@@ -12,6 +12,8 @@ const s3 = new S3Client({
   },
 });
 
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -19,6 +21,13 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json({ error: "File is required." }, { status: 400 });
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+            { error: `Ukuran file tidak boleh melebihi ${MAX_FILE_SIZE / 1024 / 1024}MB.` },
+            { status: 413 } // 413 Payload Too Large
+        );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
