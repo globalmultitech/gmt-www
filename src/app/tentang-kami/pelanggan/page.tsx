@@ -1,10 +1,10 @@
 
 import Image from 'next/image';
 import prisma from '@/lib/db';
-import { Card } from '@/components/ui/card';
 import Link from 'next/link';
 import { Home, ChevronRight } from 'lucide-react';
 import type { Metadata } from 'next';
+import PelangganClientPage from './pelanggan-client-page';
 
 async function getCustomerData() {
     const customers = await prisma.customerLogo.findMany({
@@ -48,25 +48,7 @@ export default async function PelangganPage() {
 
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
-            {customers.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 items-center">
-                    {customers.map((logo) => (
-                        <div key={logo.id} title={logo.alt} className="relative h-24 transition-transform duration-300 hover:scale-110 grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                            <Image
-                                src={logo.src}
-                                alt={logo.alt}
-                                fill
-                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                                className="object-contain"
-                            />
-                        </div>
-                    ))}
-                </div>
-            ) : (
-                 <div className="text-center text-muted-foreground py-16">
-                    <p className="text-lg">Daftar pelanggan akan segera diperbarui.</p>
-                </div>
-            )}
+            <PelangganClientPage customers={customers} />
         </div>
       </section>
     </>
