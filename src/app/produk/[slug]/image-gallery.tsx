@@ -26,7 +26,7 @@ export default function ProductImageGallery({ images, productTitle }: ProductIma
   const activeImage = imageList[activeIndex];
 
   return (
-    <div className="sticky top-24">
+    <div>
       <div className="group relative aspect-square w-full rounded-lg overflow-hidden shadow-lg border bg-muted">
         <Image
           src={activeImage}

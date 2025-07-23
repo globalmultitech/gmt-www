@@ -197,66 +197,67 @@ export default async function ProductDetailPage({ params }: Props) {
             <Breadcrumbs productTitle={product.title} />
           </div>
           
-          <div className="pb-12 md:pb-16 grid md:grid-cols-2 gap-8 md:gap-12">
-            
-            <ProductImageGallery images={product.images as string[]} productTitle={product.title} />
-
-            <div className="flex flex-col">
-              <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-              <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
-              
-              <div className="flex flex-wrap items-center gap-3 my-6">
-                <WhatsAppButton product={product} settings={settings} />
-                {product.tokopediaUrl && (
-                  <Button asChild variant="outline" size="lg" className="border-green-500 hover:bg-green-500/10 hover:text-green-600 text-green-600">
-                    <Link href={product.tokopediaUrl} target="_blank" rel="noopener noreferrer">
-                        <TokopediaIcon className="mr-2 h-5 w-5" />
-                        Tokopedia
-                    </Link>
-                  </Button>
-                )}
-                  {product.shopeeUrl && (
-                  <Button asChild variant="outline" size="lg" className="border-orange-500 hover:bg-orange-500/10 hover:text-orange-600 text-orange-600">
-                    <Link href={product.shopeeUrl} target="_blank" rel="noopener noreferrer">
-                        <ShopeeIcon className="mr-2 h-5 w-5" />
-                        Shopee
-                    </Link>
-                  </Button>
-                )}
+           <div className="md:grid md:grid-cols-2 md:gap-12">
+              <div className="md:sticky md:top-24 h-fit">
+                <ProductImageGallery images={product.images as string[]} productTitle={product.title} />
               </div>
 
-              <Accordion type="multiple" className="w-full" defaultValue={['item-desc']}>
-                  <AccordionItem value="item-desc">
-                  <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
-                  <AccordionContent>
-                      <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
-                        <div dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }} />
-                      </article>
-                  </AccordionContent>
-                </AccordionItem>
+              <div className="flex flex-col mt-8 md:mt-0">
+                <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
+                <p className="mt-4 text-lg text-muted-foreground">{product.description}</p>
                 
-                {featuresList.length > 0 && (
-                    <AccordionItem value="item-features">
-                    <AccordionTrigger className="text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
+                <div className="flex flex-wrap items-center gap-3 my-6">
+                  <WhatsAppButton product={product} settings={settings} />
+                  {product.tokopediaUrl && (
+                    <Button asChild variant="outline" size="lg" className="border-green-500 hover:bg-green-500/10 hover:text-green-600 text-green-600">
+                      <Link href={product.tokopediaUrl} target="_blank" rel="noopener noreferrer">
+                          <TokopediaIcon className="mr-2 h-5 w-5" />
+                          Tokopedia
+                      </Link>
+                    </Button>
+                  )}
+                    {product.shopeeUrl && (
+                    <Button asChild variant="outline" size="lg" className="border-orange-500 hover:bg-orange-500/10 hover:text-orange-600 text-orange-600">
+                      <Link href={product.shopeeUrl} target="_blank" rel="noopener noreferrer">
+                          <ShopeeIcon className="mr-2 h-5 w-5" />
+                          Shopee
+                      </Link>
+                    </Button>
+                  )}
+                </div>
+
+                <Accordion type="multiple" className="w-full" defaultValue={['item-desc']}>
+                    <AccordionItem value="item-desc">
+                    <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                     <AccordionContent>
-                      <ul className="space-y-4 pt-4">
-                          {featuresList.map((feature, index) => (
-                          <li key={index} className="flex items-start gap-3">
-                              <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
-                              <CheckCircle className="h-4 w-4" />
-                              </div>
-                              <div>
-                                <p className='font-semibold'>{feature.title}</p>
-                                <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: feature.description }} />
-                              </div>
-                          </li>
-                          ))}
-                      </ul>
+                        <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
+                          <div dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }} />
+                        </article>
                     </AccordionContent>
                   </AccordionItem>
-                )}
-              </Accordion>
-            </div>
+                  
+                  {featuresList.length > 0 && (
+                      <AccordionItem value="item-features">
+                      <AccordionTrigger className="text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
+                      <AccordionContent>
+                        <ul className="space-y-4 pt-4">
+                            {featuresList.map((feature, index) => (
+                            <li key={index} className="flex items-start gap-3">
+                                <div className="mt-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary">
+                                <CheckCircle className="h-4 w-4" />
+                                </div>
+                                <div>
+                                  <p className='font-semibold'>{feature.title}</p>
+                                  <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: feature.description }} />
+                                </div>
+                            </li>
+                            ))}
+                        </ul>
+                      </AccordionContent>
+                    </AccordionItem>
+                  )}
+                </Accordion>
+              </div>
           </div>
         </div>
       </div>
