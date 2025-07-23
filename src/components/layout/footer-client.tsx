@@ -31,23 +31,22 @@ export function FooterClient({ settings }: FooterClientProps) {
     .filter(Boolean);
   
   const footerLinks1 = [
-      { label: 'About Us', href: '/tentang-kami' },
-      { label: 'Our Services', href: '/layanan' },
-      { label: 'Our Projects', href: '/proyek' },
-      { label: 'Our Team', href: '/tim' },
+      { label: 'Tentang Kami', href: '/tentang-kami' },
+      { label: 'Layanan Kami', href: '/layanan' },
+      { label: 'Solusi', href: '/solusi' },
   ];
    const footerLinks2 = [
-      { label: 'Blog', href: '/resources' },
-      { label: 'Contact', href: '/hubungi-kami' },
+      { label: 'Knowledge Center', href: '/resources' },
+      { label: 'Hubungi Kami', href: '/hubungi-kami' },
       { label: 'FAQ', href: '#' },
-      { label: 'Careers', href: '#' },
+      { label: 'Karir', href: '#' },
     ];
 
     const contactInfo = [
-      { label: 'Address', value: settings.address },
+      { label: 'Alamat', value: settings.address },
       { label: 'Email', value: settings.contactEmail, href: `mailto:${settings.contactEmail}` },
-      { label: 'Phone', value: settings.contactPhone, href: `tel:${settings.contactPhone}` },
-      { label: 'Opening hours', value: settings.openingHours },
+      { label: 'Telepon', value: settings.contactPhone, href: `tel:${settings.contactPhone}` },
+      { label: 'Jam Buka', value: settings.openingHours },
     ].filter(info => info.value);
 
 
@@ -71,7 +70,7 @@ export function FooterClient({ settings }: FooterClientProps) {
           </div>
           
           <div className="lg:col-span-2">
-            <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Company</h3>
+            <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Perusahaan</h3>
             <ul className="space-y-4">
               {footerLinks1.map((link) => (
                 <li key={link.label}>
@@ -83,7 +82,7 @@ export function FooterClient({ settings }: FooterClientProps) {
             </ul>
           </div>
            <div className="lg:col-span-2">
-            <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Resources</h3>
+            <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Sumber Daya</h3>
             <ul className="space-y-4">
               {footerLinks2.map((link) => (
                 <li key={link.label}>
@@ -96,7 +95,7 @@ export function FooterClient({ settings }: FooterClientProps) {
           </div>
 
           <div className="lg:col-span-4">
-              <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Get in Touch</h3>
+              <h3 className="font-headline font-bold text-primary-foreground text-xl mb-6">Hubungi Kami</h3>
               <ul className="space-y-3">
                 {contactInfo.map((info) => (
                   <li key={info.label} className="flex items-start">
@@ -117,10 +116,10 @@ export function FooterClient({ settings }: FooterClientProps) {
         {/* Bottom Footer Section */}
         <div className="py-6 border-t border-primary-foreground/20 text-sm text-primary-foreground/80">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-                <p>&copy; {new Date().getFullYear()} {settings.companyName}. All Rights Reserved.</p>
+                <p>&copy; {new Date().getFullYear()} {settings.companyName}. Hak Cipta Dilindungi.</p>
                 <div className="flex space-x-6">
-                    <Link href="#" className="hover:text-primary-foreground">Terms & Conditions</Link>
-                    <Link href="#" className="hover:text-primary-foreground">Privacy Policy</Link>
+                    <Link href="#" className="hover:text-primary-foreground">Syarat & Ketentuan</Link>
+                    <Link href="#" className="hover:text-primary-foreground">Kebijakan Privasi</Link>
                 </div>
             </div>
             <div className="text-center mt-4">
