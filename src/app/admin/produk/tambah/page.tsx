@@ -6,8 +6,14 @@ import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
-export default async function AddProductPage() {
+export default async function AddProductPage({
+  searchParams
+}: {
+  searchParams: { [key: string]: string | string[] | undefined }
+}) {
   const categories = await getCategoriesWithSubcategories();
+  const subCategoryId = searchParams?.subCategoryId;
+  const defaultSubCategoryId = typeof subCategoryId === 'string' ? Number(subCategoryId) : undefined;
 
   return (
     <div>
@@ -18,7 +24,7 @@ export default async function AddProductPage() {
             </Link>
         </Button>
         <h1 className="text-3xl font-bold mb-6">Tambah Produk Baru</h1>
-        <ProductForm categories={categories} />
+        <ProductForm categories={categories} defaultSubCategoryId={defaultSubCategoryId} />
     </div>
   );
 }

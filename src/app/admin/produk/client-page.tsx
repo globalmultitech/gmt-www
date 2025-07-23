@@ -162,6 +162,14 @@ export default function ProductManagementClientPage({ groupedProducts }: { group
                                     Belum ada produk di sub-kategori ini.
                                 </div>
                             )}
+                            <div className="mt-4 flex justify-end">
+                                <Button asChild variant="outline" size="sm">
+                                    <Link href={`/admin/produk/tambah?subCategoryId=${subCategory.id}`}>
+                                        <PlusCircle className="mr-2 h-4 w-4" />
+                                        Tambah Produk di Sub-Kategori Ini
+                                    </Link>
+                                </Button>
+                            </div>
                          </AccordionContent>
                        </AccordionItem>
                      </Accordion>

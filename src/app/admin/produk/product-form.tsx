@@ -33,6 +33,7 @@ type CategoryWithSubCategories = ProductCategory & {
 type ProductFormProps = {
   categories: CategoryWithSubCategories[];
   product?: Product | null;
+  defaultSubCategoryId?: number;
 }
 
 type Feature = {
@@ -229,7 +230,7 @@ const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title
 }
 
 
-export function ProductForm({ categories, product = null }: ProductFormProps) {
+export function ProductForm({ categories, product = null, defaultSubCategoryId }: ProductFormProps) {
   const { toast } = useToast();
   const isEditing = !!product;
 
@@ -238,14 +239,14 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const [state, dispatch] = useActionState(formAction, undefined);
   
   const [isUploading, setIsUploading] = useState(false);
-  const [imageUrls, setImageUrls] = useState<string[]>(parseJsonSafe(product?.images, []));
+  const [imageUrls, setImageUrls] = useState<string[]>(() => parseJsonSafe(product?.images, []));
   const [productTitle, setProductTitle] = useState(product?.title ?? '');
   const [slug, setSlug] = useState(product?.slug ?? '');
 
-  const [features, setFeatures] = useState<Feature[]>(parseJsonSafe(product?.features, []));
+  const [features, setFeatures] = useState<Feature[]>(() => parseJsonSafe(product?.features, []));
   
-  const [technicalSpecifications, setTechnicalSpecifications] = useState<Specifications>(parseJsonSafe(product?.technicalSpecifications, { headers: [''], rows: [] }));
-  const [generalSpecifications, setGeneralSpecifications] = useState<Specifications>(parseJsonSafe(product?.generalSpecifications, { headers: [''], rows: [] }));
+  const [technicalSpecifications, setTechnicalSpecifications] = useState<Specifications>(() => parseJsonSafe(product?.technicalSpecifications, { headers: [''], rows: [] }));
+  const [generalSpecifications, setGeneralSpecifications] = useState<Specifications>(() => parseJsonSafe(product?.generalSpecifications, { headers: [''], rows: [] }));
   
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newTitle = e.target.value;
@@ -458,7 +459,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
                         </div>
                         <div className="space-y-1">
                           <Label htmlFor="subCategoryId">Kategori Produk</Label>
-                          <Select name="subCategoryId" required defaultValue={product?.subCategoryId?.toString()}>
+                          <Select name="subCategoryId" required defaultValue={product?.subCategoryId?.toString() ?? defaultSubCategoryId?.toString()}>
                             <SelectTrigger><SelectValue placeholder="Pilih sub-kategori..." /></SelectTrigger>
                             <SelectContent>
                               {categories.map((category) => (
