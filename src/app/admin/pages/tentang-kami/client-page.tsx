@@ -30,11 +30,9 @@ type TentangKamiPageClientProps = {
   initialCustomers: CustomerLogo[];
 };
 
-type LogoItem = {
-    id: number;
-    src: string;
-    alt: string;
-}
+type PartnerLogoItem = PartnerLogo;
+type CustomerLogoItem = CustomerLogo;
+
 
 export default function TentangKamiPageClientPage({ settings, initialPartners, initialCustomers }: TentangKamiPageClientProps) {
   const { toast } = useToast();
@@ -65,7 +63,7 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
     setFormState(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleLogoChange = (arrayName: 'partners' | 'customers', index: number, field: keyof LogoItem, value: string) => {
+  const handleLogoChange = (arrayName: 'partners' | 'customers', index: number, field: keyof PartnerLogoItem | keyof CustomerLogoItem, value: string) => {
     setFormState(prev => {
         const newArray = [...prev[arrayName]];
         // @ts-ignore
@@ -75,11 +73,9 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
   };
 
   const addLogo = (arrayName: 'partners' | 'customers') => {
-    const newItem: LogoItem = {
-        id: Date.now(), // Temporary ID for new items
-        src: '',
-        alt: ''
-    };
+    const newItem: PartnerLogoItem | CustomerLogoItem = arrayName === 'partners' 
+      ? { id: Date.now(), src: '', alt: '', description: '' }
+      : { id: Date.now(), src: '', alt: '' };
     // @ts-ignore
     setFormState(prev => ({...prev, [arrayName]: [...prev[arrayName], newItem]}));
   };
@@ -109,6 +105,7 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
         if (!res.ok) throw new Error('Failed to upload image');
         
         const { publicUrl } = await res.json();
+        // @ts-ignore
         handleLogoChange(arrayName, index, 'src', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
@@ -131,44 +128,6 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
     }
   }, [state, toast]);
 
-  const LogoGrid = ({ title, arrayName, logos, onAdd, onRemove, onChange, onUpload }: { 
-      title: string,
-      arrayName: 'partners' | 'customers',
-      logos: LogoItem[],
-      onAdd: (name: 'partners' | 'customers') => void,
-      onRemove: (name: 'partners' | 'customers', index: number) => void,
-      onChange: (name: 'partners' | 'customers', index: number, field: keyof LogoItem, value: string) => void,
-      onUpload: (e: React.ChangeEvent<HTMLInputElement>, name: 'partners' | 'customers', index: number) => void,
-  }) => (
-      <Card>
-          <CardHeader>
-              <CardTitle>{title}</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4 pt-6">
-              {logos.map((logo, index) => (
-                  <div key={logo.id} className="flex items-end gap-4 p-2 border rounded-md">
-                      <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1">
-                            <Label className="text-xs">File Gambar Logo</Label>
-                            <Input value={logo.src} disabled placeholder="Unggah gambar untuk mendapatkan URL" />
-                            <div className="flex items-center gap-2 pt-1">
-                                <Input type="file" onChange={(e) => onUpload(e, arrayName, index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`${arrayName}-${index}`]} />
-                                {uploadingStates[`${arrayName}-${index}`] && <Loader2 className="animate-spin" />}
-                            </div>
-                        </div>
-                        <div className="space-y-1">
-                            <Label className="text-xs">Nama / Alt Text</Label>
-                            <Input value={logo.alt} onChange={e => onChange(arrayName, index, 'alt', e.target.value)} />
-                        </div>
-                      </div>
-                      <Button type="button" variant="ghost" size="icon" onClick={() => onRemove(arrayName, index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
-                  </div>
-              ))}
-              <Button type="button" variant="outline" onClick={() => onAdd(arrayName)}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo</Button>
-          </CardContent>
-      </Card>
-  );
-
   return (
     <form action={formAction} className="space-y-6">
        <input type="hidden" name="tentangKamiData" value={JSON.stringify(formState)} />
@@ -188,25 +147,70 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
             </CardContent>
         </Card>
 
-        <LogoGrid 
-            title="Logo Partner"
-            arrayName="partners"
-            logos={formState.partners}
-            onAdd={addLogo}
-            onRemove={removeLogo}
-            onChange={handleLogoChange}
-            onUpload={handleImageUpload}
-        />
+        <Card>
+            <CardHeader>
+                <CardTitle>Logo Partner</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+                {formState.partners.map((logo, index) => (
+                    <div key={logo.id} className="flex flex-col md:flex-row items-start gap-4 p-4 border rounded-md">
+                        <div className="flex-shrink-0 w-full md:w-auto">
+                           <div className="relative w-32 h-32 rounded-md bg-muted overflow-hidden border">
+                              {logo.src ? ( <Image src={logo.src} alt={logo.alt} fill sizes="128px" className="object-contain p-2" /> ) : ( <ImageIcon className="w-8 h-8 text-muted-foreground m-auto" /> )}
+                           </div>
+                        </div>
 
-        <LogoGrid 
-            title="Logo Pelanggan"
-            arrayName="customers"
-            logos={formState.customers}
-            onAdd={addLogo}
-            onRemove={removeLogo}
-            onChange={handleLogoChange}
-            onUpload={handleImageUpload}
-        />
+                        <div className="flex-grow grid grid-cols-1 gap-4 w-full">
+                          <div className="space-y-1">
+                              <Label className="text-xs">File Gambar Logo</Label>
+                              <div className="flex items-center gap-2 pt-1">
+                                  <Input type="file" onChange={(e) => handleImageUpload(e, 'partners', index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`partners-${index}`]} />
+                                  {uploadingStates[`partners-${index}`] && <Loader2 className="animate-spin" />}
+                              </div>
+                          </div>
+                          <div className="space-y-1">
+                              <Label className="text-xs">Nama Partner / Alt Text</Label>
+                              <Input value={logo.alt} onChange={e => handleLogoChange('partners', index, 'alt', e.target.value)} />
+                          </div>
+                           <div className="space-y-1">
+                              <Label className="text-xs">Deskripsi Partner</Label>
+                              <Textarea value={logo.description ?? ''} onChange={e => handleLogoChange('partners', index, 'description', e.target.value)} />
+                          </div>
+                        </div>
+                        <Button type="button" variant="ghost" size="icon" onClick={() => removeLogo('partners', index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                    </div>
+                ))}
+                <Button type="button" variant="outline" onClick={() => addLogo('partners')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Partner</Button>
+            </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+              <CardTitle>Logo Pelanggan</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4 pt-6">
+              {formState.customers.map((logo, index) => (
+                  <div key={logo.id} className="flex items-end gap-4 p-2 border rounded-md">
+                      <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-1">
+                            <Label className="text-xs">File Gambar Logo</Label>
+                            <Input value={logo.src} disabled placeholder="Unggah gambar untuk mendapatkan URL" />
+                            <div className="flex items-center gap-2 pt-1">
+                                <Input type="file" onChange={(e) => handleImageUpload(e, 'customers', index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`customers-${index}`]} />
+                                {uploadingStates[`customers-${index}`] && <Loader2 className="animate-spin" />}
+                            </div>
+                        </div>
+                        <div className="space-y-1">
+                            <Label className="text-xs">Nama / Alt Text</Label>
+                            <Input value={logo.alt} onChange={e => handleLogoChange('customers', index, 'alt', e.target.value)} />
+                        </div>
+                      </div>
+                      <Button type="button" variant="ghost" size="icon" onClick={() => removeLogo('customers', index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
+                  </div>
+              ))}
+              <Button type="button" variant="outline" onClick={() => addLogo('customers')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo</Button>
+          </CardContent>
+      </Card>
       
         <div className="flex justify-end">
             <SubmitButton isDirty={isDirty}/>

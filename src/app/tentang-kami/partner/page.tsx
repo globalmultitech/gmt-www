@@ -1,9 +1,9 @@
 
 import Image from 'next/image';
 import prisma from '@/lib/db';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
-import { Home, ChevronRight } from 'lucide-react';
+import { Home, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import type { Metadata } from 'next';
 
 async function getPartnerData() {
@@ -48,17 +48,27 @@ export default async function PartnerPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
             {partners.length > 0 ? (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-8 items-center">
-                    {partners.map((logo) => (
-                        <div key={logo.id} title={logo.alt} className="relative h-24 transition-transform duration-300 hover:scale-110 grayscale hover:grayscale-0 opacity-70 hover:opacity-100">
-                            <Image
-                                src={logo.src}
-                                alt={logo.alt}
-                                fill
-                                sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 16vw"
-                                className="object-contain"
-                            />
-                        </div>
+                <div className="space-y-8">
+                    {partners.map((partner) => (
+                        <Card key={partner.id} className="flex flex-col md:flex-row items-center gap-8 p-6 shadow-sm">
+                           <div className="relative h-32 w-48 flex-shrink-0 bg-muted rounded-md border flex items-center justify-center">
+                             {partner.src ? (
+                                <Image
+                                    src={partner.src}
+                                    alt={partner.alt}
+                                    fill
+                                    sizes="(max-width: 768px) 50vw, 12rem"
+                                    className="object-contain p-2"
+                                />
+                             ) : (
+                                <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                             )}
+                           </div>
+                           <div className="text-center md:text-left">
+                             <h2 className="text-2xl font-bold text-primary font-headline">{partner.alt}</h2>
+                             <p className="mt-2 text-muted-foreground">{partner.description}</p>
+                           </div>
+                        </Card>
                     ))}
                 </div>
             ) : (

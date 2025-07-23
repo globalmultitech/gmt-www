@@ -9,13 +9,14 @@ const LogoSchema = z.object({
     id: z.number(),
     src: z.string().default(''),
     alt: z.string().default(''),
+    description: z.string().optional(),
 });
 
 const TentangKamiPageSettingsSchema = z.object({
   aboutPageTitle: z.string().optional(),
   aboutPageSubtitle: z.string().optional(),
   partners: z.array(LogoSchema).optional(),
-  customers: z.array(LogoSchema).optional(),
+  customers: z.array(LogoSchema.omit({ description: true })).optional(),
 });
 
 
@@ -57,7 +58,7 @@ export async function updateTentangKamiPageSettings(prevState: { message: string
         partnerOps.push(prisma.partnerLogo.deleteMany({ where: { id: { in: partnerIdsToDelete } } }));
     }
     for (const item of partnersFromClient) {
-        const sanitizedData = { src: item.src, alt: item.alt };
+        const sanitizedData = { src: item.src, alt: item.alt, description: item.description };
         if (!item.src && !item.alt) continue;
         if (dbPartnerIds.has(item.id)) {
             partnerOps.push(prisma.partnerLogo.update({ where: { id: item.id }, data: sanitizedData }));
