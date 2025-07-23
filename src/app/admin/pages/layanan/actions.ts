@@ -88,6 +88,7 @@ export async function createProfessionalService(prevState: { message: string, su
   revalidatePath('/admin/pages/layanan');
   revalidatePath('/layanan');
   revalidatePath(`/layanan/${data.slug}`);
+  revalidatePath('/');
   redirect('/admin/pages/layanan');
 }
 
@@ -131,6 +132,7 @@ export async function updateProfessionalService(prevState: { message: string, su
     revalidatePath('/admin/pages/layanan');
     revalidatePath('/layanan');
     revalidatePath(`/layanan/${data.slug}`);
+    revalidatePath('/');
     redirect('/admin/pages/layanan');
 }
 
@@ -143,6 +145,7 @@ export async function deleteProfessionalService(serviceId: number) {
         revalidatePath('/admin/pages/layanan');
         revalidatePath('/layanan');
         revalidatePath(`/layanan/${service.slug}`);
+        revalidatePath('/');
         return { message: 'Layanan berhasil dihapus.' };
     }
     return { message: 'Layanan tidak ditemukan.' };
