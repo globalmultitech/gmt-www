@@ -13,7 +13,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command';
-import { cn } from '@/lib/utils';
+import { DialogDescription, DialogTitle } from './ui/dialog';
 
 interface GlobalSearchProps {
   products: { id: number; title: string; slug: string }[];
@@ -52,6 +52,8 @@ export default function GlobalSearch({ products }: GlobalSearchProps) {
         <span className="sr-only">Cari produk</span>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
+        <DialogTitle className="sr-only">Cari Produk Global</DialogTitle>
+        <DialogDescription className="sr-only">Ketik untuk mencari produk di seluruh situs.</DialogDescription>
         <CommandInput placeholder="Ketik nama produk..." />
         <CommandList>
           <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
