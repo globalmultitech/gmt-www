@@ -13,8 +13,8 @@ import { useFormStatus } from 'react-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import Image from 'next/image';
 import type { NewsItem } from '@prisma/client';
-import { Textarea } from '@/components/ui/textarea';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
+import RichTextEditor from '@/app/admin/produk/rich-text-editor';
 
 function SubmitButton({ isDirty }: { isDirty: boolean }) {
   const { pending } = useFormStatus();
@@ -244,8 +244,11 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                                 </div>
                                 <div className="space-y-1">
                                 <Label className="text-xs">Konten</Label>
-                                {/* @ts-ignore */}
-                                <Textarea value={item.content || ''} onChange={e => handleItemChange(index, 'content', e.target.value)} rows={8}/>
+                                 <RichTextEditor
+                                    key={`content-${item.id}`}
+                                    defaultValue={item.content || ''}
+                                    onUpdate={({ editor }) => handleItemChange(index, 'content', editor.getHTML())}
+                                />
                                 </div>
                            </div>
                         </AccordionContent>
