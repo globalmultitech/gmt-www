@@ -131,6 +131,7 @@ export async function createProduct(prevState: { message: string, success?: bool
     return { message: 'Gagal membuat produk karena kesalahan server.', success: false };
   }
   
+  revalidatePath('/');
   revalidatePath('/admin/produk');
   revalidatePath('/produk');
   revalidatePath(`/produk/${rest.slug}`);
@@ -183,6 +184,7 @@ export async function updateProduct(prevState: { message: string, success?: bool
         return { message: 'Gagal memperbarui produk.', success: false };
     }
 
+    revalidatePath('/');
     revalidatePath('/admin/produk');
     revalidatePath('/produk');
     revalidatePath(`/produk/${rest.slug}`);
@@ -197,6 +199,7 @@ export async function deleteProduct(productId: number) {
     });
     if (product) {
         await prisma.product.delete({ where: { id: productId } });
+        revalidatePath('/');
         revalidatePath('/admin/produk');
         revalidatePath('/produk');
         revalidatePath(`/produk/${product.slug}`);

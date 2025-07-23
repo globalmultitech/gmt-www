@@ -74,6 +74,7 @@ export async function createSolution(prevState: { message: string, success?: boo
     return { message: 'Gagal membuat solusi karena kesalahan server.', success: false };
   }
   
+  revalidatePath('/');
   revalidatePath('/admin/pages/solusi');
   revalidatePath('/solusi');
   revalidatePath(`/solusi/${data.slug}`);
@@ -117,23 +118,30 @@ export async function updateSolution(prevState: { message: string, success?: boo
         return { message: 'Gagal memperbarui solusi.', success: false };
     }
 
+    revalidatePath('/');
     revalidatePath('/admin/pages/solusi');
     revalidatePath('/solusi');
     revalidatePath(`/solusi/${data.slug}`);
-    revalidatePath('/');
     redirect('/admin/pages/solusi');
 }
 
 
 export async function deleteSolution(solutionId: number) {
   try {
+    // First, recursively delete all children
+    const children = await prisma.solution.findMany({ where: { parentId: solutionId } });
+    for (const child of children) {
+      await deleteSolution(child.id);
+    }
+    
+    // Then, delete the solution itself
     const solution = await prisma.solution.findUnique({ where: { id: solutionId }});
     if (solution) {
         await prisma.solution.delete({ where: { id: solutionId } });
+        revalidatePath('/');
         revalidatePath('/admin/pages/solusi');
         revalidatePath('/solusi');
         revalidatePath(`/solusi/${solution.slug}`);
-        revalidatePath('/');
         return { message: 'Solusi berhasil dihapus.' };
     }
     return { message: 'Solusi tidak ditemukan.' };
