@@ -12,7 +12,7 @@ const s3 = new S3Client({
   },
 });
 
-const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2 MB
+const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 
 export async function POST(request: NextRequest) {
   try {
