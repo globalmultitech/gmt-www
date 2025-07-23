@@ -1,22 +1,33 @@
 
-
 'use client';
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { WhatsAppIcon } from './whatsapp-icon';
-import type { Product } from '@prisma/client';
+import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
+
+type ProductWithSubCategory = Product & {
+    subCategory: ProductSubCategory & {
+        category: ProductCategory;
+    };
+};
+
+type CategoryWithProducts = ProductCategory & {
+    subCategories: (ProductSubCategory & {
+        products: Product[];
+    })[];
+};
 
 type ContactFormProps = {
     whatsappNumber: string;
     companyName: string;
-    products: Pick<Product, 'title' | 'slug'>[];
+    categories: CategoryWithProducts[];
 }
 
-export default function ContactForm({ whatsappNumber, companyName, products }: ContactFormProps) {
+export default function ContactForm({ whatsappNumber, companyName, categories }: ContactFormProps) {
     const [name, setName] = useState('');
     const [clientCompany, setClientCompany] = useState('');
     const [selectedProductSlug, setSelectedProductSlug] = useState('');
@@ -24,7 +35,18 @@ export default function ContactForm({ whatsappNumber, companyName, products }: C
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        const selectedProduct = products.find(p => p.slug === selectedProductSlug);
+        let selectedProduct: Product | undefined;
+        for (const category of categories) {
+            for (const subCategory of category.subCategories) {
+                const found = subCategory.products.find(p => p.slug === selectedProductSlug);
+                if (found) {
+                    selectedProduct = found;
+                    break;
+                }
+            }
+            if (selectedProduct) break;
+        }
+
         if (!selectedProduct) return;
 
         const cleanWaNumber = whatsappNumber.replace(/[^0-9]/g, '');
@@ -73,10 +95,22 @@ Mohon informasinya. Terima kasih.`;
                         <SelectValue placeholder="Pilih produk..." />
                     </SelectTrigger>
                     <SelectContent>
-                        {products.map((product) => (
-                            <SelectItem key={product.slug} value={product.slug}>
-                                {product.title}
-                            </SelectItem>
+                        {categories.map((category) => (
+                           <SelectGroup key={category.id}>
+                             <SelectLabel className="font-bold text-primary">{category.name}</SelectLabel>
+                              {category.subCategories.map((subCategory) => (
+                                <React.Fragment key={subCategory.id}>
+                                    {subCategory.products.length > 0 && (
+                                         <SelectLabel className="pl-6 italic">{subCategory.name}</SelectLabel>
+                                    )}
+                                    {subCategory.products.map((product) => (
+                                        <SelectItem key={product.slug} value={product.slug} className="pl-10">
+                                            {product.title}
+                                        </SelectItem>
+                                    ))}
+                                </React.Fragment>
+                              ))}
+                           </SelectGroup>
                         ))}
                     </SelectContent>
                 </Select>

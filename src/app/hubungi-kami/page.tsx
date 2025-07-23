@@ -11,20 +11,29 @@ import prisma from '@/lib/db';
 
 async function getPageData() {
     const settings = await getSettings();
-    const products = await prisma.product.findMany({
-        select: {
-            title: true,
-            slug: true, // Also fetch the slug
+    const categories = await prisma.productCategory.findMany({
+        include: {
+            subCategories: {
+                orderBy: { name: 'asc' },
+                include: {
+                    products: {
+                        orderBy: { title: 'asc' },
+                        select: {
+                            title: true,
+                            slug: true,
+                            id: true,
+                        }
+                    }
+                }
+            }
         },
-        orderBy: {
-            title: 'asc',
-        },
+        orderBy: { name: 'asc' },
     });
-    return { settings, products };
+    return { settings, categories };
 }
 
 export default async function HubungiKamiPage() {
-  const { settings, products } = await getPageData();
+  const { settings, categories } = await getPageData();
   const whatsappNumber = settings.whatsappSales;
   const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=Halo,%20saya%20tertarik%20dengan%20produk/layanan%20Anda.`;
 
@@ -52,7 +61,7 @@ export default async function HubungiKamiPage() {
                   <ContactForm 
                     whatsappNumber={settings.whatsappSales}
                     companyName={settings.companyName}
-                    products={products}
+                    categories={categories}
                   />
                 </CardContent>
               </Card>
