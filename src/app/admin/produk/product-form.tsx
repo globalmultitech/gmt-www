@@ -65,46 +65,50 @@ const generateSlug = (title: string) => {
 }
 
 const parseJsonSafe = (json: any, fallback: any) => {
-    if (Array.isArray(json)) {
-        return json; // Already an array, return as is.
-    }
     if (typeof json === 'string') {
         try {
             const parsed = JSON.parse(json);
-            if (Array.isArray(parsed)) {
-                return parsed;
-            }
+            return parsed;
         } catch (e) {
-            return fallback;
+            // It might be a string that's not JSON, or malformed.
+            // Let the later checks handle it or return fallback.
         }
     }
     
-    // For other cases or failed parsing, handle specifications object structure
-    if (typeof json === 'object' && json !== null && 'headers' in json && 'rows' in json) {
-        if (!Array.isArray(json.headers)) {
-            json.headers = fallback.headers;
+    // If it's already a parsed object (from Prisma or previous parsing)
+    if (typeof json === 'object' && json !== null) {
+        if (Array.isArray(json)) { // For images or features array
+            return json.map((item, index) => {
+                if(typeof item === 'object' && item !== null && !item.id) {
+                    return { ...item, id: `item-${Date.now()}-${index}` };
+                }
+                return item;
+            });
         }
-        if (!Array.isArray(json.rows)) {
-            json.rows = fallback.rows;
-        }
-        json.rows = json.rows.map((row: string[] | (string[] & {id: any}), index: number) => {
-            const newRow = [...row] as (string[] & { id: number | string});
-            // @ts-ignore
-            if (!newRow.id) {
-               newRow.id = `row-${Date.now()}-${index}`;
+        if ('headers' in json && 'rows' in json) { // For specifications object
+            if (!Array.isArray(json.headers)) {
+                json.headers = fallback.headers;
             }
-            return newRow;
-        });
-        return json;
-    } else if (Array.isArray(json)) { // for features
-        return json.map((item, index) => ({
-            ...item,
-            id: item.id || `item-${Date.now()}-${index}`
-        }));
-    } 
-
-    return fallback;
+            if (!Array.isArray(json.rows)) {
+                json.rows = fallback.rows;
+            } else {
+                 // Ensure each row has a unique ID for React keys
+                json.rows = json.rows.map((row: any, index: number) => {
+                    const newRow = Array.isArray(row) ? [...row] as any : [];
+                    if (!newRow.id) {
+                       newRow.id = `row-${Date.now()}-${index}`;
+                    }
+                    return newRow;
+                });
+            }
+            return json;
+        }
+        return json; // Return as is if it's an object but doesn't match known structures
+    }
+    
+    return fallback; // Final fallback for anything else
 };
+
 
 
 // Moved outside the main component
@@ -290,7 +294,7 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
         return newFeatures;
     });
   };
-  const addFeature = () => setFeatures([...features, { id: `new-${Date.now()}`, title: '', description: '' }]);
+  const addFeature = () => setFeatures([...features, { id: `new-${Date.now()}-${features.length}`, title: '', description: '' }]);
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
 
   const handleFormSubmit = (formData: FormData) => {
