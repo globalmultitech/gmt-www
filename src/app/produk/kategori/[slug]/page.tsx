@@ -1,11 +1,12 @@
 
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Home, ChevronRight, ArrowRight } from 'lucide-react';
+import { Home, ChevronRight, ArrowRight, Package } from 'lucide-react';
 import Link from 'next/link';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import Image from 'next/image';
 
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
@@ -18,15 +19,28 @@ export async function generateStaticParams() {
   }));
 }
 
+const parseJsonSafe = (json: any, fallback: any) => {
+    if (typeof json === 'string') {
+        try {
+            return JSON.parse(json);
+        } catch (e) {
+            return fallback;
+        }
+    }
+    return json ?? fallback;
+}
+
 async function getCategoryDataBySlug(slug: string) {
   const category = await prisma.productCategory.findUnique({
     where: { slug },
     include: {
       subCategories: {
         orderBy: { name: 'asc' },
-        select: {
-          id: true,
-          name: true,
+        include: {
+          products: {
+            take: 1,
+            select: { images: true }
+          }
         },
       },
     },
@@ -36,7 +50,7 @@ async function getCategoryDataBySlug(slug: string) {
     return null;
   }
 
-  return { category, subCategories: category.subCategories };
+  return { category };
 }
 
 type Props = {
@@ -102,7 +116,7 @@ export default async function CategoryPage({ params }: Props) {
     notFound();
   }
   
-  const { category, subCategories } = data;
+  const { category } = data;
 
   const toSubCategorySlug = (name: string) => {
     if (!name) return '';
@@ -130,18 +144,31 @@ export default async function CategoryPage({ params }: Props) {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-headline font-bold text-center mb-8">Pilih Sub-Kategori</h2>
-          {subCategories.length > 0 ? (
+          {category.subCategories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-              {subCategories.map((subCategory) => (
+              {category.subCategories.map((subCategory) => {
+                const firstProductImage = parseJsonSafe(subCategory.products[0]?.images, [])[0];
+                
+                return (
                 <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block">
                     <Card className="h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                      <CardContent className="p-6 flex justify-between items-center">
-                        <span className="font-semibold text-lg">{subCategory.name}</span>
-                        <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                      <CardContent className="p-6 flex items-center gap-4">
+                        <div className="relative h-16 w-16 flex-shrink-0 rounded-md overflow-hidden bg-muted border">
+                            {firstProductImage ? (
+                                <Image src={firstProductImage} alt={subCategory.name} fill sizes="64px" className="object-cover" />
+                            ) : (
+                                <Package className="h-8 w-8 text-muted-foreground m-auto" />
+                            )}
+                        </div>
+                        <div className="flex-grow flex justify-between items-center">
+                            <span className="font-semibold text-lg">{subCategory.name}</span>
+                            <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
+                        </div>
                       </CardContent>
                     </Card>
                 </Link>
-              ))}
+                )
+              })}
             </div>
           ) : (
              <div className="text-center text-muted-foreground py-16">
