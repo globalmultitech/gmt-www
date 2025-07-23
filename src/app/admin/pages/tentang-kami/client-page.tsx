@@ -74,8 +74,8 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
 
   const addLogo = (arrayName: 'partners' | 'customers') => {
     const newItem: PartnerLogoItem | CustomerLogoItem = arrayName === 'partners' 
-      ? { id: Date.now(), src: '', alt: '', description: '' }
-      : { id: Date.now(), src: '', alt: '' };
+      ? { id: Date.now(), src: '', alt: '', description: '', createdAt: new Date(), updatedAt: new Date() }
+      : { id: Date.now(), src: '', alt: '', createdAt: new Date(), updatedAt: new Date() };
     // @ts-ignore
     setFormState(prev => ({...prev, [arrayName]: [...prev[arrayName], newItem]}));
   };
@@ -87,26 +87,34 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
     }));
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, arrayName: 'partners' | 'customers', index: number) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, arrayName: 'partners' | 'customers') => {
+      const files = event.target.files;
+      if (!files || files.length === 0) return;
 
-      const uploadKey = `${arrayName}-${index}`;
+      const uploadKey = `${arrayName}-upload`;
       setUploadingStates(prev => ({...prev, [uploadKey]: true}));
+      
       const formData = new FormData();
-      formData.append("file", file);
+      for (const file of files) {
+          formData.append("file", file);
+      }
       
       try {
-        const res = await fetch('/api/upload', {
-            method: 'POST',
-            body: formData,
+        const res = await fetch('/api/upload', { method: 'POST', body: formData });
+        if (!res.ok) throw new Error('Failed to upload images');
+        
+        const { publicUrls } = await res.json();
+        
+        setFormState(prev => {
+            const newLogos = publicUrls.map((url: string) => (
+                arrayName === 'partners'
+                ? { id: Date.now() + Math.random(), src: url, alt: '', description: '', createdAt: new Date(), updatedAt: new Date() }
+                : { id: Date.now() + Math.random(), src: url, alt: '', createdAt: new Date(), updatedAt: new Date() }
+            ));
+            // @ts-ignore
+            return {...prev, [arrayName]: [...prev[arrayName], ...newLogos]};
         });
 
-        if (!res.ok) throw new Error('Failed to upload image');
-        
-        const { publicUrl } = await res.json();
-        // @ts-ignore
-        handleLogoChange(arrayName, index, 'src', publicUrl);
       } catch (error) {
         console.error("Upload error:", error);
         toast({ title: 'Upload Gagal', variant: 'destructive' });
@@ -150,8 +158,16 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
         <Card>
             <CardHeader>
                 <CardTitle>Logo Partner</CardTitle>
+                <CardDescription>Tambah satu atau beberapa logo partner sekaligus.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
+                <div className="p-4 border rounded-md bg-muted/50">
+                    <Label htmlFor="partner-upload">Unggah Logo Partner Baru</Label>
+                    <div className="flex items-center gap-2 pt-1">
+                        <Input id="partner-upload" type="file" onChange={(e) => handleImageUpload(e, 'partners')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates['partners-upload']} multiple />
+                        {uploadingStates['partners-upload'] && <Loader2 className="animate-spin" />}
+                    </div>
+                </div>
                 {formState.partners.map((logo, index) => (
                     <div key={logo.id} className="flex flex-col md:flex-row items-start gap-4 p-4 border rounded-md">
                         <div className="flex-shrink-0 w-full md:w-auto">
@@ -162,11 +178,8 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
 
                         <div className="flex-grow grid grid-cols-1 gap-4 w-full">
                           <div className="space-y-1">
-                              <Label className="text-xs">File Gambar Logo</Label>
-                              <div className="flex items-center gap-2 pt-1">
-                                  <Input type="file" onChange={(e) => handleImageUpload(e, 'partners', index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`partners-${index}`]} />
-                                  {uploadingStates[`partners-${index}`] && <Loader2 className="animate-spin" />}
-                              </div>
+                              <Label className="text-xs">URL Gambar Logo</Label>
+                              <Input value={logo.src} disabled />
                           </div>
                           <div className="space-y-1">
                               <Label className="text-xs">Nama Partner / Alt Text</Label>
@@ -180,25 +193,28 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
                         <Button type="button" variant="ghost" size="icon" onClick={() => removeLogo('partners', index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
                     </div>
                 ))}
-                <Button type="button" variant="outline" onClick={() => addLogo('partners')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Partner</Button>
             </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
               <CardTitle>Logo Pelanggan</CardTitle>
+              <CardDescription>Tambah satu atau beberapa logo pelanggan sekaligus.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 pt-6">
+              <div className="p-4 border rounded-md bg-muted/50">
+                  <Label htmlFor="customer-upload">Unggah Logo Pelanggan Baru</Label>
+                  <div className="flex items-center gap-2 pt-1">
+                      <Input id="customer-upload" type="file" onChange={(e) => handleImageUpload(e, 'customers')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates['customers-upload']} multiple />
+                      {uploadingStates['customers-upload'] && <Loader2 className="animate-spin" />}
+                  </div>
+              </div>
               {formState.customers.map((logo, index) => (
                   <div key={logo.id} className="flex items-end gap-4 p-2 border rounded-md">
                       <div className="flex-grow grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-1">
-                            <Label className="text-xs">File Gambar Logo</Label>
-                            <Input value={logo.src} disabled placeholder="Unggah gambar untuk mendapatkan URL" />
-                            <div className="flex items-center gap-2 pt-1">
-                                <Input type="file" onChange={(e) => handleImageUpload(e, 'customers', index)} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={uploadingStates[`customers-${index}`]} />
-                                {uploadingStates[`customers-${index}`] && <Loader2 className="animate-spin" />}
-                            </div>
+                            <Label className="text-xs">URL Gambar Logo</Label>
+                            <Input value={logo.src} disabled />
                         </div>
                         <div className="space-y-1">
                             <Label className="text-xs">Nama / Alt Text</Label>
@@ -208,7 +224,6 @@ export default function TentangKamiPageClientPage({ settings, initialPartners, i
                       <Button type="button" variant="ghost" size="icon" onClick={() => removeLogo('customers', index)} className="text-destructive h-9 w-9 flex-shrink-0"><Trash2 className="h-4 w-4" /></Button>
                   </div>
               ))}
-              <Button type="button" variant="outline" onClick={() => addLogo('customers')}><PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo</Button>
           </CardContent>
       </Card>
       

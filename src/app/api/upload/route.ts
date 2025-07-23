@@ -17,39 +17,43 @@ const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100 MB
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
-    const file = formData.get("file") as File;
+    const files = formData.getAll("file") as File[];
 
-    if (!file) {
-      return NextResponse.json({ error: "File is required." }, { status: 400 });
+    if (!files || files.length === 0) {
+      return NextResponse.json({ error: "At least one file is required." }, { status: 400 });
     }
 
-    if (file.size > MAX_FILE_SIZE) {
-        return NextResponse.json(
-            { error: `Ukuran file tidak boleh melebihi ${MAX_FILE_SIZE / 1024 / 1024}MB.` },
-            { status: 413 } // 413 Payload Too Large
-        );
+    const publicUrls: string[] = [];
+
+    for (const file of files) {
+        if (file.size > MAX_FILE_SIZE) {
+            return NextResponse.json(
+                { error: `File size for "${file.name}" cannot exceed ${MAX_FILE_SIZE / 1024 / 1024}MB.` },
+                { status: 413 } // 413 Payload Too Large
+            );
+        }
+
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const extension = file.name.split(".").pop();
+        const key = `${uuidv4()}.${extension}`;
+
+        const command = new PutObjectCommand({
+            Bucket: process.env.R2_BUCKET_NAME!,
+            Key: key,
+            Body: buffer,
+            ContentType: file.type,
+        });
+
+        await s3.send(command);
+        publicUrls.push(`${process.env.R2_PUBLIC_URL}/${key}`);
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const extension = file.name.split(".").pop();
-    const key = `${uuidv4()}.${extension}`;
 
-    const command = new PutObjectCommand({
-      Bucket: process.env.R2_BUCKET_NAME!,
-      Key: key,
-      Body: buffer,
-      ContentType: file.type,
-    });
-
-    await s3.send(command);
-
-    const publicUrl = `${process.env.R2_PUBLIC_URL}/${key}`;
-
-    return NextResponse.json({ publicUrl });
+    return NextResponse.json({ publicUrls });
   } catch (error) {
     console.error("Upload error:", error);
     return NextResponse.json(
-      { error: "Failed to upload file." },
+      { error: "Failed to upload files." },
       { status: 500 }
     );
   }

@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useActionState, useEffect, useState, type ReactNode } from 'react';
@@ -99,29 +100,36 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, fieldName: keyof WebSettings, index?: number, subField?: 'image' | 'src') => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     const uploadingKey = index !== undefined ? `${fieldName}-${index}` : fieldName;
     setUploadingStates(prev => ({ ...prev, [uploadingKey]: true }));
 
     const formData = new FormData();
-    formData.append("file", file);
+    for (const file of files) {
+        formData.append("file", file);
+    }
 
     try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Upload failed");
-
-      const { publicUrl } = await res.json();
+      const { publicUrls } = await res.json();
       
       if (index !== undefined && subField) {
-        handleArrayChange(fieldName, index, subField, publicUrl);
+        // This handles upload for a specific item in an array, e.g., changing one logo
+        if (publicUrls.length > 0) {
+            handleArrayChange(fieldName, index, subField, publicUrls[0]);
+        }
+      } else if (fieldName === 'trustedByLogos') {
+        // This handles multi-upload for the 'trustedByLogos' array
+        const newLogos = publicUrls.map((url: string) => ({ src: url, alt: '' }));
+        addItemToArray('trustedByLogos', newLogos);
       } else {
-        handleFieldChange(fieldName, publicUrl);
+        // This handles single image field update, e.g., main logo
+        if (publicUrls.length > 0) {
+            handleFieldChange(fieldName, publicUrls[0]);
+        }
       }
     } catch (error) {
       console.error("Upload error:", error);
@@ -410,9 +418,16 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                 <AccordionContent>
                     <Card>
                         <CardHeader>
-                            <CardDescription>Kelola logo perusahaan yang ditampilkan di bagian "Trusted by".</CardDescription>
+                            <CardDescription>Kelola logo perusahaan yang ditampilkan di bagian "Trusted by". Anda dapat mengunggah beberapa logo sekaligus.</CardDescription>
                         </CardHeader>
                         <CardContent className="space-y-4">
+                             <div className="p-4 border rounded-md bg-muted/50">
+                                <Label htmlFor="trustedBy-upload">Unggah Logo Mitra Baru</Label>
+                                <div className="flex items-center gap-2 pt-1">
+                                    <Input id="trustedBy-upload" type="file" onChange={(e) => handleImageUpload(e, 'trustedByLogos')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={!!uploadingStates['trustedByLogos']} multiple />
+                                    {uploadingStates['trustedByLogos'] && <Loader2 className="animate-spin" />}
+                                </div>
+                            </div>
                             <div className="space-y-2">
                                 <Label htmlFor="trustedByText">Teks Judul</Label>
                                 <Input id="trustedByText" value={formState.trustedByText ?? ''} onChange={e => handleFieldChange('trustedByText', e.target.value)} placeholder="Contoh: Trusted by the world's leading companies" />
@@ -425,11 +440,8 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                         </div>
                                         <div className="grid grid-cols-1 gap-2 flex-grow">
                                             <div className="space-y-1">
-                                                <Label htmlFor={`logo-file-${index}`} className="text-xs">File Gambar Logo</Label>
-                                                <div className="flex items-center gap-2">
-                                                    <Input id={`logo-file-${index}`} type="file" onChange={(e) => handleImageUpload(e, 'trustedByLogos', index, 'src')} accept="image/png, image/jpeg, image/webp, image/svg+xml" disabled={!!(uploadingStates['trustedByLogos'] as any)?.[index]} />
-                                                    {(uploadingStates['trustedByLogos'] as any)?.[index] && <Loader2 className="animate-spin" />}
-                                                </div>
+                                                <Label htmlFor={`logo-url-${index}`} className="text-xs">URL Gambar</Label>
+                                                <Input id={`logo-url-${index}`} value={logo.src} disabled />
                                             </div>
                                             <div className="space-y-1">
                                                 <Label htmlFor={`logo-alt-${index}`} className="text-xs">Teks Alternatif (Alt)</Label>
@@ -442,9 +454,6 @@ export default function SettingsClientPage({ settings }: { settings: WebSettings
                                     </div>
                                 ))}
                             </div>
-                            <Button type="button" variant="outline" onClick={() => addItemToArray('trustedByLogos', {src: '', alt: ''})}>
-                                <PlusCircle className="mr-2 h-4 w-4" /> Tambah Logo
-                            </Button>
                         </CardContent>
                     </Card>
                 </AccordionContent>

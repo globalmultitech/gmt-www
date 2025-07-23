@@ -255,12 +255,14 @@ export function ProductForm({ categories, product = null, defaultSubCategoryId }
   }
   
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
     setIsUploading(true);
     const formData = new FormData();
-    formData.append("file", file);
+    for (const file of files) {
+      formData.append("file", file);
+    }
 
     try {
       const res = await fetch("/api/upload", {
@@ -268,10 +270,10 @@ export function ProductForm({ categories, product = null, defaultSubCategoryId }
         body: formData,
       });
 
-      if (!res.ok) throw new Error("Failed to upload image");
+      if (!res.ok) throw new Error("Failed to upload images");
 
-      const { publicUrl } = await res.json();
-      setImageUrls(prev => [...prev, publicUrl]);
+      const { publicUrls } = await res.json();
+      setImageUrls(prev => [...prev, ...publicUrls]);
     } catch (error) {
       console.error("Upload error:", error);
       toast({
@@ -373,6 +375,7 @@ export function ProductForm({ categories, product = null, defaultSubCategoryId }
                 <Card>
                     <CardHeader>
                         <CardTitle>Gambar Produk</CardTitle>
+                        <CardDescription>Pilih satu atau beberapa gambar. Gambar pertama akan menjadi gambar utama.</CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
                         <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
@@ -392,7 +395,7 @@ export function ProductForm({ categories, product = null, defaultSubCategoryId }
                           ))}
                         </div>
                         <div className="flex items-center gap-4">
-                          <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading}/>
+                          <Input id="image-upload" type="file" onChange={handleFileChange} accept="image/png, image/jpeg, image/webp" disabled={isUploading} multiple/>
                           {isUploading && <Loader2 className="animate-spin" />}
                         </div>
                     </CardContent>
