@@ -10,6 +10,7 @@ import { getSettings } from '@/lib/settings';
 import { Button } from '@/components/ui/button';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import BenefitsSection from './benefits-section';
+import { Card, CardContent } from '@/components/ui/card';
 
 type Props = {
   params: { slug: string };
@@ -148,20 +149,30 @@ export default async function ServiceDetailPage({ params }: Props) {
             
             {detailsList && detailsList.length > 0 && (
                 <div>
-                    <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">Detail Layanan Kami</h2>
+                    <h2 className="text-3xl font-headline font-bold text-primary mb-8 text-center">Detail Layanan Kami</h2>
                     <div className="space-y-8">
                         {detailsList.map((item, index) => (
-                           <div key={index} className="grid md:grid-cols-2 gap-6 items-center">
-                               {item.image && (
-                                   <div className={`relative h-64 rounded-lg overflow-hidden ${index % 2 === 1 ? 'md:order-last' : ''}`}>
-                                       <Image src={item.image} alt={item.title} fill className="object-cover" />
+                           <Card key={index} className="group overflow-hidden transition-all duration-300 hover:shadow-xl">
+                               <div className="grid md:grid-cols-12 gap-6 items-center">
+                                   {item.image && (
+                                       <div className="md:col-span-4 h-64 md:h-full relative overflow-hidden">
+                                           <Image 
+                                            src={item.image} 
+                                            alt={item.title} 
+                                            fill 
+                                            sizes="(max-width: 768px) 100vw, 33vw"
+                                            className="object-cover transition-transform duration-300 group-hover:scale-105" 
+                                           />
+                                       </div>
+                                   )}
+                                   <div className={`p-6 space-y-3 ${item.image ? 'md:col-span-8' : 'md:col-span-12'}`}>
+                                       <h3 className="font-headline text-2xl font-bold text-primary hover:text-sky-blue transition-colors">
+                                            {item.title}
+                                       </h3>
+                                       <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
                                    </div>
-                               )}
-                               <div className={`space-y-3 ${!item.image ? 'md:col-span-2' : ''}`}>
-                                   <h3 className="text-2xl font-bold font-headline">{item.title}</h3>
-                                   <div className="prose dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: item.description }} />
                                </div>
-                           </div>
+                           </Card>
                         ))}
                     </div>
                 </div>
@@ -169,7 +180,33 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
       </div>
       
-      <BenefitsSection benefits={benefitsList} />
+      {benefitsList && benefitsList.length > 0 && (
+        <section className="bg-secondary py-16 md:py-24">
+          <div className="container mx-auto px-4">
+            <h2 className="text-3xl font-headline font-bold text-primary mb-8 text-center">Manfaat & Keuntungan</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {benefitsList.map((item, index) => (
+                  <Card key={index} className="group overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-2 bg-card">
+                      <CardContent className="p-6 space-y-4">
+                        {item.image && (
+                          <div className="relative h-48 w-full rounded-md overflow-hidden bg-muted">
+                            <Image src={item.image} alt={item.title} fill className="object-cover transition-transform duration-300 group-hover:scale-105" />
+                          </div>
+                        )}
+                        <div className="flex items-start gap-3">
+                          <CheckCircle className="h-6 w-6 text-sky-blue mt-1 flex-shrink-0" />
+                          <div>
+                            <h3 className="text-xl font-bold font-headline">{item.title}</h3>
+                            <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground mt-2" dangerouslySetInnerHTML={{ __html: item.description }} />
+                          </div>
+                        </div>
+                      </CardContent>
+                  </Card>
+                ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       <div className="text-center py-16 md:py-24">
           <Button asChild size="lg">
