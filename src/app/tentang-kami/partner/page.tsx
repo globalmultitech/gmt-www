@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 
 async function getPartnerData() {
     const partners = await prisma.partnerLogo.findMany({
-        orderBy: { id: 'asc' }
+        orderBy: { createdAt: 'asc' }
     });
     return { partners };
 }
