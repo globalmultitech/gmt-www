@@ -11,23 +11,25 @@ type PelangganClientPageProps = {
 };
 
 export default function PelangganClientPage({ customers }: PelangganClientPageProps) {
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeIndices, setActiveIndices] = useState<number[]>([]);
 
   useEffect(() => {
     if (customers.length === 0) return;
 
     const interval = setInterval(() => {
-      // Pick a random index that is different from the current one
-      let newIndex;
-      do {
-        newIndex = Math.floor(Math.random() * customers.length);
-      } while (customers.length > 1 && newIndex === activeIndex);
+      const numToActivate = Math.min(5, customers.length);
+      const newActiveIndices = new Set<number>();
       
-      setActiveIndex(newIndex);
-    }, 2000); // Change logo every 2 seconds
+      while (newActiveIndices.size < numToActivate) {
+        const randomIndex = Math.floor(Math.random() * customers.length);
+        newActiveIndices.add(randomIndex);
+      }
+      
+      setActiveIndices(Array.from(newActiveIndices));
+    }, 2000); // Change logos every 2 seconds
 
     return () => clearInterval(interval);
-  }, [customers, activeIndex]);
+  }, [customers]);
 
   if (customers.length === 0) {
     return (
@@ -45,7 +47,7 @@ export default function PelangganClientPage({ customers }: PelangganClientPagePr
           title={logo.alt}
           className={cn(
             'relative h-24 transition-all duration-500 ease-in-out',
-            activeIndex === index
+            activeIndices.includes(index)
               ? 'scale-110 grayscale-0 opacity-100'
               : 'grayscale opacity-70 hover:grayscale-0 hover:opacity-100'
           )}
