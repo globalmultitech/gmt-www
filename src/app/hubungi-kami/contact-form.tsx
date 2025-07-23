@@ -6,9 +6,13 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { WhatsAppIcon } from './whatsapp-icon';
 import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
+
 
 type ProductWithSubCategory = Product & {
     subCategory: ProductSubCategory & {
@@ -32,6 +36,8 @@ export default function ContactForm({ whatsappNumber, companyName, categories }:
     const [name, setName] = useState('');
     const [clientCompany, setClientCompany] = useState('');
     const [selectedProductSlug, setSelectedProductSlug] = useState('');
+    
+    const [open, setOpen] = React.useState(false);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -67,6 +73,16 @@ Mohon informasinya. Terima kasih.`;
         window.open(whatsappUrl, '_blank');
     };
 
+    const getProductTitleBySlug = (slug: string) => {
+        for (const category of categories) {
+            for (const subCategory of category.subCategories) {
+                const product = subCategory.products.find(p => p.slug === slug);
+                if (product) return product.title;
+            }
+        }
+        return "Pilih produk...";
+    }
+
     return (
         <form onSubmit={handleSubmit} className="grid grid-cols-1 gap-6">
             <div className="space-y-2">
@@ -91,30 +107,56 @@ Mohon informasinya. Terima kasih.`;
             </div>
             <div className="space-y-2">
                 <Label htmlFor="interest">Produk yang diminati</Label>
-                <Select onValueChange={setSelectedProductSlug} required value={selectedProductSlug}>
-                    <SelectTrigger id="interest">
-                        <SelectValue placeholder="Pilih produk..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                        {categories.map((category) => (
-                           <SelectGroup key={category.id}>
-                             <SelectLabel className="font-bold text-primary">{category.name}</SelectLabel>
-                              {category.subCategories.map((subCategory) => (
-                                <React.Fragment key={subCategory.id}>
-                                    {subCategory.products.length > 0 && (
-                                         <SelectLabel className="pl-6 italic">{subCategory.name}</SelectLabel>
-                                    )}
-                                    {subCategory.products.map((product) => (
-                                        <SelectItem key={product.slug} value={product.slug} className="pl-10">
-                                            {product.title}
-                                        </SelectItem>
-                                    ))}
-                                </React.Fragment>
-                              ))}
-                           </SelectGroup>
-                        ))}
-                    </SelectContent>
-                </Select>
+                 <Popover open={open} onOpenChange={setOpen}>
+                    <PopoverTrigger asChild>
+                        <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={open}
+                        className="w-full justify-between font-normal"
+                        >
+                        <span className="truncate">
+                           {selectedProductSlug ? getProductTitleBySlug(selectedProductSlug) : "Pilih produk..."}
+                        </span>
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                        </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Command>
+                            <CommandInput placeholder="Cari produk..." />
+                            <CommandList>
+                                <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
+                                {categories.map((category) => (
+                                    <CommandGroup key={category.id} heading={category.name}>
+                                        {category.subCategories.map((subCategory) => (
+                                            <React.Fragment key={subCategory.id}>
+                                                {subCategory.products.map((product) => (
+                                                    <CommandItem
+                                                        key={product.slug}
+                                                        value={product.title}
+                                                        onSelect={() => {
+                                                            setSelectedProductSlug(product.slug);
+                                                            setOpen(false);
+                                                        }}
+                                                        className="pl-8"
+                                                    >
+                                                        <Check
+                                                            className={cn(
+                                                                "mr-2 h-4 w-4",
+                                                                selectedProductSlug === product.slug ? "opacity-100" : "opacity-0"
+                                                            )}
+                                                        />
+                                                        {product.title}
+                                                    </CommandItem>
+                                                ))}
+                                            </React.Fragment>
+                                        ))}
+                                    </CommandGroup>
+                                ))}
+                             </CommandList>
+                        </Command>
+                    </PopoverContent>
+                </Popover>
             </div>
             <div>
                 <Button 
