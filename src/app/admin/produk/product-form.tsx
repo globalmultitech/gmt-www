@@ -65,25 +65,29 @@ const generateSlug = (title: string) => {
 }
 
 const parseJsonSafe = (json: any, fallback: any) => {
-    let parsedJson;
+    if (Array.isArray(json)) {
+        return json; // Already an array, return as is.
+    }
     if (typeof json === 'string') {
         try {
-            parsedJson = JSON.parse(json);
+            const parsed = JSON.parse(json);
+            if (Array.isArray(parsed)) {
+                return parsed;
+            }
         } catch (e) {
             return fallback;
         }
-    } else {
-        parsedJson = json ?? fallback;
     }
     
-    if (typeof parsedJson === 'object' && parsedJson !== null && 'headers' in parsedJson && 'rows' in parsedJson) {
-        if (!Array.isArray(parsedJson.headers)) {
-            parsedJson.headers = fallback.headers;
+    // For other cases or failed parsing, handle specifications object structure
+    if (typeof json === 'object' && json !== null && 'headers' in json && 'rows' in json) {
+        if (!Array.isArray(json.headers)) {
+            json.headers = fallback.headers;
         }
-        if (!Array.isArray(parsedJson.rows)) {
-            parsedJson.rows = fallback.rows;
+        if (!Array.isArray(json.rows)) {
+            json.rows = fallback.rows;
         }
-        parsedJson.rows = parsedJson.rows.map((row: string[] | (string[] & {id: any}), index: number) => {
+        json.rows = json.rows.map((row: string[] | (string[] & {id: any}), index: number) => {
             const newRow = [...row] as (string[] & { id: number | string});
             // @ts-ignore
             if (!newRow.id) {
@@ -91,17 +95,17 @@ const parseJsonSafe = (json: any, fallback: any) => {
             }
             return newRow;
         });
-    } else if (Array.isArray(parsedJson)) {
-        return parsedJson.map((item, index) => ({
+        return json;
+    } else if (Array.isArray(json)) { // for features
+        return json.map((item, index) => ({
             ...item,
             id: item.id || `item-${Date.now()}-${index}`
         }));
-    } else {
-        return fallback;
-    }
+    } 
 
-    return parsedJson;
+    return fallback;
 };
+
 
 // Moved outside the main component
 const DynamicSpecEditor = ({ title, specifications, setSpecifications }: { title: string, specifications: Specifications, setSpecifications: React.Dispatch<React.SetStateAction<Specifications>> }) => {
@@ -290,6 +294,8 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   const removeFeature = (index: number) => setFeatures(features.filter((_, i) => i !== index));
 
   const handleFormSubmit = (formData: FormData) => {
+    formData.set('images', JSON.stringify(imageUrls));
+
     const featuresToSave = features.map(({id, ...rest}) => rest).filter(f => {
         const descHtml = f.description || '';
         const descText = descHtml.replace(/<[^>]*>?/gm, '').trim();
@@ -335,7 +341,6 @@ export function ProductForm({ categories, product = null }: ProductFormProps) {
   return (
     <form action={handleFormSubmit} className="space-y-8">
         {isEditing && <input type="hidden" name="id" value={product.id} />}
-        <input type="hidden" name="images" value={JSON.stringify(imageUrls)} />
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
