@@ -9,6 +9,7 @@ import Image from 'next/image';
 import { getSettings } from '@/lib/settings';
 import { Button } from '@/components/ui/button';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import BenefitsSection from './benefits-section';
 
 type Props = {
   params: { slug: string };
@@ -168,31 +169,7 @@ export default async function ServiceDetailPage({ params }: Props) {
         </div>
       </div>
       
-      {benefitsList && benefitsList.length > 0 && (
-            <section className="bg-secondary py-16 md:py-24">
-              <div className="container mx-auto px-4">
-                  <h2 className="text-3xl md:text-4xl font-headline font-bold text-primary mb-12 text-center">Manfaat & Keuntungan</h2>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 items-start">
-                    {benefitsList.map((item, index) => (
-                        <div key={index} className="bg-card p-6 rounded-lg shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-2">
-                            {item.image && (
-                                <div className="relative w-full h-40 mb-6 rounded-md overflow-hidden">
-                                    <Image src={item.image} alt={item.title} fill className="object-cover" />
-                                </div>
-                            )}
-                            <div className="flex items-start gap-3">
-                              <CheckCircle className="h-6 w-6 text-sky-blue mt-1 flex-shrink-0" />
-                              <div>
-                                <h3 className="text-xl font-bold font-headline mb-2">{item.title}</h3>
-                                <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
-                              </div>
-                            </div>
-                        </div>
-                    ))}
-                  </div>
-              </div>
-            </section>
-      )}
+      <BenefitsSection benefits={benefitsList} />
 
       <div className="text-center py-16 md:py-24">
           <Button asChild size="lg">
