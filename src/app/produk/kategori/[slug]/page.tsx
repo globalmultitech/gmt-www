@@ -1,5 +1,4 @@
 
-
 import { Card, CardContent } from '@/components/ui/card';
 import { Home, ChevronRight, ArrowRight, Package } from 'lucide-react';
 import Link from 'next/link';
@@ -145,28 +144,38 @@ export default async function CategoryPage({ params }: Props) {
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-headline font-bold text-center mb-8">Pilih Sub-Kategori</h2>
           {category.subCategories.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {category.subCategories.map((subCategory) => {
                 const firstProductImage = parseJsonSafe(subCategory.products[0]?.images, [])[0];
                 
                 return (
-                <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block">
-                    <Card className="h-full transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-                      <CardContent className="p-6 flex items-center gap-4">
-                        <div className="relative h-16 w-16 flex-shrink-0 rounded-md overflow-hidden bg-muted border">
-                            {firstProductImage ? (
-                                <Image src={firstProductImage} alt={subCategory.name} fill sizes="64px" className="object-cover" />
-                            ) : (
-                                <Package className="h-8 w-8 text-muted-foreground m-auto" />
-                            )}
+                 <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block">
+                     <Card className="flex flex-col h-full overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
+                        <div className="relative h-56 w-full">
+                           {firstProductImage ? (
+                             <Image 
+                                src={firstProductImage} 
+                                alt={subCategory.name} 
+                                fill 
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                                className="object-cover transition-transform duration-300 group-hover:scale-105" 
+                             />
+                           ) : (
+                            <div className="flex h-full w-full items-center justify-center bg-muted text-muted-foreground">
+                               <Package className="h-16 w-16" />
+                            </div>
+                           )}
+                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                           <h3 className="absolute bottom-4 left-4 font-headline text-2xl font-bold text-primary-foreground">{subCategory.name}</h3>
                         </div>
-                        <div className="flex-grow flex justify-between items-center">
-                            <span className="font-semibold text-lg">{subCategory.name}</span>
-                            <ArrowRight className="h-5 w-5 text-muted-foreground transition-transform duration-300 group-hover:translate-x-1 group-hover:text-primary" />
-                        </div>
-                      </CardContent>
-                    </Card>
-                </Link>
+                        <CardContent className="pt-6 flex-grow flex flex-col">
+                            <p className="text-muted-foreground text-sm line-clamp-3">Jelajahi semua produk dalam sub-kategori {subCategory.name}.</p>
+                            <div className="mt-auto pt-4 font-semibold text-sky-blue flex items-center group-hover:text-sky-blue/80 transition-colors">
+                                Lihat Sub-Kategori <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                            </div>
+                        </CardContent>
+                     </Card>
+                   </Link>
                 )
               })}
             </div>
