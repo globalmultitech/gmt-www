@@ -1,4 +1,5 @@
 
+
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
@@ -170,7 +171,12 @@ export default async function ServiceDetailPage({ params }: Props) {
                     <h2 className="text-3xl font-headline font-bold text-primary mb-6 text-center">Manfaat & Keuntungan</h2>
                      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {benefitsList.map((item, index) => (
-                           <div key={index} className="p-6 rounded-lg bg-dark-slate">
+                           <div key={index} className="p-6 rounded-lg bg-dark-slate flex flex-col">
+                                {item.image && (
+                                    <div className="relative w-full h-40 mb-4 rounded-md overflow-hidden">
+                                        <Image src={item.image} alt={item.title} fill className="object-cover" />
+                                    </div>
+                                )}
                                <h3 className="text-xl font-bold font-headline mb-2">{item.title}</h3>
                                <div className="prose prose-sm dark:prose-invert max-w-none" dangerouslySetInnerHTML={{ __html: item.description }} />
                            </div>
