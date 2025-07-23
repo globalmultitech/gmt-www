@@ -9,7 +9,6 @@ import Image from 'next/image';
 import { getSettings } from '@/lib/settings';
 import { Button } from '@/components/ui/button';
 import { DynamicIcon } from '@/components/dynamic-icon';
-import BenefitsSection from './benefits-section';
 import { Card, CardContent } from '@/components/ui/card';
 
 type Props = {
@@ -150,28 +149,26 @@ export default async function ServiceDetailPage({ params }: Props) {
             {detailsList && detailsList.length > 0 && (
                 <div>
                     <h2 className="text-3xl font-headline font-bold text-primary mb-8 text-center">Detail Layanan Kami</h2>
-                    <div className="space-y-8">
+                    <div className="space-y-12">
                         {detailsList.map((item, index) => (
-                           <Card key={index} className="group overflow-hidden transition-all duration-300 hover:shadow-xl">
-                               <div className="grid md:grid-cols-12 gap-6 items-center">
-                                   {item.image && (
-                                       <div className="md:col-span-4 h-64 md:h-full relative overflow-hidden">
-                                           <Image 
-                                            src={item.image} 
-                                            alt={item.title} 
-                                            fill 
-                                            sizes="(max-width: 768px) 100vw, 33vw"
-                                            className="object-cover transition-transform duration-300 group-hover:scale-105" 
-                                           />
-                                       </div>
-                                   )}
-                                   <div className={`p-6 space-y-3 ${item.image ? 'md:col-span-8' : 'md:col-span-12'}`}>
-                                       <h3 className="font-headline text-2xl font-bold text-primary hover:text-sky-blue transition-colors">
-                                            {item.title}
-                                       </h3>
-                                       <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
-                                   </div>
-                               </div>
+                           <Card key={index} className="overflow-hidden bg-card border-none shadow-none rounded-lg">
+                                {item.image && (
+                                    <div className="relative w-full aspect-[16/9] mb-6 rounded-md overflow-hidden bg-muted">
+                                        <Image 
+                                        src={item.image} 
+                                        alt={item.title} 
+                                        fill 
+                                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 896px, 896px"
+                                        className="object-cover" 
+                                        />
+                                    </div>
+                                )}
+                                <div className="space-y-3">
+                                    <h3 className="font-headline text-3xl font-bold text-primary">
+                                        {item.title}
+                                    </h3>
+                                    <div className="prose dark:prose-invert max-w-none text-muted-foreground" dangerouslySetInnerHTML={{ __html: item.description }} />
+                                </div>
                            </Card>
                         ))}
                     </div>
