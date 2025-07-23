@@ -8,7 +8,7 @@ import type { Metadata } from 'next';
 
 async function getPartnerData() {
     const partners = await prisma.partnerLogo.findMany({
-        orderBy: { createdAt: 'asc' }
+        orderBy: { id: 'asc' }
     });
     return { partners };
 }
@@ -48,27 +48,29 @@ export default async function PartnerPage() {
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
             {partners.length > 0 ? (
-                <div className="space-y-8">
-                    {partners.map((partner) => (
-                        <Card key={partner.id} className="flex flex-col md:flex-row items-center gap-8 p-6 shadow-sm">
-                           <div className="relative h-32 w-48 flex-shrink-0 bg-muted rounded-md border flex items-center justify-center">
+                <div className="space-y-16">
+                    {partners.map((partner, index) => (
+                        <div key={partner.id} className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
+                           <div className={`relative h-80 rounded-lg overflow-hidden shadow-lg bg-muted ${index % 2 !== 0 ? 'md:order-last' : ''}`}>
                              {partner.src ? (
                                 <Image
                                     src={partner.src}
                                     alt={partner.alt}
                                     fill
-                                    sizes="(max-width: 768px) 50vw, 12rem"
-                                    className="object-contain p-2"
+                                    sizes="(max-width: 768px) 100vw, 50vw"
+                                    className="object-contain p-8"
                                 />
                              ) : (
-                                <ImageIcon className="h-10 w-10 text-muted-foreground" />
+                                <div className="flex h-full w-full items-center justify-center text-muted-foreground">
+                                    <ImageIcon className="h-16 w-16" />
+                                </div>
                              )}
                            </div>
                            <div className="text-center md:text-left">
-                             <h2 className="text-2xl font-bold text-primary font-headline">{partner.alt}</h2>
-                             <p className="mt-2 text-muted-foreground">{partner.description}</p>
+                             <h2 className="text-3xl font-bold text-primary font-headline">{partner.alt}</h2>
+                             <p className="mt-4 text-lg text-muted-foreground">{partner.description}</p>
                            </div>
-                        </Card>
+                        </div>
                     ))}
                 </div>
             ) : (
