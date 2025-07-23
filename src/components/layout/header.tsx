@@ -1,9 +1,12 @@
+
 import { getSettings } from '@/lib/settings';
 import { HeaderClient } from './header-client';
 import type { MenuItem } from '@/lib/settings';
+import { getAllProductsForSearch } from '@/app/produk/actions';
 
 export async function Header() {
   const settings = await getSettings();
+  const searchProducts = await getAllProductsForSearch();
   
   const navItems = (settings.menuItems as MenuItem[]) || [];
   const companyName = settings.companyName;
@@ -15,5 +18,6 @@ export async function Header() {
     companyName={companyName} 
     logoUrl={logoUrl} 
     whatsappNumber={whatsappNumber}
+    searchProducts={searchProducts}
   />;
 }

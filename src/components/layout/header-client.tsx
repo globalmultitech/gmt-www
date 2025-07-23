@@ -10,15 +10,18 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import type { MenuItem } from '@/lib/settings';
+import type { Product } from '@prisma/client';
+import GlobalSearch from '../global-search';
 
 type HeaderClientProps = {
     navItems: MenuItem[];
     companyName: string;
     logoUrl?: string | null;
     whatsappNumber: string;
+    searchProducts: { id: number; title: string; slug: string }[];
 }
 
-export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }: HeaderClientProps) {
+export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, searchProducts }: HeaderClientProps) {
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -78,7 +81,8 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
               </nav>
             </div>
 
-            <div className="hidden lg:flex items-center space-x-4">
+            <div className="hidden lg:flex items-center space-x-2">
+                <GlobalSearch products={searchProducts} />
                 <Button asChild className={cn(
                   headerIsScrolled && 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
                 )}>
@@ -87,6 +91,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber }:
             </div>
 
             <div className="lg:hidden flex items-center">
+                <GlobalSearch products={searchProducts} />
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', headerIsScrolled ? 'text-primary-foreground hover:text-primary-foreground' : 'text-primary')}>

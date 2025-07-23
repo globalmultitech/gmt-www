@@ -7,6 +7,20 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
+export async function getAllProductsForSearch() {
+    return prisma.product.findMany({
+        select: {
+            id: true,
+            title: true,
+            slug: true,
+        },
+        orderBy: {
+            title: 'asc',
+        },
+    });
+}
+
+
 const FeatureSchema = z.object({
   title: z.string().default(''),
   description: z.string().default(''),
