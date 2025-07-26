@@ -38,7 +38,7 @@ Tugas Anda adalah menulis postingan blog yang menarik dan informatif berdasarkan
 - Anda dapat menggunakan daftar tidak berurutan dengan tag \`<ul>\` dan \`<li>\`.
 - Gunakan tag \`<strong>\` untuk penekanan jika perlu.
 - Jangan gunakan tag HTML kompleks lainnya seperti tabel, div, atau style inline.
-- Konten harus terdiri dari 3-5 paragraf.
+- Tulis artikel blog yang komprehensif, informatif, dan mendalam, dengan panjang minimal 8-10 paragraf. Pastikan artikel memiliki struktur yang jelas: pendahuluan, beberapa poin pembahasan utama, dan kesimpulan.
 
 Judul Postingan Blog: {{{blogPostTitle}}}
 `,
