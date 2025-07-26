@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/footer';
 import { Toaster } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
 import { AppShell } from '@/components/layout/app-shell';
+import PageTransitionLoader from '@/components/page-transition-loader';
 
 export const metadata: Metadata = {
   title: 'Global Multi Technology',
@@ -29,6 +30,7 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased bg-background')}>
           <AppShell header={<Header />} footer={<Footer />}>
+            <PageTransitionLoader />
             {children}
           </AppShell>
           <Toaster />
