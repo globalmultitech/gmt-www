@@ -281,7 +281,7 @@ export function SolusiForm({ solution = null, parentSolutions }: SolusiFormProps
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="description">Deskripsi</Label>
-                            <Textarea id="description" name="description" required defaultValue={solution?.description} rows={5} />
+                            <RichTextEditor name="description" defaultValue={solution?.description ?? ''} />
                         </div>
                     </CardContent>
                 </Card>
