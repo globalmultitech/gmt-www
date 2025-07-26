@@ -16,7 +16,7 @@ const GenerateBlogPostInputSchema = z.object({
 export type GenerateBlogPostInput = z.infer<typeof GenerateBlogPostInputSchema>;
 
 const GenerateBlogPostOutputSchema = z.object({
-  blogPostContent: z.string().describe('The generated content of the blog post in simple text or markdown format.'),
+  blogPostContent: z.string().describe('The generated content of the blog post in simple HTML format.'),
 });
 export type GenerateBlogPostOutput = z.infer<typeof GenerateBlogPostOutputSchema>;
 
@@ -29,11 +29,16 @@ const prompt = ai.definePrompt({
   input: {schema: GenerateBlogPostInputSchema},
   output: {schema: GenerateBlogPostOutputSchema},
   prompt: `Anda adalah seorang penulis konten profesional untuk sebuah perusahaan teknologi bernama "Global Multi Technology" yang berspesialisasi dalam solusi IT perbankan dan keuangan.
-Tugas Anda adalah menulis postingan blog yang singkat, menarik, dan ramah SEO berdasarkan judul yang diberikan.
-Gaya bahasa harus profesional, informatif, dan sedikit formal.
-**Tulis konten dalam Bahasa Indonesia.**
-Hasilnya harus dalam format teks biasa atau markdown sederhana, terdiri dari 2-4 paragraf.
-Jangan gunakan markdown yang kompleks seperti tabel. Gunakan paragraf sederhana, dan boleh menggunakan poin-poin (bullet points) jika perlu.
+Tugas Anda adalah menulis postingan blog yang menarik dan informatif berdasarkan judul yang diberikan.
+
+**Instruksi Format Keluaran:**
+- Tulis konten dalam **Bahasa Indonesia**.
+- Format keluaran harus berupa **HTML sederhana**.
+- Gunakan tag paragraf \`<p>\` untuk setiap paragraf.
+- Anda dapat menggunakan daftar tidak berurutan dengan tag \`<ul>\` dan \`<li>\`.
+- Gunakan tag \`<strong>\` untuk penekanan jika perlu.
+- Jangan gunakan tag HTML kompleks lainnya seperti tabel, div, atau style inline.
+- Konten harus terdiri dari 3-5 paragraf.
 
 Judul Postingan Blog: {{{blogPostTitle}}}
 `,

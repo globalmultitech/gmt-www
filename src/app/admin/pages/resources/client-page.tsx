@@ -255,7 +255,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                                 <div className="space-y-1">
                                 <Label className="text-xs">Konten</Label>
                                  <RichTextEditor
-                                    key={`content-${item.id}`}
+                                    key={`content-${item.id}-${item.content}`}
                                     defaultValue={item.content || ''}
                                     onUpdate={({ editor }) => handleItemChange(index, 'content', editor.getHTML())}
                                 />
