@@ -109,33 +109,43 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
   };
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>, itemId: number) => {
-      const file = event.target.files?.[0];
-      if (!file) return;
-      setUploadingStates(prev => ({...prev, [itemId]: true}));
-      const formData = new FormData();
-      formData.append("file", file);
-      
-      try {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setUploadingStates(prev => ({ ...prev, [itemId]: true }));
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
         const res = await fetch('/api/upload', {
             method: 'POST',
             body: formData,
         });
 
         if (!res.ok) {
-            throw new Error('Failed to upload image');
+            throw new Error('Gagal mengunggah gambar');
         }
         
-        const { publicUrl } = await res.json();
+        // Expect a single URL since we upload one file
+        const { publicUrls } = await res.json();
+        if (!publicUrls || publicUrls.length === 0) {
+            throw new Error('URL gambar tidak diterima dari server.');
+        }
+
+        const publicUrl = publicUrls[0];
         const itemIndex = formState.newsItems.findIndex(item => item.id === itemId);
-        handleItemChange(itemIndex, 'image', publicUrl);
-      } catch (error) {
+        if (itemIndex > -1) {
+            handleItemChange(itemIndex, 'image', publicUrl);
+        }
+
+    } catch (error: any) {
         console.error("Upload error:", error);
-        toast({ title: 'Upload Gagal', variant: 'destructive' });
-      } finally {
-        setUploadingStates(prev => ({...prev, [itemId]: false}));
+        toast({ title: 'Upload Gagal', description: error.message, variant: 'destructive' });
+    } finally {
+        setUploadingStates(prev => ({ ...prev, [itemId]: false }));
         event.target.value = '';
-      }
-  }
+    }
+}
 
   const handleGenerateContent = async (itemId: number) => {
     const itemIndex = formState.newsItems.findIndex(item => item.id === itemId);
@@ -265,3 +275,5 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
     </form>
   );
 }
+
+    

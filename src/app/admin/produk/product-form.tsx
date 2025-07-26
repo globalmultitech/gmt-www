@@ -363,7 +363,7 @@ export function ProductForm({ categories, product = null, defaultSubCategoryId }
                         </div>
                         <div className="space-y-1">
                             <Label htmlFor="description">Deskripsi Singkat</Label>
-                            <Textarea id="description" name="description" required defaultValue={product?.description} />
+                             <RichTextEditor name="description" defaultValue={product?.description ?? ''} />
                         </div>
                         <div className="space-y-1">
                           <Label>Deskripsi Lengkap</Label>
@@ -518,3 +518,5 @@ export function ProductForm({ categories, product = null, defaultSubCategoryId }
     </form>
   )
 }
+
+    
