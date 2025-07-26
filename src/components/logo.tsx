@@ -2,7 +2,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSidebar } from './ui/sidebar';
-import { Bot } from 'lucide-react';
+import { Bot, Loader2 } from 'lucide-react';
 
 type LogoProps = {
   className?: string;
@@ -42,7 +42,7 @@ export function Logo({
      return logoUrl ? (
         <Image src={logoUrl} alt="Logo" width={50} height={50} className="object-contain h-12 w-12" priority />
      ) : (
-        <Bot className="h-12 w-12 text-primary" />
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
      )
   }
 

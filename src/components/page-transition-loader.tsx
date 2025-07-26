@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from './logo';
@@ -9,27 +9,20 @@ import { Logo } from './logo';
 function PageTransitionLoaderContent() {
   const pathname = usePathname();
   const [loading, setLoading] = useState(false);
-  const [previousPath, setPreviousPath] = useState(pathname);
+  const previousPathRef = useRef(pathname);
 
   useEffect(() => {
-    if (previousPath !== pathname) {
+    if (previousPathRef.current !== pathname) {
       setLoading(true);
       
       const timer = setTimeout(() => {
         setLoading(false);
-        setPreviousPath(pathname);
+        previousPathRef.current = pathname;
       }, 700); // Duration of the loading indicator
 
       return () => clearTimeout(timer);
-    } else if (loading) {
-       // This handles cases where navigation is cancelled or instantaneous
-       const timer = setTimeout(() => {
-        setLoading(false);
-      }, 700);
-      return () => clearTimeout(timer);
     }
-
-  }, [pathname, previousPath, loading]);
+  }, [pathname]);
 
   return (
     <AnimatePresence>
