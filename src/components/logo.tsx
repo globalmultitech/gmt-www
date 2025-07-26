@@ -2,6 +2,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSidebar } from './ui/sidebar';
+import { Bot } from 'lucide-react';
 
 type LogoProps = {
   className?: string;
@@ -35,6 +36,15 @@ export function Logo({
     default: scrolled ? 'text-primary-foreground' : 'text-primary',
     footer: 'text-primary-foreground',
   };
+
+  // Special case for the loading spinner, which passes an empty companyName
+  if (companyName === '') {
+     return logoUrl ? (
+        <Image src={logoUrl} alt="Logo" width={50} height={50} className="object-contain h-12 w-12" priority />
+     ) : (
+        <Bot className="h-12 w-12 text-primary" />
+     )
+  }
 
   if (sidebar) {
      const isCollapsed = sidebar.state === 'collapsed';

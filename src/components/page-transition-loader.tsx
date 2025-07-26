@@ -39,7 +39,7 @@ function PageTransitionLoaderContent() {
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.3 }}
-          className="fixed inset-0 z-[999] flex items-center justify-center bg-background/80 backdrop-blur-sm"
+          className="fixed inset-0 z-[999] flex items-center justify-center pointer-events-none"
         >
           <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
@@ -47,8 +47,8 @@ function PageTransitionLoaderContent() {
             exit={{ scale: 0.8, opacity: 0 }}
             transition={{ type: 'spring', stiffness: 260, damping: 20 }}
           >
-            <div className="animate-pulse">
-              <Logo companyName="" />
+            <div className="p-4 bg-background/80 backdrop-blur-sm rounded-full shadow-lg">
+                <Logo companyName="" />
             </div>
           </motion.div>
         </motion.div>
