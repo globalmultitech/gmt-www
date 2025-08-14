@@ -91,7 +91,7 @@ Mohon informasinya. Terima kasih.`;
                     id="name" 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="Contoh: Budi" 
+                    placeholder="" 
                     required 
                 />
             </div>
@@ -101,7 +101,7 @@ Mohon informasinya. Terima kasih.`;
                     id="clientCompany" 
                     value={clientCompany}
                     onChange={(e) => setClientCompany(e.target.value)}
-                    placeholder="Contoh: PT Sejahtera" 
+                    placeholder="" 
                     required
                 />
             </div>
