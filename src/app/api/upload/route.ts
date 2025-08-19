@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
 
+    // Always return an array, even for a single file.
     return NextResponse.json({ publicUrls });
   } catch (error) {
     console.error("Upload error:", error);

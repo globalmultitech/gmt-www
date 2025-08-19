@@ -79,8 +79,10 @@ export default function CategoryManagementClientPage({ categories }: { categorie
         throw new Error('Failed to upload image');
       }
 
-      const { publicUrl } = await res.json();
-      setImageUrl(publicUrl);
+      const { publicUrls } = await res.json();
+      if (publicUrls && publicUrls.length > 0) {
+        setImageUrl(publicUrls[0]);
+      }
 
     } catch (error) {
       console.error("Upload error:", error);
@@ -239,11 +241,12 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                         
                         <DialogHeader>
                           <DialogTitle>{dialogState.mode === 'editCategory' ? 'Edit Kategori' : 'Tambah Kategori Baru'}</DialogTitle>
+                          <DialogDescription>Isi detail di bawah ini. Klik simpan jika sudah selesai.</DialogDescription>
                         </DialogHeader>
                         
                         <div className="space-y-2">
                             <Label htmlFor="image-upload">Gambar Kategori</Label>
-                             <div className="relative w-full h-40 rounded-md bg-muted overflow-hidden">
+                             <div className="relative w-full h-40 rounded-md bg-muted overflow-hidden border">
                                 {imageUrl ? (
                                     <Image src={imageUrl} alt="Preview" fill className="object-cover" />
                                 ) : (
@@ -282,7 +285,10 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                 {dialogState.mode === 'addSubCategory' && (
                     <form action={createSubCategoryAction}>
                          <input type="hidden" name="categoryId" value={(dialogState.data as { categoryId: number }).categoryId} />
-                        <DialogHeader><DialogTitle>Tambah Sub-Kategori Baru</DialogTitle></DialogHeader>
+                        <DialogHeader>
+                          <DialogTitle>Tambah Sub-Kategori Baru</DialogTitle>
+                          <DialogDescription>Masukkan nama untuk sub-kategori baru.</DialogDescription>
+                        </DialogHeader>
                         <div className="py-4 space-y-2"><Label htmlFor="name">Nama Sub-Kategori</Label><Input id="name" name="name" required /></div>
                         <DialogFooter><Button type="button" variant="ghost" onClick={closeDialog}>Batal</Button><SubmitButton>Simpan</SubmitButton></DialogFooter>
                     </form>
@@ -290,7 +296,10 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                  {dialogState.mode === 'editSubCategory' && (
                     <form action={updateSubCategoryAction}>
                          <input type="hidden" name="id" value={(dialogState.data as ProductSubCategory).id} />
-                        <DialogHeader><DialogTitle>Edit Sub-Kategori</DialogTitle></DialogHeader>
+                        <DialogHeader>
+                          <DialogTitle>Edit Sub-Kategori</DialogTitle>
+                          <DialogDescription>Perbarui nama sub-kategori.</DialogDescription>
+                        </DialogHeader>
                         <div className="py-4 space-y-2"><Label htmlFor="name">Nama Sub-Kategori</Label><Input id="name" name="name" required defaultValue={(dialogState.data as ProductSubCategory).name} /></div>
                         <DialogFooter><Button type="button" variant="ghost" onClick={closeDialog}>Batal</Button><SubmitButton>Simpan</SubmitButton></DialogFooter>
                     </form>
