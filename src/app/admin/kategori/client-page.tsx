@@ -235,7 +235,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                 {['addCategory', 'editCategory'].includes(dialogState.mode!) && (
                     <form action={dialogState.mode === 'editCategory' ? updateCategoryAction : createCategoryAction} className="space-y-4">
                         {dialogState.mode === 'editCategory' && <input type="hidden" name="id" value={(dialogState.data as ProductCategory).id} />}
-                        <input type="hidden" name="imageUrl" value={imageUrl} />
+                        <input type="hidden" name="imageUrl" value={imageUrl || ''} />
                         
                         <DialogHeader>
                           <DialogTitle>{dialogState.mode === 'editCategory' ? 'Edit Kategori' : 'Tambah Kategori Baru'}</DialogTitle>
