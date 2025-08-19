@@ -105,6 +105,7 @@ const RichTextEditor = ({ name, defaultValue = '', onUpdate }: RichTextEditorPro
       ListItem,
     ],
     content: defaultValue,
+    immediatelyRender: false,
     editorProps: {
       attributes: {
         class: 'prose dark:prose-invert prose-sm sm:prose-base min-h-[150px] max-h-[300px] overflow-y-auto w-full rounded-b-md border border-input bg-background px-3 py-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50',

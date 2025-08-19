@@ -115,9 +115,9 @@ const PointEditor = ({ title, points, setPoints, isUploading, setIsUploading, to
     try {
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Gagal mengunggah gambar");
-      const { publicUrl } = await res.json();
+      const { publicUrls } = await res.json();
       
-      handleArrayChange(index, 'image', publicUrl);
+      handleArrayChange(index, 'image', publicUrls[0]);
 
     } catch (error) {
       toast({ title: 'Upload Gagal', variant: 'destructive' });
@@ -150,7 +150,7 @@ const PointEditor = ({ title, points, setPoints, isUploading, setIsUploading, to
                               <div className="space-y-2">
                                   <Label>Gambar (Opsional)</Label>
                                   <div className="relative w-full h-24 rounded-md bg-muted overflow-hidden border">
-                                      {item.image ? ( <Image src={item.image} alt="Preview" fill className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
+                                      {item.image ? ( <Image src={item.image} alt="Preview" fill sizes="100%" className="object-contain p-1" /> ) : ( <div className="flex items-center justify-center h-full w-full"><ImageIcon className="w-8 h-8 text-muted-foreground" /></div> )}
                                   </div>
                                   <div className="flex items-center gap-4">
                                       <Input type="file" onChange={(e: any) => handleUpload(e, index)} accept="image/png, image/jpeg, image/webp" disabled={isUploading[`${title.toLowerCase()}-${index}`]} />
@@ -232,9 +232,9 @@ export function LayananForm({ service = null }: LayananFormProps) {
     try {
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       if (!res.ok) throw new Error("Gagal mengunggah gambar");
-      const { publicUrl } = await res.json();
+      const { publicUrls } = await res.json();
       
-      setImageUrl(publicUrl);
+      setImageUrl(publicUrls[0]);
 
     } catch (error) {
       toast({ title: 'Upload Gagal', variant: 'destructive' });
@@ -341,7 +341,7 @@ export function LayananForm({ service = null }: LayananFormProps) {
                     <CardContent className="space-y-2">
                         <div className="relative w-full aspect-video rounded-md bg-muted overflow-hidden border">
                             {imageUrl ? (
-                                <Image src={imageUrl} alt="Preview" fill className="object-cover" />
+                                <Image src={imageUrl} alt="Preview" fill sizes="100%" className="object-cover" />
                             ) : (
                                 <div className="flex items-center justify-center h-full w-full">
                                     <ImageIcon className="w-10 h-10 text-muted-foreground" />

@@ -168,7 +168,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                                     <div className="flex items-center gap-4">
                                         <div className="relative w-16 h-10 rounded-md bg-muted overflow-hidden">
                                         {category.imageUrl ? (
-                                            <Image src={category.imageUrl} alt={category.name} fill className="object-cover" />
+                                            <Image src={category.imageUrl} alt={category.name} fill sizes="64px" className="object-cover" />
                                         ) : (
                                             <div className="flex items-center justify-center h-full w-full">
                                             <ImageIcon className="w-5 h-5 text-muted-foreground" />
@@ -212,7 +212,10 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                                                 <AlertDialog>
                                                     <AlertDialogTrigger asChild><Button variant="ghost" size="icon" className="h-7 w-7"><Trash2 className="h-4 w-4 text-destructive" /></Button></AlertDialogTrigger>
                                                     <AlertDialogContent>
-                                                        <AlertDialogHeader><AlertDialogTitle>Hapus Sub-Kategori?</AlertDialogTitle><AlertDialogDescription>Tindakan ini tidak bisa dibatalkan.</AlertDialogDescription></AlertDialogHeader>
+                                                        <AlertDialogHeader>
+                                                            <AlertDialogTitle>Hapus Sub-Kategori?</AlertDialogTitle>
+                                                            <AlertDialogDescription>Tindakan ini tidak bisa dibatalkan.</AlertDialogDescription>
+                                                        </AlertDialogHeader>
                                                         <AlertDialogFooter><AlertDialogCancel>Batal</AlertDialogCancel><AlertDialogAction onClick={() => handleDelete(deleteSubCategory, sub.id, 'sub-kategori')}>Hapus</AlertDialogAction></AlertDialogFooter>
                                                     </AlertDialogContent>
                                                 </AlertDialog>
@@ -248,7 +251,7 @@ export default function CategoryManagementClientPage({ categories }: { categorie
                             <Label htmlFor="image-upload">Gambar Kategori</Label>
                              <div className="relative w-full h-40 rounded-md bg-muted overflow-hidden border">
                                 {imageUrl ? (
-                                    <Image src={imageUrl} alt="Preview" fill className="object-cover" />
+                                    <Image src={imageUrl} alt="Preview" fill sizes="100%" className="object-cover" />
                                 ) : (
                                     <div className="flex items-center justify-center h-full w-full">
                                     <ImageIcon className="w-10 h-10 text-muted-foreground" />

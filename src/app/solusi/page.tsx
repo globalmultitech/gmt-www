@@ -62,7 +62,7 @@ export default async function SolusiPage() {
                        </Link>
                     </h2>
                   </div>
-                  <p className="text-muted-foreground">{solution.description}</p>
+                  <div className="text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: solution.description }} />
                    {solution.children.length > 0 && (
                       <ul className="space-y-2 pt-2">
                         {solution.children.map((child, i) => (

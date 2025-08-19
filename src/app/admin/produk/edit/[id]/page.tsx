@@ -19,6 +19,10 @@ async function getProduct(id: number) {
 
 export default async function EditProductPage({ params }: { params: { id: string }}) {
   const id = Number(params.id);
+  if (isNaN(id)) {
+    notFound();
+  }
+  
   const [product, categories] = await Promise.all([
       getProduct(id),
       getCategoriesWithSubcategories()

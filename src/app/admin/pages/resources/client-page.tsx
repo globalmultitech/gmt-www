@@ -126,7 +126,6 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
             throw new Error('Gagal mengunggah gambar');
         }
         
-        // Expect a single URL since we upload one file
         const { publicUrls } = await res.json();
         if (!publicUrls || publicUrls.length === 0) {
             throw new Error('URL gambar tidak diterima dari server.');
@@ -223,7 +222,7 @@ export default function ResourcesPageClientPage({ settings, initialNewsItems }: 
                                 <div className="flex-shrink-0 space-y-2">
                                 <div className="relative w-40 h-24 rounded-md bg-muted overflow-hidden border">
                                     {/* @ts-ignore */}
-                                    {item.image ? (<Image src={item.image} alt={item.title} fill className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
+                                    {item.image ? (<Image src={item.image} alt={item.title} fill sizes="160px" className="object-cover" />) : (<ImageIcon className="w-8 h-8 text-muted-foreground m-auto" />)}
                                 </div>
                                 <Input type="file" onChange={(e) => handleImageUpload(e, item.id)} accept="image/png, image/jpeg, image/webp" disabled={uploadingStates[item.id]} className="w-40" />
                                 </div>
