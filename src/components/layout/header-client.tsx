@@ -3,7 +3,7 @@
 
 import { Logo } from '@/components/logo';
 import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 import { Menu } from 'lucide-react';
 import Link from 'next/link';
@@ -103,10 +103,12 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                     </Button>
                 </SheetTrigger>
                 <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-background text-foreground p-0">
+                    <SheetHeader className="p-4 border-b">
+                       <SheetTitle className="sr-only">Menu Utama</SheetTitle>
+                       <SheetDescription className="sr-only">Pilih halaman untuk dijelajahi.</SheetDescription>
+                       <Logo companyName={companyName} logoUrl={logoUrl} />
+                    </SheetHeader>
                     <div className="flex flex-col h-full">
-                    <div className="p-4 border-b">
-                        <Logo companyName={companyName} logoUrl={logoUrl} />
-                    </div>
                     <nav className="flex flex-col items-start space-y-4 p-4 text-lg">
                         {navItems.map((item) => (
                         <Link
