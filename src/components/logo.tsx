@@ -1,3 +1,4 @@
+
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -74,38 +75,46 @@ export function Logo({
   }
 
   return (
-    <Link href="/" className={cn('flex items-center gap-3', className)}>
-      {logoUrl ? (
-        <>
-          <Image
-            src={logoUrl}
-            alt={`Logo ${companyName}`}
-            width={80}
-            height={80}
-            className={cn('object-contain', imageSizeClasses[variant])}
-            priority
-          />
+    <div
+      className={cn(
+        'transition-all duration-300',
+        scrolled && 'bg-white rounded-md shadow-md p-1'
+      )}
+    >
+      <Link href="/" className={cn('flex items-center gap-3', className)}>
+        {logoUrl ? (
+          <>
+            <Image
+              src={logoUrl}
+              alt={`Logo ${companyName}`}
+              width={80}
+              height={80}
+              className={cn('object-contain', imageSizeClasses[variant])}
+              priority
+            />
+            <span
+              className={cn(
+                'font-headline font-extrabold tracking-wide transition-colors',
+                textSizeClasses[variant],
+                // When scrolled, the text color should be primary to contrast with the new white background
+                scrolled ? 'text-primary' : textColorClasses[variant]
+              )}
+            >
+              {companyName}
+            </span>
+          </>
+        ) : (
           <span
             className={cn(
               'font-headline font-extrabold tracking-wide transition-colors',
               textSizeClasses[variant],
-              textColorClasses[variant]
+              scrolled ? 'text-primary' : textColorClasses[variant]
             )}
           >
             {companyName}
           </span>
-        </>
-      ) : (
-        <span
-          className={cn(
-            'font-headline font-extrabold tracking-wide transition-colors',
-            textSizeClasses[variant],
-            textColorClasses[variant]
-          )}
-        >
-          {companyName}
-        </span>
-      )}
-    </Link>
+        )}
+      </Link>
+    </div>
   );
 }
