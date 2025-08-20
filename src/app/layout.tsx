@@ -1,4 +1,5 @@
 
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { Header } from '@/components/layout/header';
@@ -30,12 +31,12 @@ export default function RootLayout({
         />
       </head>
       <body className={cn('font-body antialiased bg-background')}>
-          <Suspense>
-            <AppShell header={<Header />} footer={<Footer />}>
-              {children}
-            </AppShell>
+          <AppShell header={<Header />} footer={<Footer />}>
+            {children}
+          </AppShell>
+          <Suspense fallback={null}>
+            <PageTransitionLoader />
           </Suspense>
-          <PageTransitionLoader />
           <Toaster />
       </body>
     </html>

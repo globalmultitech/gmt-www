@@ -1,13 +1,25 @@
 
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from './logo';
 import { useLoadingStore } from '@/hooks/use-loading-store';
+import { useSearchParams } from 'next/navigation';
 
 function PageTransitionLoaderContent() {
   const { isLoading, stopLoading } = useLoadingStore();
+  
+  // useSearchParams is a Client Component hook that lets you read the current URL's query string.
+  // We use it here to re-trigger the useEffect when the path changes, inside a Suspense boundary.
+  useSearchParams();
+
+  useEffect(() => {
+    // This effect will run when the new page component has been rendered,
+    // thanks to the <Suspense> boundary in layout.tsx.
+    // We can now safely stop the loading animation.
+    stopLoading();
+  }, [stopLoading]);
 
   return (
     <AnimatePresence>
@@ -37,9 +49,7 @@ function PageTransitionLoaderContent() {
 
 
 export default function PageTransitionLoader() {
-    return (
-        <Suspense fallback={null}>
-            <PageTransitionLoaderContent />
-        </Suspense>
-    )
+    // This top-level component doesn't need Suspense itself, 
+    // but its child needs to be wrapped in Suspense where it's used.
+    return <PageTransitionLoaderContent />;
 }

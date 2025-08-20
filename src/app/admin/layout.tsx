@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { ReactNode } from 'react';
@@ -41,9 +42,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useLoadingStore } from '@/hooks/use-loading-store';
+
+export const dynamic = 'force-dynamic';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const startLoading = useLoadingStore(state => state.startLoading);
 
   const navItems = [
     { href: '/admin/dashboard', label: 'Dashboard', icon: <LayoutDashboard /> },
@@ -76,7 +81,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             {navItems.map((item) => (
               <SidebarMenuItem key={item.href}>
                 <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
-                  <Link href={item.href}>
+                  <Link href={item.href} onClick={() => pathname !== item.href && startLoading()}>
                     {item.icon}
                     <span>{item.label}</span>
                   </Link>
@@ -99,7 +104,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                 <DropdownMenuContent className="w-56" side="right" sideOffset={10}>
                   {pageNavItems.map((item) => (
                     <DropdownMenuItem key={item.href} asChild>
-                      <Link href={item.href}>{item.label}</Link>
+                      <Link href={item.href} onClick={() => pathname !== item.href && startLoading()}>{item.label}</Link>
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -109,7 +114,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
                  {pageNavItems.map((item) => (
                     <SidebarMenuItem key={item.href}>
                         <SidebarMenuSubButton asChild isActive={pathname.startsWith(item.href)}>
-                            <Link href={item.href}>
+                            <Link href={item.href} onClick={() => pathname !== item.href && startLoading()}>
                                 <span>{item.label}</span>
                             </Link>
                         </SidebarMenuSubButton>
@@ -122,7 +127,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             {settingsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={pathname.startsWith(item.href)} tooltip={item.label}>
-                        <Link href={item.href}>
+                        <Link href={item.href} onClick={() => pathname !== item.href && startLoading()}>
                             {item.icon}
                             <span>{item.label}</span>
                         </Link>
@@ -136,7 +141,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           <SidebarMenu>
              <SidebarMenuItem>
                 <form action={logout} className="w-full">
-                    <SidebarMenuButton tooltip="Logout">
+                    <SidebarMenuButton tooltip="Logout" onClick={startLoading}>
                         <LogOut/>
                         <span>Logout</span>
                     </SidebarMenuButton>

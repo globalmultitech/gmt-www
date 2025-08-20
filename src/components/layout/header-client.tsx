@@ -12,6 +12,7 @@ import { useState, useEffect } from 'react';
 import type { MenuItem } from '@/lib/settings';
 import type { Product } from '@prisma/client';
 import GlobalSearch from '../global-search';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type HeaderClientProps = {
     navItems: MenuItem[];
@@ -26,6 +27,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [hasMounted, setHasMounted] = useState(false);
+  const startLoading = useLoadingStore(state => state.startLoading);
   
   useEffect(() => {
     setHasMounted(true);
@@ -68,6 +70,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                   <Link
                       key={item.href}
                       href={item.href}
+                      onClick={() => pathname !== item.href && startLoading()}
                       className={cn(
                         'relative transition-colors duration-300',
                         headerIsScrolled ? 'text-primary-foreground' : 'text-primary',
@@ -86,7 +89,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                 <Button asChild className={cn(
                   headerIsScrolled && 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
                 )}>
-                    <Link href="/hubungi-kami">Get a Quote</Link>
+                    <Link href="/hubungi-kami" onClick={() => pathname !== '/hubungi-kami' && startLoading()}>Get a Quote</Link>
                 </Button>
             </div>
 
@@ -109,7 +112,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                         <Link
                             key={item.href}
                             href={item.href}
-                            onClick={() => setIsMobileMenuOpen(false)}
+                            onClick={() => {
+                                if (pathname !== item.href) startLoading();
+                                setIsMobileMenuOpen(false);
+                            }}
                             className={cn(
                             'transition-colors hover:text-primary w-full p-2 rounded-md text-foreground',
                             pathname === item.href && 'text-primary font-bold bg-primary/10'
@@ -121,7 +127,10 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                     </nav>
                      <div className="mt-auto p-4 border-t">
                         <Button asChild className="w-full">
-                           <Link href="/hubungi-kami">Get a Quote</Link>
+                           <Link href="/hubungi-kami" onClick={() => {
+                               if (pathname !== '/hubungi-kami') startLoading();
+                               setIsMobileMenuOpen(false);
+                           }}>Get a Quote</Link>
                         </Button>
                     </div>
                     </div>
