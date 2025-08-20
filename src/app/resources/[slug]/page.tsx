@@ -1,4 +1,5 @@
 
+
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
@@ -7,6 +8,7 @@ import { Home, ChevronRight, Calendar, User } from 'lucide-react';
 import Image from 'next/image';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type Props = {
   params: { slug: string };
@@ -52,15 +54,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Breadcrumbs = ({ postTitle }: { postTitle: string }) => (
+const Breadcrumbs = ({ postTitle }: { postTitle: string }) => {
+  const { startLoading } = useLoadingStore.getState();
+  return (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-    <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+    <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href="/resources" className="hover:text-primary">Knowledge Center</Link>
+    <Link href="/resources" onClick={startLoading} className="hover:text-primary">Knowledge Center</Link>
     <ChevronRight className="h-4 w-4" />
     <span className="font-semibold text-foreground truncate max-w-xs">{postTitle}</span>
   </nav>
-);
+  )
+};
 
 export default async function BlogPostPage({ params }: Props) {
   const post = await getPostBySlug(params.slug);

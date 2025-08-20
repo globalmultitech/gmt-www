@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 import { DynamicIcon } from './dynamic-icon';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type SolutionWithChildren = Solution & { children: Solution[] };
 
@@ -15,6 +16,8 @@ type HomeSolutionsTabsProps = {
 };
 
 export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
+  const { startLoading } = useLoadingStore();
+
   if (!solutions || solutions.length === 0) {
     return null;
   }
@@ -57,7 +60,7 @@ export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
                       <div className="flex-grow">
                         <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{solution.title}</h3>
                         <p className="text-muted-foreground text-sm mb-4 h-20">{solution.description}</p>
-                        <Link href={`/solusi/${solution.slug}`} className="font-semibold text-sky-blue flex items-center group">
+                        <Link href={`/solusi/${solution.slug}`} onClick={startLoading} className="font-semibold text-sky-blue flex items-center group">
                           Pelajari lebih jauh
                           <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                         </Link>

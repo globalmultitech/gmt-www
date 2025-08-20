@@ -1,18 +1,19 @@
 
+
+'use client';
+
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShieldCheck, ArrowRight } from 'lucide-react';
 import Image from 'next/image';
 import { DynamicIcon } from '@/components/dynamic-icon';
-import { getSettings } from '@/lib/settings';
-import prisma from '@/lib/db';
+import type { WebSettings } from '@/lib/settings';
 import Link from 'next/link';
+import type { ProfessionalService } from '@prisma/client';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
-async function getPageData() {
-    const settings = await getSettings();
-    const services = await prisma.professionalService.findMany({
-        orderBy: { createdAt: 'asc' }
-    });
-    return { settings, services };
+type LayananPageProps = {
+    settings: WebSettings;
+    services: ProfessionalService[];
 }
 
 const parseJsonSafe = (jsonString: any, fallback: any[]) => {
@@ -26,16 +27,14 @@ const parseJsonSafe = (jsonString: any, fallback: any[]) => {
     }
 }
 
-export default async function LayananPage() {
-  const { settings, services } = await getPageData();
+export default function LayananPage({ settings, services }: LayananPageProps) {
+  const { startLoading } = useLoadingStore();
   
-  // Collect all possible images from service details
   const allDetailImages = services.flatMap(service => {
     const details = parseJsonSafe(service.details, []);
     return details.map((detail: { image?: string }) => detail.image).filter(Boolean);
   });
 
-  // Pick a random image, or use the default from settings as a fallback
   const commitmentImageUrl = allDetailImages.length > 0 
     ? allDetailImages[Math.floor(Math.random() * allDetailImages.length)]
     : settings.servicesPageHeaderImageUrl;
@@ -55,7 +54,7 @@ export default async function LayananPage() {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             {services.map((service, index) => (
-              <Link key={service.id} href={`/layanan/${service.slug}`} className="group block">
+              <Link key={service.id} href={`/layanan/${service.slug}`} className="group block" onClick={startLoading}>
                 <Card className="transform transition-all duration-300 hover:-translate-y-2 hover:shadow-xl h-full flex flex-col">
                   <CardHeader className="flex flex-row items-center gap-4">
                     <div className="bg-primary/10 p-4 rounded-full">

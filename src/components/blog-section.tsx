@@ -9,6 +9,7 @@ import { ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { id } from 'date-fns/locale';
 import { useState, useEffect } from 'react';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type BlogSectionProps = {
   newsItems: NewsItem[];
@@ -27,6 +28,8 @@ const FormattedDate = ({ dateString }: { dateString: string }) => {
 };
 
 export default function BlogSection({ newsItems }: BlogSectionProps) {
+  const { startLoading } = useLoadingStore();
+
   if (!newsItems || newsItems.length === 0) {
     return null;
   }
@@ -45,7 +48,7 @@ export default function BlogSection({ newsItems }: BlogSectionProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {newsItems.map((item) => (
-            <Link key={item.id} href={`/resources/${item.slug}`} className="group block">
+            <Link key={item.id} href={`/resources/${item.slug}`} className="group block" onClick={startLoading}>
               <Card className="h-full overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
                 <div className="relative h-48 w-full">
                   <Image

@@ -14,6 +14,7 @@ import { HomeMapSection } from '@/components/home-map-section';
 import BlogSection from '@/components/blog-section';
 import * as React from 'react';
 import FadeIn from '@/components/fade-in';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
   subCategory: ProductSubCategory & {
@@ -51,7 +52,7 @@ const Marquee = ({ logos, duration, reverse = false }: { logos: TrustedByLogo[],
 
 
 export default function HomeClientPage({ products, settings, professionalServices, newsItems, solutions }: HomePageProps) {
-  
+  const { startLoading } = useLoadingStore();
   const trustedByLogos = settings.trustedByLogos as TrustedByLogo[];
   
   return (
@@ -76,12 +77,12 @@ export default function HomeClientPage({ products, settings, professionalService
             <div className="flex justify-center items-center gap-4 fade-in-up" style={{animationDelay: '0.4s'}}>
               {settings.heroButton1Text && settings.heroButton1Link && (
                   <Button asChild size="lg">
-                    <Link href={settings.heroButton1Link}>{settings.heroButton1Text}</Link>
+                    <Link href={settings.heroButton1Link} onClick={startLoading}>{settings.heroButton1Text}</Link>
                   </Button>
               )}
                {settings.heroButton2Text && settings.heroButton2Link && (
                   <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
-                    <Link href={settings.heroButton2Link}>{settings.heroButton2Text}</Link>
+                    <Link href={settings.heroButton2Link} onClick={startLoading}>{settings.heroButton2Text}</Link>
                   </Button>
                )}
             </div>
@@ -161,7 +162,7 @@ export default function HomeClientPage({ products, settings, professionalService
                   </div>
                   <div className="grid md:grid-cols-2 gap-8">
                     {professionalServices.map((service) => (
-                      <Link key={service.id} href={`/layanan/${service.slug}`} className="group block">
+                      <Link key={service.id} href={`/layanan/${service.slug}`} className="group block" onClick={startLoading}>
                         <Card className="transform transition-all duration-300 hover:shadow-xl h-full">
                           <div className="flex flex-row items-center gap-4 p-6">
                             <div className="bg-primary/10 p-3 md:p-4 rounded-full">
@@ -214,7 +215,7 @@ export default function HomeClientPage({ products, settings, professionalService
                 {settings.ctaButtonText && settings.ctaButtonLink && (
                     <div className="flex-shrink-0">
                       <Button asChild size="lg" variant="outline" className="bg-transparent border-2 border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
-                        <Link href={settings.ctaButtonLink}>{settings.ctaButtonText}</Link>
+                        <Link href={settings.ctaButtonLink} onClick={startLoading}>{settings.ctaButtonText}</Link>
                       </Button>
                     </div>
                 )}
@@ -249,13 +250,13 @@ export default function HomeClientPage({ products, settings, professionalService
                       <p className="font-semibold text-primary uppercase tracking-widest mb-2">OUR PRODUCTS</p>
                       <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">Produk Unggulan Kami</h2>
                     </div>
-                    <Link href="/produk" className="font-semibold text-foreground hover:text-primary flex items-center gap-2">
+                    <Link href="/produk" onClick={startLoading} className="font-semibold text-foreground hover:text-primary flex items-center gap-2">
                         Semua Produk <ArrowRight className="h-4 w-4" />
                     </Link>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
                       {products.map((product) => (
-                         <Link key={product.id} href={`/produk/${product.slug}`} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:shadow-2xl">
+                         <Link key={product.id} href={`/produk/${product.slug}`} onClick={startLoading} className="bg-background rounded-lg shadow-md overflow-hidden group transition-all duration-300 hover:shadow-2xl">
                               <div className="relative h-48">
                                 <Image 
                                     src={(product.images as string[])?.[0] ?? 'https://placehold.co/600x400.png'} 

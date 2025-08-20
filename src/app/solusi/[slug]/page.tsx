@@ -1,4 +1,5 @@
 
+
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
@@ -8,6 +9,7 @@ import Image from 'next/image';
 import { getSettings } from '@/lib/settings';
 import { Button } from '@/components/ui/button';
 import { DynamicIcon } from '@/components/dynamic-icon';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type Props = {
   params: { slug: string };
@@ -79,19 +81,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Breadcrumbs = ({ solutionTitle }: { solutionTitle: string }) => (
+const Breadcrumbs = ({ solutionTitle }: { solutionTitle: string }) => {
+  const { startLoading } = useLoadingStore.getState();
+  return (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-    <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+    <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href="/solusi" className="hover:text-primary">Solusi</Link>
+    <Link href="/solusi" onClick={startLoading} className="hover:text-primary">Solusi</Link>
     <ChevronRight className="h-4 w-4" />
     <span className="font-semibold text-foreground">{solutionTitle}</span>
   </nav>
-);
+  )
+};
 
 export default async function SolutionDetailPage({ params }: Props) {
   const { slug } = params;
   const solution = await getSolutionBySlug(slug);
+  const { startLoading } = useLoadingStore.getState();
 
   if (!solution) {
     notFound();
@@ -156,7 +162,7 @@ export default async function SolutionDetailPage({ params }: Props) {
             </div>
             <div className="mt-12 text-center">
                 <Button asChild className="w-full md:w-auto" size="lg">
-                    <Link href="/hubungi-kami">Diskusikan Kebutuhan Anda</Link>
+                    <Link href="/hubungi-kami" onClick={startLoading}>Diskusikan Kebutuhan Anda</Link>
                 </Button>
             </div>
         </div>

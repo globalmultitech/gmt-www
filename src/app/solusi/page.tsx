@@ -1,27 +1,25 @@
 
+
+'use client';
+
 import { ArrowRight, Handshake } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { getSettings } from '@/lib/settings';
+import { type WebSettings } from '@/lib/settings';
 import { DynamicIcon } from '@/components/dynamic-icon';
-import prisma from '@/lib/db';
 import type { Solution } from '@prisma/client';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type SolutionWithChildren = Solution & { children: Solution[] };
 
-async function getPageData() {
-    const settings = await getSettings();
-    const solutions = await prisma.solution.findMany({
-        where: { parentId: null },
-        include: { children: { orderBy: { createdAt: 'asc' }}},
-        orderBy: { createdAt: 'asc' }
-    });
-    return { settings, solutions };
+type SolusiPageProps = {
+  settings: WebSettings;
+  solutions: SolutionWithChildren[];
 }
 
-export default async function SolusiPage() {
-  const { settings, solutions } = await getPageData();
+export default function SolusiPage({ settings, solutions }: SolusiPageProps) {
+  const { startLoading } = useLoadingStore();
 
   return (
     <>
@@ -40,7 +38,7 @@ export default async function SolusiPage() {
             {solutions.map((solution, index) => (
               <div key={solution.id} className="grid md:grid-cols-2 gap-8 md:gap-12 items-center">
                 <div className={`relative h-80 rounded-lg overflow-hidden shadow-lg ${index % 2 === 1 ? 'md:order-last' : ''}`}>
-                  <Link href={`/solusi/${solution.slug}`}>
+                  <Link href={`/solusi/${solution.slug}`} onClick={startLoading}>
                     <Image
                         src={solution.image || "https://placehold.co/600x400.png"}
                         alt={solution.title}
@@ -57,7 +55,7 @@ export default async function SolusiPage() {
                       <DynamicIcon name={solution.icon} className="h-10 w-10" />
                     </div>
                     <h2 className="text-3xl font-headline font-bold text-primary">
-                       <Link href={`/solusi/${solution.slug}`} className="hover:text-sky-blue transition-colors">
+                       <Link href={`/solusi/${solution.slug}`} onClick={startLoading} className="hover:text-sky-blue transition-colors">
                         {solution.title}
                        </Link>
                     </h2>
@@ -75,7 +73,7 @@ export default async function SolusiPage() {
                    )}
                    <div className="pt-4">
                       <Button asChild>
-                        <Link href={`/solusi/${solution.slug}`}>Pelajari Lebih Lanjut <ArrowRight className="ml-2 h-4 w-4"/></Link>
+                        <Link href={`/solusi/${solution.slug}`} onClick={startLoading}>Pelajari Lebih Lanjut <ArrowRight className="ml-2 h-4 w-4"/></Link>
                       </Button>
                    </div>
                 </div>
@@ -93,7 +91,7 @@ export default async function SolusiPage() {
             Tim kami siap membantu merancang solusi kustom yang paling sesuai untuk tantangan bisnis Anda.
           </p>
           <Button asChild size="lg">
-            <Link href="/hubungi-kami">Diskusikan Proyek Anda <ArrowRight className="ml-2 h-5 w-5" /></Link>
+            <Link href="/hubungi-kami" onClick={startLoading}>Diskusikan Proyek Anda <ArrowRight className="ml-2 h-5 w-5" /></Link>
           </Button>
         </div>
       </section>

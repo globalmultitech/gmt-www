@@ -1,4 +1,5 @@
 
+
 import { Card } from '@/components/ui/card';
 import { Home, ChevronRight, CheckCircle, ArrowRight, Image as ImageIcon } from 'lucide-react';
 import Image from 'next/image';
@@ -7,6 +8,7 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { Button } from '@/components/ui/button';
 import { notFound } from 'next/navigation';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 const toSlug = (name: string) => {
   if (!name) return '';
@@ -90,22 +92,26 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { categoryName: string, categorySlug: string, subCategoryName: string }) => (
+const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { categoryName: string, categorySlug: string, subCategoryName: string }) => {
+  const { startLoading } = useLoadingStore.getState();
+  return (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-    <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+    <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href="/produk" className="hover:text-primary">Produk</Link>
+    <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href={`/produk/kategori/${categorySlug}`} className="hover:text-primary">{categoryName}</Link>
+    <Link href={`/produk/kategori/${categorySlug}`} onClick={startLoading} className="hover:text-primary">{categoryName}</Link>
     <ChevronRight className="h-4 w-4" />
     <span className="font-semibold text-foreground">{subCategoryName}</span>
   </nav>
-);
+  )
+};
 
 
 export default async function SubCategoryProductPage({ params }: Props) {
   const { slug } = params;
   const data = await getSubCategoryDataBySlug(slug);
+  const { startLoading } = useLoadingStore.getState();
 
   if (!data) {
     notFound();
@@ -140,7 +146,7 @@ export default async function SubCategoryProductPage({ params }: Props) {
                 const mainImage = (product.images as string[])?.[0];
 
                 return (
-                  <Link key={product.id} href={`/produk/${product.slug}`} className="group block">
+                  <Link key={product.id} href={`/produk/${product.slug}`} className="group block" onClick={startLoading}>
                     <Card className="relative w-full h-80 overflow-hidden rounded-xl shadow-lg transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                       {/* Background Image */}
                       <div className="absolute inset-0 z-0">

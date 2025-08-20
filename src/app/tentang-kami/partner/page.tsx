@@ -1,10 +1,12 @@
 
+
 import Image from 'next/image';
 import prisma from '@/lib/db';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import Link from 'next/link';
 import { Home, ChevronRight, Image as ImageIcon } from 'lucide-react';
 import type { Metadata } from 'next';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 async function getPartnerData() {
     const partners = await prisma.partnerLogo.findMany({
@@ -18,15 +20,18 @@ export const metadata: Metadata = {
   description: 'Kami berkolaborasi dengan para pemimpin teknologi global untuk memberikan solusi terbaik bagi pelanggan kami.',
 };
 
-const Breadcrumbs = () => (
+const Breadcrumbs = () => {
+    const { startLoading } = useLoadingStore.getState();
+    return (
     <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-      <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+      <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
       <ChevronRight className="h-4 w-4" />
-      <Link href="/tentang-kami" className="hover:text-primary">Tentang Kami</Link>
+      <Link href="/tentang-kami" onClick={startLoading} className="hover:text-primary">Tentang Kami</Link>
       <ChevronRight className="h-4 w-4" />
       <span className="font-semibold text-foreground">Partner Kami</span>
     </nav>
-  );
+    )
+};
 
 export default async function PartnerPage() {
   const { partners } = await getPartnerData();

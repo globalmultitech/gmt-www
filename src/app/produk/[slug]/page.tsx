@@ -27,6 +27,7 @@ import { Button } from '@/components/ui/button';
 import { TokopediaIcon } from '@/components/icons/tokopedia-icon';
 import { ShopeeIcon } from '@/components/icons/shopee-icon';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type Props = {
   params: { slug: string };
@@ -130,15 +131,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Breadcrumbs = ({ productTitle }: { productTitle: string }) => (
+const Breadcrumbs = ({ productTitle }: { productTitle: string }) => {
+  const { startLoading } = useLoadingStore.getState();
+  return (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-    <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+    <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href="/produk" className="hover:text-primary">Produk</Link>
+    <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
     <ChevronRight className="h-4 w-4" />
     <span className="font-semibold text-foreground">{productTitle}</span>
   </nav>
-);
+  )
+};
 
 const SpecificationAccordion = ({ title, specs }: { title: string, specs: Specifications }) => {
   if (!specs || !specs.headers || specs.headers.length === 0 || specs.rows.length === 0) {

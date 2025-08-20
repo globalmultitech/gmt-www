@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { Card, CardContent } from '@/components/ui/card';
 import BenefitsSection from './benefits-section';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type Props = {
   params: { slug: string };
@@ -83,19 +84,23 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-const Breadcrumbs = ({ serviceTitle }: { serviceTitle: string }) => (
+const Breadcrumbs = ({ serviceTitle }: { serviceTitle: string }) => {
+  const { startLoading } = useLoadingStore.getState();
+  return (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-    <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+    <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
-    <Link href="/layanan" className="hover:text-primary">Layanan</Link>
+    <Link href="/layanan" onClick={startLoading} className="hover:text-primary">Layanan</Link>
     <ChevronRight className="h-4 w-4" />
     <span className="font-semibold text-foreground">{serviceTitle}</span>
   </nav>
-);
+  )
+};
 
 export default async function ServiceDetailPage({ params }: Props) {
   const { slug } = params;
   const service = await getServiceBySlug(slug);
+  const { startLoading } = useLoadingStore.getState();
 
   if (!service) {
     notFound();
@@ -184,7 +189,7 @@ export default async function ServiceDetailPage({ params }: Props) {
 
       <div className="text-center py-16 md:py-24 bg-background">
           <Button asChild size="lg">
-              <Link href="/hubungi-kami">Diskusikan Kebutuhan Anda</Link>
+              <Link href="/hubungi-kami" onClick={startLoading}>Diskusikan Kebutuhan Anda</Link>
           </Button>
       </div>
     </>

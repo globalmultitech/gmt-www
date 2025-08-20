@@ -1,13 +1,19 @@
 
-import Image from 'next/image';
-import { getSettings } from '@/lib/settings';
-import prisma from '@/lib/db';
-import { Card, CardContent } from '@/components/ui/card';
-import Link from 'next/link';
-import { ArrowRight, Handshake, Heart } from 'lucide-react';
 
-export default async function TentangKamiPage() {
-  const settings = await getSettings();
+'use client';
+
+import { ArrowRight, Handshake, Heart } from 'lucide-react';
+import Link from 'next/link';
+import { Card, CardContent } from '@/components/ui/card';
+import { useLoadingStore } from '@/hooks/use-loading-store';
+import type { WebSettings } from '@/lib/settings';
+
+type TentangKamiPageProps = {
+  settings: WebSettings;
+}
+
+export default function TentangKamiPage({ settings }: TentangKamiPageProps) {
+  const { startLoading } = useLoadingStore();
 
   return (
     <>
@@ -24,7 +30,7 @@ export default async function TentangKamiPage() {
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             
-            <Link href="/tentang-kami/partner" className="group block">
+            <Link href="/tentang-kami/partner" className="group block" onClick={startLoading}>
                 <Card className="h-full transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                     <CardContent className="p-8 text-center">
                         <div className="inline-block p-5 bg-primary/10 text-primary rounded-full mb-6 transform transition-transform duration-300 group-hover:scale-110">
@@ -39,7 +45,7 @@ export default async function TentangKamiPage() {
                 </Card>
             </Link>
 
-            <Link href="/tentang-kami/pelanggan" className="group block">
+            <Link href="/tentang-kami/pelanggan" className="group block" onClick={startLoading}>
                 <Card className="h-full transform transition-all duration-300 hover:shadow-2xl hover:-translate-y-2">
                      <CardContent className="p-8 text-center">
                         <div className="inline-block p-5 bg-primary/10 text-primary rounded-full mb-6 transform transition-transform duration-300 group-hover:scale-110">

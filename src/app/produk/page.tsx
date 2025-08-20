@@ -1,41 +1,27 @@
 
+
+'use client';
+
 import { Card, CardContent } from '@/components/ui/card';
-import { getSettings } from '@/lib/settings';
 import { ArrowRight, Package } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import prisma from '@/lib/db';
-import type { Metadata } from 'next';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
-async function getCategories() {
-  return prisma.productCategory.findMany({
-    orderBy: {
-      name: 'asc',
-    },
-    select: {
-      id: true,
-      name: true,
-      slug: true,
-      description: true,
-      imageUrl: true,
-    }
-  });
+type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  description: string | null;
+  imageUrl: string | null;
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const settings = await getSettings();
-  const title = `Kategori Produk | ${settings.companyName}`;
-  const description =
-    'Jelajahi kategori produk kami, mulai dari perangkat keras canggih hingga solusi perangkat lunak inovatif untuk transformasi digital.';
-
-  return {
-    title,
-    description,
-  };
+type ProdukPageProps = {
+  categories: Category[];
 }
 
-export default async function ProdukPage() {
-  const categories = await getCategories();
+export default function ProdukPage({ categories }: ProdukPageProps) {
+  const { startLoading } = useLoadingStore();
 
   return (
     <>
@@ -55,7 +41,7 @@ export default async function ProdukPage() {
           {categories.length > 0 ? (
              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 {categories.map((category) => (
-                  <Link key={category.id} href={`/produk/kategori/${category.slug}`} className="group block">
+                  <Link key={category.id} href={`/produk/kategori/${category.slug}`} className="group block" onClick={startLoading}>
                      <Card className="flex flex-col h-full overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                         <div className="relative h-56 w-full">
                            {category.imageUrl ? (

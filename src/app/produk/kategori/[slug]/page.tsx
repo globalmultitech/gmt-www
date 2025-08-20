@@ -1,4 +1,5 @@
 
+
 import { Card, CardContent } from '@/components/ui/card';
 import { Home, ChevronRight, ArrowRight, Package } from 'lucide-react';
 import Link from 'next/link';
@@ -6,6 +7,7 @@ import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Image from 'next/image';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 export async function generateStaticParams() {
   const categories = await prisma.productCategory.findMany({
@@ -78,6 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { categoryName: string, categorySlug: string, subCategoryName?: string }) => {
+    const { startLoading } = useLoadingStore.getState();
     const toSubCategorySlug = (name: string) => {
       if (!name) return '';
       return name
@@ -89,13 +92,13 @@ const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { category
 
     return (
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <Link href="/" className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
+        <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
         <ChevronRight className="h-4 w-4" />
-        <Link href="/produk" className="hover:text-primary">Produk</Link>
+        <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
         <ChevronRight className="h-4 w-4" />
         {subCategoryName ? (
             <>
-                <Link href={`/produk/kategori/${categorySlug}`} className="hover:text-primary">{categoryName}</Link>
+                <Link href={`/produk/kategori/${categorySlug}`} onClick={startLoading} className="hover:text-primary">{categoryName}</Link>
                 <ChevronRight className="h-4 w-4" />
                 <span className="font-semibold text-foreground">{subCategoryName}</span>
             </>
@@ -110,6 +113,7 @@ const Breadcrumbs = ({ categoryName, categorySlug, subCategoryName }: { category
 export default async function CategoryPage({ params }: Props) {
   const { slug } = params;
   const data = await getCategoryDataBySlug(slug);
+  const { startLoading } = useLoadingStore.getState();
 
   if (!data) {
     notFound();
@@ -149,7 +153,7 @@ export default async function CategoryPage({ params }: Props) {
                 const firstProductImage = parseJsonSafe(subCategory.products[0]?.images, [])[0];
                 
                 return (
-                 <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block">
+                 <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block" onClick={startLoading}>
                      <Card className="flex flex-col h-full overflow-hidden transform transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl">
                         <div className="relative h-56 w-full">
                            {firstProductImage ? (
