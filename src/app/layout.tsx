@@ -30,9 +30,9 @@ export default function RootLayout({
       </head>
       <body className={cn('font-body antialiased bg-background')}>
           <AppShell header={<Header />} footer={<Footer />}>
-            <PageTransitionLoader />
             {children}
           </AppShell>
+          <PageTransitionLoader />
           <Toaster />
       </body>
     </html>

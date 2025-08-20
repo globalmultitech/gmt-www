@@ -5,28 +5,20 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Logo } from './logo';
+import { useLoadingStore } from '@/hooks/use-loading-store';
 
 function PageTransitionLoaderContent() {
   const pathname = usePathname();
-  const [loading, setLoading] = useState(false);
-  const previousPathRef = useRef(pathname);
+  const { isLoading, stopLoading } = useLoadingStore();
 
   useEffect(() => {
-    if (previousPathRef.current !== pathname) {
-      setLoading(true);
-      
-      const timer = setTimeout(() => {
-        setLoading(false);
-        previousPathRef.current = pathname;
-      }, 700); // Duration of the loading indicator
-
-      return () => clearTimeout(timer);
-    }
-  }, [pathname]);
+    // Whenever the pathname changes, the new page has loaded, so we stop the loading animation.
+    stopLoading();
+  }, [pathname, stopLoading]);
 
   return (
     <AnimatePresence>
-      {loading && (
+      {isLoading && (
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
