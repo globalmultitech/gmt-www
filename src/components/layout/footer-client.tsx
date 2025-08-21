@@ -118,8 +118,8 @@ export function FooterClient({ settings }: FooterClientProps) {
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">
                 <p>&copy; {new Date().getFullYear()} {settings.companyName}. Hak Cipta Dilindungi.</p>
                 <div className="flex space-x-6">
-                    <Link href="#" className="hover:text-primary-foreground">Syarat & Ketentuan</Link>
-                    <Link href="#" className="hover:text-primary-foreground">Kebijakan Privasi</Link>
+                    <Link href="/syarat-ketentuan" className="hover:text-primary-foreground">Syarat & Ketentuan</Link>
+                    <Link href="/kebijakan-privasi" className="hover:text-primary-foreground">Kebijakan Privasi</Link>
                 </div>
             </div>
             <div className="text-center mt-4">
