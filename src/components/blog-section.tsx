@@ -49,7 +49,7 @@ export default function BlogSection({ newsItems }: BlogSectionProps) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {newsItems.map((item) => (
             <Link key={item.id} href={`/resources/${item.slug}`} className="group block" onClick={startLoading}>
-              <Card className="h-full overflow-hidden transition-all duration-300 transform hover:-translate-y-2 hover:shadow-2xl">
+              <Card className="h-full overflow-hidden transition-all duration-300 transform shadow-xl hover:-translate-y-2 hover:shadow-2xl">
                 <div className="relative h-48 w-full">
                   <Image
                     src={item.image || 'https://placehold.co/400x300.png'}
