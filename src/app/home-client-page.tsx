@@ -163,7 +163,7 @@ export default function HomeClientPage({ products, settings, professionalService
                   <div className="grid md:grid-cols-2 gap-8">
                     {professionalServices.map((service) => (
                       <Link key={service.id} href={`/layanan/${service.slug}`} className="group block" onClick={startLoading}>
-                        <Card className="transform transition-all duration-300 hover:shadow-xl h-full">
+                        <Card className="transform transition-all duration-300 shadow-xl hover:shadow-2xl h-full">
                           <div className="flex flex-row items-center gap-4 p-6">
                             <div className="bg-primary/10 p-3 md:p-4 rounded-full">
                               <DynamicIcon name={service.icon} className="h-8 w-8 md:h-10 md:w-10 text-primary" />
