@@ -38,8 +38,7 @@ export function FooterClient({ settings }: FooterClientProps) {
    const footerLinks2 = [
       { label: 'Knowledge Center', href: '/resources' },
       { label: 'Hubungi Kami', href: '/hubungi-kami' },
-      { label: 'FAQ', href: '#' },
-      { label: 'Karir', href: '#' },
+      { label: 'FAQ', href: '/faq' },
     ];
 
     const contactInfo = [
