@@ -7,16 +7,34 @@ import prisma from '@/lib/db';
 import { z } from 'zod';
 import { redirect } from 'next/navigation';
 
-export async function getAllProductsForSearch() {
-    return prisma.product.findMany({
+export async function getGroupedProductsForSearch() {
+    return prisma.productCategory.findMany({
         select: {
             id: true,
-            title: true,
-            slug: true,
+            name: true,
+            subCategories: {
+                select: {
+                    id: true,
+                    name: true,
+                    products: {
+                        select: {
+                            id: true,
+                            title: true,
+                            slug: true,
+                        },
+                        orderBy: {
+                            title: 'asc',
+                        },
+                    }
+                },
+                orderBy: {
+                    name: 'asc'
+                }
+            }
         },
         orderBy: {
-            title: 'asc',
-        },
+            name: 'asc'
+        }
     });
 }
 
@@ -145,6 +163,7 @@ export async function createProduct(prevState: { message: string, success?: bool
     return { message: 'Gagal membuat produk karena kesalahan server.', success: false };
   }
   
+  revalidatePath('/');
   revalidatePath('/admin/produk');
   revalidatePath('/produk');
   revalidatePath(`/produk/${rest.slug}`);
@@ -197,6 +216,7 @@ export async function updateProduct(prevState: { message: string, success?: bool
         return { message: 'Gagal memperbarui produk.', success: false };
     }
 
+    revalidatePath('/');
     revalidatePath('/admin/produk');
     revalidatePath('/produk');
     revalidatePath(`/produk/${rest.slug}`);
@@ -211,6 +231,7 @@ export async function deleteProduct(productId: number) {
     });
     if (product) {
         await prisma.product.delete({ where: { id: productId } });
+        revalidatePath('/');
         revalidatePath('/admin/produk');
         revalidatePath('/produk');
         revalidatePath(`/produk/${product.slug}`);

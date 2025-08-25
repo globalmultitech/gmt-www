@@ -2,11 +2,11 @@
 import { getSettings } from '@/lib/settings';
 import { HeaderClient } from './header-client';
 import type { MenuItem } from '@/lib/settings';
-import { getAllProductsForSearch } from '@/app/produk/actions';
+import { getGroupedProductsForSearch } from '@/app/produk/actions';
 
 export async function Header() {
   const settings = await getSettings();
-  const searchProducts = await getAllProductsForSearch();
+  const searchProducts = await getGroupedProductsForSearch();
   
   const navItems = (settings.menuItems as MenuItem[]) || [];
   const companyName = settings.companyName;

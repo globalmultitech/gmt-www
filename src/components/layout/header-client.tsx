@@ -10,16 +10,19 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import type { MenuItem } from '@/lib/settings';
-import type { Product } from '@prisma/client';
 import GlobalSearch from '../global-search';
 import { useLoadingStore } from '@/hooks/use-loading-store';
+
+type Category = { id: number; name: string; subCategories: SubCategory[] };
+type SubCategory = { id: number; name: string; products: Product[] };
+type Product = { id: number; title: string; slug: string };
 
 type HeaderClientProps = {
     navItems: MenuItem[];
     companyName: string;
     logoUrl?: string | null;
     whatsappNumber: string;
-    searchProducts: { id: number; title: string; slug: string }[];
+    searchProducts: Category[];
 }
 
 export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, searchProducts }: HeaderClientProps) {
@@ -85,7 +88,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
             </div>
 
             <div className="hidden lg:flex items-center space-x-2">
-                <GlobalSearch products={searchProducts} />
+                <GlobalSearch searchProducts={searchProducts} />
                 <Button asChild className={cn(
                   headerIsScrolled && 'border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary',
                 )}>
@@ -94,7 +97,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
             </div>
 
             <div className="lg:hidden flex items-center">
-                <GlobalSearch products={searchProducts} />
+                <GlobalSearch searchProducts={searchProducts} />
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
                     <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', headerIsScrolled ? 'text-primary-foreground hover:text-primary-foreground' : 'text-primary')}>
