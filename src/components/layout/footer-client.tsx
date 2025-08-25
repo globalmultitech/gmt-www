@@ -42,7 +42,7 @@ export function FooterClient({ settings }: FooterClientProps) {
     ];
 
     const contactInfo = [
-      { label: 'Alamat', value: settings.address, href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address || '')}` },
+      { label: 'Alamat', value: settings.address, href: 'https://maps.app.goo.gl/ApoZr1QN7tottejP6' },
       { label: 'Email', value: settings.contactEmail, href: `mailto:${settings.contactEmail}` },
       { label: 'Telepon', value: settings.contactPhone, href: `tel:${settings.contactPhone}` },
       { label: 'Jam Buka', value: settings.openingHours },
