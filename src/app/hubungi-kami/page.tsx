@@ -36,6 +36,7 @@ export default async function HubungiKamiPage() {
   const { settings, categories } = await getPageData();
   const whatsappNumber = settings.whatsappSales;
   const whatsappLink = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=Halo,%20saya%20tertarik%20dengan%20produk/layanan%20Anda.`;
+  const gmapsLink = "https://maps.app.goo.gl/ApoZr1QN7tottejP6";
 
   return (
     <>
@@ -77,7 +78,9 @@ export default async function HubungiKamiPage() {
                   <h3 className="font-headline text-2xl text-primary">Kantor Pusat</h3>
                 </div>
                 <p className="text-muted-foreground pl-16">
-                  {settings.address}
+                  <a href={gmapsLink} target="_blank" rel="noopener noreferrer" className="hover:text-accent">
+                    {settings.address}
+                  </a>
                 </p>
               </div>
               <div className="space-y-3">
