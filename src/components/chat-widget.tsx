@@ -162,11 +162,11 @@ export default function ChatWidget() {
                 <form onSubmit={handleStartChat} className="p-4 space-y-4">
                     <div className="space-y-1">
                         <Label htmlFor="name">Nama</Label>
-                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="Contoh: Budi" />
+                        <Input id="name" value={name} onChange={(e) => setName(e.target.value)} required placeholder="" />
                     </div>
                     <div className="space-y-1">
                         <Label htmlFor="company">Perusahaan</Label>
-                        <Input id="company" value={company} onChange={(e) => setCompany(e.target.value)} required placeholder="Contoh: PT. Maju Mundur" />
+                        <Input id="company" value={company} onChange={(e) => setCompany(e.target.value)} required placeholder="" />
                     </div>
                     <Button type="submit" className="w-full" disabled={!name || !company}>Mulai Mengobrol</Button>
                 </form>
