@@ -42,7 +42,7 @@ export function FooterClient({ settings }: FooterClientProps) {
     ];
 
     const contactInfo = [
-      { label: 'Alamat', value: settings.address },
+      { label: 'Alamat', value: settings.address, href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(settings.address || '')}` },
       { label: 'Email', value: settings.contactEmail, href: `mailto:${settings.contactEmail}` },
       { label: 'Telepon', value: settings.contactPhone, href: `tel:${settings.contactPhone}` },
       { label: 'Jam Buka', value: settings.openingHours },
@@ -100,7 +100,12 @@ export function FooterClient({ settings }: FooterClientProps) {
                   <li key={info.label} className="flex items-start">
                     <span className="font-semibold w-32 shrink-0">{info.label}</span>
                     {info.href ? (
-                      <Link href={info.href} className="text-primary-foreground/80 hover:text-white">
+                      <Link 
+                        href={info.href} 
+                        className="text-primary-foreground/80 hover:text-white"
+                        target={info.href.startsWith('http') ? '_blank' : undefined}
+                        rel={info.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      >
                         {info.value}
                       </Link>
                     ) : (
