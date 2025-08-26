@@ -1,3 +1,4 @@
+
 'use client';
 
 import Image from 'next/image';
@@ -68,11 +69,35 @@ const branchOffices = [
     }
 ];
 
-const servicePointCities = [
-    "Jakarta", "Surabaya", "Bandung", "Medan", "Bekasi", "Tangerang", "Depok",
-    "Semarang", "Palembang", "Makassar", "Batam", "Pekanbaru", "Bogor", "Bandar Lampung",
-    "Padang", "Malang", "Denpasar", "Samarinda", "Yogyakarta", "Banjarmasin", "Pontianak",
-    "Manado", "Balikpapan", "Jambi", "Ambon", "Mataram", "Kupang", "Jayapura"
+const servicePointsByRegion = [
+  {
+    region: "Sumatra",
+    locations: [ "Banda Aceh", "Syiah Kuala", "Lueng Bata", "Lhokseumawe", "Medan", "Kisaran", "Pematang Siantar", "Bukit Tinggi", "Padang", "Jambi", "Muaro Bungo", "Lubuklinggau", "Bengkulu", "Palembang", "Gandus", "Sako Baru", "Sako Plaju", "Muara Enim", "Batu Raja", "Bandar Lampung", "Terbanggi Besar", "Tanjung Sari", "Pemanggilan" ]
+  },
+  {
+    region: "Kepulauan Riau dan sekitarnya",
+    locations: [ "Batam", "Batam Kota", "Tj. Pinang", "Natuna" ]
+  },
+  {
+    region: "Kalimantan",
+    locations: [ "Pontianak", "Pontianak Kota", "Pontianak Tenggara", "Tj. Pandan", "Pangkalpinang", "Palangkaraya", "Banjarmasin Utara", "Banjarmasin Barat", "Tarakan", "Sangata", "Samarinda", "Balikpapan", "Banjarmasin", "Kertak Hanyar" ]
+  },
+  {
+    region: "Jawa",
+    locations: [ "Jakarta", "Jakarta Timur", "Tangerang", "Depok", "Bogor", "Bekasi", "Serang", "Bandung", "Garut", "Cirebon", "Tegal", "Purwokerto", "Yogyakarta", "Semarang", "Kudus", "Surabaya", "Sidoarjo", "Malang", "Probolinggo", "Situbondo", "Jember", "Ambulu", "Banyuwangi" ]
+  },
+  {
+    region: "Bali dan Nusa Tenggara",
+    locations: [ "Denpasar", "Singaraja", "Mataram", "Sumbawa", "Kupang" ]
+  },
+  {
+    region: "Sulawesi",
+    locations: [ "Palu", "Kendari", "Makasar", "Mannuruki", "Biringkanaya", "Pallangga", "Manado", "Tikala", "Malaya" ]
+  },
+  {
+    region: "Maluku & Papua",
+    locations: [ "Ternate", "Ambon", "Sorong", "Manokwari", "Timika", "Jayapura" ]
+  }
 ];
 
 
@@ -117,16 +142,21 @@ export function HomeMapSection() {
                       </div>
                     </DialogContent>
                   ) : (
-                     <DialogContent className="sm:max-w-[650px]">
+                     <DialogContent className="sm:max-w-4xl max-h-[80vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle className="text-2xl font-headline">Jangkauan Titik Layanan</DialogTitle>
                       </DialogHeader>
-                      <div className="py-4">
-                          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
-                             {servicePointCities.sort().map((city) => (
-                                <li key={city} className="text-muted-foreground">{city}</li>
-                             ))}
-                          </ul>
+                      <div className="py-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {servicePointsByRegion.map((regionData) => (
+                          <div key={regionData.region}>
+                            <h4 className="font-bold text-lg text-primary mb-2 border-b pb-1">{regionData.region}</h4>
+                            <ul className="space-y-1">
+                                {regionData.locations.map((city) => (
+                                  <li key={city} className="text-sm text-muted-foreground">{city}</li>
+                                ))}
+                            </ul>
+                          </div>
+                        ))}
                       </div>
                     </DialogContent>
                   )}
@@ -140,7 +170,7 @@ export function HomeMapSection() {
                 href={stat.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer"
+                className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer"
               >
                 <MapPin className={`h-5 w-5 ${stat.color}`} />
                 <span className="font-semibold text-sm text-foreground">{stat.label}</span>
