@@ -1,14 +1,72 @@
-
 'use client';
 
 import Image from 'next/image';
 import { MapPin } from 'lucide-react';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { Button } from './ui/button';
 
 const stats = [
   { label: 'Kantor Pusat', color: 'text-sky-blue', href: 'https://maps.app.goo.gl/ApoZr1QN7tottejP6' },
-  { label: '6 Kantor Cabang', color: 'text-cyan-500' },
+  { label: '6 Kantor Cabang', color: 'text-cyan-500', isDialog: true },
   { label: '100+ Titik Layanan', color: 'text-red-500' },
 ];
+
+const branchOffices = [
+    {
+        city: 'Medan',
+        addressLines: [
+            'Jl. Brigjend Katamso',
+            'Komplek Istana Prima 2, Blok E No.20-21',
+            'Medan 20159, Indonesia'
+        ]
+    },
+    {
+        city: 'Bandung',
+        addressLines: [
+            'Jl. Garuda No. 5A',
+            'Bandung 40183',
+            'Indonesia'
+        ]
+    },
+    {
+        city: 'Semarang',
+        addressLines: [
+            'Jl. Pusponjolo Tengah 1 No. 25-G',
+            'Semarang 50141',
+            'Indonesia'
+        ]
+    },
+    {
+        city: 'Yogyakarta',
+        addressLines: [
+            'Jl. Bima No. 164 B',
+            'Yogyakarta 55182',
+            'Indonesia'
+        ]
+    },
+    {
+        city: 'Surabaya',
+        addressLines: [
+            'Ruko Mega Galaxy Blok 16/C-17',
+            'Jl. Kertajaya Indah Timur',
+            'Surabaya 60116, Indonesia'
+        ]
+    },
+    {
+        city: 'Denpasar',
+        addressLines: [
+            'Rukan Imam Bonjol Square',
+            'Blok A No. 37 – 39, Jl. Imam Bonjol 555',
+            'Denpasar 80119, Indonesia'
+        ]
+    }
+]
 
 export function HomeMapSection() {
   return (
@@ -23,6 +81,36 @@ export function HomeMapSection() {
         
         <div className="flex justify-center items-center gap-4 md:gap-8 my-8 flex-wrap">
           {stats.map((stat, index) => {
+            if (stat.isDialog) {
+              return (
+                <Dialog key={index}>
+                  <DialogTrigger asChild>
+                    <Button variant="default" className="bg-white text-foreground hover:bg-white/90 px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105 h-auto">
+                       <MapPin className={`h-5 w-5 mr-2 ${stat.color}`} />
+                       <span className="font-semibold text-sm">{stat.label}</span>
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[650px]">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-headline">Lokasi Kantor Cabang Kami</DialogTitle>
+                    </DialogHeader>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-4">
+                      {branchOffices.map((office) => (
+                        <div key={office.city}>
+                          <h4 className="font-bold text-lg text-primary">{office.city}</h4>
+                          <address className="text-sm text-muted-foreground not-italic mt-1">
+                            {office.addressLines.map((line, i) => (
+                                <span key={i}>{line}<br/></span>
+                            ))}
+                          </address>
+                        </div>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )
+            }
+            
             const Component = stat.href ? 'a' : 'div';
             return (
                <Component
@@ -30,7 +118,7 @@ export function HomeMapSection() {
                 href={stat.href}
                 target={stat.href ? '_blank' : undefined}
                 rel={stat.href ? 'noopener noreferrer' : undefined}
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105"
+                className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer"
               >
                 <MapPin className={`h-5 w-5 ${stat.color}`} />
                 <span className="font-semibold text-sm text-foreground">{stat.label}</span>
