@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { MapPin } from 'lucide-react';
 
 const stats = [
-  { label: 'Kantor Pusat', color: 'text-sky-blue' },
+  { label: 'Kantor Pusat', color: 'text-sky-blue', href: 'https://maps.app.goo.gl/ApoZr1QN7tottejP6' },
   { label: '6 Kantor Cabang', color: 'text-cyan-500' },
   { label: '100+ Titik Layanan', color: 'text-red-500' },
 ];
@@ -22,12 +22,21 @@ export function HomeMapSection() {
         </p>
         
         <div className="flex justify-center items-center gap-4 md:gap-8 my-8 flex-wrap">
-          {stats.map((stat, index) => (
-            <div key={index} className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md">
-              <MapPin className={`h-5 w-5 ${stat.color}`} />
-              <span className="font-semibold text-sm text-foreground">{stat.label}</span>
-            </div>
-          ))}
+          {stats.map((stat, index) => {
+            const Component = stat.href ? 'a' : 'div';
+            return (
+               <Component
+                key={index}
+                href={stat.href}
+                target={stat.href ? '_blank' : undefined}
+                rel={stat.href ? 'noopener noreferrer' : undefined}
+                className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105"
+              >
+                <MapPin className={`h-5 w-5 ${stat.color}`} />
+                <span className="font-semibold text-sm text-foreground">{stat.label}</span>
+              </Component>
+            )
+          })}
         </div>
 
         <div className="relative mt-8 w-full max-w-5xl mx-auto">
