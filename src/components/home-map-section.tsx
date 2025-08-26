@@ -13,8 +13,8 @@ import { Button } from './ui/button';
 
 const stats = [
   { label: 'Kantor Pusat', color: 'text-sky-blue', href: 'https://maps.app.goo.gl/ApoZr1QN7tottejP6' },
-  { label: '6 Kantor Cabang', color: 'text-cyan-500', isDialog: true },
-  { label: '100+ Titik Layanan', color: 'text-red-500' },
+  { label: '6 Kantor Cabang', color: 'text-cyan-500', dialog: 'branch' },
+  { label: '100+ Titik Layanan', color: 'text-red-500', dialog: 'service-points' },
 ];
 
 const branchOffices = [
@@ -66,7 +66,15 @@ const branchOffices = [
             'Denpasar 80119, Indonesia'
         ]
     }
-]
+];
+
+const servicePointCities = [
+    "Jakarta", "Surabaya", "Bandung", "Medan", "Bekasi", "Tangerang", "Depok",
+    "Semarang", "Palembang", "Makassar", "Batam", "Pekanbaru", "Bogor", "Bandar Lampung",
+    "Padang", "Malang", "Denpasar", "Samarinda", "Yogyakarta", "Banjarmasin", "Pontianak",
+    "Manado", "Balikpapan", "Jambi", "Ambon", "Mataram", "Kupang", "Jayapura"
+];
+
 
 export function HomeMapSection() {
   return (
@@ -81,7 +89,7 @@ export function HomeMapSection() {
         
         <div className="flex justify-center items-center gap-4 md:gap-8 my-8 flex-wrap">
           {stats.map((stat, index) => {
-            if (stat.isDialog) {
+            if (stat.dialog) {
               return (
                 <Dialog key={index}>
                   <DialogTrigger asChild>
@@ -90,39 +98,53 @@ export function HomeMapSection() {
                        <span className="font-semibold text-sm">{stat.label}</span>
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="sm:max-w-[650px]">
-                    <DialogHeader>
-                      <DialogTitle className="text-2xl font-headline">Lokasi Kantor Cabang Kami</DialogTitle>
-                    </DialogHeader>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-4">
-                      {branchOffices.map((office) => (
-                        <div key={office.city}>
-                          <h4 className="font-bold text-lg text-primary">{office.city}</h4>
-                          <address className="text-sm text-muted-foreground not-italic mt-1">
-                            {office.addressLines.map((line, i) => (
-                                <span key={i}>{line}<br/></span>
-                            ))}
-                          </address>
-                        </div>
-                      ))}
-                    </div>
-                  </DialogContent>
+                  {stat.dialog === 'branch' ? (
+                    <DialogContent className="sm:max-w-[650px]">
+                      <DialogHeader>
+                        <DialogTitle className="text-2xl font-headline">Lokasi Kantor Cabang Kami</DialogTitle>
+                      </DialogHeader>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 py-4">
+                        {branchOffices.map((office) => (
+                          <div key={office.city}>
+                            <h4 className="font-bold text-lg text-primary">{office.city}</h4>
+                            <address className="text-sm text-muted-foreground not-italic mt-1">
+                              {office.addressLines.map((line, i) => (
+                                  <span key={i}>{line}<br/></span>
+                              ))}
+                            </address>
+                          </div>
+                        ))}
+                      </div>
+                    </DialogContent>
+                  ) : (
+                     <DialogContent className="sm:max-w-[650px]">
+                      <DialogHeader>
+                        <DialogTitle className="text-2xl font-headline">Jangkauan Titik Layanan</DialogTitle>
+                      </DialogHeader>
+                      <div className="py-4">
+                          <ul className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-4 gap-y-2">
+                             {servicePointCities.sort().map((city) => (
+                                <li key={city} className="text-muted-foreground">{city}</li>
+                             ))}
+                          </ul>
+                      </div>
+                    </DialogContent>
+                  )}
                 </Dialog>
               )
             }
             
-            const Component = stat.href ? 'a' : 'div';
             return (
-               <Component
+               <a
                 key={index}
                 href={stat.href}
-                target={stat.href ? '_blank' : undefined}
-                rel={stat.href ? 'noopener noreferrer' : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-md transition-transform hover:scale-105 cursor-pointer"
               >
                 <MapPin className={`h-5 w-5 ${stat.color}`} />
                 <span className="font-semibold text-sm text-foreground">{stat.label}</span>
-              </Component>
+              </a>
             )
           })}
         </div>
