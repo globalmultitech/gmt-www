@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
@@ -31,8 +32,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  subCategory: ProductSubCategory & {
-    category: ProductCategory
+  ProductSubCategory: ProductSubCategory & {
+    ProductCategory: ProductCategory
   }
 }
 
@@ -190,3 +191,4 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
     </>
   );
 }
+

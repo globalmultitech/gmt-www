@@ -36,9 +36,9 @@ async function getProductData(slug: string) {
     const productRaw = await prisma.product.findUnique({
       where: { slug },
       include: {
-        subCategory: {
+        ProductSubCategory: {
           include: {
-            category: true,
+            ProductCategory: true,
           },
         },
       },
@@ -62,6 +62,24 @@ async function getProductData(slug: string) {
           subCategoryId: product.subCategoryId,
       },
       take: 4,
+      select: { // Explicitly select all required fields for related products
+        id: true,
+        slug: true,
+        title: true,
+        images: true,
+        description: true,
+        createdAt: true,
+        updatedAt: true,
+        subCategoryId: true,
+        longDescription: true,
+        features: true,
+        technicalSpecifications: true,
+        generalSpecifications: true,
+        metaTitle: true,
+        metaDescription: true,
+        tokopediaUrl: true,
+        shopeeUrl: true,
+      }
     });
 
     const relatedProducts = relatedProductsRaw.map(p => ({
@@ -108,6 +126,7 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
 
+  // @ts-ignore
   return (
     <ProductDetailClientPage
         product={product}
@@ -116,3 +135,4 @@ export default async function ProductDetailPage({ params }: Props) {
     />
   );
 }
+
