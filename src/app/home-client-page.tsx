@@ -92,16 +92,6 @@ export default function HomeClientPage({ products, settings, professionalService
         </div>
       </section>
 
-      {/* AI Search Section */}
-      <section className="bg-dark-slate py-12">
-        <FadeIn>
-          <div className="container mx-auto px-4 relative z-10 -mt-28">
-            <AIProductSearch />
-          </div>
-        </FadeIn>
-      </section>
-
-
       {/* Feature Cards Section */}
       {settings.featureCards && (settings.featureCards as FeatureCard[]).length > 0 && (
         <section className="bg-dark-slate pt-8 pb-20">
@@ -126,8 +116,17 @@ export default function HomeClientPage({ products, settings, professionalService
         </section>
       )}
 
+      {/* AI Search Section */}
+      <section className="bg-background py-12">
+        <FadeIn>
+          <div className="container mx-auto px-4">
+            <AIProductSearch />
+          </div>
+        </FadeIn>
+      </section>
+
       {/* About Section */}
-      <section className="py-20 md:py-28 bg-background">
+      <section className="py-20 md:py-28 bg-dark-slate">
         <FadeIn>
             <div className="container mx-auto px-4">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -164,7 +163,7 @@ export default function HomeClientPage({ products, settings, professionalService
 
        {/* Services Section */}
        {professionalServices && professionalServices.length > 0 && (
-          <section className="py-20 md:py-28 bg-dark-slate">
+          <section className="py-20 md:py-28 bg-background">
             <FadeIn>
                 <div className="container mx-auto px-4">
                   <div className="text-center max-w-3xl mx-auto mb-16">
