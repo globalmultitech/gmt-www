@@ -1,5 +1,4 @@
 
-
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -32,10 +31,10 @@ async function getCategoryDataBySlug(slug: string) {
   const category = await prisma.productCategory.findUnique({
     where: { slug },
     include: {
-      subCategories: {
+      ProductSubCategory: {
         orderBy: { name: 'asc' },
         include: {
-          products: {
+          Product: {
             take: 1,
             select: { images: true }
           }
@@ -51,9 +50,9 @@ async function getCategoryDataBySlug(slug: string) {
   // Ensure product images are parsed correctly for each subcategory
   const processedCategory = {
       ...category,
-      subCategories: category.subCategories.map(sc => ({
+      ProductSubCategory: category.ProductSubCategory.map(sc => ({
           ...sc,
-          products: sc.products.map(p => ({
+          Product: sc.Product.map(p => ({
               ...p,
               images: parseJsonSafe(p.images, [])
           }))
