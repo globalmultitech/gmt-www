@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -40,7 +41,7 @@ export default function AIProductSearch() {
           Cari Produk dengan AI
         </h2>
         <p className="text-center text-muted-foreground mb-4">
-          Ketik kebutuhan Anda (contoh: "mesin hitung koin" atau "layar untuk lobi kantor")
+          Ketik kebutuhan Anda (contoh: "mesin hitung uang" atau "produk videotron")
         </p>
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
