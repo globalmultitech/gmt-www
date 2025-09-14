@@ -30,10 +30,10 @@ async function getHomePageData() {
       slug: true,
       images: true,
       description: true,
-      subCategory: {
+      ProductSubCategory: {
         select: {
           name: true,
-          category: {
+          ProductCategory: {
             select: {
               name: true
             }
@@ -77,12 +77,12 @@ async function getHomePageData() {
   const solutions = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      children: { // And include their direct children
+      other_Solution: { // And include their direct children
         orderBy: { createdAt: 'asc' }
       }
     },
     orderBy: { createdAt: 'asc' },
-  });
+  }).then(solutions => solutions.map(s => ({ ...s, children: s.other_Solution })));
 
   return { products, settings, professionalServices, newsItems, solutions };
 }
