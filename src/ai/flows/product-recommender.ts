@@ -1,0 +1,59 @@
+'use server';
+/**
+ * @fileOverview Product recommendation agent.
+ */
+
+import { ai } from '@/ai/genkit';
+import { z } from 'zod';
+import { searchProductsTool } from '../tools/product-search';
+
+export const ProductRecommenderInputSchema = z.string();
+export const ProductRecommenderOutputSchema = z.string();
+
+export type ProductRecommenderInput = z.infer<
+  typeof ProductRecommenderInputSchema
+>;
+export type ProductRecommenderOutput = z.infer<
+  typeof ProductRecommenderOutputSchema
+>;
+
+const productRecommenderPrompt = ai.definePrompt(
+  {
+    name: 'productRecommenderPrompt',
+    input: { schema: z.object({ query: z.string() }) },
+    output: { format: 'text' },
+    tools: [searchProductsTool],
+    system: `You are an expert product recommender for a company called Global Multi Technology.
+Your task is to help users find the right product based on their needs.
+Use the searchProductsTool to find relevant products from the company's database.
+Analyze the user's query to extract keywords for the tool.
+If you find relevant products, present them to the user in a helpful and concise way.
+If you don't find any relevant products, inform the user politely and ask if they can rephrase their request.
+Always reply in Bahasa Indonesia. Format your response using simple HTML paragraph tags <p>.`,
+  },
+  async (input) => {
+    return {
+      prompt: `Please recommend products for the following query: ${input.query}`,
+    };
+  }
+);
+
+
+const productRecommenderFlow = ai.defineFlow(
+  {
+    name: 'productRecommenderFlow',
+    inputSchema: ProductRecommenderInputSchema,
+    outputSchema: ProductRecommenderOutputSchema,
+  },
+  async (query) => {
+    const llmResponse = await productRecommenderPrompt({ query });
+    const response = llmResponse.text;
+    return response;
+  }
+);
+
+export async function recommendProduct(
+  input: ProductRecommenderInput
+): Promise<ProductRecommenderOutput> {
+  return await productRecommenderFlow(input);
+}

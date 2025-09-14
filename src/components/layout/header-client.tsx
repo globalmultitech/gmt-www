@@ -48,16 +48,28 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
     };
   }, []);
 
-  const headerIsScrolled = hasMounted && isScrolled;
+  const isHomepage = pathname === '/';
+  const headerIsScrolled = hasMounted && (isScrolled || !isHomepage);
 
   const headerClasses = cn(
     "fixed top-0 z-50 w-full transition-all duration-300",
     {
-      'bg-primary/90 backdrop-blur-sm shadow-md': headerIsScrolled,
-      'bg-transparent': !headerIsScrolled,
+      'bg-primary/95 backdrop-blur-sm shadow-md': headerIsScrolled,
+      'bg-gradient-to-b from-black/50 to-transparent': !headerIsScrolled && isHomepage,
+      'bg-primary': !isHomepage && !headerIsScrolled // for non-homepages at top
     }
   );
   
+  const linkColorClasses = cn(
+    'relative transition-colors duration-300',
+    {
+      'text-primary-foreground hover:text-white': headerIsScrolled || !isHomepage,
+      'text-white hover:text-gray-200': !headerIsScrolled && isHomepage
+    },
+     'after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-current after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100'
+  );
+
+
   return (
     <header className={headerClasses}>
         <div className="container mx-auto px-4">
@@ -75,9 +87,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                       href={item.href}
                       onClick={() => pathname !== item.href && startLoading()}
                       className={cn(
-                        'relative transition-colors duration-300',
-                        headerIsScrolled ? 'text-primary-foreground' : 'text-primary',
-                        'after:absolute after:bottom-[-4px] after:left-0 after:h-[2px] after:w-full after:bg-current after:scale-x-0 after:origin-left after:transition-transform after:duration-300 hover:after:scale-x-100',
+                        linkColorClasses,
                         pathname === item.href ? 'after:scale-x-100' : ''
                       )}
                   >
@@ -100,7 +110,7 @@ export function HeaderClient({ navItems, companyName, logoUrl, whatsappNumber, s
                 <GlobalSearch searchProducts={searchProducts} />
                 <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <SheetTrigger asChild>
-                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', headerIsScrolled ? 'text-primary-foreground hover:text-primary-foreground' : 'text-primary')}>
+                    <Button variant="ghost" size="icon" className={cn('hover:bg-muted/20', (headerIsScrolled || !isHomepage) ? 'text-primary-foreground hover:text-primary-foreground' : 'text-white')}>
                         <Menu className="h-6 w-6" />
                         <span className="sr-only">Buka menu</span>
                     </Button>

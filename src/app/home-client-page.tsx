@@ -15,6 +15,7 @@ import BlogSection from '@/components/blog-section';
 import * as React from 'react';
 import FadeIn from '@/components/fade-in';
 import { useLoadingStore } from '@/hooks/use-loading-store';
+import AIProductSearch from '@/components/ai-product-search';
 
 type EnrichedProduct = Product & {
   subCategory: ProductSubCategory & {
@@ -62,6 +63,7 @@ export default function HomeClientPage({ products, settings, professionalService
         className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" 
         style={{backgroundImage: `url('${settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}')`}}
         >
+        <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-black/20"></div>
         <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (
@@ -90,11 +92,21 @@ export default function HomeClientPage({ products, settings, professionalService
         </div>
       </section>
 
+      {/* AI Search Section */}
+      <section className="bg-dark-slate py-12">
+        <FadeIn>
+          <div className="container mx-auto px-4 relative z-10 -mt-28">
+            <AIProductSearch />
+          </div>
+        </FadeIn>
+      </section>
+
+
       {/* Feature Cards Section */}
       {settings.featureCards && (settings.featureCards as FeatureCard[]).length > 0 && (
-        <section className="bg-dark-slate">
+        <section className="bg-dark-slate pt-8 pb-20">
           <FadeIn>
-            <div className="container mx-auto px-4 relative z-10 -mt-20">
+            <div className="container mx-auto px-4 relative z-10">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
                     {(settings.featureCards as FeatureCard[]).map((card: FeatureCard, index: number) => (
                         <Card key={index} className="p-6 text-center bg-card shadow-lg rounded-lg transition-all duration-300 hover:shadow-2xl">
@@ -115,7 +127,7 @@ export default function HomeClientPage({ products, settings, professionalService
       )}
 
       {/* About Section */}
-      <section className="py-20 md:py-28 bg-dark-slate">
+      <section className="py-20 md:py-28 bg-background">
         <FadeIn>
             <div className="container mx-auto px-4">
               <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -152,7 +164,7 @@ export default function HomeClientPage({ products, settings, professionalService
 
        {/* Services Section */}
        {professionalServices && professionalServices.length > 0 && (
-          <section className="py-20 md:py-28 bg-background">
+          <section className="py-20 md:py-28 bg-dark-slate">
             <FadeIn>
                 <div className="container mx-auto px-4">
                   <div className="text-center max-w-3xl mx-auto mb-16">

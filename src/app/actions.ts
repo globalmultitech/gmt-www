@@ -1,6 +1,7 @@
 'use server';
 
 import { summarizeBlogPost } from '@/ai/flows/blog-post-summarizer';
+import { recommendProduct } from '@/ai/flows/product-recommender';
 
 export async function getBlogPostSummary(blogPostContent: string) {
   if (!blogPostContent) {
@@ -16,5 +17,18 @@ export async function getBlogPostSummary(blogPostContent: string) {
   } catch (error) {
     console.error('Error summarizing blog post:', error);
     return { error: 'Gagal meringkas blog post. Silakan coba lagi nanti.' };
+  }
+}
+
+export async function getProductRecommendation(query: string) {
+  if (!query) {
+    return { error: 'Prompt tidak boleh kosong.' };
+  }
+  try {
+    const result = await recommendProduct(query);
+    return { recommendation: result };
+  } catch (error) {
+    console.error('Error getting product recommendation:', error);
+    return { error: 'Gagal mendapatkan rekomendasi produk. Silakan coba lagi nanti.' };
   }
 }
