@@ -33,7 +33,7 @@ async function getHomePageData() {
       ProductSubCategory: {
         select: {
           name: true,
-          category: {
+          ProductCategory: {
             select: {
               name: true
             }
@@ -46,12 +46,7 @@ async function getHomePageData() {
   const products = productsRaw.map(product => {
     return {
       ...product,
-      // Ensure fields that might not be selected are handled, even though we select them now.
       images: parseJsonField(product.images, []),
-      features: [], // Not needed for home page card
-      technicalSpecifications: { headers: [], rows: [] }, // Not needed
-      generalSpecifications: { headers: [], rows: [] }, // Not needed
-      subCategory: product.ProductSubCategory, // Remap for client component
     };
   });
 
@@ -75,15 +70,21 @@ async function getHomePageData() {
     orderBy: { id: 'desc' },
   });
 
-  const solutions = await prisma.solution.findMany({
+  const solutionsRaw = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      children: { // And include their direct children
+      other_Solution: { // And include their direct children
         orderBy: { createdAt: 'asc' }
       }
     },
     orderBy: { createdAt: 'asc' },
   });
+
+  const solutions = solutionsRaw.map(s => ({
+    ...s,
+    children: s.other_Solution,
+  }));
+
 
   return { products, settings, professionalServices, newsItems, solutions };
 }

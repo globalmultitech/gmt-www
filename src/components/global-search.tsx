@@ -16,8 +16,8 @@ import { DialogDescription, DialogTitle } from './ui/dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 type Product = { id: number; title: string; slug: string };
-type SubCategory = { id: number; name: string; products: Product[] };
-type Category = { id: number; name: string; subCategories: SubCategory[] };
+type SubCategory = { id: number; name: string; Product: Product[] };
+type Category = { id: number; name: string; ProductSubCategory: SubCategory[] };
 
 interface GlobalSearchProps {
   searchProducts: Category[];
@@ -56,8 +56,6 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
         <span className="sr-only">Cari produk</span>
       </Button>
       <CommandDialog open={open} onOpenChange={setOpen}>
-        <DialogTitle className="sr-only">Cari Produk Global</DialogTitle>
-        <DialogDescription className="sr-only">Ketik untuk mencari produk di seluruh situs.</DialogDescription>
         <CommandInput placeholder="Ketik nama produk..." />
         <CommandList>
           <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
@@ -69,11 +67,11 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="pl-4">
-                  {category.subCategories.map((subCategory) => (
-                    subCategory.products.length > 0 && (
+                  {category.ProductSubCategory.map((subCategory) => (
+                    subCategory.Product.length > 0 && (
                         <div key={subCategory.id}>
                              <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
-                             {subCategory.products.map((product) => (
+                             {subCategory.Product.map((product) => (
                                 <CommandItem
                                     key={product.id}
                                     value={product.title}
