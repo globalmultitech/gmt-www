@@ -5,17 +5,14 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'zod';
-import { searchProductsTool } from '../tools/product-search';
+import { 
+  searchProductsTool,
+  ProductRecommenderInputSchema,
+  ProductRecommenderOutputSchema,
+  type ProductRecommenderInput,
+  type ProductRecommenderOutput
+} from '../tools/product-search';
 
-export const ProductRecommenderInputSchema = z.string();
-export const ProductRecommenderOutputSchema = z.string();
-
-export type ProductRecommenderInput = z.infer<
-  typeof ProductRecommenderInputSchema
->;
-export type ProductRecommenderOutput = z.infer<
-  typeof ProductRecommenderOutputSchema
->;
 
 const productRecommenderPrompt = ai.definePrompt(
   {
