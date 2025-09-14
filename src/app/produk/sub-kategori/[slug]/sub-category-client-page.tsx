@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedSubCategory = ProductSubCategory & {
-  category: ProductCategory;
+  ProductCategory: ProductCategory;
 };
 
 type SubCategoryClientPageProps = {
@@ -52,8 +52,8 @@ export default function SubCategoryClientPage({ subCategory, products }: SubCate
       <section className="bg-secondary pt-20">
         <div className="container mx-auto px-4 py-8">
             <Breadcrumbs 
-              categoryName={subCategory.category.name} 
-              categorySlug={toSlug(subCategory.category.name)} 
+              categoryName={subCategory.ProductCategory.name} 
+              categorySlug={toSlug(subCategory.ProductCategory.name)} 
               subCategoryName={subCategory.name} 
             />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{subCategory.name}</h1>
@@ -144,3 +144,4 @@ export default function SubCategoryClientPage({ subCategory, products }: SubCate
     </>
   );
 }
+
