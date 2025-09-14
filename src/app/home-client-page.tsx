@@ -78,51 +78,51 @@ export default function HomeClientPage({ products, settings, professionalService
                 {settings.heroDescription}
               </p>
             )}
-            <div className="flex justify-center items-center gap-4 fade-in-up" style={{animationDelay: '0.4s'}}>
-              {settings.heroButton1Text && settings.heroButton1Link && (
+          </div>
+        </div>
+      </section>
+
+      {/* Feature Cards Section */}
+      <section className="bg-dark-slate -mt-20 pt-20">
+         <FadeIn>
+            <div className="container mx-auto px-4 relative z-10 -mt-20">
+                {featureCards && featureCards.length > 0 && (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                        {featureCards.map((card: FeatureCard, index: number) => (
+                            <Card key={index} className="p-6 text-center bg-card shadow-lg rounded-lg transition-all duration-300 hover:shadow-2xl">
+                                <div className="flex justify-center mb-4">
+                                <DynamicIcon 
+                                    name={card.icon} 
+                                    className="h-8 w-8 text-primary"
+                                />
+                                </div>
+                                <h3 className="text-lg font-bold text-primary mb-2">{card.title}</h3>
+                                <p className="text-sm text-muted-foreground">{card.description}</p>
+                            </Card>
+                        ))}
+                    </div>
+                )}
+            </div>
+          </FadeIn>
+      </section>
+      
+      {/* AI Search Section */}
+      <section className="bg-dark-slate py-12">
+        <FadeIn>
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-center gap-4">
+               {settings.heroButton1Text && settings.heroButton1Link && (
                   <Button asChild size="lg">
                     <Link href={settings.heroButton1Link} onClick={startLoading}>{settings.heroButton1Text}</Link>
                   </Button>
               )}
+              <AIProductSearch />
                {settings.heroButton2Text && settings.heroButton2Link && (
                   <Button asChild size="lg" className="bg-primary-foreground text-primary hover:bg-primary-foreground/90">
                     <Link href={settings.heroButton2Link} onClick={startLoading}>{settings.heroButton2Text}</Link>
                   </Button>
                )}
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Feature Cards Section */}
-      {featureCards && featureCards.length > 0 && (
-        <section className="bg-dark-slate -mt-20 pt-20">
-          <FadeIn>
-            <div className="container mx-auto px-4 relative z-10 -mt-20">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {featureCards.map((card: FeatureCard, index: number) => (
-                        <Card key={index} className="p-6 text-center bg-card shadow-lg rounded-lg transition-all duration-300 hover:shadow-2xl">
-                            <div className="flex justify-center mb-4">
-                              <DynamicIcon 
-                                name={card.icon} 
-                                className="h-8 w-8 text-primary"
-                              />
-                            </div>
-                            <h3 className="text-lg font-bold text-primary mb-2">{card.title}</h3>
-                            <p className="text-sm text-muted-foreground">{card.description}</p>
-                        </Card>
-                    ))}
-                </div>
-            </div>
-          </FadeIn>
-        </section>
-      )}
-
-      {/* AI Search Section */}
-      <section className="bg-dark-slate py-12">
-        <FadeIn>
-          <div className="container mx-auto px-4">
-            <AIProductSearch />
           </div>
         </FadeIn>
       </section>
