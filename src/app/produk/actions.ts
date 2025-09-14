@@ -9,14 +9,11 @@ import { redirect } from 'next/navigation';
 
 export async function getGroupedProductsForSearch() {
     return prisma.productCategory.findMany({
-        select: {
-            id: true,
-            name: true,
-            subCategories: {
-                select: {
-                    id: true,
-                    name: true,
-                    products: {
+        include: {
+            ProductSubCategory: {
+                orderBy: { name: 'asc' },
+                include: {
+                    Product: {
                         select: {
                             id: true,
                             title: true,
@@ -26,9 +23,6 @@ export async function getGroupedProductsForSearch() {
                             title: 'asc',
                         },
                     }
-                },
-                orderBy: {
-                    name: 'asc'
                 }
             }
         },
@@ -62,7 +56,7 @@ const ProductSchema = z.object({
       if (Array.isArray(parsed) && parsed.every(item => typeof item === 'string')) {
         return parsed as string[];
       }
-      throw new Error();
+      throw new Error("Invalid image format");
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk gambar tidak valid' });
       return z.NEVER;
@@ -75,7 +69,7 @@ const ProductSchema = z.object({
       if (result.success) {
         return result.data;
       }
-      throw new Error();
+      throw new Error("Invalid feature format");
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk fitur tidak valid' });
       return z.NEVER;
@@ -88,7 +82,7 @@ const ProductSchema = z.object({
        if (result.success) {
         return result.data;
       }
-      throw new Error();
+      throw new Error("Invalid technical specification format");
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi teknis tidak valid' });
       return z.NEVER;
@@ -101,7 +95,7 @@ const ProductSchema = z.object({
        if (result.success) {
         return result.data;
       }
-      throw new Error();
+      throw new Error("Invalid general specification format");
     } catch (e) {
       ctx.addIssue({ code: 'custom', message: 'Format JSON untuk spesifikasi umum tidak valid' });
       return z.NEVER;
@@ -222,6 +216,7 @@ export async function updateProduct(prevState: { message: string, success?: bool
     revalidatePath(`/produk/${rest.slug}`);
     redirect('/admin/produk');
 }
+
 
 export async function deleteProduct(productId: number) {
   try {

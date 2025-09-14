@@ -30,7 +30,7 @@ async function getHomePageData() {
       slug: true,
       images: true,
       description: true,
-      subCategory: {
+      ProductSubCategory: {
         select: {
           name: true,
           category: {
@@ -51,6 +51,7 @@ async function getHomePageData() {
       features: [], // Not needed for home page card
       technicalSpecifications: { headers: [], rows: [] }, // Not needed
       generalSpecifications: { headers: [], rows: [] }, // Not needed
+      subCategory: product.ProductSubCategory, // Remap for client component
     };
   });
 
