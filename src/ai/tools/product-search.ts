@@ -5,8 +5,13 @@ import { ai } from '@/ai/genkit';
 import prisma from '@/lib/db';
 import { z } from 'zod';
 
-export const ProductRecommenderInputSchema = z.string();
-export const ProductRecommenderOutputSchema = z.string();
+export const ProductRecommenderInputSchema = z.object({
+  query: z.string().describe('The user\'s request for a product recommendation.')
+});
+export const ProductRecommenderOutputSchema = z.object({
+  recommendation: z.string().describe('The HTML formatted recommendation response.')
+});
+
 export type ProductRecommenderInput = z.infer<typeof ProductRecommenderInputSchema>;
 export type ProductRecommenderOutput = z.infer<typeof ProductRecommenderOutputSchema>;
 

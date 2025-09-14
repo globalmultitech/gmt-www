@@ -25,8 +25,8 @@ export async function getProductRecommendation(query: string) {
     return { error: 'Prompt tidak boleh kosong.' };
   }
   try {
-    const result = await recommendProduct(query);
-    return { recommendation: result };
+    const result = await recommendProduct({ query });
+    return { recommendation: result.recommendation };
   } catch (error) {
     console.error('Error getting product recommendation:', error);
     return { error: 'Gagal mendapatkan rekomendasi produk. Silakan coba lagi nanti.' };
