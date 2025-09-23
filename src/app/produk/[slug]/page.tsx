@@ -31,19 +31,27 @@ async function getProductData(slug: string) {
     if (!productRaw) {
       return { product: null, relatedProducts: [] };
     }
-    
-    // Step 2: Fetch the subCategory and its related category separately.
-    const subCategory = await prisma.productSubCategory.findUnique({
-        where: { id: productRaw.subCategoryId },
-        include: {
-            category: true, // This is a direct relation and should be safe.
-        },
+
+    // Step 2: Fetch the subCategory and its related category in separate, simple steps.
+    const subCategoryRaw = await prisma.productSubCategory.findUnique({
+      where: { id: productRaw.subCategoryId },
     });
+
+    let subCategoryWithCategory = null;
+    if (subCategoryRaw) {
+      const categoryRaw = await prisma.productCategory.findUnique({
+        where: { id: subCategoryRaw.categoryId },
+      });
+      subCategoryWithCategory = {
+        ...subCategoryRaw,
+        category: categoryRaw || null,
+      };
+    }
     
-    // Manually attach the subCategory and category to the product object.
+    // Manually assemble the product object.
     const product = {
         ...productRaw,
-        subCategory: subCategory || null,
+        subCategory: subCategoryWithCategory,
     };
 
     // Step 3: Fetch related products.
@@ -136,4 +144,5 @@ export default async function ProductDetailPage({ params }: Props) {
     />
   );
 }
+
 
