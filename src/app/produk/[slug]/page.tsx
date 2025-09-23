@@ -21,35 +21,32 @@ const parseJsonSafe = (json: any, fallback: any) => {
     return json ?? fallback;
 }
 
-export async function generateStaticParams() {
-  const products = await prisma.product.findMany({
-    where: { slug: { not: '' } },
-    select: { slug: true },
-  });
- 
-  return products.map((product) => ({
-    slug: product.slug,
-  }));
-}
-
 async function getProductData(slug: string) {
   try {
-    const product = await prisma.product.findUnique({
+    // Step 1: Fetch the product without any includes.
+    const productRaw = await prisma.product.findUnique({
       where: { slug },
-      include: {
-        subCategory: {
-          include: {
-            category: true,
-          },
-        },
-      },
     });
 
-    if (!product) {
+    if (!productRaw) {
       return { product: null, relatedProducts: [] };
     }
     
-    // Fetch related products in a separate query
+    // Step 2: Fetch the subCategory and its related category separately.
+    const subCategory = await prisma.productSubCategory.findUnique({
+        where: { id: productRaw.subCategoryId },
+        include: {
+            category: true,
+        },
+    });
+    
+    // Manually attach the subCategory and category to the product object.
+    const product = {
+        ...productRaw,
+        subCategory: subCategory || null,
+    };
+
+    // Step 3: Fetch related products.
     const relatedProducts = await prisma.product.findMany({
       where: {
         id: { not: product.id },
@@ -70,6 +67,18 @@ async function getProductData(slug: string) {
     return { product: null, relatedProducts: [] };
   }
 }
+
+export async function generateStaticParams() {
+  const products = await prisma.product.findMany({
+    where: { slug: { not: '' } },
+    select: { slug: true },
+  });
+ 
+  return products.map((product) => ({
+    slug: product.slug,
+  }));
+}
+
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { product } = await getProductData(params.slug);
