@@ -21,23 +21,37 @@ const parseJsonField = (field: any, fallback: any = []) => {
 
 
 async function getHomePageData() {
+  // 1. Fetch products and their related data using manual joins.
   const productsRaw = await prisma.product.findMany({
     take: 5,
     orderBy: { createdAt: 'desc' },
-    include: {
-      subCategory: {
-        include: {
-          category: true,
-        },
-      },
-    },
   });
 
-  const products = productsRaw.map(product => ({
-    ...product,
-    images: parseJsonField(product.images, []),
-    description: product.description || '',
-  }));
+  const allSubCategories = await prisma.productSubCategory.findMany();
+  const allCategories = await prisma.productCategory.findMany();
+
+  const subCategoriesMap = new Map(allSubCategories.map(sc => [sc.id, sc]));
+  const categoriesMap = new Map(allCategories.map(c => [c.id, c]));
+
+  const products = productsRaw.map(product => {
+    const subCategoryRaw = subCategoriesMap.get(product.subCategoryId);
+    let subCategory = null;
+
+    if (subCategoryRaw) {
+      const category = categoriesMap.get(subCategoryRaw.categoryId);
+      subCategory = {
+        ...subCategoryRaw,
+        category: category || null,
+      };
+    }
+
+    return {
+      ...product,
+      images: parseJsonField(product.images, []),
+      description: product.description || '',
+      subCategory: subCategory,
+    };
+  });
 
 
   const settings = await getSettings();
@@ -60,15 +74,22 @@ async function getHomePageData() {
     orderBy: { id: 'desc' },
   });
 
-  const solutions = await prisma.solution.findMany({
-    where: { parentId: null }, // Only fetch parent solutions
-    include: {
-      children: { // And include their direct children
-        orderBy: { createdAt: 'asc' }
-      }
-    },
+  // Fetch parent solutions and children solutions in separate queries
+  const parentSolutions = await prisma.solution.findMany({
+    where: { parentId: null },
     orderBy: { createdAt: 'asc' },
   });
+  
+  const childrenSolutions = await prisma.solution.findMany({
+    where: { parentId: { not: null } },
+    orderBy: { createdAt: 'asc' },
+  });
+
+  // Manually join them
+  const solutions = parentSolutions.map(parent => ({
+    ...parent,
+    children: childrenSolutions.filter(child => child.parentId === parent.id),
+  }));
 
   return { products, settings, professionalServices, newsItems, solutions };
 }
