@@ -6,8 +6,18 @@ import { getGroupedProductsForSearch } from '@/app/produk/actions';
 
 export async function Header() {
   const settings = await getSettings();
-  const searchProducts = await getGroupedProductsForSearch();
+  const searchProductsRaw = await getGroupedProductsForSearch();
   
+  // Transform the data here to be consistent for the client component
+  const searchProducts = searchProductsRaw.map(category => ({
+    ...category,
+    subCategories: category.ProductSubCategory.map(sub => ({
+      ...sub,
+      products: sub.Product
+    }))
+  }));
+
+
   const navItems = (settings.menuItems as MenuItem[]) || [];
   const companyName = settings.companyName;
   const logoUrl = settings.logoUrl;

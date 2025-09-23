@@ -16,8 +16,8 @@ import { DialogDescription, DialogTitle } from './ui/dialog';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 type Product = { id: number; title: string; slug: string };
-type SubCategory = { id: number; name: string; Product: Product[] };
-type Category = { id: number; name: string; ProductSubCategory: SubCategory[] };
+type SubCategory = { id: number; name: string; products: Product[] };
+type Category = { id: number; name: string; subCategories: SubCategory[] };
 
 interface GlobalSearchProps {
   searchProducts: Category[];
@@ -69,11 +69,11 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
                 </AccordionTrigger>
                 <AccordionContent>
                   <div className="pl-4">
-                  {category.ProductSubCategory.map((subCategory) => (
-                    subCategory.Product && subCategory.Product.length > 0 && (
+                  {category.subCategories?.map((subCategory) => (
+                    subCategory.products && subCategory.products.length > 0 && (
                         <div key={subCategory.id}>
                              <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
-                             {subCategory.Product.map((product) => (
+                             {subCategory.products.map((product) => (
                                 <CommandItem
                                     key={product.id}
                                     value={product.title}
