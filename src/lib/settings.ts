@@ -33,6 +33,8 @@ export interface WebSettings extends Omit<PrismaWebSettings, 'socialMedia' | 'me
   featureCards: FeatureCard[];
   aboutUsChecklist: string[];
   trustedByLogos: TrustedByLogo[];
+  contactPageTitle: string;
+  contactPageSubtitle: string;
 }
 
 const defaultSettings: WebSettings = {
@@ -89,7 +91,8 @@ const defaultSettings: WebSettings = {
 
   resourcesPageTitle: 'Resources',
   resourcesPageSubtitle: 'Dapatkan wawasan terbaru dari industri.',
-
+  contactPageTitle: 'Hubungi Kami',
+  contactPageSubtitle: 'Kami siap membantu. Hubungi kami untuk pertanyaan, permintaan demo, atau dukungan teknis.',
   createdAt: new Date(),
   updatedAt: new Date(),
 };

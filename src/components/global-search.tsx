@@ -15,13 +15,15 @@ import {
   CommandGroup,
 } from '@/components/ui/command';
 import { DialogDescription, DialogTitle } from './ui/dialog';
+import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
 
-type Product = { id: number; title: string; slug: string };
-type SubCategory = { id: number; name: string; products: Product[] };
-type Category = { id: number; name: string; subCategories: SubCategory[] };
+type EnrichedProduct = { id: number; title: string; slug: string; };
+type EnrichedSubCategory = { id: number; name: string; Products: EnrichedProduct[] };
+type EnrichedCategory = { id: number; name: string; subCategories: EnrichedSubCategory[] };
+
 
 interface GlobalSearchProps {
-  searchProducts: Category[];
+  searchProducts: EnrichedCategory[];
 }
 
 export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
@@ -65,10 +67,10 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
             {searchProducts.map((category) => (
               <CommandGroup key={category.id} heading={category.name}>
                   {category.subCategories?.map((subCategory) => (
-                    subCategory.products && subCategory.products.length > 0 && (
+                    subCategory.Products && subCategory.Products.length > 0 && (
                         <React.Fragment key={subCategory.id}>
                              <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
-                             {subCategory.products.map((product) => (
+                             {subCategory.Products.map((product) => (
                                 <CommandItem
                                     key={product.id}
                                     value={product.title}

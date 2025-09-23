@@ -10,7 +10,7 @@ async function getSolusiData() {
       parentId: null // Fetch only parent solutions
     },
     include: {
-      children: { // Include their children (sub-solutions)
+      Children: { // Include their children
         orderBy: { createdAt: 'asc' }
       }
     },
@@ -22,5 +22,5 @@ async function getSolusiData() {
 export default async function SolusiSettingsPage() {
   const { solutions } = await getSolusiData();
 
-  return <SolusiListPage solutions={solutions} />;
+  return <SolusiListPage solutions={solutions.map(s => ({ ...s, children: s.Children })) as any} />;
 }

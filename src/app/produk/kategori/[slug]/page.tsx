@@ -1,4 +1,5 @@
 
+
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -30,59 +31,25 @@ const parseJsonSafe = (json: any, fallback: any) => {
 async function getCategoryDataBySlug(slug: string) {
   const category = await prisma.productCategory.findUnique({
     where: { slug },
+    include: {
+      subCategories: {
+        orderBy: { name: 'asc' },
+        include: {
+          Products: {
+            take: 1,
+            select: { images: true }
+          }
+        }
+      }
+    }
   });
 
   if (!category) {
     return null;
   }
-
-  const subCategoriesRaw = await prisma.productSubCategory.findMany({
-    where: { categoryId: category.id },
-    orderBy: { name: 'asc' },
-  });
   
-  if (subCategoriesRaw.length === 0) {
-    return { category: { ...category, subCategories: [] } };
-  }
-
-  const subCategoryIds = subCategoriesRaw.map(sc => sc.id);
-
-  const productsForSubCategories = await prisma.product.findMany({
-    where: {
-      subCategoryId: {
-        in: subCategoryIds,
-      },
-    },
-    take: 1, // This might not behave as expected across all subcategories. A more complex query might be needed for per-subcategory limit.
-    select: {
-      subCategoryId: true,
-      images: true,
-    },
-  });
-
-  // Since `take: 1` on a findMany over multiple relations is tricky,
-  // we'll just grab the first product image found for each subcategory manually.
-  const productImagesMap = new Map<number, string[]>();
-  for(const p of productsForSubCategories) {
-    if (!productImagesMap.has(p.subCategoryId)) {
-      productImagesMap.set(p.subCategoryId, parseJsonSafe(p.images, []));
-    }
-  }
-
-  const subCategories = subCategoriesRaw.map(sc => {
-    const images = productImagesMap.get(sc.id) || [];
-    return {
-      ...sc,
-      products: images.length > 0 ? [{ images: images }] : []
-    };
-  });
-  
-  const processedCategory = {
-    ...category,
-    subCategories: subCategories
-  };
-
-  return { category: processedCategory };
+  // No need to process further if the query is correct
+  return { category };
 }
 
 type Props = {
@@ -120,9 +87,18 @@ export default async function CategoryPage({ params }: Props) {
   
   const { category } = data;
   
+  const processedCategory = {
+      ...category,
+      subCategories: category.subCategories.map(sc => ({
+          ...sc,
+          products: sc.Products.map(p => ({
+              ...p,
+              images: parseJsonSafe(p.images, [])
+          }))
+      }))
+  };
+
   return (
-    // @ts-ignore
-    <CategoryClientPage category={category} slug={slug} />
+    <CategoryClientPage category={processedCategory as any} slug={slug} />
   );
 }
-

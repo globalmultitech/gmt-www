@@ -29,7 +29,7 @@ import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
   subCategory?: (ProductSubCategory & {
-    category: ProductCategory
+    Category: ProductCategory
   }) | null;
 }
 
@@ -56,10 +56,10 @@ const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
     <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
     <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
-    {product.subCategory?.category?.name && (
+    {product.subCategory?.Category?.name && (
         <>
             <ChevronRight className="h-4 w-4" />
-            <Link href={`/produk/kategori/${product.subCategory.category.slug}`} onClick={startLoading} className="hover:text-primary">{product.subCategory.category.name}</Link>
+            <Link href={`/produk/kategori/${product.subCategory.Category.slug}`} onClick={startLoading} className="hover:text-primary">{product.subCategory.Category.name}</Link>
         </>
     )}
     <ChevronRight className="h-4 w-4" />

@@ -1,4 +1,5 @@
 
+
 import { getSettings } from '@/lib/settings';
 import prisma from '@/lib/db';
 import SolusiPageClient from './solusi-client-page';
@@ -9,7 +10,7 @@ async function getPageData() {
     const solutions = await prisma.solution.findMany({
         where: { parentId: null }, // Only fetch parent solutions
         include: {
-          children: { // And include their direct children
+          Children: { // And include their direct children
             orderBy: { createdAt: 'asc' }
           }
         },
@@ -35,6 +36,6 @@ export default async function SolusiPage() {
     const { settings, solutions } = await getPageData();
   
     return (
-        <SolusiPageClient settings={settings} solutions={solutions} />
+        <SolusiPageClient settings={settings} solutions={solutions.map(s => ({...s, children: s.Children})) as any} />
     );
 }

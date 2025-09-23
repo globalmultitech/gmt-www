@@ -21,38 +21,18 @@ const parseJsonField = (field: any, fallback: any = []) => {
 
 
 async function getHomePageData() {
-  // 1. Fetch products and their related data using manual joins.
-  const productsRaw = await prisma.product.findMany({
+  // 1. Fetch products and their related data using the correct relation names.
+  const products = await prisma.product.findMany({
     take: 5,
     orderBy: { createdAt: 'desc' },
+    include: {
+      subCategory: {
+        include: {
+          Category: true,
+        },
+      },
+    },
   });
-
-  const allSubCategories = await prisma.productSubCategory.findMany();
-  const allCategories = await prisma.productCategory.findMany();
-
-  const subCategoriesMap = new Map(allSubCategories.map(sc => [sc.id, sc]));
-  const categoriesMap = new Map(allCategories.map(c => [c.id, c]));
-
-  const products = productsRaw.map(product => {
-    const subCategoryRaw = subCategoriesMap.get(product.subCategoryId);
-    let subCategory = null;
-
-    if (subCategoryRaw) {
-      const category = categoriesMap.get(subCategoryRaw.categoryId);
-      subCategory = {
-        ...subCategoryRaw,
-        category: category || null,
-      };
-    }
-
-    return {
-      ...product,
-      images: parseJsonField(product.images, []),
-      description: product.description || '',
-      subCategory: subCategory,
-    };
-  });
-
 
   const settings = await getSettings();
 
@@ -74,22 +54,17 @@ async function getHomePageData() {
     orderBy: { id: 'desc' },
   });
 
-  // Fetch parent solutions and children solutions in separate queries
-  const parentSolutions = await prisma.solution.findMany({
-    where: { parentId: null },
-    orderBy: { createdAt: 'asc' },
-  });
-  
-  const childrenSolutions = await prisma.solution.findMany({
-    where: { parentId: { not: null } },
+  // Fetch all solutions and manually construct the hierarchy
+  const solutions = await prisma.solution.findMany({
+    where: { parentId: null }, // Only fetch parent solutions
+    include: {
+      Children: { // And include their direct children
+        orderBy: { createdAt: 'asc' }
+      }
+    },
     orderBy: { createdAt: 'asc' },
   });
 
-  // Manually join them
-  const solutions = parentSolutions.map(parent => ({
-    ...parent,
-    children: childrenSolutions.filter(child => child.parentId === parent.id),
-  }));
 
   return { products, settings, professionalServices, newsItems, solutions };
 }
@@ -103,7 +78,7 @@ export default async function Home() {
       settings={settings} 
       professionalServices={professionalServices} 
       newsItems={newsItems}
-      solutions={solutions}
+      solutions={solutions as any}
     />
   );
 }

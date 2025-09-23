@@ -10,7 +10,7 @@ import { DynamicIcon } from '@/components/dynamic-icon';
 import type { Solution } from '@prisma/client';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
-type SolutionWithChildren = Solution & { children: Solution[] };
+type SolutionWithChildren = Solution & { Children: Solution[] };
 
 type SolusiPageProps = {
   settings: WebSettings;
@@ -60,9 +60,9 @@ export default function SolusiPageClient({ settings, solutions }: SolusiPageProp
                     </h2>
                   </div>
                   <div className="text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: solution.description }} />
-                   {solution.children && solution.children.length > 0 && (
+                   {solution.Children && solution.Children.length > 0 && (
                       <ul className="space-y-2 pt-2">
-                        {solution.children.map((child, i) => (
+                        {solution.Children.map((child, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
                             <Link href={`/solusi/${child.slug}`} onClick={startLoading} className="text-muted-foreground hover:text-primary transition-colors">

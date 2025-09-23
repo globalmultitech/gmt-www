@@ -54,6 +54,7 @@ model WebSettings {
   ctaButtonLink              String?
   trustedByText              String?
   trustedByLogos             Json?
+  testimonials               Json?
   servicesPageTitle          String?
   servicesPageSubtitle       String?
   servicesPageCommitmentTitle String?
@@ -76,12 +77,12 @@ model WebSettings {
 }
 
 model ProductCategory {
-  id            Int                  @id @default(autoincrement())
-  name          String               @unique
-  slug          String               @unique
-  description   String?
-  imageUrl      String?
-  subCategories ProductSubCategory[]
+  id          Int                  @id @default(autoincrement())
+  name        String               @unique
+  slug        String               @unique
+  description String?
+  imageUrl    String?
+  SubCategories ProductSubCategory[]
 }
 
 model ProductSubCategory {
@@ -96,20 +97,20 @@ model Product {
   id                      Int                @id @default(autoincrement())
   title                   String
   slug                    String             @unique
+  SubCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategoryId           Int
   description             String
   longDescription         String?
-  images                  Json?
-  features                Json?
-  technicalSpecifications Json?
-  generalSpecifications   Json?
+  images                  Json?              @default("[]")
+  features                Json?              @default("[]")
+  technicalSpecifications Json?              @default("{\"headers\":[], \"rows\":[]}")
+  generalSpecifications   Json?              @default("{\"headers\":[], \"rows\":[]}")
   metaTitle               String?
   metaDescription         String?
   tokopediaUrl            String?
   shopeeUrl               String?
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
-  SubCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
-  subCategoryId           Int
 }
 
 model ProfessionalService {
@@ -120,8 +121,8 @@ model ProfessionalService {
   description     String
   longDescription String?
   imageUrl        String?
-  details         Json?
-  benefits        Json?
+  details         Json?    @default("[]")
+  benefits        Json?    @default("[]")
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 }
@@ -134,12 +135,12 @@ model Solution {
   description String
   image       String?
   aiHint      String?
-  keyPoints   Json?
+  keyPoints   Json?     @default("[]")
   parentId    Int?
+  Parent      Solution? @relation("SolutionChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  Children    Solution[] @relation("SolutionChildren")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
-  Parent      Solution? @relation("SubSolutions", fields: [parentId], references: [id], onDelete: Cascade)
-  children    Solution[] @relation("SubSolutions")
 }
 
 model PartnerLogo {

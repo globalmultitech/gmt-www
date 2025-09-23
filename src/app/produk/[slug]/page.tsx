@@ -23,38 +23,21 @@ const parseJsonSafe = (json: any, fallback: any) => {
 
 async function getProductData(slug: string) {
   try {
-    // Step 1: Fetch the product without any includes.
-    const productRaw = await prisma.product.findUnique({
+    const product = await prisma.product.findUnique({
       where: { slug },
+      include: {
+        subCategory: {
+          include: {
+            Category: true,
+          },
+        },
+      },
     });
 
-    if (!productRaw) {
+    if (!product) {
       return { product: null, relatedProducts: [] };
     }
 
-    // Step 2: Fetch the subCategory and its related category in separate, simple steps.
-    const subCategoryRaw = await prisma.productSubCategory.findUnique({
-      where: { id: productRaw.subCategoryId },
-    });
-
-    let subCategoryWithCategory = null;
-    if (subCategoryRaw) {
-      const categoryRaw = await prisma.productCategory.findUnique({
-        where: { id: subCategoryRaw.categoryId },
-      });
-      subCategoryWithCategory = {
-        ...subCategoryRaw,
-        category: categoryRaw || null,
-      };
-    }
-    
-    // Manually assemble the product object.
-    const product = {
-        ...productRaw,
-        subCategory: subCategoryWithCategory,
-    };
-
-    // Step 3: Fetch related products.
     const relatedProducts = await prisma.product.findMany({
       where: {
         id: { not: product.id },
@@ -144,5 +127,3 @@ export default async function ProductDetailPage({ params }: Props) {
     />
   );
 }
-
-
