@@ -24,23 +24,13 @@ async function getHomePageData() {
   const productsRaw = await prisma.product.findMany({
     take: 5,
     orderBy: { createdAt: 'desc' },
-    select: {
-      id: true,
-      title: true,
-      slug: true,
-      images: true,
-      description: true,
+    include: {
       ProductSubCategory: {
-        select: {
-          name: true,
-          ProductCategory: {
-            select: {
-              name: true
-            }
-          }
-        }
-      }
-    }
+        include: {
+          ProductCategory: true,
+        },
+      },
+    },
   });
 
   const products = productsRaw.map(product => {
@@ -79,7 +69,7 @@ async function getHomePageData() {
   const solutionsRaw = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      other_Solution: { // And include their direct children
+      other_Solution: { // Correct relation name for children
         orderBy: { createdAt: 'asc' }
       }
     },
@@ -88,7 +78,7 @@ async function getHomePageData() {
 
   const solutions = solutionsRaw.map(s => {
     const { other_Solution, ...rest } = s;
-    return { ...rest, children: other_Solution };
+    return { ...rest, children: other_Solution }; // Map to 'children' for the client component
   })
 
   return { products, settings, professionalServices, newsItems, solutions };
