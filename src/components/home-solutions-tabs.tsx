@@ -59,7 +59,10 @@ export function HomeSolutionsTabs({ solutions }: HomeSolutionsTabsProps) {
                       </div>
                       <div className="flex-grow">
                         <h3 className="text-lg md:text-xl font-bold text-primary mb-2">{solution.title}</h3>
-                        <p className="text-muted-foreground text-sm mb-4 h-20">{solution.description}</p>
+                        <div
+                          className="text-muted-foreground text-sm mb-4 h-20 overflow-hidden prose prose-sm"
+                          dangerouslySetInnerHTML={{ __html: solution.description }}
+                        />
                         <Link href={`/solusi/${solution.slug}`} onClick={startLoading} className="font-semibold text-sky-blue flex items-center group">
                           Pelajari lebih jauh
                           <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
