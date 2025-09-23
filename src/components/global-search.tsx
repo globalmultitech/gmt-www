@@ -18,8 +18,8 @@ import { DialogDescription, DialogTitle } from './ui/dialog';
 import type { Product, ProductSubCategory, ProductCategory } from '@prisma/client';
 
 type EnrichedProduct = { id: number; title: string; slug: string; };
-type EnrichedSubCategory = { id: number; name: string; Products: EnrichedProduct[] };
-type EnrichedCategory = { id: number; name: string; subCategories: EnrichedSubCategory[] };
+type EnrichedSubCategory = ProductSubCategory & { Products: EnrichedProduct[] };
+type EnrichedCategory = ProductCategory & { ProductSubCategory: EnrichedSubCategory[] };
 
 
 interface GlobalSearchProps {
@@ -66,7 +66,7 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
           <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
             {searchProducts.map((category) => (
               <CommandGroup key={category.id} heading={category.name}>
-                  {category.subCategories?.map((subCategory) => (
+                  {category.ProductSubCategory?.map((subCategory) => (
                     subCategory.Products && subCategory.Products.length > 0 && (
                         <React.Fragment key={subCategory.id}>
                              <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
