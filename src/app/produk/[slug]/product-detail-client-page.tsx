@@ -31,9 +31,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  subCategory: ProductSubCategory & {
+  subCategory: (ProductSubCategory & {
     category: ProductCategory
-  }
+  }) | null;
 }
 
 type ProductDetailClientPageProps = {
@@ -52,15 +52,21 @@ type Specifications = {
     rows: string[][];
 }
 
-const Breadcrumbs = ({ productTitle }: { productTitle: string }) => {
+const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
   const { startLoading } = useLoadingStore();
   return (
   <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
     <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
     <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
+    {product.subCategory?.category?.name && (
+        <>
+            <ChevronRight className="h-4 w-4" />
+            <Link href={`/produk/kategori/${product.subCategory.category.slug}`} onClick={startLoading} className="hover:text-primary">{product.subCategory.category.name}</Link>
+        </>
+    )}
     <ChevronRight className="h-4 w-4" />
-    <span className="font-semibold text-foreground">{productTitle}</span>
+    <span className="font-semibold text-foreground truncate max-w-[200px]">{product.title}</span>
   </nav>
   )
 };
@@ -108,7 +114,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
       <div className="bg-secondary pt-20">
         <div className="container mx-auto px-4">
           <div className="py-8 md:py-12">
-            <Breadcrumbs productTitle={product.title} />
+            <Breadcrumbs product={product} />
           </div>
           
            <div className="md:grid md:grid-cols-2 md:gap-12">
@@ -118,7 +124,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
 
               <div className="flex flex-col mt-8 md:mt-0">
                 <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                <div className="mt-4 text-lg text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: product.description }} />
+                <div className="mt-4 text-lg text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: product.description || '' }} />
                 
                 <div className="flex flex-wrap items-center gap-3 my-6">
                   <WhatsAppButton product={product} settings={settings} />
@@ -145,7 +151,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
                     <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                     <AccordionContent>
                         <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
-                          <div dangerouslySetInnerHTML={{ __html: product.longDescription || product.description }} />
+                          <div dangerouslySetInnerHTML={{ __html: product.longDescription || product.description || '' }} />
                         </article>
                     </AccordionContent>
                   </AccordionItem>

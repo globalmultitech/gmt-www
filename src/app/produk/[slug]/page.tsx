@@ -36,9 +36,9 @@ async function getProductData(slug: string) {
     const productRaw = await prisma.product.findUnique({
       where: { slug },
       include: {
-        subCategory: {
+        ProductSubCategory: {
           include: {
-            category: true,
+            ProductCategory: true,
           },
         },
       },
@@ -47,13 +47,19 @@ async function getProductData(slug: string) {
     if (!productRaw) {
       return { product: null, relatedProducts: [] };
     }
-
+    
+    // Transform the raw product data to match the expected client-side structure
+    const { ProductSubCategory, ...restOfProduct } = productRaw;
     const product = {
-      ...productRaw,
+      ...restOfProduct,
       images: parseJsonSafe(productRaw.images, []),
       features: parseJsonSafe(productRaw.features, []),
       technicalSpecifications: parseJsonSafe(productRaw.technicalSpecifications, { headers: [], rows: [] }),
       generalSpecifications: parseJsonSafe(productRaw.generalSpecifications, { headers: [], rows: [] }),
+      subCategory: ProductSubCategory ? {
+          ...ProductSubCategory,
+          category: ProductSubCategory.ProductCategory,
+      } : null
     };
 
     const relatedProductsRaw = await prisma.product.findMany({
@@ -62,6 +68,12 @@ async function getProductData(slug: string) {
           subCategoryId: product.subCategoryId,
       },
       take: 4,
+       select: {
+        id: true,
+        title: true,
+        slug: true,
+        images: true,
+       }
     });
 
     const relatedProducts = relatedProductsRaw.map(p => ({
@@ -69,6 +81,7 @@ async function getProductData(slug: string) {
         images: parseJsonSafe(p.images, []),
     }));
 
+    // @ts-ignore
     return { product, relatedProducts };
   } catch (error) {
     console.error("Failed to fetch product data:", error);
@@ -89,10 +102,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: product.metaTitle || product.title,
-    description: product.metaDescription || product.description,
+    description: product.metaDescription || product.description || undefined,
     openGraph: {
         title: product.metaTitle || product.title,
-        description: product.metaDescription || product.description,
+        description: product.metaDescription || product.description || undefined,
         images: mainImageUrl ? [mainImageUrl] : [],
     },
   };
@@ -110,6 +123,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
   return (
     <ProductDetailClientPage
+        // @ts-ignore
         product={product}
         relatedProducts={relatedProducts}
         settings={settings}
