@@ -36,7 +36,7 @@ async function getProductData(slug: string) {
     const subCategory = await prisma.productSubCategory.findUnique({
         where: { id: productRaw.subCategoryId },
         include: {
-            category: true,
+            category: true, // This is a direct relation and should be safe.
         },
     });
     
@@ -67,6 +67,7 @@ async function getProductData(slug: string) {
     return { product: null, relatedProducts: [] };
   }
 }
+
 
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({
@@ -135,3 +136,4 @@ export default async function ProductDetailPage({ params }: Props) {
     />
   );
 }
+
