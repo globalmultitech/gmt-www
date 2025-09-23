@@ -31,8 +31,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  subCategory: (ProductSubCategory & {
-    category: ProductCategory
+  ProductSubCategory?: (ProductSubCategory & {
+    ProductCategory: ProductCategory
   }) | null;
 }
 
@@ -59,10 +59,10 @@ const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
     <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
     <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
-    {product.subCategory?.category?.name && (
+    {product.ProductSubCategory?.ProductCategory?.name && (
         <>
             <ChevronRight className="h-4 w-4" />
-            <Link href={`/produk/kategori/${product.subCategory.category.slug}`} onClick={startLoading} className="hover:text-primary">{product.subCategory.category.name}</Link>
+            <Link href={`/produk/kategori/${product.ProductSubCategory.ProductCategory.slug}`} onClick={startLoading} className="hover:text-primary">{product.ProductSubCategory.ProductCategory.name}</Link>
         </>
     )}
     <ChevronRight className="h-4 w-4" />

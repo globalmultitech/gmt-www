@@ -102,8 +102,8 @@ export default async function CategoryPage({ params }: Props) {
   const { category } = data;
   
   return (
-    // @ts-ignore
     <CategoryClientPage category={category} slug={slug} />
   );
 }
+
 

@@ -39,17 +39,17 @@ const parseJsonSafe = (json: any, fallback: any) => {
 
 
 async function getSubCategoryDataBySlug(slug: string) {
-  const subCategories = await prisma.productSubCategory.findMany({ include: { category: true } }); // Correct relation name is 'category'
+  const subCategories = await prisma.productSubCategory.findMany({ include: { ProductCategory: true } });
   const subCategoryRaw = subCategories.find(sc => toSlug(sc.name) === slug);
 
   if (!subCategoryRaw) {
     return null;
   }
   
-  const { category, ...restOfSubCategory } = subCategoryRaw;
+  const { ProductCategory, ...restOfSubCategory } = subCategoryRaw;
   const subCategory = {
     ...restOfSubCategory,
-    category: category,
+    category: ProductCategory,
   }
 
   const rawProducts = await prisma.product.findMany({

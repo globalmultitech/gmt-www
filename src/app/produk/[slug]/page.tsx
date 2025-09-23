@@ -48,17 +48,13 @@ async function getProductData(slug: string) {
       return { product: null, relatedProducts: [] };
     }
     
-    const { ProductSubCategory, ...restOfProduct } = productRaw;
+    // Simplified processing
     const product = {
-      ...restOfProduct,
+      ...productRaw,
       images: parseJsonSafe(productRaw.images, []),
       features: parseJsonSafe(productRaw.features, []),
       technicalSpecifications: parseJsonSafe(productRaw.technicalSpecifications, { headers: [], rows: [] }),
       generalSpecifications: parseJsonSafe(productRaw.generalSpecifications, { headers: [], rows: [] }),
-      subCategory: ProductSubCategory ? {
-          ...ProductSubCategory,
-          category: ProductSubCategory.ProductCategory,
-      } : null
     };
 
     const relatedProductsRaw = await prisma.product.findMany({

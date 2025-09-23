@@ -10,8 +10,7 @@ import { useLoadingStore } from '@/hooks/use-loading-store';
 import type { ProductCategory, ProductSubCategory, Product } from '@prisma/client';
 
 type EnrichedSubCategory = ProductSubCategory & {
-  products: { images: any }[];
-  Product: { images: any }[]; // Add this to handle both possibilities
+  products: { images: string[] }[];
 }
 
 type EnrichedCategory = ProductCategory & {
@@ -86,8 +85,7 @@ export default function CategoryClientPage({ category, slug }: CategoryClientPag
           {category.subCategories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {category.subCategories.map((subCategory) => {
-                const products = subCategory.products || subCategory.Product || [];
-                const firstProductImage = products[0]?.images?.[0];
+                const firstProductImage = subCategory.products[0]?.images?.[0];
                 
                 return (
                  <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block" onClick={startLoading}>
@@ -130,4 +128,3 @@ export default function CategoryClientPage({ category, slug }: CategoryClientPag
     </>
   );
 }
-
