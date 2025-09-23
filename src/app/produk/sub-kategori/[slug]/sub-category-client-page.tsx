@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
@@ -53,7 +54,7 @@ export default function SubCategoryClientPage({ subCategory, products }: SubCate
         <div className="container mx-auto px-4 py-8">
             <Breadcrumbs 
               categoryName={subCategory.category.name} 
-              categorySlug={toSlug(subCategory.category.name)} 
+              categorySlug={subCategory.category.slug || toSlug(subCategory.category.name)} 
               subCategoryName={subCategory.name} 
             />
             <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary mt-4">{subCategory.name}</h1>
@@ -111,9 +112,7 @@ export default function SubCategoryClientPage({ subCategory, products }: SubCate
                           {product.title}
                         </h3>
 
-                        <p className="text-xs text-white/90 mt-2 mb-3 h-12 overflow-hidden">
-                          {product.description}
-                        </p>
+                        <div className="text-xs text-white/90 mt-2 mb-3 h-12 overflow-hidden" dangerouslySetInnerHTML={{ __html: product.description || ''}} />
                         
                         <ul className="space-y-1 mb-3 text-xs h-14 overflow-hidden">
                           {featuresList.slice(0, 2).map((feature, index) => (
@@ -144,3 +143,4 @@ export default function SubCategoryClientPage({ subCategory, products }: SubCate
     </>
   );
 }
+
