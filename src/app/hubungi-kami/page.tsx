@@ -11,12 +11,12 @@ import prisma from '@/lib/db';
 
 async function getPageData() {
     const settings = await getSettings();
-    const categories = await prisma.productCategory.findMany({
+    const categoriesRaw = await prisma.productCategory.findMany({
         include: {
-            subCategories: {
+            ProductSubCategory: {
                 orderBy: { name: 'asc' },
                 include: {
-                    products: {
+                    Product: {
                         orderBy: { title: 'asc' },
                         select: {
                             title: true,
@@ -29,6 +29,21 @@ async function getPageData() {
         },
         orderBy: { name: 'asc' },
     });
+
+    const categories = categoriesRaw.map(cat => {
+      const { ProductSubCategory, ...restCat } = cat;
+      return {
+        ...restCat,
+        subCategories: ProductSubCategory.map(sub => {
+          const { Product, ...restSub } = sub;
+          return {
+            ...restSub,
+            products: Product
+          }
+        })
+      }
+    });
+
     return { settings, categories };
 }
 
@@ -62,7 +77,7 @@ export default async function HubungiKamiPage() {
                   <ContactForm 
                     whatsappNumber={settings.whatsappSales}
                     companyName={settings.companyName}
-                    categories={categories}
+                    categories={categories as any}
                   />
                 </CardContent>
               </Card>
