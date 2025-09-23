@@ -1,11 +1,13 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
 model User {
@@ -18,11 +20,11 @@ model User {
 }
 
 model WebSettings {
-  id                         Int      @id @default(1)
+  id                         Int     @id @default(1)
   logoUrl                    String?
-  companyName                String?
-  whatsappSales              String?
-  footerText                 String?
+  companyName                String
+  whatsappSales              String
+  footerText                 String
   address                    String?
   contactEmail               String?
   contactPhone               String?
@@ -52,12 +54,11 @@ model WebSettings {
   ctaButtonLink              String?
   trustedByText              String?
   trustedByLogos             Json?
-  testimonials               Json?
   servicesPageTitle          String?
   servicesPageSubtitle       String?
   servicesPageCommitmentTitle String?
-  servicesPageCommitmentText  String?
-  servicesPageHeaderImageUrl  String?
+  servicesPageCommitmentText String?
+  servicesPageHeaderImageUrl String?
   solutionsPageTitle         String?
   solutionsPageSubtitle      String?
   aboutPageTitle             String?
@@ -76,7 +77,7 @@ model WebSettings {
 
 model ProductCategory {
   id            Int                  @id @default(autoincrement())
-  name          String
+  name          String               @unique
   slug          String               @unique
   description   String?
   imageUrl      String?
@@ -86,43 +87,43 @@ model ProductCategory {
 model ProductSubCategory {
   id         Int             @id @default(autoincrement())
   name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  Category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
-  products   Product[]
+  Products   Product[]
 }
 
 model Product {
-  id                      Int                 @id @default(autoincrement())
+  id                      Int                @id @default(autoincrement())
   title                   String
-  slug                    String              @unique
+  slug                    String             @unique
   description             String
   longDescription         String?
   images                  Json?
   features                Json?
   technicalSpecifications Json?
   generalSpecifications   Json?
-  tokopediaUrl            String?
-  shopeeUrl               String?
   metaTitle               String?
   metaDescription         String?
-  subCategory             ProductSubCategory  @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  tokopediaUrl            String?
+  shopeeUrl               String?
+  createdAt               DateTime           @default(now())
+  updatedAt               DateTime           @updatedAt
+  SubCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   subCategoryId           Int
-  createdAt               DateTime            @default(now())
-  updatedAt               DateTime            @updatedAt
 }
 
 model ProfessionalService {
-  id               Int      @id @default(autoincrement())
-  icon             String
-  title            String
-  slug             String   @unique
-  description      String
-  longDescription  String?
-  imageUrl         String?
-  details          Json?
-  benefits         Json?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  id              Int      @id @default(autoincrement())
+  icon            String
+  title           String
+  slug            String   @unique
+  description     String
+  longDescription String?
+  imageUrl        String?
+  details         Json?
+  benefits        Json?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 }
 
 model Solution {
@@ -134,11 +135,11 @@ model Solution {
   image       String?
   aiHint      String?
   keyPoints   Json?
-  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   parentId    Int?
-  children    Solution[] @relation("SolutionHierarchy")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+  Parent      Solution? @relation("SubSolutions", fields: [parentId], references: [id], onDelete: Cascade)
+  children    Solution[] @relation("SubSolutions")
 }
 
 model PartnerLogo {
