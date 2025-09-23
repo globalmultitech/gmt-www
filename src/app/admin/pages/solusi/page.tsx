@@ -22,5 +22,5 @@ async function getSolusiData() {
 export default async function SolusiSettingsPage() {
   const { solutions } = await getSolusiData();
 
-  return <SolusiListPage solutions={solutions.map(s => ({ ...s, children: s.Children })) as any} />;
+  return <SolusiListPage solutions={solutions as any} />;
 }

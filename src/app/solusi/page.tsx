@@ -10,7 +10,7 @@ async function getPageData() {
     const solutions = await prisma.solution.findMany({
         where: { parentId: null }, // Only fetch parent solutions
         include: {
-          Children: { // And include their direct children
+          children: { // And include their direct children
             orderBy: { createdAt: 'asc' }
           }
         },
@@ -36,6 +36,6 @@ export default async function SolusiPage() {
     const { settings, solutions } = await getPageData();
   
     return (
-        <SolusiPageClient settings={settings} solutions={solutions.map(s => ({...s, children: s.Children})) as any} />
+        <SolusiPageClient settings={settings} solutions={solutions as any} />
     );
 }

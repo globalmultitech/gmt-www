@@ -33,7 +33,7 @@ import Link from 'next/link';
 import { DynamicIcon } from '@/components/dynamic-icon';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-type SolutionWithChildren = Solution & { Children: Solution[] };
+type SolutionWithChildren = Solution & { children: Solution[] };
 
 function DeleteButton({ solutionId }: { solutionId: number }) {
   const [isPending, startTransition] = useTransition();
@@ -119,11 +119,11 @@ export default function SolusiListPage({ solutions }: { solutions: SolutionWithC
                   </div>
                 </div>
                 {/* Children Table */}
-                {solution.Children && solution.Children.length > 0 && (
+                {solution.children && solution.children.length > 0 && (
                   <div className="pl-4 md:pl-10">
                     <Table>
                       <TableBody>
-                        {solution.Children.map(child => (
+                        {solution.children.map(child => (
                            <TableRow key={child.id}>
                              <TableCell className="w-[80px]">
                                 <div className="flex items-center">

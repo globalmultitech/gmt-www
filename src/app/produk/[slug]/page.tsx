@@ -26,9 +26,9 @@ async function getProductData(slug: string) {
     const product = await prisma.product.findUnique({
       where: { slug },
       include: {
-        SubCategory: {
+        subCategory: {
           include: {
-            Category: true,
+            category: true,
           },
         },
       },
@@ -107,7 +107,6 @@ export default async function ProductDetailPage({ params }: Props) {
   // Ensure JSON fields are parsed for the client component
   const processedProduct = {
     ...product,
-    subCategory: product.SubCategory, // Pass the correct relation
     images: parseJsonSafe(product.images, []),
     features: parseJsonSafe(product.features, []),
     technicalSpecifications: parseJsonSafe(product.technicalSpecifications, { headers: [], rows: [] }),

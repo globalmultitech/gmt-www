@@ -28,7 +28,7 @@ async function getHomePageData() {
     include: {
       subCategory: {
         include: {
-          Category: true,
+          category: true,
         },
       },
     },
@@ -58,7 +58,7 @@ async function getHomePageData() {
   const solutions = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      Children: { // And include their direct children
+      children: { // And include their direct children
         orderBy: { createdAt: 'asc' }
       }
     },
@@ -72,15 +72,9 @@ async function getHomePageData() {
 export default async function Home() {
   const { products, settings, professionalServices, newsItems, solutions } = await getHomePageData();
   
-  // Manually rename for client component compatibility if needed, but the query should be fixed first.
-  const clientProducts = products.map(p => ({
-      ...p,
-      subCategory: p.subCategory
-  }));
-
   return (
     <HomeClientPage 
-      products={clientProducts as any} 
+      products={products as any} 
       settings={settings} 
       professionalServices={professionalServices} 
       newsItems={newsItems}
@@ -88,3 +82,4 @@ export default async function Home() {
     />
   );
 }
+
