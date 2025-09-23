@@ -32,10 +32,10 @@ async function getCategoryDataBySlug(slug: string) {
   const categoryRaw = await prisma.productCategory.findUnique({
     where: { slug },
     include: {
-      subCategories: { // Correct relation name
+      ProductSubCategory: { // Correct relation name
         orderBy: { name: 'asc' },
         include: {
-          products: { // Correct relation name
+          Product: { // Correct relation name
             take: 1,
             select: { images: true }
           }
@@ -48,14 +48,14 @@ async function getCategoryDataBySlug(slug: string) {
     return null;
   }
   
-  const { subCategories, ...restOfCategory } = categoryRaw;
+  const { ProductSubCategory, ...restOfCategory } = categoryRaw;
   const category = {
       ...restOfCategory,
-      subCategories: subCategories.map(sc => {
-        const { products, ...restOfSub } = sc;
+      subCategories: ProductSubCategory.map(sc => {
+        const { Product, ...restOfSub } = sc;
         return {
           ...restOfSub,
-          products: products.map(p => ({
+          products: Product.map(p => ({
               ...p,
               images: parseJsonSafe(p.images, [])
           }))
@@ -106,3 +106,4 @@ export default async function CategoryPage({ params }: Props) {
     <CategoryClientPage category={category} slug={slug} />
   );
 }
+
