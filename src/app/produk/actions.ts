@@ -1,35 +1,37 @@
 
+
 'use server';
 
 import prisma from '@/lib/db';
 
 export async function getGroupedProductsForSearch() {
-  return prisma.productCategory.findMany({
+  // Fetch all data in separate, simple queries to avoid complex include issues.
+  const categories = await prisma.productCategory.findMany({
+    orderBy: { name: 'asc' },
+  });
+  const subCategories = await prisma.productSubCategory.findMany({
+    orderBy: { name: 'asc' },
+  });
+  const products = await prisma.product.findMany({
     select: {
       id: true,
-      name: true,
-      subCategories: {
-        select: {
-          id: true,
-          name: true,
-          products: {
-            select: {
-              id: true,
-              title: true,
-              slug: true,
-            },
-            orderBy: {
-              title: 'asc',
-            },
-          },
-        },
-        orderBy: {
-          name: 'asc',
-        },
-      },
+      title: true,
+      slug: true,
+      subCategoryId: true,
     },
-    orderBy: {
-      name: 'asc',
-    },
+    orderBy: { title: 'asc' },
   });
+
+  // Manually assemble the nested structure.
+  const subCategoriesWithProducts = subCategories.map(sub => ({
+    ...sub,
+    products: products.filter(p => p.subCategoryId === sub.id),
+  }));
+
+  const categoriesWithSubCategories = categories.map(cat => ({
+    ...cat,
+    subCategories: subCategoriesWithProducts.filter(sub => sub.categoryId === cat.id),
+  }));
+
+  return categoriesWithSubCategories;
 }

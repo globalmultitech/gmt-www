@@ -1,9 +1,10 @@
 
+
 'use client';
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Search, Package, ChevronRight } from 'lucide-react';
+import { Search, Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   CommandDialog,
@@ -11,9 +12,9 @@ import {
   CommandInput,
   CommandList,
   CommandItem,
+  CommandGroup,
 } from '@/components/ui/command';
 import { DialogDescription, DialogTitle } from './ui/dialog';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from './ui/accordion';
 
 type Product = { id: number; title: string; slug: string };
 type SubCategory = { id: number; name: string; products: Product[] };
@@ -61,17 +62,11 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
         <CommandInput placeholder="Ketik nama produk..." />
         <CommandList>
           <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
-          <Accordion type="multiple" className="w-full">
             {searchProducts.map((category) => (
-              <AccordionItem value={`category-${category.id}`} key={category.id}>
-                <AccordionTrigger className="px-2 py-2 text-sm font-semibold hover:no-underline [&[data-state=open]>svg]:rotate-90">
-                  {category.name}
-                </AccordionTrigger>
-                <AccordionContent>
-                  <div className="pl-4">
+              <CommandGroup key={category.id} heading={category.name}>
                   {category.subCategories?.map((subCategory) => (
                     subCategory.products && subCategory.products.length > 0 && (
-                        <div key={subCategory.id}>
+                        <React.Fragment key={subCategory.id}>
                              <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
                              {subCategory.products.map((product) => (
                                 <CommandItem
@@ -86,14 +81,11 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
                                     <span>{product.title}</span>
                                 </CommandItem>
                              ))}
-                        </div>
+                        </React.Fragment>
                     )
                   ))}
-                  </div>
-                </AccordionContent>
-              </AccordionItem>
+              </CommandGroup>
             ))}
-          </Accordion>
         </CommandList>
       </CommandDialog>
     </>
