@@ -48,7 +48,6 @@ async function getProductData(slug: string) {
       return { product: null, relatedProducts: [] };
     }
     
-    // Transform the raw product data to match the expected client-side structure
     const { ProductSubCategory, ...restOfProduct } = productRaw;
     const product = {
       ...restOfProduct,

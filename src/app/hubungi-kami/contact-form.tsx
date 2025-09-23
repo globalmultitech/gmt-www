@@ -45,7 +45,7 @@ export default function ContactForm({ whatsappNumber, companyName, categories }:
         let selectedProduct: Product | undefined;
         for (const category of categories) {
             for (const subCategory of category.subCategories) {
-                const found = subCategory.products.find(p => p.slug === selectedProductSlug);
+                const found = subCategory.products?.find(p => p.slug === selectedProductSlug);
                 if (found) {
                     selectedProduct = found;
                     break;
@@ -76,7 +76,7 @@ Mohon informasinya. Terima kasih.`;
     const getProductTitleBySlug = (slug: string) => {
         for (const category of categories) {
             for (const subCategory of category.subCategories) {
-                const product = subCategory.products.find(p => p.slug === slug);
+                const product = subCategory.products?.find(p => p.slug === slug);
                 if (product) return product.title;
             }
         }
@@ -130,7 +130,7 @@ Mohon informasinya. Terima kasih.`;
                                     <CommandGroup key={category.id} heading={category.name}>
                                         {category.subCategories.map((subCategory) => (
                                             <React.Fragment key={subCategory.id}>
-                                                {subCategory.products.map((product) => (
+                                                {subCategory.products?.map((product) => (
                                                     <CommandItem
                                                         key={product.slug}
                                                         value={product.title}

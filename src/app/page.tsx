@@ -49,12 +49,10 @@ async function getHomePageData() {
       ...rest,
       images: parseJsonField(product.images, []),
       description: product.description || '',
-      subCategory: {
-        name: ProductSubCategory?.name ?? 'Uncategorized',
-        category: {
-          name: ProductSubCategory?.ProductCategory?.name ?? 'Uncategorized'
-        }
-      }
+      subCategory: ProductSubCategory ? {
+        name: ProductSubCategory.name,
+        category: ProductSubCategory.ProductCategory
+      } : null,
     };
   });
 
@@ -109,4 +107,3 @@ export default async function Home() {
     />
   );
 }
-

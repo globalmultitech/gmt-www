@@ -32,10 +32,10 @@ async function getCategoryDataBySlug(slug: string) {
   const category = await prisma.productCategory.findUnique({
     where: { slug },
     include: {
-      ProductSubCategory: { // Corrected relation name
+      subCategories: {
         orderBy: { name: 'asc' },
         include: {
-          Product: { // Corrected relation name
+          products: {
             take: 1,
             select: { images: true }
           }
@@ -48,22 +48,16 @@ async function getCategoryDataBySlug(slug: string) {
     return null;
   }
   
-  // Process the data to match what the client component expects
   const processedCategory = {
       ...category,
-      subCategories: category.ProductSubCategory.map(sc => ({
+      subCategories: category.subCategories.map(sc => ({
           ...sc,
-          products: sc.Product.map(p => ({
+          products: sc.products.map(p => ({
               ...p,
               images: parseJsonSafe(p.images, [])
           }))
       }))
   };
-
-  // Remove the old relation name to avoid confusion
-  // @ts-ignore
-  delete processedCategory.ProductSubCategory;
-
 
   return { category: processedCategory };
 }
@@ -103,9 +97,7 @@ export default async function CategoryPage({ params }: Props) {
   
   const { category } = data;
   
-  // @ts-ignore
   return (
     <CategoryClientPage category={category} slug={slug} />
   );
 }
-
