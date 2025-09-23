@@ -1,4 +1,5 @@
 
+
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
@@ -22,6 +23,7 @@ const parseJsonSafe = (json: any, fallback: any) => {
 
 export async function generateStaticParams() {
   const products = await prisma.product.findMany({
+    where: { slug: { not: '' } },
     select: { slug: true },
   });
  
@@ -32,50 +34,36 @@ export async function generateStaticParams() {
 
 async function getProductData(slug: string) {
   try {
-    const productRaw = await prisma.product.findUnique({
+    const product = await prisma.product.findUnique({
       where: { slug },
       include: {
-        subCategory: { // Correct: subCategory
+        subCategory: {
           include: {
-            category: true, // Correct: category
+            category: true,
           },
         },
       },
     });
 
-    if (!productRaw) {
+    if (!product) {
       return { product: null, relatedProducts: [] };
     }
     
-    // Simplified processing
-    const product = {
-      ...productRaw,
-      images: parseJsonSafe(productRaw.images, []),
-      features: parseJsonSafe(productRaw.features, []),
-      technicalSpecifications: parseJsonSafe(productRaw.technicalSpecifications, { headers: [], rows: [] }),
-      generalSpecifications: parseJsonSafe(productRaw.generalSpecifications, { headers: [], rows: [] }),
-    };
-
-    const relatedProductsRaw = await prisma.product.findMany({
-      where: { 
-          id: { not: product.id },
-          subCategoryId: product.subCategoryId,
+    // Fetch related products in a separate query
+    const relatedProducts = await prisma.product.findMany({
+      where: {
+        id: { not: product.id },
+        subCategoryId: product.subCategoryId,
       },
       take: 4,
-       select: {
+      select: {
         id: true,
         title: true,
         slug: true,
         images: true,
-       }
+      },
     });
 
-    const relatedProducts = relatedProductsRaw.map(p => ({
-        ...p,
-        images: parseJsonSafe(p.images, []),
-    }));
-
-    // @ts-ignore
     return { product, relatedProducts };
   } catch (error) {
     console.error("Failed to fetch product data:", error);
@@ -92,7 +80,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
   
-  const mainImageUrl = (product.images as string[])?.[0];
+  const mainImageUrl = (parseJsonSafe(product.images, []) as string[])?.[0];
 
   return {
     title: product.metaTitle || product.title,
@@ -115,11 +103,25 @@ export default async function ProductDetailPage({ params }: Props) {
     notFound();
   }
 
+  // Ensure JSON fields are parsed for the client component
+  const processedProduct = {
+    ...product,
+    images: parseJsonSafe(product.images, []),
+    features: parseJsonSafe(product.features, []),
+    technicalSpecifications: parseJsonSafe(product.technicalSpecifications, { headers: [], rows: [] }),
+    generalSpecifications: parseJsonSafe(product.generalSpecifications, { headers: [], rows: [] }),
+  };
+
+  const processedRelatedProducts = relatedProducts.map(p => ({
+    ...p,
+    images: parseJsonSafe(p.images, []),
+  }));
+
+
   return (
     <ProductDetailClientPage
-        // @ts-ignore
-        product={product}
-        relatedProducts={relatedProducts}
+        product={processedProduct as any}
+        relatedProducts={processedRelatedProducts}
         settings={settings}
     />
   );
