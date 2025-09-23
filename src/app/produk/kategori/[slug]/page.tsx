@@ -47,6 +47,7 @@ async function getCategoryDataBySlug(slug: string) {
     return null;
   }
   
+<<<<<<< HEAD
   // Ensure product images are parsed correctly for each subcategory
   const processedCategory = {
       ...category,
@@ -60,6 +61,10 @@ async function getCategoryDataBySlug(slug: string) {
   };
 
   return { category: processedCategory };
+=======
+  // No need to process here if client component uses the correct relation name
+  return { category };
+>>>>>>> cbc88e2afc27f31724ff1c7b5d8002d88d12dd28
 }
 
 type Props = {

@@ -9,10 +9,20 @@ import { redirect } from 'next/navigation';
 
 export async function getGroupedProductsForSearch() {
     return prisma.productCategory.findMany({
+<<<<<<< HEAD
         include: {
             ProductSubCategory: {
                 orderBy: { name: 'asc' },
                 include: {
+=======
+        select: {
+            id: true,
+            name: true,
+            ProductSubCategory: {
+                select: {
+                    id: true,
+                    name: true,
+>>>>>>> cbc88e2afc27f31724ff1c7b5d8002d88d12dd28
                     Product: {
                         select: {
                             id: true,

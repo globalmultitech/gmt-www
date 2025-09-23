@@ -1,4 +1,5 @@
 
+
 import { getSettings } from '@/lib/settings';
 import prisma from '@/lib/db';
 import SolusiPageClient from './solusi-client-page';
@@ -6,15 +7,22 @@ import type { Metadata } from 'next';
 
 async function getPageData() {
     const settings = await getSettings();
-    const solutions = await prisma.solution.findMany({
+    const solutionsRaw = await prisma.solution.findMany({
         where: { parentId: null }, // Only fetch parent solutions
         include: {
-        children: { // And include their direct children
+        other_Solution: { // And include their direct children
             orderBy: { createdAt: 'asc' }
         }
         },
         orderBy: { createdAt: 'asc' },
     });
+
+    // Map other_Solution to children to match client component prop type
+    const solutions = solutionsRaw.map(s => {
+        const { other_Solution, ...rest } = s;
+        return { ...rest, children: other_Solution || [] };
+    });
+
     return { settings, solutions };
 }
 

@@ -21,8 +21,8 @@ type ProductWithSubCategory = Product & {
 };
 
 type CategoryWithProducts = ProductCategory & {
-    subCategories: (ProductSubCategory & {
-        products: Product[];
+    ProductSubCategory: (ProductSubCategory & {
+        Product: Product[];
     })[];
 };
 
@@ -44,11 +44,13 @@ export default function ContactForm({ whatsappNumber, companyName, categories }:
         
         let selectedProduct: Product | undefined;
         for (const category of categories) {
-            for (const subCategory of category.subCategories) {
-                const found = subCategory.products.find(p => p.slug === selectedProductSlug);
-                if (found) {
-                    selectedProduct = found;
-                    break;
+            for (const subCategory of category.ProductSubCategory) {
+                if (subCategory.Product) {
+                    const found = subCategory.Product.find(p => p.slug === selectedProductSlug);
+                    if (found) {
+                        selectedProduct = found;
+                        break;
+                    }
                 }
             }
             if (selectedProduct) break;
@@ -75,9 +77,11 @@ Mohon informasinya. Terima kasih.`;
 
     const getProductTitleBySlug = (slug: string) => {
         for (const category of categories) {
-            for (const subCategory of category.subCategories) {
-                const product = subCategory.products.find(p => p.slug === slug);
-                if (product) return product.title;
+            for (const subCategory of category.ProductSubCategory) {
+                if (subCategory.Product) {
+                    const product = subCategory.Product.find(p => p.slug === slug);
+                    if (product) return product.title;
+                }
             }
         }
         return "Pilih produk...";
@@ -128,14 +132,14 @@ Mohon informasinya. Terima kasih.`;
                                 <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
                                 {categories.map((category) => (
                                     <CommandGroup key={category.id} heading={category.name}>
-                                        {category.subCategories.map((subCategory) => (
+                                        {category.ProductSubCategory.map((subCategory) => (
                                             <React.Fragment key={subCategory.id}>
-                                                {subCategory.products.map((product) => (
+                                                {subCategory.Product && subCategory.Product.map((product) => (
                                                     <CommandItem
                                                         key={product.slug}
                                                         value={product.title}
                                                         onSelect={() => {
-                                                            setSelectedProductSlug(product.slug);
+                                                            setSelectedProductSlug(product.slug as string);
                                                             setOpen(false);
                                                         }}
                                                         className="pl-8"

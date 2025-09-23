@@ -68,7 +68,11 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
                 <AccordionContent>
                   <div className="pl-4">
                   {category.ProductSubCategory.map((subCategory) => (
+<<<<<<< HEAD
                     subCategory.Product.length > 0 && (
+=======
+                    subCategory.Product && subCategory.Product.length > 0 && (
+>>>>>>> cbc88e2afc27f31724ff1c7b5d8002d88d12dd28
                         <div key={subCategory.id}>
                              <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
                              {subCategory.Product.map((product) => (

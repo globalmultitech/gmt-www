@@ -78,7 +78,7 @@ async function getHomePageData() {
       }
     },
     orderBy: { createdAt: 'asc' },
-  });
+  }).then(solutions => solutions.map(s => ({ ...s, children: s.other_Solution })));
 
   const solutions = solutionsRaw.map(s => ({
     ...s,

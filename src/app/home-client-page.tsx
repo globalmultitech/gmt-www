@@ -19,8 +19,16 @@ import { useLoadingStore } from '@/hooks/use-loading-store';
 import AIProductSearch from '@/components/ai-product-search';
 
 type EnrichedProduct = Product & {
+<<<<<<< HEAD
   ProductSubCategory: ProductSubCategory & {
     ProductCategory: ProductCategory;
+=======
+  ProductSubCategory: {
+    name: string;
+    ProductCategory: {
+      name: string;
+    };
+>>>>>>> cbc88e2afc27f31724ff1c7b5d8002d88d12dd28
   };
 };
 
@@ -285,7 +293,10 @@ export default function HomeClientPage({ products, settings, professionalService
                                     <p className="text-muted-foreground uppercase font-semibold">KATEGORI</p>
                                     <p className="font-bold truncate">{product.ProductSubCategory.ProductCategory.name}</p>
                                 </div>
-                                <p className="text-muted-foreground text-sm h-20 overflow-hidden">{product.description}</p>
+                                <div 
+                                  className="text-muted-foreground text-sm h-20 overflow-hidden prose prose-sm max-w-none"
+                                  dangerouslySetInnerHTML={{ __html: product.description }} 
+                                />
                               </div>
                           </Link>
                       ))}
