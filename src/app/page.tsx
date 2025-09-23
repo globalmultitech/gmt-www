@@ -72,9 +72,15 @@ async function getHomePageData() {
 export default async function Home() {
   const { products, settings, professionalServices, newsItems, solutions } = await getHomePageData();
   
+  // Manually rename for client component compatibility if needed, but the query should be fixed first.
+  const clientProducts = products.map(p => ({
+      ...p,
+      subCategory: p.subCategory
+  }));
+
   return (
     <HomeClientPage 
-      products={products as any} 
+      products={clientProducts as any} 
       settings={settings} 
       professionalServices={professionalServices} 
       newsItems={newsItems}

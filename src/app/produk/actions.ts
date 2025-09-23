@@ -13,7 +13,7 @@ export async function getGroupedProductsForSearch() {
       ProductSubCategory: {
         orderBy: { name: 'asc' },
         include: {
-          Products: {
+          Product: { // Corrected from Products
             select: {
               id: true,
               title: true,
