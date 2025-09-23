@@ -40,7 +40,7 @@ async function getHomePageData() {
       images: parseJsonField(product.images, []),
       description: product.description || '',
       subCategory: ProductSubCategory ? {
-        name: ProductSubCategory.name,
+        ...ProductSubCategory,
         category: ProductSubCategory.ProductCategory
       } : null,
     };
@@ -69,7 +69,7 @@ async function getHomePageData() {
   const solutionsRaw = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      other_Solution: { // Correct relation name for children
+      other_Solution: { 
         orderBy: { createdAt: 'asc' }
       }
     },
@@ -78,7 +78,7 @@ async function getHomePageData() {
 
   const solutions = solutionsRaw.map(s => {
     const { other_Solution, ...rest } = s;
-    return { ...rest, children: other_Solution }; // Map to 'children' for the client component
+    return { ...rest, children: other_Solution };
   })
 
   return { products, settings, professionalServices, newsItems, solutions };
