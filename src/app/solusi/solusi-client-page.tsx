@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { ArrowRight, Handshake } from 'lucide-react';
@@ -60,7 +61,7 @@ export default function SolusiPageClient({ settings, solutions }: SolusiPageProp
                     </h2>
                   </div>
                   <div className="text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: solution.description }} />
-                   {solution.children.length > 0 && (
+                   {solution.children && solution.children.length > 0 && (
                       <ul className="space-y-2 pt-2">
                         {solution.children.map((child, i) => (
                           <li key={i} className="flex items-start gap-3">
