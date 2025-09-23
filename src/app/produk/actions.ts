@@ -12,11 +12,11 @@ export async function getGroupedProductsForSearch() {
         select: {
             id: true,
             name: true,
-            subCategories: {
+            ProductSubCategory: {
                 select: {
                     id: true,
                     name: true,
-                    products: {
+                    Product: {
                         select: {
                             id: true,
                             title: true,

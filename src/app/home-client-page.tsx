@@ -272,7 +272,7 @@ export default function HomeClientPage({ products, settings, professionalService
                                     <p className="text-muted-foreground uppercase font-semibold">KATEGORI</p>
                                     <p className="font-bold truncate">{product.subCategory.category.name}</p>
                                 </div>
-                                <p className="text-muted-foreground text-sm h-20 overflow-hidden">{product.description}</p>
+                                <div className="text-muted-foreground text-sm h-20 overflow-hidden" dangerouslySetInnerHTML={{ __html: product.description }} />
                               </div>
                           </Link>
                       ))}
