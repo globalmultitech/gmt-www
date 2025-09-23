@@ -1,5 +1,4 @@
 
-
 'use client';
 
 import { ArrowRight, Handshake } from 'lucide-react';
@@ -66,7 +65,9 @@ export default function SolusiPageClient({ settings, solutions }: SolusiPageProp
                         {solution.children.map((child, i) => (
                           <li key={i} className="flex items-start gap-3">
                             <Handshake className="h-5 w-5 text-sky-blue mt-1 flex-shrink-0" />
-                            <span className="text-muted-foreground">{child.title}</span>
+                            <Link href={`/solusi/${child.slug}`} onClick={startLoading} className="text-muted-foreground hover:text-primary transition-colors">
+                              {child.title}
+                            </Link>
                           </li>
                         ))}
                       </ul>

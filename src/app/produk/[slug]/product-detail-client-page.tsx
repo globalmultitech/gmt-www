@@ -2,8 +2,6 @@
 'use client';
 
 import type { Product, ProductCategory, ProductSubCategory } from '@prisma/client';
-import { notFound } from 'next/navigation';
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Home, ChevronRight, CheckCircle } from 'lucide-react';
 import {
@@ -27,12 +25,11 @@ import RelatedProducts from './related-products';
 import { Button } from '@/components/ui/button';
 import { TokopediaIcon } from '@/components/icons/tokopedia-icon';
 import { ShopeeIcon } from '@/components/icons/shopee-icon';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  ProductSubCategory?: (ProductSubCategory & {
-    ProductCategory: ProductCategory
+  subCategory?: (ProductSubCategory & {
+    category: ProductCategory
   }) | null;
 }
 
@@ -59,10 +56,10 @@ const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
     <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
     <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
-    {product.ProductSubCategory?.ProductCategory?.name && (
+    {product.subCategory?.category?.name && (
         <>
             <ChevronRight className="h-4 w-4" />
-            <Link href={`/produk/kategori/${product.ProductSubCategory.ProductCategory.slug}`} onClick={startLoading} className="hover:text-primary">{product.ProductSubCategory.ProductCategory.name}</Link>
+            <Link href={`/produk/kategori/${product.subCategory.category.slug}`} onClick={startLoading} className="hover:text-primary">{product.subCategory.category.name}</Link>
         </>
     )}
     <ChevronRight className="h-4 w-4" />
@@ -72,7 +69,7 @@ const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
 };
 
 const SpecificationAccordion = ({ title, specs }: { title: string, specs: Specifications }) => {
-  if (!specs || !specs.headers || specs.headers.length === 0 || specs.rows.length === 0) {
+  if (!specs || !specs.headers || specs.headers.length === 0 || !specs.rows || specs.rows.length === 0) {
     return null;
   }
   return (
@@ -156,7 +153,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
                     </AccordionContent>
                   </AccordionItem>
                   
-                  {featuresList.length > 0 && (
+                  {featuresList && featuresList.length > 0 && (
                       <AccordionItem value="item-features">
                       <AccordionTrigger className="text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
                       <AccordionContent>

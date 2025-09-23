@@ -28,12 +28,14 @@ type DetailPoint = {
     description: string;
 }
 
+type SolutionWithChildren = Solution & { children: Solution[] };
+
 type HomePageProps = {
   products: EnrichedProduct[];
   settings: WebSettings;
   professionalServices: ProfessionalService[];
   newsItems: NewsItem[];
-  solutions: Solution[];
+  solutions: SolutionWithChildren[];
 }
 
 const Marquee = ({ logos, duration, reverse = false }: { logos: TrustedByLogo[], duration: string, reverse?: boolean }) => (

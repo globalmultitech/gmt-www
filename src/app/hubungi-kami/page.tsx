@@ -1,5 +1,4 @@
 
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
@@ -13,10 +12,10 @@ async function getPageData() {
     const settings = await getSettings();
     const categoriesRaw = await prisma.productCategory.findMany({
         include: {
-            ProductSubCategory: {
+            subCategories: {
                 orderBy: { name: 'asc' },
                 include: {
-                    Product: {
+                    products: {
                         orderBy: { title: 'asc' },
                         select: {
                             title: true,
@@ -30,21 +29,7 @@ async function getPageData() {
         orderBy: { name: 'asc' },
     });
 
-    const categories = categoriesRaw.map(cat => {
-      const { ProductSubCategory, ...restCat } = cat;
-      return {
-        ...restCat,
-        subCategories: ProductSubCategory.map(sub => {
-          const { Product, ...restSub } = sub;
-          return {
-            ...restSub,
-            products: Product
-          }
-        })
-      }
-    });
-
-    return { settings, categories };
+    return { settings, categories: categoriesRaw };
 }
 
 export default async function HubungiKamiPage() {

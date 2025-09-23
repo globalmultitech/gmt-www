@@ -1,5 +1,4 @@
 
-
 import HomeClientPage from './home-client-page';
 import prisma from '@/lib/db';
 import { getSettings } from '@/lib/settings';
@@ -25,26 +24,20 @@ async function getHomePageData() {
     take: 5,
     orderBy: { createdAt: 'desc' },
     include: {
-      ProductSubCategory: {
+      subCategory: {
         include: {
-          ProductCategory: true,
+          category: true,
         },
       },
     },
   });
 
-  const products = productsRaw.map(product => {
-    const { ProductSubCategory, ...rest } = product;
-    return {
-      ...rest,
-      images: parseJsonField(product.images, []),
-      description: product.description || '',
-      subCategory: ProductSubCategory ? {
-        ...ProductSubCategory,
-        category: ProductSubCategory.ProductCategory
-      } : null,
-    };
-  });
+  const products = productsRaw.map(product => ({
+    ...product,
+    images: parseJsonField(product.images, []),
+    description: product.description || '',
+  }));
+
 
   const settings = await getSettings();
 
@@ -66,20 +59,15 @@ async function getHomePageData() {
     orderBy: { id: 'desc' },
   });
 
-  const solutionsRaw = await prisma.solution.findMany({
+  const solutions = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      other_Solution: { 
+      children: { // And include their direct children
         orderBy: { createdAt: 'asc' }
       }
     },
     orderBy: { createdAt: 'asc' },
   });
-
-  const solutions = solutionsRaw.map(s => {
-    const { other_Solution, ...rest } = s;
-    return { ...rest, children: other_Solution };
-  })
 
   return { products, settings, professionalServices, newsItems, solutions };
 }

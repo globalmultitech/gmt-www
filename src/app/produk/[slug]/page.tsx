@@ -1,5 +1,4 @@
 
-
 import { notFound } from 'next/navigation';
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
@@ -36,9 +35,9 @@ async function getProductData(slug: string) {
     const productRaw = await prisma.product.findUnique({
       where: { slug },
       include: {
-        ProductSubCategory: {
+        subCategory: { // Correct: subCategory
           include: {
-            ProductCategory: true,
+            category: true, // Correct: category
           },
         },
       },

@@ -1,5 +1,4 @@
 
-
 import prisma from '@/lib/db';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
@@ -29,13 +28,13 @@ const parseJsonSafe = (json: any, fallback: any) => {
 }
 
 async function getCategoryDataBySlug(slug: string) {
-  const categoryRaw = await prisma.productCategory.findUnique({
+  const category = await prisma.productCategory.findUnique({
     where: { slug },
     include: {
-      ProductSubCategory: { // Correct relation name
+      subCategories: {
         orderBy: { name: 'asc' },
         include: {
-          Product: { // Correct relation name
+          products: {
             take: 1,
             select: { images: true }
           }
@@ -44,26 +43,23 @@ async function getCategoryDataBySlug(slug: string) {
     },
   });
 
-  if (!categoryRaw) {
+  if (!category) {
     return null;
   }
   
-  const { ProductSubCategory, ...restOfCategory } = categoryRaw;
-  const category = {
-      ...restOfCategory,
-      subCategories: ProductSubCategory.map(sc => {
-        const { Product, ...restOfSub } = sc;
-        return {
-          ...restOfSub,
-          products: Product.map(p => ({
-              ...p,
-              images: parseJsonSafe(p.images, [])
-          }))
-        }
-      })
+  // Parse images JSON for each product
+  const processedCategory = {
+    ...category,
+    subCategories: category.subCategories.map(sc => ({
+      ...sc,
+      products: sc.products.map(p => ({
+        ...p,
+        images: parseJsonSafe(p.images, [])
+      }))
+    }))
   };
 
-  return { category };
+  return { category: processedCategory };
 }
 
 type Props = {
@@ -105,5 +101,3 @@ export default async function CategoryPage({ params }: Props) {
     <CategoryClientPage category={category} slug={slug} />
   );
 }
-
-
