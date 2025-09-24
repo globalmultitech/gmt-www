@@ -1,7 +1,4 @@
-
-
 'use client';
-
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { Search, Package } from 'lucide-react';
@@ -19,8 +16,7 @@ import type { Product, ProductSubCategory, ProductCategory } from '@prisma/clien
 
 type EnrichedProduct = { id: number; title: string; slug: string; };
 type EnrichedSubCategory = ProductSubCategory & { products: EnrichedProduct[] };
-type EnrichedCategory = ProductCategory & { ProductSubCategory: EnrichedSubCategory[] };
-
+type EnrichedCategory = ProductCategory & { subCategories: EnrichedSubCategory[] }; // ✅ Perbaikan
 
 interface GlobalSearchProps {
   searchProducts: EnrichedCategory[];
@@ -37,7 +33,6 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
         setOpen((open) => !open);
       }
     };
-
     document.addEventListener('keydown', down);
     return () => document.removeEventListener('keydown', down);
   }, []);
@@ -64,30 +59,30 @@ export default function GlobalSearch({ searchProducts }: GlobalSearchProps) {
         <CommandInput placeholder="Ketik nama produk..." />
         <CommandList>
           <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
-            {searchProducts.map((category) => (
-              <CommandGroup key={category.id} heading={category.name}>
-                  {category.ProductSubCategory?.map((subCategory) => (
-                    subCategory.products && subCategory.products.length > 0 && (
-                        <React.Fragment key={subCategory.id}>
-                             <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
-                             {subCategory.products.map((product) => (
-                                <CommandItem
-                                    key={product.id}
-                                    value={product.title}
-                                    onSelect={() => {
-                                    runCommand(() => router.push(`/produk/${product.slug}`));
-                                    }}
-                                    className="pl-4"
-                                >
-                                    <Package className="mr-2 h-4 w-4" />
-                                    <span>{product.title}</span>
-                                </CommandItem>
-                             ))}
-                        </React.Fragment>
-                    )
-                  ))}
-              </CommandGroup>
-            ))}
+          {searchProducts.map((category) => (
+            <CommandGroup key={category.id} heading={category.name}>
+              {category.subCategories?.map((subCategory) => ( // ✅ Perbaikan
+                subCategory.products && subCategory.products.length > 0 && (
+                  <React.Fragment key={subCategory.id}>
+                    <p className="text-xs font-medium text-muted-foreground px-2 pt-2 pb-1">{subCategory.name}</p>
+                    {subCategory.products.map((product) => (
+                      <CommandItem
+                        key={product.id}
+                        value={product.title}
+                        onSelect={() => {
+                          runCommand(() => router.push(`/produk/${product.slug}`));
+                        }}
+                        className="pl-4"
+                      >
+                        <Package className="mr-2 h-4 w-4" />
+                        <span>{product.title}</span>
+                      </CommandItem>
+                    ))}
+                  </React.Fragment>
+                )
+              ))}
+            </CommandGroup>
+          ))}
         </CommandList>
       </CommandDialog>
     </>

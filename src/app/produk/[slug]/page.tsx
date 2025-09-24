@@ -26,18 +26,18 @@ async function getProductData(slug: string) {
     const product = await prisma.product.findUnique({
       where: { slug },
       include: {
-        ProductSubCategory: {
+        subCategory: {        // ✅ Sesuai schema relation name
           include: {
-            Category: true,
+            category: true,   // ✅ Sesuai schema relation name
           },
         },
       },
     });
-
+    
     if (!product) {
       return { product: null, relatedProducts: [] };
     }
-
+    
     const relatedProducts = await prisma.product.findMany({
       where: {
         id: { not: product.id },
@@ -51,7 +51,7 @@ async function getProductData(slug: string) {
         images: true,
       },
     });
-
+    
     return { product, relatedProducts };
   } catch (error) {
     console.error("Failed to fetch product data:", error);

@@ -10,10 +10,10 @@ import { redirect } from 'next/navigation';
 export async function getGroupedProductsForSearch() {
   const categories = await prisma.productCategory.findMany({
     include: {
-      ProductSubCategory: {
+      subCategories: {  // ✅ Sesuai schema relation name
         orderBy: { name: 'asc' },
         include: {
-          Product: {
+          products: {     // ✅ Sesuai schema relation name  
             select: {
               id: true,
               title: true,
@@ -26,7 +26,6 @@ export async function getGroupedProductsForSearch() {
     },
     orderBy: { name: 'asc' },
   });
-
   return categories;
 }
 

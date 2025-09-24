@@ -26,9 +26,9 @@ async function getHomePageData() {
     take: 5,
     orderBy: { createdAt: 'desc' },
     include: {
-      ProductSubCategory: {
+      subCategory: {       // ✅ Sesuai schema: relation name "subCategory"
         include: {
-          Category: true,
+          category: true,  // ✅ Sesuai schema: relation name "category"
         },
       },
     },
