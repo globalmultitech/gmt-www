@@ -23,43 +23,46 @@ export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
 
 // This function will fetch the data from the JSON files served in the /public directory.
 async function getWebsiteData(): Promise<string> {
-  try {
-    // In a deployed Next.js environment, files in the `public` directory are served at the root.
-    // We need to fetch them via HTTP/S. We construct a base URL.
-    // Ensure NEXT_PUBLIC_BASE_URL is set in your environment variables.
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+  const dataEndpoints = {
+    categories: `${baseUrl}/kategori.json`,
+    products: `${baseUrl}/produk.json`,
+  };
 
-    const kategoriUrl = `${baseUrl}/kategori.json`;
-    const produkUrl = `${baseUrl}/produk.json`;
+  const results = await Promise.allSettled(
+    Object.entries(dataEndpoints).map(async ([key, url]) => {
+      try {
+        const response = await fetch(url, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Failed to fetch ${url}: ${response.status} ${response.statusText}`);
+        }
+        const data = await response.json();
+        return { key, data };
+      } catch (error) {
+        console.warn(`Could not fetch data for '${key}' from ${url}. Continuing without it.`, error);
+        return { key, data: null, error: (error as Error).message };
+      }
+    })
+  );
 
-    const [kategoriResponse, produkResponse] = await Promise.all([
-        fetch(kategoriUrl),
-        fetch(produkUrl)
-    ]);
+  const websiteData: { [key: string]: any } = {};
+  let hasData = false;
 
-    if (!kategoriResponse.ok) {
-        throw new Error(`Failed to fetch kategori.json: ${kategoriResponse.statusText}`);
+  for (const result of results) {
+    if (result.status === 'fulfilled' && result.value.data) {
+      websiteData[result.value.key] = result.value.data;
+      hasData = true;
     }
-    if (!produkResponse.ok) {
-        throw new Error(`Failed to fetch produk.json: ${produkResponse.statusText}`);
-    }
-
-    const categories = await kategoriResponse.json();
-    const products = await produkResponse.json();
-
-    const websiteData = {
-      categories,
-      products,
-    };
-    
-    return JSON.stringify(websiteData, null, 2);
-
-  } catch (error) {
-    console.error('Error fetching website data from JSON files:', error);
-    // Return a message indicating data is unavailable, so the AI can respond gracefully.
-    return 'Website data is currently unavailable due to a data fetching error.';
   }
+
+  if (!hasData) {
+     console.error('All data fetching failed. Assistant will have no context.');
+     return 'Website data is currently unavailable due to a data fetching error on all sources.';
+  }
+
+  return JSON.stringify(websiteData, null, 2);
 }
+
 
 export async function askAssistant(input: AssistantInput): Promise<AssistantOutput> {
   return assistantFlow(input);
@@ -77,7 +80,7 @@ Your role is to answer user questions about our products and services based *exc
 - Be concise, helpful, and friendly.
 - If the user asks for specifications or data that is structured, present it in a **Markdown table**.
 - Your knowledge is strictly limited to the data provided below. Do not use any external knowledge.
-- If the answer cannot be found in the data, politely state that you do not have that information and suggest they contact the company directly through the "Hubungi Kami" page.
+- If the answer cannot be found in the data, or if the data is unavailable, politely state that you do not have that information and suggest they contact the company directly through the "Hubungi Kami" page. For example, if the user asks a question and the website data is unavailable, say: "Maaf, saat ini saya tidak memiliki informasi mengenai produk yang tersedia karena ada masalah dalam mengambil data. Silakan hubungi kami melalui halaman 'Hubungi Kami' untuk informasi".
 - When mentioning a product, service, or solution, always include its name.
 
 **Website Data (JSON):**
