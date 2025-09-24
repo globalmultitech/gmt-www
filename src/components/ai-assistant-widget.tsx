@@ -59,12 +59,17 @@ export default function AiAssistantWidget() {
       sender: 'user',
     };
     
-    setMessages(prev => [...prev, userMessage]);
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
     setNewMessage('');
     setIsThinking(true);
 
     try {
-      const result = await askAssistant({ question: newMessage });
+      // Pass the entire conversation history to the assistant
+      const result = await askAssistant({ 
+        history: updatedMessages.map(({id, ...rest}) => rest) // Exclude ID from what's sent
+      });
+
       const aiMessage: Message = {
         id: `ai-${Date.now()}`,
         content: result.answer,

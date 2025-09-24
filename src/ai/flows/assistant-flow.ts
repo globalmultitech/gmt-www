@@ -8,9 +8,13 @@ import { z } from 'genkit';
 import fs from 'fs';
 import path from 'path';
 
+const MessageSchema = z.object({
+  sender: z.enum(['user', 'ai']),
+  content: z.string(),
+});
 
 const AssistantInputSchema = z.object({
-  question: z.string().describe("The user's question about products or services."),
+  history: z.array(MessageSchema).describe('The conversation history.'),
 });
 export type AssistantInput = z.infer<typeof AssistantInputSchema>;
 
@@ -51,7 +55,7 @@ export async function askAssistant(input: AssistantInput): Promise<AssistantOutp
 
 const prompt = ai.definePrompt({
   name: 'assistantPrompt',
-  input: { schema: z.object({ question: z.string(), websiteData: z.string() }) },
+  input: { schema: z.object({ history: z.array(MessageSchema), websiteData: z.string() }) },
   output: { schema: AssistantOutputSchema },
   prompt: `You are a professional and friendly AI assistant for "Global Multi Technology", a company specializing in IT solutions.
 Your role is to answer user questions about our products and services based *exclusively* on the provided website data in JSON format.
@@ -69,8 +73,10 @@ Your role is to answer user questions about our products and services based *exc
 {{{websiteData}}}
 \`\`\`
 
-**User's Question:**
-"{{{question}}}"
+**Conversation History:**
+{{#each history}}
+  **{{sender}}**: {{{content}}}
+{{/each}}
 `,
 });
 
