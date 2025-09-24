@@ -5,8 +5,6 @@
 
 import { ai } from '@/ai/genkit';
 import { z } from 'genkit';
-import fs from 'fs';
-import path from 'path';
 
 const MessageSchema = z.object({
   sender: z.enum(['user', 'ai']),
@@ -23,17 +21,31 @@ const AssistantOutputSchema = z.object({
 });
 export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
 
-// This function will read the data directly from the JSON files in the /public directory.
+// This function will fetch the data from the JSON files served in the /public directory.
 async function getWebsiteData(): Promise<string> {
   try {
-    const kategoriPath = path.join(process.cwd(), 'public', 'kategori.json');
-    const produkPath = path.join(process.cwd(), 'public', 'produk.json');
+    // In a deployed Next.js environment, files in the `public` directory are served at the root.
+    // We need to fetch them via HTTP/S. We construct a base URL.
+    // Ensure NEXT_PUBLIC_BASE_URL is set in your environment variables.
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
 
-    const kategoriData = fs.readFileSync(kategoriPath, 'utf-8');
-    const produkData = fs.readFileSync(produkPath, 'utf-8');
+    const kategoriUrl = `${baseUrl}/kategori.json`;
+    const produkUrl = `${baseUrl}/produk.json`;
 
-    const categories = JSON.parse(kategoriData);
-    const products = JSON.parse(produkData);
+    const [kategoriResponse, produkResponse] = await Promise.all([
+        fetch(kategoriUrl),
+        fetch(produkUrl)
+    ]);
+
+    if (!kategoriResponse.ok) {
+        throw new Error(`Failed to fetch kategori.json: ${kategoriResponse.statusText}`);
+    }
+    if (!produkResponse.ok) {
+        throw new Error(`Failed to fetch produk.json: ${produkResponse.statusText}`);
+    }
+
+    const categories = await kategoriResponse.json();
+    const products = await produkResponse.json();
 
     const websiteData = {
       categories,
@@ -43,9 +55,9 @@ async function getWebsiteData(): Promise<string> {
     return JSON.stringify(websiteData, null, 2);
 
   } catch (error) {
-    console.error('Error reading website data from JSON files:', error);
+    console.error('Error fetching website data from JSON files:', error);
     // Return a message indicating data is unavailable, so the AI can respond gracefully.
-    return 'Website data is currently unavailable due to a file reading error.';
+    return 'Website data is currently unavailable due to a data fetching error.';
   }
 }
 
@@ -92,7 +104,7 @@ const assistantFlow = ai.defineFlow(
 
     // Call the prompt with the user's question and the website data
     const { output } = await prompt({
-      ...input,
+      history: input.history,
       websiteData, // Pass the data to be used in the handlebars template
     });
 
