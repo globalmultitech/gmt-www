@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Product } from '@prisma/client';
@@ -76,21 +77,21 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
           onMouseLeave={autoplayPlugin.current.reset}
           className="w-full"
         >
-          <CarouselContent>
+          <CarouselContent className="-ml-2 md:-ml-4">
             {products.map((product) => {
               const mainImage = (product.images as string[])?.[0];
               return (
-                <CarouselItem key={product.id} className="sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
+                <CarouselItem key={product.id} className="pl-2 md:pl-4 basis-1/2 sm:basis-1/2 md:basis-1/3 lg:basis-1/4">
                   <div className="p-1 h-full">
                     <Card className="flex flex-col h-full overflow-hidden transform transition-transform duration-300 hover:-translate-y-1 hover:shadow-xl">
                       <Link href={`/produk/${product.slug}`} className="block">
-                        <div className="relative h-48 w-full bg-muted">
+                        <div className="relative h-36 md:h-48 w-full bg-muted">
                           {mainImage ? (
                             <Image
                               src={mainImage}
                               alt={product.title}
                               fill
-                              sizes="(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                               className="object-cover"
                             />
                           ) : (
@@ -100,14 +101,14 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                           )}
                         </div>
                       </Link>
-                      <CardHeader className="flex-grow">
-                        <CardTitle className="font-headline text-lg">
+                      <CardHeader className="flex-grow p-3 md:p-4">
+                        <CardTitle className="font-headline text-sm md:text-lg">
                           <Link href={`/produk/${product.slug}`} className="hover:text-primary">
                             {product.title}
                           </Link>
                         </CardTitle>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="p-3 md:p-4 pt-0">
                         <Button asChild className="w-full" variant="default" size="sm">
                           <Link href={`/produk/${product.slug}`}>
                             Lihat Detail <ArrowRight className="ml-2 h-4 w-4" />
@@ -120,8 +121,8 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
               );
             })}
           </CarouselContent>
-          <CarouselPrevious className="absolute left-[-20px] top-1/2 -translate-y-1/2" />
-          <CarouselNext className="absolute right-[-20px] top-1/2 -translate-y-1/2" />
+          <CarouselPrevious className="absolute left-[-12px] md:left-[-20px] top-1/2 -translate-y-1/2 h-8 w-8 md:h-12 md:w-12" />
+          <CarouselNext className="absolute right-[-12px] md:right-[-20px] top-1/2 -translate-y-1/2 h-8 w-8 md:h-12 md:w-12" />
         </Carousel>
       </div>
     </section>

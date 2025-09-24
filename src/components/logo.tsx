@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { cn } from '@/lib/utils';
@@ -26,13 +27,13 @@ export function Logo({
   const sidebar = useSidebar();
   
   const imageSizeClasses = {
-    default: 'h-12 md:h-16 w-auto',
-    footer: 'h-14 w-auto',
+    default: 'h-10 md:h-16 w-auto',
+    footer: 'h-12 md:h-14 w-auto',
   };
 
   const textSizeClasses = {
     default: 'text-2xl md:text-4xl',
-    footer: 'text-3xl md:text-4xl',
+    footer: 'text-2xl md:text-3xl',
   };
   
   const textColorClasses = {

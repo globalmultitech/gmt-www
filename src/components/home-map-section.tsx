@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import Image from 'next/image';
@@ -103,12 +104,12 @@ const servicePointsByRegion = [
 
 export function HomeMapSection() {
   return (
-    <section className="bg-dark-slate py-20 md:py-28">
+    <section className="bg-dark-slate py-16 md:py-28">
       <div className="container mx-auto px-4 text-center">
-        <h2 className="text-4xl md:text-5xl font-headline font-extrabold text-primary">
+        <h2 className="text-3xl md:text-5xl font-headline font-extrabold text-primary">
           Kelancaran Bisnis Anda adalah Prioritas Kami
         </h2>
-        <p className="mt-4 text-lg text-muted-foreground max-w-3xl mx-auto">
+        <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-3xl mx-auto">
           Untuk memastikan respon yang cepat tanggap bagi setiap klien, kami didukung oleh Helpdesk 24 Jam dan jaringan layanan di seluruh Indonesia.
         </p>
         

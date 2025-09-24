@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Logo } from '@/components/logo';
@@ -13,8 +14,8 @@ import type { MenuItem } from '@/lib/settings';
 import GlobalSearch from '../global-search';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
-type Category = { id: number; name: string; subCategories: SubCategory[] };
-type SubCategory = { id: number; name: string; products: Product[] };
+type Category = { id: number; name: string; ProductSubCategory: SubCategory[] };
+type SubCategory = { id: number; name: string; Product: Product[] };
 type Product = { id: number; title: string; slug: string };
 
 type HeaderClientProps = {

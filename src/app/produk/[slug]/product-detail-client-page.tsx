@@ -75,7 +75,7 @@ const SpecificationAccordion = ({ title, specs }: { title: string, specs: Specif
   }
   return (
     <AccordionItem value={title}>
-        <AccordionTrigger className="text-xl font-headline font-bold text-primary">{title}</AccordionTrigger>
+        <AccordionTrigger className="text-lg md:text-xl font-headline font-bold text-primary">{title}</AccordionTrigger>
         <AccordionContent>
             <div className="overflow-x-auto rounded-lg border bg-card mt-2">
                 <Table>
@@ -121,8 +121,8 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
               </div>
 
               <div className="flex flex-col mt-8 md:mt-0">
-                <h1 className="text-4xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
-                <div className="mt-4 text-lg text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: product.description || '' }} />
+                <h1 className="text-3xl md:text-5xl font-headline font-bold text-primary">{product.title}</h1>
+                <div className="mt-4 text-base md:text-lg text-muted-foreground prose" dangerouslySetInnerHTML={{ __html: product.description || '' }} />
                 
                 <div className="flex flex-wrap items-center gap-3 my-6">
                   <WhatsAppButton product={product} settings={settings} />
@@ -146,7 +146,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
 
                 <Accordion type="multiple" className="w-full">
                     <AccordionItem value="item-desc">
-                    <AccordionTrigger className="text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
+                    <AccordionTrigger className="text-lg md:text-xl font-headline font-bold text-primary">Deskripsi Lengkap</AccordionTrigger>
                     <AccordionContent>
                         <article className="prose prose-sm md:prose-base dark:prose-invert max-w-none pt-4">
                           <div dangerouslySetInnerHTML={{ __html: product.longDescription || product.description || '' }} />
@@ -156,7 +156,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
                   
                   {featuresList && featuresList.length > 0 && (
                       <AccordionItem value="item-features">
-                      <AccordionTrigger className="text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
+                      <AccordionTrigger className="text-lg md:text-xl font-headline font-bold text-primary">Fitur Utama</AccordionTrigger>
                       <AccordionContent>
                         <ul className="space-y-4 pt-4">
                             {featuresList.map((feature, index) => (
@@ -165,7 +165,7 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
                                 <CheckCircle className="h-4 w-4" />
                                 </div>
                                 <div>
-                                  <p className='font-semibold'>{feature.title}</p>
+                                  <p className='font-semibold text-base'>{feature.title}</p>
                                   <div className="text-muted-foreground prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: feature.description }} />
                                 </div>
                             </li>
