@@ -16,14 +16,14 @@ import { cn } from '@/lib/utils';
 
 
 type ProductWithSubCategory = Product & {
-    subCategory: ProductSubCategory & {
-        category: ProductCategory;
+    SubCategory: ProductSubCategory & {
+        Category: ProductCategory;
     };
 };
 
 type CategoryWithProducts = ProductCategory & {
-    subCategories: (ProductSubCategory & {
-        products: Product[];
+    ProductSubCategory: (ProductSubCategory & {
+        Product: Product[];
     })[];
 };
 
@@ -45,8 +45,8 @@ export default function ContactForm({ whatsappNumber, companyName, categories }:
         
         let selectedProduct: Product | undefined;
         for (const category of categories) {
-            for (const subCategory of category.subCategories) {
-                const found = subCategory.products?.find(p => p.slug === selectedProductSlug);
+            for (const subCategory of category.ProductSubCategory) {
+                const found = subCategory.Product?.find(p => p.slug === selectedProductSlug);
                 if (found) {
                     selectedProduct = found;
                     break;
@@ -76,8 +76,8 @@ Mohon informasinya. Terima kasih.`;
 
     const getProductTitleBySlug = (slug: string) => {
         for (const category of categories) {
-            for (const subCategory of category.subCategories) {
-                const product = subCategory.products?.find(p => p.slug === slug);
+            for (const subCategory of category.ProductSubCategory) {
+                const product = subCategory.Product?.find(p => p.slug === slug);
                 if (product) return product.title;
             }
         }
@@ -129,9 +129,9 @@ Mohon informasinya. Terima kasih.`;
                                 <CommandEmpty>Produk tidak ditemukan.</CommandEmpty>
                                 {categories.map((category) => (
                                     <CommandGroup key={category.id} heading={category.name}>
-                                        {category.subCategories.map((subCategory) => (
+                                        {category.ProductSubCategory.map((subCategory) => (
                                             <React.Fragment key={subCategory.id}>
-                                                {subCategory.products?.map((product) => (
+                                                {subCategory.Product?.map((product) => (
                                                     <CommandItem
                                                         key={product.slug}
                                                         value={product.title}

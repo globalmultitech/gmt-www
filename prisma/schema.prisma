@@ -86,9 +86,9 @@ model ProductCategory {
 model ProductSubCategory {
   id         Int             @id @default(autoincrement())
   name       String
-  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  Category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
-  products   Product[]
+  Product    Product[]
 }
 
 model Product {
@@ -105,7 +105,7 @@ model Product {
   shopeeUrl               String?
   metaTitle               String?
   metaDescription         String?
-  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  SubCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   subCategoryId           Int
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
@@ -134,9 +134,9 @@ model Solution {
   image       String?
   aiHint      String?
   keyPoints   Json?
-  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  Parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   parentId    Int?
-  children    Solution[] @relation("SolutionHierarchy")
+  Children    Solution[] @relation("SolutionHierarchy")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }

@@ -13,7 +13,7 @@ async function getPageData() {
     const settings = await getSettings();
     const categoriesRaw = await prisma.productCategory.findMany({
         include: {
-            subCategories: {
+            ProductSubCategory: {
                 orderBy: { name: 'asc' },
                 include: {
                     products: {

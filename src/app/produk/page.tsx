@@ -19,6 +19,6 @@ export default async function ProdukPage() {
     const categories = await getCategories();
 
     return (
-        <ProdukPageClient categories={categories} />
+        <ProdukPageClient categories={categories as any} />
     );
 }

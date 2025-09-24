@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import type { Product, ProductSubCategory, ProductCategory, ProfessionalService, NewsItem, Solution } from '@prisma/client';
@@ -17,7 +18,7 @@ import FadeIn from '@/components/fade-in';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  subCategory: (ProductSubCategory & {
+  SubCategory: (ProductSubCategory & {
     Category: ProductCategory;
   }) | null;
 };
@@ -272,7 +273,7 @@ export default function HomeClientPage({ products, settings, professionalService
                                 <h3 className="text-base font-bold font-headline mb-2 text-primary group-hover:text-primary-dark transition-colors h-12 overflow-hidden">{product.title}</h3>
                                 <div className="text-xs mb-2 border-b pb-2">
                                     <p className="text-muted-foreground uppercase font-semibold">KATEGORI</p>
-                                    <p className="font-bold truncate">{product.subCategory?.Category?.name}</p>
+                                    <p className="font-bold truncate">{product.SubCategory?.Category?.name}</p>
                                 </div>
                                 <div className="text-muted-foreground text-sm h-20 overflow-hidden" dangerouslySetInnerHTML={{ __html: product.description }} />
                               </div>

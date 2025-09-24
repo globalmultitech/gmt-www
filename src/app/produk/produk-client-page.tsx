@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
@@ -6,17 +7,10 @@ import { ArrowRight, Package } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useLoadingStore } from '@/hooks/use-loading-store';
-
-type Category = {
-  id: number;
-  name: string;
-  slug: string;
-  description: string | null;
-  imageUrl: string | null;
-}
+import type { ProductCategory } from '@prisma/client';
 
 type ProdukPageProps = {
-  categories: Category[];
+  categories: ProductCategory[];
 }
 
 export default function ProdukPageClient({ categories }: ProdukPageProps) {

@@ -26,9 +26,9 @@ async function getHomePageData() {
     take: 5,
     orderBy: { createdAt: 'desc' },
     include: {
-      subCategory: {
+      SubCategory: {
         include: {
-          category: true,
+          Category: true,
         },
       },
     },
@@ -58,7 +58,7 @@ async function getHomePageData() {
   const solutions = await prisma.solution.findMany({
     where: { parentId: null }, // Only fetch parent solutions
     include: {
-      children: { // And include their direct children
+      Children: { // And include their direct children
         orderBy: { createdAt: 'asc' }
       }
     },
@@ -82,4 +82,3 @@ export default async function Home() {
     />
   );
 }
-
