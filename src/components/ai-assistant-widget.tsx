@@ -91,7 +91,7 @@ export default function AiAssistantWidget() {
 
   return (
     <>
-      <div className="fixed bottom-24 right-4 z-50">
+      <div className="fixed bottom-4 right-4 z-50">
         <AnimatePresence>
           {isOpen && (
             <motion.div
@@ -99,20 +99,23 @@ export default function AiAssistantWidget() {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 50, scale: 0.9 }}
               transition={{ duration: 0.3, ease: 'easeInOut' }}
-              className="w-80 h-[500px] origin-bottom-right"
+              className="w-[calc(100vw-2rem)] h-[70vh] sm:w-80 sm:h-[500px] origin-bottom-right mb-4"
             >
               <Card className="flex flex-col h-full shadow-2xl">
-                <CardHeader className="flex-row items-center justify-between bg-primary text-primary-foreground p-4">
-                  <CardTitle className="text-lg">GMT-AI Assistant</CardTitle>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" onClick={() => setIsOpen(false)}>
+                <CardHeader className="flex-row items-center justify-between bg-primary text-primary-foreground p-3 sm:p-4">
+                  <div className="flex items-center gap-2">
+                    <Bot className="h-5 w-5" />
+                    <CardTitle className="text-base sm:text-lg">GMT-AI Assistant</CardTitle>
+                  </div>
+                  <Button variant="ghost" size="icon" className="h-7 w-7 sm:h-6 sm:w-6 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" onClick={() => setIsOpen(false)}>
                       <X className="h-4 w-4" />
                       <span className="sr-only">Tutup Jendela</span>
                   </Button>
                 </CardHeader>
                 
-                <CardContent className="flex-grow p-4 overflow-hidden">
-                    <ScrollArea className="h-full pr-4" ref={scrollAreaRef}>
-                        <div className="space-y-4">
+                <CardContent className="flex-grow p-2 sm:p-4 overflow-hidden">
+                    <ScrollArea className="h-full pr-2 sm:pr-4" ref={scrollAreaRef}>
+                        <div className="space-y-3 sm:space-y-4">
                             {messages.map((message) => (
                             <div
                                 key={message.id}
@@ -122,13 +125,13 @@ export default function AiAssistantWidget() {
                                 )}
                             >
                                 {message.sender === 'ai' && (
-                                <Avatar className="h-8 w-8 bg-sky-blue text-white">
-                                    <AvatarFallback><Bot className="h-5 w-5" /></AvatarFallback>
+                                <Avatar className="h-6 w-6 sm:h-8 sm:w-8 bg-sky-blue text-white">
+                                    <AvatarFallback><Bot className="h-4 w-4 sm:h-5 sm:w-5" /></AvatarFallback>
                                 </Avatar>
                                 )}
                                 <div
                                 className={cn(
-                                    'max-w-xs rounded-lg px-3 py-2 text-sm',
+                                    'max-w-[180px] sm:max-w-xs rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 text-sm',
                                     message.sender === 'user'
                                     ? 'bg-primary text-primary-foreground rounded-br-none'
                                     : 'bg-muted text-muted-foreground rounded-bl-none'
@@ -144,7 +147,7 @@ export default function AiAssistantWidget() {
                                   </div>
                                 </div>
                                 {message.sender === 'user' && (
-                                <Avatar className="h-8 w-8">
+                                <Avatar className="h-6 w-6 sm:h-8 sm:w-8">
                                     <AvatarFallback><User /></AvatarFallback>
                                 </Avatar>
                                 )}
@@ -152,8 +155,8 @@ export default function AiAssistantWidget() {
                             ))}
                             {isThinking && (
                                 <div className="flex items-end gap-2 justify-start">
-                                    <Avatar className="h-8 w-8 bg-sky-blue text-white">
-                                      <AvatarFallback><Bot className="h-5 w-5" /></AvatarFallback>
+                                    <Avatar className="h-6 w-6 sm:h-8 sm:w-8 bg-sky-blue text-white">
+                                      <AvatarFallback><Bot className="h-4 w-4 sm:h-5 sm:w-5" /></AvatarFallback>
                                     </Avatar>
                                     <div className="max-w-xs rounded-lg px-3 py-2 text-sm bg-muted text-muted-foreground rounded-bl-none flex items-center gap-2">
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -164,7 +167,7 @@ export default function AiAssistantWidget() {
                         </div>
                     </ScrollArea>
                 </CardContent>
-                <CardFooter className="p-4 border-t">
+                <CardFooter className="p-2 sm:p-4 border-t">
                     <form onSubmit={handleSendMessage} className="flex w-full items-center gap-2">
                         <Input
                         value={newMessage}
@@ -172,8 +175,9 @@ export default function AiAssistantWidget() {
                         placeholder="Tanya tentang produk..."
                         autoComplete="off"
                         disabled={isThinking}
+                        className="h-10 sm:h-9"
                         />
-                        <Button type="submit" size="icon" disabled={!newMessage.trim() || isThinking}>
+                        <Button type="submit" size="icon" disabled={!newMessage.trim() || isThinking} className="h-10 w-10 sm:h-9 sm:w-9">
                           {isThinking ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
                         </Button>
                     </form>
@@ -185,11 +189,10 @@ export default function AiAssistantWidget() {
         <motion.div
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="mt-4"
         >
         <Button
           size="icon"
-          className="rounded-full w-16 h-16 shadow-lg bg-sky-blue hover:bg-sky-blue/90"
+          className="rounded-full w-14 h-14 sm:w-16 sm:h-16 shadow-lg bg-sky-blue hover:bg-sky-blue/90"
           onClick={() => setIsOpen(!isOpen)}
         >
             <AnimatePresence mode="wait">
@@ -200,7 +203,7 @@ export default function AiAssistantWidget() {
                     exit={{ y: 20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                 >
-                {isOpen ? <X className="h-8 w-8" /> : <Bot className="h-8 w-8" />}
+                {isOpen ? <X className="h-7 w-7 sm:h-8 sm:w-8" /> : <Bot className="h-7 w-7 sm:h-8 sm:w-8" />}
                 </motion.div>
             </AnimatePresence>
         </Button>
