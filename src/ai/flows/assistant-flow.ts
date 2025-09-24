@@ -4,8 +4,10 @@
  */
 
 import { ai } from '@/ai/genkit';
-import prisma from '@/lib/db';
 import { z } from 'genkit';
+import fs from 'fs';
+import path from 'path';
+
 
 const AssistantInputSchema = z.object({
   question: z.string().describe("The user's question about products or services."),
@@ -17,65 +19,29 @@ const AssistantOutputSchema = z.object({
 });
 export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
 
-// This function will read the data directly from the Prisma database.
+// This function will read the data directly from the JSON files in the /public directory.
 async function getWebsiteData(): Promise<string> {
   try {
-    const [
-      products,
-      services,
-      solutions,
-      newsItems,
-      settings,
-    ] = await prisma.$transaction([
-      prisma.product.findMany({
-        include: {
-          ProductSubCategory: {
-            include: {
-              Category: true,
-            },
-          },
-        },
-      }),
-      prisma.professionalService.findMany(),
-      prisma.solution.findMany(),
-      prisma.newsItem.findMany(),
-      prisma.webSettings.findUnique({ where: { id: 1 } }),
-    ]);
+    const kategoriPath = path.join(process.cwd(), 'public', 'kategori.json');
+    const produkPath = path.join(process.cwd(), 'public', 'produk.json');
+
+    const kategoriData = fs.readFileSync(kategoriPath, 'utf-8');
+    const produkData = fs.readFileSync(produkPath, 'utf-8');
+
+    const categories = JSON.parse(kategoriData);
+    const products = JSON.parse(produkData);
 
     const websiteData = {
-      companyName: settings?.companyName,
-      contact: {
-        email: settings?.contactEmail,
-        phone: settings?.contactPhone,
-        address: settings?.address,
-      },
-      products: products.map(p => ({
-        title: p.title,
-        description: p.description,
-        category: p.ProductSubCategory?.Category?.name,
-        subCategory: p.ProductSubCategory?.name,
-      })),
-      services: services.map(s => ({
-        title: s.title,
-        description: s.description,
-      })),
-      solutions: solutions.map(s => ({
-        title: s.title,
-        description: s.description,
-      })),
-      articles: newsItems.map(n => ({
-        title: n.title,
-        category: n.category,
-        contentSummary: n.content?.substring(0, 200),
-      })),
+      categories,
+      products,
     };
     
     return JSON.stringify(websiteData, null, 2);
 
   } catch (error) {
-    console.error('Error reading website data from database:', error);
+    console.error('Error reading website data from JSON files:', error);
     // Return a message indicating data is unavailable, so the AI can respond gracefully.
-    return 'Website data is currently unavailable due to a database error.';
+    return 'Website data is currently unavailable due to a file reading error.';
   }
 }
 
@@ -114,7 +80,7 @@ const assistantFlow = ai.defineFlow(
     outputSchema: AssistantOutputSchema,
   },
   async (input) => {
-    // Fetch the website data from the database
+    // Fetch the website data from the JSON files
     const websiteData = await getWebsiteData();
 
     // Call the prompt with the user's question and the website data
