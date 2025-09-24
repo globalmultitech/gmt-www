@@ -11,6 +11,9 @@ import { Bot, X, Send, User, Loader2, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Avatar, AvatarFallback } from './ui/avatar';
 import { askAssistant } from '@/ai/flows/assistant-flow';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
+
 
 type Message = {
   id: string;
@@ -126,7 +129,11 @@ export default function AiAssistantWidget() {
                                     : 'bg-muted text-muted-foreground rounded-bl-none'
                                 )}
                                 >
-                                {message.content}
+                                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                        {message.content}
+                                    </ReactMarkdown>
+                                  </div>
                                 </div>
                                 {message.sender === 'user' && (
                                 <Avatar className="h-8 w-8">
