@@ -103,7 +103,7 @@ export default function AiAssistantWidget() {
             >
               <Card className="flex flex-col h-full shadow-2xl">
                 <CardHeader className="flex-row items-center justify-between bg-primary text-primary-foreground p-4">
-                  <CardTitle className="text-lg">AI Assistant</CardTitle>
+                  <CardTitle className="text-lg">GMT-AI Assistant</CardTitle>
                   <Button variant="ghost" size="icon" className="h-6 w-6 text-primary-foreground hover:bg-primary/80 hover:text-primary-foreground" onClick={() => setIsOpen(false)}>
                       <X className="h-4 w-4" />
                       <span className="sr-only">Tutup Jendela</span>
@@ -123,7 +123,7 @@ export default function AiAssistantWidget() {
                             >
                                 {message.sender === 'ai' && (
                                 <Avatar className="h-8 w-8 bg-sky-blue text-white">
-                                    <AvatarFallback><Sparkles className="h-5 w-5" /></AvatarFallback>
+                                    <AvatarFallback><Bot className="h-5 w-5" /></AvatarFallback>
                                 </Avatar>
                                 )}
                                 <div
@@ -153,7 +153,7 @@ export default function AiAssistantWidget() {
                             {isThinking && (
                                 <div className="flex items-end gap-2 justify-start">
                                     <Avatar className="h-8 w-8 bg-sky-blue text-white">
-                                      <AvatarFallback><Sparkles className="h-5 w-5" /></AvatarFallback>
+                                      <AvatarFallback><Bot className="h-5 w-5" /></AvatarFallback>
                                     </Avatar>
                                     <div className="max-w-xs rounded-lg px-3 py-2 text-sm bg-muted text-muted-foreground rounded-bl-none flex items-center gap-2">
                                         <Loader2 className="h-4 w-4 animate-spin" />
@@ -200,7 +200,7 @@ export default function AiAssistantWidget() {
                     exit={{ y: 20, opacity: 0 }}
                     transition={{ duration: 0.2 }}
                 >
-                {isOpen ? <X className="h-8 w-8" /> : <Sparkles className="h-8 w-8" />}
+                {isOpen ? <X className="h-8 w-8" /> : <Bot className="h-8 w-8" />}
                 </motion.div>
             </AnimatePresence>
         </Button>
