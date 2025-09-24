@@ -23,7 +23,7 @@ export type AssistantOutput = z.infer<typeof AssistantOutputSchema>;
 
 // This function will fetch the data from the JSON files served in the /public directory.
 async function getWebsiteData(): Promise<string> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+  const baseUrl = 'https://www.globalmultitechnology.id';
   const dataEndpoints = {
     categories: `${baseUrl}/kategori.json`,
     products: `${baseUrl}/produk.json`,
