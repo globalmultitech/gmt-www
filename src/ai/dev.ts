@@ -3,3 +3,4 @@ config();
 
 import '@/ai/flows/blog-post-summarizer.ts';
 import '@/ai/flows/generate-blog-post.ts';
+import '@/ai/flows/assistant-flow.ts';

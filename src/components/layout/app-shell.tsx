@@ -4,6 +4,7 @@
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import ChatWidget from '@/components/chat-widget';
+import AiAssistantWidget from '../ai-assistant-widget';
 
 type AppShellProps = {
   header: ReactNode;
@@ -24,6 +25,7 @@ export function AppShell({ header, footer, children }: AppShellProps) {
       <main className="flex-1">{children}</main>
       {showHeaderFooter && footer}
       {showHeaderFooter && <ChatWidget />}
+      {showHeaderFooter && <AiAssistantWidget />}
     </div>
   );
 }
