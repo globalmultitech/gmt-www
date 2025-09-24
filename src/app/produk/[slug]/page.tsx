@@ -26,7 +26,7 @@ async function getProductData(slug: string) {
     const product = await prisma.product.findUnique({
       where: { slug },
       include: {
-        SubCategory: {
+        ProductSubCategory: {
           include: {
             Category: true,
           },

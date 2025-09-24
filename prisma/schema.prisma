@@ -75,20 +75,20 @@ model WebSettings {
 }
 
 model ProductCategory {
-  id                 Int                  @id @default(autoincrement())
-  name               String
-  slug               String               @unique
-  description        String?
-  imageUrl           String?
-  ProductSubCategory ProductSubCategory[]
+  id          Int                  @id @default(autoincrement())
+  name        String
+  slug        String               @unique
+  description String?
+  imageUrl    String?
+  subCategories ProductSubCategory[]
 }
 
 model ProductSubCategory {
   id         Int             @id @default(autoincrement())
   name       String
-  Category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   ProductCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId Int
-  Product    Product[]
+  products   Product[]
 }
 
 model Product {
@@ -105,24 +105,24 @@ model Product {
   shopeeUrl               String?
   metaTitle               String?
   metaDescription         String?
-  SubCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
+  subCategory             ProductSubCategory @relation(fields: [subCategoryId], references: [id], onDelete: Cascade)
   subCategoryId           Int
   createdAt               DateTime           @default(now())
   updatedAt               DateTime           @updatedAt
 }
 
 model ProfessionalService {
-  id              Int      @id @default(autoincrement())
-  icon            String
-  title           String
-  slug            String   @unique
-  description     String
-  longDescription String?
-  imageUrl        String?
-  details         Json?
-  benefits        Json?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id               Int      @id @default(autoincrement())
+  icon             String
+  title            String
+  slug             String   @unique
+  description      String
+  longDescription  String?
+  imageUrl         String?
+  details          Json?
+  benefits         Json?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model Solution {
@@ -134,9 +134,9 @@ model Solution {
   image       String?
   aiHint      String?
   keyPoints   Json?
-  Parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
+  parent      Solution? @relation("SolutionHierarchy", fields: [parentId], references: [id], onDelete: SetNull)
   parentId    Int?
-  Children    Solution[] @relation("SolutionHierarchy")
+  children    Solution[] @relation("SolutionHierarchy")
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 }

@@ -29,7 +29,7 @@ import { ShopeeIcon } from '@/components/icons/shopee-icon';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  SubCategory?: (ProductSubCategory & {
+  ProductSubCategory?: (ProductSubCategory & {
     Category: ProductCategory
   }) | null;
 }
@@ -57,10 +57,10 @@ const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
     <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
     <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
-    {product.SubCategory?.Category?.name && (
+    {product.ProductSubCategory?.Category?.name && (
         <>
             <ChevronRight className="h-4 w-4" />
-            <Link href={`/produk/kategori/${product.SubCategory.Category.slug}`} onClick={startLoading} className="hover:text-primary">{product.SubCategory.Category.name}</Link>
+            <Link href={`/produk/kategori/${product.ProductSubCategory.Category.slug}`} onClick={startLoading} className="hover:text-primary">{product.ProductSubCategory.Category.name}</Link>
         </>
     )}
     <ChevronRight className="h-4 w-4" />

@@ -10,11 +10,11 @@ import { useLoadingStore } from '@/hooks/use-loading-store';
 import type { ProductCategory, ProductSubCategory, Product } from '@prisma/client';
 
 type EnrichedSubCategory = ProductSubCategory & {
-  Product: { images: string[] }[];
+  products: { images: string[] }[];
 }
 
 type EnrichedCategory = ProductCategory & {
-  ProductSubCategory: EnrichedSubCategory[];
+  subCategories: EnrichedSubCategory[];
 }
 
 type CategoryClientPageProps = {
@@ -82,10 +82,10 @@ export default function CategoryClientPage({ category, slug }: CategoryClientPag
       <section className="py-16 md:py-24">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-headline font-bold text-center mb-8">Pilih Sub-Kategori</h2>
-          {category.ProductSubCategory.length > 0 ? (
+          {category.subCategories.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {category.ProductSubCategory.map((subCategory) => {
-                const firstProductImage = subCategory.Product[0]?.images?.[0];
+              {category.subCategories.map((subCategory) => {
+                const firstProductImage = subCategory.products[0]?.images?.[0];
                 
                 return (
                  <Link key={subCategory.id} href={`/produk/sub-kategori/${toSubCategorySlug(subCategory.name)}`} className="group block" onClick={startLoading}>

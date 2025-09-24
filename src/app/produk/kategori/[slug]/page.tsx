@@ -32,10 +32,10 @@ async function getCategoryDataBySlug(slug: string) {
   const category = await prisma.productCategory.findUnique({
     where: { slug },
     include: {
-      ProductSubCategory: { 
+      subCategories: { 
         orderBy: { name: 'asc' },
         include: {
-          Product: {
+          products: {
             take: 1,
             select: { images: true }
           }
@@ -88,9 +88,9 @@ export default async function CategoryPage({ params }: Props) {
   
   const processedCategory = {
       ...category,
-      ProductSubCategory: category.ProductSubCategory.map(sc => ({
+      subCategories: category.subCategories.map(sc => ({
           ...sc,
-          Product: sc.Product.map(p => ({
+          products: sc.products.map(p => ({
               ...p,
               images: parseJsonSafe(p.images, [])
           }))
