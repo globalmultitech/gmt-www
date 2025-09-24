@@ -134,7 +134,10 @@ export default function AiAssistantWidget() {
                                     : 'bg-muted text-muted-foreground rounded-bl-none'
                                 )}
                                 >
-                                  <div className="prose prose-sm max-w-none dark:prose-invert">
+                                  <div className={cn(
+                                      "prose prose-sm max-w-none dark:prose-invert",
+                                      message.sender === 'user' && "text-primary-foreground"
+                                    )}>
                                     <ReactMarkdown remarkPlugins={[remarkGfm]}>
                                         {message.content}
                                     </ReactMarkdown>
