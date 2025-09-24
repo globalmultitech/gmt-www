@@ -29,8 +29,8 @@ import { ShopeeIcon } from '@/components/icons/shopee-icon';
 import { useLoadingStore } from '@/hooks/use-loading-store';
 
 type EnrichedProduct = Product & {
-  ProductSubCategory?: (ProductSubCategory & {
-    Category: ProductCategory
+  subCategory?: (ProductSubCategory & {
+    category: ProductCategory
   }) | null;
 }
 
@@ -57,10 +57,10 @@ const Breadcrumbs = ({ product }: { product: EnrichedProduct }) => {
     <Link href="/" onClick={startLoading} className="hover:text-primary flex items-center gap-1"><Home className="h-4 w-4" /> Beranda</Link>
     <ChevronRight className="h-4 w-4" />
     <Link href="/produk" onClick={startLoading} className="hover:text-primary">Produk</Link>
-    {product.ProductSubCategory?.Category?.name && (
+    {product.subCategory?.category?.name && (
         <>
             <ChevronRight className="h-4 w-4" />
-            <Link href={`/produk/kategori/${product.ProductSubCategory.Category.slug}`} onClick={startLoading} className="hover:text-primary">{product.ProductSubCategory.Category.name}</Link>
+            <Link href={`/produk/kategori/${product.subCategory.category.slug}`} onClick={startLoading} className="hover:text-primary">{product.subCategory.category.name}</Link>
         </>
     )}
     <ChevronRight className="h-4 w-4" />
@@ -174,21 +174,14 @@ export default function ProductDetailClientPage({ product, relatedProducts, sett
                       </AccordionContent>
                     </AccordionItem>
                   )}
+                  
+                  <SpecificationAccordion title="Spesifikasi Teknis" specs={techSpecs} />
+                  <SpecificationAccordion title="Spesifikasi Umum" specs={generalSpecs} />
                 </Accordion>
               </div>
           </div>
         </div>
       </div>
-      
-      <section className="bg-background py-16 md:py-24">
-        <div className="container mx-auto px-4">
-            <h2 className="text-3xl font-headline font-bold mb-8 text-primary text-center">Spesifikasi</h2>
-            <Accordion type="multiple" className="w-full space-y-4">
-                <SpecificationAccordion title="Spesifikasi Teknis" specs={techSpecs} />
-                <SpecificationAccordion title="Spesifikasi Umum" specs={generalSpecs} />
-            </Accordion>
-        </div>
-      </section>
       
       <RelatedProducts products={relatedProducts} />
     </>

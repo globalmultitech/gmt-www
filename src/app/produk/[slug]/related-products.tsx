@@ -15,6 +15,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import type { CarouselApi } from '@/components/ui/carousel';
 import Autoplay from 'embla-carousel-autoplay';
 import { useRef, useEffect, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -48,6 +49,7 @@ function RelatedProductsSkeleton() {
 
 export default function RelatedProducts({ products }: RelatedProductsProps) {
   const [isClient, setIsClient] = useState(false);
+  const [api, setApi] = useState<CarouselApi>()
   const autoplayPlugin = useRef(Autoplay({ delay: 5000, stopOnInteraction: true }));
 
   useEffect(() => {
@@ -67,14 +69,15 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
       <div className="container mx-auto px-4">
         <h2 className="text-3xl font-headline font-bold mb-8 text-primary">Produk Unggulan Lainnya</h2>
         <Carousel
+          setApi={setApi}
           opts={{
             align: 'start',
             loop: true,
             slidesToScroll: 1,
           }}
           plugins={[autoplayPlugin.current]}
-          onMouseEnter={autoplayPlugin.current.stop}
-          onMouseLeave={autoplayPlugin.current.reset}
+          onMouseEnter={api?.plugins?.().autoplay.stop}
+          onMouseLeave={api?.plugins?.().autoplay.reset}
           className="w-full"
         >
           <CarouselContent className="-ml-2 md:-ml-4">

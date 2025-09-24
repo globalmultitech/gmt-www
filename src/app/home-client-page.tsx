@@ -63,8 +63,15 @@ export default function HomeClientPage({ products, settings, professionalService
       {/* Hero Section */}
       <section 
         className="relative min-h-[700px] md:min-h-[800px] flex items-center bg-cover bg-center bg-no-repeat" 
-        style={{backgroundImage: `url('${settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}')`}}
         >
+        <Image
+            src={settings.heroImageUrl || 'https://placehold.co/1920x1080.png'}
+            alt={settings.heroHeadline || 'Hero Image'}
+            fill
+            priority
+            className="object-cover"
+        />
+        <div className="absolute inset-0 bg-black/30"></div>
         <div className="container mx-auto px-4 relative z-10 text-center text-primary-foreground">
           <div className="max-w-4xl mx-auto">
             {settings.heroHeadline && (
