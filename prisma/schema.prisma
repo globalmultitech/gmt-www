@@ -17,6 +17,16 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+model ChatLead {
+  id             Int      @id @default(autoincrement())
+  name           String
+  company        String
+  contact        String
+  initialMessage String   @db.Text
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
 model WebSettings {
   id                         Int      @id @default(1)
   logoUrl                    String?
