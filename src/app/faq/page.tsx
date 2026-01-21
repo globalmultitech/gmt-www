@@ -10,6 +10,10 @@ import {
 export const metadata: Metadata = {
   title: 'FAQ - Pertanyaan Umum | Global Multi Technology',
   description: 'Temukan jawaban atas pertanyaan yang sering diajukan mengenai produk, layanan, dan dukungan kami.',
+  openGraph: {
+    title: 'FAQ - Pertanyaan Umum | Global Multi Technology',
+    description: 'Temukan jawaban atas pertanyaan yang sering diajukan mengenai produk, layanan, dan dukungan kami.',
+  },
 };
 
 const faqs = [

@@ -4,6 +4,10 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Kebijakan Privasi | Global Multi Technology',
   description: 'Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda.',
+  openGraph: {
+    title: 'Kebijakan Privasi | Global Multi Technology',
+    description: 'Pelajari bagaimana kami mengumpulkan, menggunakan, dan melindungi data pribadi Anda.',
+  },
 };
 
 export default function KebijakanPrivasiPage() {

@@ -4,7 +4,6 @@ import prisma from '@/lib/db';
 import ResourcesPageClient from './resources-client-page';
 import type { Metadata } from 'next';
 
-
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -15,6 +14,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
+    openGraph: {
+      title,
+      description,
+    }
   };
 }
 

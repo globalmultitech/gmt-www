@@ -11,6 +11,11 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
+    openGraph: {
+      title,
+      description,
+      images: settings.aboutUsImageUrl ? [settings.aboutUsImageUrl] : [],
+    }
   };
 }
 

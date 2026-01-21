@@ -4,6 +4,10 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: 'Syarat & Ketentuan | Global Multi Technology',
   description: 'Baca syarat dan ketentuan penggunaan situs web dan layanan kami.',
+  openGraph: {
+    title: 'Syarat & Ketentuan | Global Multi Technology',
+    description: 'Baca syarat dan ketentuan penggunaan situs web dan layanan kami.',
+  },
 };
 
 export default function SyaratKetentuanPage() {

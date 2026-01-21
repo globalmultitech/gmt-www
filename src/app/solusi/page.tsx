@@ -1,5 +1,4 @@
 
-
 import { getSettings } from '@/lib/settings';
 import prisma from '@/lib/db';
 import SolusiPageClient from './solusi-client-page';
@@ -28,6 +27,10 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title,
     description,
+    openGraph: {
+      title,
+      description,
+    }
   };
 }
 

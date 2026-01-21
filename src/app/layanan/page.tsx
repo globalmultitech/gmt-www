@@ -16,10 +16,16 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const title = `${settings.servicesPageTitle} | ${settings.companyName}`;
   const description = settings.servicesPageSubtitle;
+  const image = settings.servicesPageHeaderImageUrl;
 
   return {
     title,
     description,
+    openGraph: {
+      title,
+      description,
+      images: image ? [image] : [],
+    }
   };
 }
 

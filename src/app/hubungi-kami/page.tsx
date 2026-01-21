@@ -1,5 +1,4 @@
 
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { getSettings } from '@/lib/settings';
@@ -8,6 +7,23 @@ import Image from 'next/image';
 import Link from 'next/link';
 import ContactForm from './contact-form';
 import prisma from '@/lib/db';
+import type { Metadata } from 'next';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await getSettings();
+  const title = settings.contactPageTitle || 'Hubungi Kami';
+  const description = settings.contactPageSubtitle || 'Kami siap membantu. Hubungi kami untuk pertanyaan, permintaan demo, atau dukungan teknis.';
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: settings.logoUrl ? [settings.logoUrl] : [],
+    },
+  };
+}
 
 async function getPageData() {
     const settings = await getSettings();
