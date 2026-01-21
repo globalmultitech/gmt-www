@@ -14,7 +14,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const settings = await getSettings();
   const defaultTitle = settings.companyName || 'Global Multi Technology';
   const defaultDescription = settings.footerText || 'Solusi dan layanan teknologi terdepan untuk transformasi digital perusahaan Anda.';
-  const defaultImage = settings.heroImageUrl || settings.logoUrl;
+  const defaultImage = settings.logoUrl || settings.heroImageUrl;
 
   return {
     title: {
